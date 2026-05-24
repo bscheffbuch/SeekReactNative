@@ -2,7 +2,9 @@
 // so we can mock them for e2e tests in simulators without camera.
 import {
   Camera,
+  getCameraDevice,
   useCameraDevice,
+  useCameraDevices,
   useCameraFormat,
   useFrameProcessor,
   useLocationPermission,
@@ -10,7 +12,9 @@ import {
 
 export {
   Camera,
+  getCameraDevice,
   useCameraDevice,
+  useCameraDevices,
   useCameraFormat,
   useFrameProcessor,
   useLocationPermission,

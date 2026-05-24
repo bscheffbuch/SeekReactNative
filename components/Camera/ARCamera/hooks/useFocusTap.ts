@@ -39,12 +39,12 @@ const useFocusTap = ( cameraRef: React.RefObject<Camera | null>, supportsFocus: 
     if ( !supportsFocus ) {
       return;
     }
-    cameraRef?.current?.focus( { x, y } );
     focusLeft.set( x - HALF_SIZE_FOCUS_BOX );
     focusTop.set( y - HALF_SIZE_FOCUS_BOX );
     focusOpacity.set( 1 );
     setTappedCoordinates( { x, y } );
     focusOpacity.set( withTiming( 0, { duration: 2000 } ) );
+    await cameraRef?.current?.focus( { x, y } ).catch( () => null );
   }, [cameraRef, focusLeft, focusTop, focusOpacity, supportsFocus] );
 
   const tapToFocus = useMemo( ( ) => Gesture.Tap( )

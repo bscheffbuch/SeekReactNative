@@ -24,6 +24,7 @@ import { baseTextStyles } from "../../../styles/textStyles";
 import GalleryButton from "./GalleryButton";
 import Flash from "./Flash";
 import CameraFlip from "./CameraFlip";
+import CameraLensSwitch from "./CameraLensSwitch";
 import Location from "./Location";
 import type { TakePhotoOptions } from "react-native-vision-camera";
 import ToastAnimationWithText from "../../UIComponents/ToastAnimationWithText";
@@ -45,6 +46,9 @@ interface Props {
   filterByTaxonId: ( taxonId: string | null, negativeFilter: boolean ) => void;
   setIsActive: ( arg0: boolean ) => void;
   flipCamera: ( ) => void;
+  switchLens: ( ) => void;
+  canSwitchLens: boolean;
+  lensLabel: string;
   toggleFlash: ( ) => void;
   hasFlash?: boolean;
   takePhotoOptions: TakePhotoOptions;
@@ -64,6 +68,9 @@ const ARCameraOverlay = ( {
   filterByTaxonId,
   setIsActive,
   flipCamera,
+  switchLens,
+  canSwitchLens,
+  lensLabel,
   toggleFlash,
   hasFlash,
   takePhotoOptions,
@@ -173,6 +180,12 @@ const ARCameraOverlay = ( {
         <CameraFlip
           flipCamera={flipCamera}
         />
+        {canSwitchLens && (
+          <CameraLensSwitch
+            lensLabel={lensLabel}
+            switchLens={switchLens}
+          />
+        )}
         <Flash
           toggleFlash={toggleFlash}
           hasFlash={hasFlash}

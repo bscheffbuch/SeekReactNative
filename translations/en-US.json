@@ -673,6 +673,8 @@
     "enable_flash": "Enable flash",
     "flip_camera": "Flip camera",
     "use_other_camera": "Use the device's other camera.",
+    "switch_lens": "Switch camera lens",
+    "use_next_lens": "Use the next rear camera lens.",
     "location": "Location",
     "disable_location": "Disable location",
     "enable_location": "Enable location"

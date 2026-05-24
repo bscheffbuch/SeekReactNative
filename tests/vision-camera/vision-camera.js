@@ -59,6 +59,7 @@ export class mockCamera extends React.PureComponent {
 
 
   async takePhoto( ) {
+    this.props.onShutter?.( { type: "photo" } );
     // TODO: this only works on iOS
     return CameraRoll.getPhotos( {
       first: 20,
@@ -111,25 +112,105 @@ export class mockCamera extends React.PureComponent {
 
 export const mockSortDevices = ( _left, _right ) => 1;
 
-export const mockUseCameraDevice = ( _deviceType ) => {
-  const device = {
-    devices: ["wide-angle-camera"],
+export const mockUseCameraDevices = ( ) => [
+  {
+    devices: ["ultra-wide-angle-camera", "wide-angle-camera", "telephoto-camera"],
+    formats: [
+      {
+        autoFocusSystem: "phase-detection",
+        fieldOfView: 83.97117848314457,
+        maxFps: 60,
+        maxISO: 11377,
+        minFps: 15,
+        minISO: 44,
+        photoHeight: 3024,
+        photoWidth: 4032,
+        pixelFormats: ["yuv", "native"],
+        supportsDepthCapture: false,
+        supportsPhotoHdr: false,
+        supportsVideoHdr: false,
+        videoHeight: 2160,
+        videoStabilizationModes: ["off", "cinematic", "cinematic-extended"],
+        videoWidth: 3840,
+      },
+    ],
     hasFlash: true,
     hasTorch: true,
-    id: "1",
+    hardwareLevel: "full",
+    id: "back-1",
     isMultiCam: true,
+    maxExposure: 8,
     maxZoom: 12.931958198547363,
+    minExposure: -8,
+    minFocusDistance: 10,
     minZoom: 1,
-    name: "front (1)",
+    name: "back (1)",
     neutralZoom: 1,
-    position: "front",
+    physicalDevices: ["ultra-wide-angle-camera", "wide-angle-camera", "telephoto-camera"],
+    position: "back",
+    sensorOrientation: "landscape-left",
     supportsDepthCapture: false,
     supportsFocus: true,
     supportsLowLightBoost: false,
     supportsParallelVideoProcessing: true,
     supportsRawCapture: true,
-  };
-  return device;
+  },
+  {
+    devices: ["wide-angle-camera"],
+    formats: [
+      {
+        autoFocusSystem: "contrast-detection",
+        fieldOfView: 83.97117848314457,
+        maxFps: 60,
+        maxISO: 11377,
+        minFps: 15,
+        minISO: 44,
+        photoHeight: 3024,
+        photoWidth: 4032,
+        pixelFormats: ["yuv", "native"],
+        supportsDepthCapture: false,
+        supportsPhotoHdr: false,
+        supportsVideoHdr: false,
+        videoHeight: 2160,
+        videoStabilizationModes: ["off", "cinematic", "cinematic-extended"],
+        videoWidth: 3840,
+      },
+    ],
+    hasFlash: true,
+    hasTorch: true,
+    hardwareLevel: "full",
+    id: "front-1",
+    isMultiCam: true,
+    maxZoom: 12.931958198547363,
+    maxExposure: 8,
+    minExposure: -8,
+    minFocusDistance: 10,
+    minZoom: 1,
+    name: "front (1)",
+    neutralZoom: 1,
+    physicalDevices: ["wide-angle-camera"],
+    position: "front",
+    sensorOrientation: "landscape-left",
+    supportsDepthCapture: false,
+    supportsFocus: true,
+    supportsLowLightBoost: false,
+    supportsParallelVideoProcessing: true,
+    supportsRawCapture: true,
+  },
+];
+
+export const mockGetCameraDevice = ( devices, position, filter = {} ) => {
+  const filteredDevices = devices.filter( cameraDevice => cameraDevice.position === position );
+  if ( !filter.physicalDevices ) {
+    return filteredDevices[0];
+  }
+  return filteredDevices.find( cameraDevice => (
+    filter.physicalDevices.some( physicalDevice => cameraDevice.physicalDevices.includes( physicalDevice ) )
+  ) ) || filteredDevices[0];
+};
+
+export const mockUseCameraDevice = ( deviceType, filter ) => {
+  return mockGetCameraDevice( mockUseCameraDevices(), deviceType, filter );
 };
 
 export const mockUseCameraFormat = ( _device ) => {

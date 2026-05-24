@@ -1,9 +1,9 @@
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, Platform, StyleSheet } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import type { CameraDevice, CameraRuntimeError } from "react-native-vision-camera";
-import { Worklets } from "react-native-worklets-core";
+import { useSharedValue, Worklets } from "react-native-worklets-core";
 
 import {
   useIsForeground,
@@ -21,6 +21,10 @@ import {
 import FocusSquare from "./FocusSquare";
 import useFocusTap from "./hooks/useFocusTap";
 import { LogLevels, logToApi } from "../../../utility/apiCalls";
+import {
+  getPreferredVideoStabilizationMode,
+  getPreferredVideoStabilizationModeForDevice,
+} from "./helpers/cameraDeviceHelpers";
 
 export interface ErrorMessage {
   nativeEvent: {
@@ -53,6 +57,7 @@ interface Props {
   isActive: boolean;
   useLocation: boolean;
   hasPermission: boolean;
+  onCaptureStarted: ( ) => void;
 }
 
 const FrameProcessorCamera = ( props: Props ) => {
@@ -71,6 +76,7 @@ const FrameProcessorCamera = ( props: Props ) => {
     isActive,
     useLocation,
     hasPermission,
+    onCaptureStarted,
   } = props;
 
   const navigation = useNavigation( );
@@ -122,17 +128,19 @@ const FrameProcessorCamera = ( props: Props ) => {
   const screen = Dimensions.get( "screen" );
   const videoAspectRatio = screen.height / screen.width;
   const photoAspectRatio = screen.height / screen.width;
-  // Select a format that provides the highest resolution primarily for videos, then photos
-  const iosFormat = useCameraFormat( device, [
+  const requestedVideoStabilizationMode = getPreferredVideoStabilizationModeForDevice( device );
+  const cameraFormatFilters = useMemo( () => [
+    ...( requestedVideoStabilizationMode
+      ? [{ videoStabilizationMode: requestedVideoStabilizationMode }]
+      : [] ),
+    { videoResolution: { width: 1920, height: 1080 } },
     { videoAspectRatio },
     { photoAspectRatio },
     { photoResolution: "max" },
-    { videoResolution: "max" },
-  ] );
-  if ( Platform.OS === "android" ) {
-    console.log( "Android is not using a specific camera format because we never got around to" );
-  }
-  const format = Platform.OS === "ios" ? iosFormat : undefined;
+    { autoFocusSystem: "phase-detection" },
+  ], [photoAspectRatio, requestedVideoStabilizationMode, videoAspectRatio] );
+  const format = useCameraFormat( device, cameraFormatFilters );
+  const videoStabilizationMode = getPreferredVideoStabilizationMode( format );
 
   // Set the exposure to the middle of the min and max exposure
   const exposure = ( device.maxExposure + device.minExposure ) / 2;
@@ -174,11 +182,9 @@ const FrameProcessorCamera = ( props: Props ) => {
     tappedCoordinates,
   } = useFocusTap( props.cameraRef, device.supportsFocus );
 
-  const [lastTimestamp, setLastTimestamp] = useState( undefined );
+  const lastClassificationTimestamp = useSharedValue( 0 );
   const fps = 1;
   const handleResult = Worklets.createRunOnJS( ( result: InatVision.Result, timeTaken: number ) => {
-    setLastTimestamp( result.timestamp );
-    console.log( "result.timeElapsed", result.timeElapsed );
     framesProcessingTime.current.push( timeTaken );
     if ( framesProcessingTime.current.length >= 10 ) {
       const avgTime = framesProcessingTime.current.reduce( ( a, b ) => a + b, 0 ) / 10;
@@ -214,12 +220,12 @@ const FrameProcessorCamera = ( props: Props ) => {
       // react-native-worklets-core documentation for what is supported in those worklets.
       // If there is no lastTimestamp, i.e. the first time this runs do not compare
       const timestamp = Date.now();
-      if ( lastTimestamp ) {
-        const timeSinceLastFrame = timestamp - lastTimestamp;
-        if ( timeSinceLastFrame < 1000 / fps ) {
-          return;
-        }
+      const timeSinceLastFrame = timestamp - lastClassificationTimestamp.value;
+      if ( timeSinceLastFrame < 1000 / fps ) {
+        return;
       }
+      // eslint-disable-next-line react-hooks/react-compiler
+      lastClassificationTimestamp.value = timestamp;
       patchedRunAsync( frame, () => {
         "worklet";
         try {
@@ -261,7 +267,7 @@ const FrameProcessorCamera = ( props: Props ) => {
       confidenceThreshold,
       filterByTaxonId,
       negativeFilter,
-      lastTimestamp,
+      lastClassificationTimestamp,
       fps,
       hasUserLocation,
       geoModelCellLocation,
@@ -356,10 +362,14 @@ const FrameProcessorCamera = ( props: Props ) => {
             zoom={device.neutralZoom}
             frameProcessor={frameProcessor}
             pixelFormat="yuv"
+            enableBufferCompression={false}
             onError={onError}
+            onShutter={onCaptureStarted}
             outputOrientation="device"
             photoQualityBalance="speed"
+            videoStabilizationMode={videoStabilizationMode}
             enableLocation={hasPermission}
+            androidPreviewViewType="surface-view"
           />
         </GestureDetector>
         <FocusSquare

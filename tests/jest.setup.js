@@ -12,8 +12,10 @@ import mockRNCNetInfo from "@react-native-community/netinfo/jest/netinfo-mock";
 import mockSafeAreaContext from "react-native-safe-area-context/jest/mock";
 import {
   mockCamera,
+  mockGetCameraDevice,
   mockSortDevices,
   mockUseCameraDevice,
+  mockUseCameraDevices,
   mockUseCameraFormat,
 } from "./vision-camera/vision-camera";
 
@@ -196,8 +198,10 @@ jest.mock( "realm", () => {
 
 jest.mock( "react-native-vision-camera", () => ( {
   Camera: mockCamera,
+  getCameraDevice: mockGetCameraDevice,
   sortDevices: mockSortDevices,
   useCameraDevice: mockUseCameraDevice,
+  useCameraDevices: mockUseCameraDevices,
   useCameraFormat: mockUseCameraFormat,
   useFrameProcessor: jest.fn(),
   VisionCameraProxy: {

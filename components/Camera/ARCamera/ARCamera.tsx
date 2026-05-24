@@ -4,6 +4,7 @@ import React, {
   useRef,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react";
 import {
@@ -17,7 +18,12 @@ import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/n
 import isNumber from "lodash/isNumber";
 import { useSharedValue } from "react-native-worklets-core";
 import type { Prediction } from "vision-camera-plugin-inatvision";
-import type { Camera, PhotoFile, TakePhotoOptions } from "react-native-vision-camera";
+import type {
+  Camera,
+  CameraDevice,
+  PhotoFile,
+  TakePhotoOptions,
+} from "react-native-vision-camera";
 
 import i18n from "../../../i18n";
 import { viewStyles, imageStyles } from "../../../styles/camera/arCamera";
@@ -48,10 +54,20 @@ import { log } from "../../../react-native-logs.config";
 import { useCameraLocationPreference } from "../../Providers/CameraLocationPreferenceProvider";
 import { useObservation } from "../../Providers/ObservationProvider";
 import { LogLevels, logToApi } from "../../../utility/apiCalls";
-import { useCameraDevice } from "./helpers/visionCameraWrapper";
+import {
+  getCameraDevice,
+  useCameraDevices,
+} from "./helpers/visionCameraWrapper";
 import {
   useLocationPermission as useLocationPermissionCamera,
 } from "./helpers/visionCameraWrapper";
+import {
+  DEFAULT_BACK_CAMERA_LENS,
+  getAvailableBackCameraLenses,
+  getBackCameraLensLabel,
+  getNextBackCameraLens,
+} from "./helpers/cameraDeviceHelpers";
+import type { BackCameraLens } from "./helpers/cameraDeviceHelpers";
 
 const logger = log.extend( "ARCamera.js" );
 
@@ -111,14 +127,27 @@ const ARCamera = ( ) => {
   const [isActive, setIsActive] = useState( true );
 
   const [cameraPosition, setCameraPosition] = useState<"front" | "back">( "back" );
-  const backDevice = useCameraDevice( "back", {
-    physicalDevices: [
-      // "ultra-wide-angle-camera",
-      "wide-angle-camera",
-      "telephoto-camera",
-    ],
-  } );
-  const frontDevice = useCameraDevice( "front" );
+  const [backCameraLens, setBackCameraLens] = useState<BackCameraLens>( DEFAULT_BACK_CAMERA_LENS );
+  const cameraDevices = useCameraDevices();
+  const backCameraDevices = useMemo( () => (
+    cameraDevices.filter( ( cameraDevice: CameraDevice ) => cameraDevice.position === "back" )
+  ), [cameraDevices] );
+  const availableBackLenses = useMemo( () => (
+    getAvailableBackCameraLenses( backCameraDevices )
+  ), [backCameraDevices] );
+  const backDevice = useMemo( () => (
+    getCameraDevice( cameraDevices, "back", {
+      physicalDevices: [backCameraLens],
+    } )
+    || getCameraDevice( cameraDevices, "back", {
+      physicalDevices: [DEFAULT_BACK_CAMERA_LENS],
+    } )
+    || backCameraDevices[0]
+  ), [backCameraDevices, backCameraLens, cameraDevices] );
+  const frontDevice = useMemo( () => (
+    getCameraDevice( cameraDevices, "front" )
+  ), [cameraDevices] );
+
   let device = cameraPosition === "back" ? backDevice : frontDevice;
   // If there is no back camera, use the front camera
   if ( !backDevice ) {
@@ -134,6 +163,32 @@ const ARCamera = ( ) => {
   } as const;
   const [takePhotoOptions, setTakePhotoOptions] = useState<TakePhotoOptions>( initialPhotoOptions );
   const [visibleToast, setVisibleToast] = useState( TOAST.NONE );
+
+  useEffect( () => {
+    const selectedLensAvailable = availableBackLenses.some(
+      lensOption => lensOption.id === backCameraLens
+    );
+    if ( !selectedLensAvailable ) {
+      setBackCameraLens( availableBackLenses[0].id );
+    }
+  }, [availableBackLenses, backCameraLens] );
+
+  useEffect( () => {
+    setTakePhotoOptions( previousOptions => {
+      if ( hasFlash && !previousOptions.flash ) {
+        return {
+          ...previousOptions,
+          flash: "off",
+        };
+      }
+      if ( !hasFlash && previousOptions.flash ) {
+        const optionsWithoutFlash = { ...previousOptions };
+        delete optionsWithoutFlash.flash;
+        return optionsWithoutFlash;
+      }
+      return previousOptions;
+    } );
+  }, [hasFlash] );
   
   const location = useLocationPermissionCamera();
   const { hasPermission } = location;
@@ -158,31 +213,31 @@ const ARCamera = ( ) => {
 
   const pictureTaken = useSharedValue( false );
 
-  const [state, dispatch] = useReducer( ( state: State, action: Action ) => {
+  const [state, dispatch] = useReducer( ( currentState: State, action: Action ) => {
     switch ( action.type ) {
       case ACTION.RESET_PREDICTIONS:
-        return { ...state, allPredictions: [] };
+        return { ...currentState, allPredictions: [] };
       case ACTION.SET_PREDICTIONS:
-        return { ...state, allPredictions: action.predictions };
+        return { ...currentState, allPredictions: action.predictions };
       case ACTION.RESET_STATE:
         // eslint-disable-next-line react-hooks/react-compiler
         pictureTaken.value = false;
         return {
-          ...state,
+          ...currentState,
           error: null,
           allPredictions: [],
         };
       case ACTION.FILTER_TAXON:
         pictureTaken.value = false;
         return {
-          ...state,
+          ...currentState,
           negativeFilter: action.negativeFilter,
           taxonId: action.taxonId,
           error: null,
           allPredictions: [],
         };
       case ACTION.ERROR:
-        return { ...state, error: action.error, errorEvent: action.errorEvent };
+        return { ...currentState, error: action.error, errorEvent: action.errorEvent };
       default:
         throw new Error( );
     }
@@ -220,6 +275,17 @@ const ARCamera = ( ) => {
     const newPosition = cameraPosition === "back" ? "front" : "back";
     setCameraPosition( newPosition );
   };
+
+  const switchLens = useCallback( () => {
+    if ( cameraPosition !== "back" ) {
+      setCameraPosition( "back" );
+      return;
+    }
+    setBackCameraLens( currentLens => getNextBackCameraLens( currentLens, availableBackLenses ) );
+  }, [availableBackLenses, cameraPosition] );
+
+  const lensLabel = getBackCameraLensLabel( backCameraLens );
+  const canSwitchLens = cameraPosition === "back" && availableBackLenses.length > 1;
 
   const toggleFlash = ( ) => {
     setTakePhotoOptions( {
@@ -372,6 +438,11 @@ const ARCamera = ( ) => {
       updateError( "take" );
     }
   }, [updateError] );
+
+  const handleNativeShutter = useCallback( () => {
+    pictureTaken.value = true;
+    setIsActive( false );
+  }, [pictureTaken] );
 
   const requestAndroidSavePermissions = useCallback( ( photo: HandledPhoto ) => {
     const checkPermissions = async ( ) => {
@@ -551,6 +622,7 @@ const ARCamera = ( ) => {
         isActive={isActive}
         useLocation={useLocation}
         hasPermission={hasPermission}
+        onCaptureStarted={handleNativeShutter}
       />
     );
   };
@@ -574,6 +646,9 @@ const ARCamera = ( ) => {
           filterByTaxonId={filterByTaxonId}
           setIsActive={setIsActive}
           flipCamera={flipCamera}
+          switchLens={switchLens}
+          canSwitchLens={canSwitchLens}
+          lensLabel={lensLabel}
           hasFlash={hasFlash}
           takePhotoOptions={takePhotoOptions}
           toggleFlash={toggleFlash}
