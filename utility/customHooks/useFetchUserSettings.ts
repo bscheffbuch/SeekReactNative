@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 
 import realmConfig from "../../models";
@@ -7,6 +8,7 @@ const useFetchUserSettings = ( ) => {
     autoCapture?: boolean;
     localSeasonality?: boolean;
     scientificNames?: boolean;
+    cameraViewportResolution?: string;
     appVersion?: string;
   }>( { } );
 

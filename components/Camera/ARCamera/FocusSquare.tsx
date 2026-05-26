@@ -15,6 +15,7 @@ const FocusSquare = ( { animatedStyle, tappedCoordinates }: Props ) => {
   if ( !tappedCoordinates ) { return null; }
   return (
     <Animated.View
+      pointerEvents="none"
       style={[
         styles.focusSquare,
         animatedStyle,

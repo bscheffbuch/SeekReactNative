@@ -11,7 +11,7 @@ const getScientificNames = async ( ): Promise<boolean> => {
       return false;
     }
     return true;
-  } catch ( error ) {
+  } catch {
     return false;
   }
 };
@@ -24,7 +24,7 @@ const getLanguage = async ( ): Promise<string | boolean> => {
   try {
     const language = await AsyncStorage.getItem( "language" );
     return language || setDeviceLanguageOrFallback( );
-  } catch ( error ) {
+  } catch {
     return false;
   }
 };
@@ -36,7 +36,7 @@ const getAutoCapture = async ( ): Promise<boolean> => {
       return false;
     }
     return true;
-  } catch ( error ) {
+  } catch {
     return false;
   }
 };
@@ -48,7 +48,7 @@ const getSeasonality = async ( ): Promise<boolean> => {
       return false;
     }
     return true;
-  } catch ( error ) {
+  } catch {
     return false;
   }
 };
@@ -79,7 +79,7 @@ const setupUserSettings = async ( ) => {
   }
 };
 
-const updateUserSetting = async ( key: string, value: boolean ): Promise<boolean | undefined> => {
+const updateUserSetting = async ( key: string, value: boolean | string ): Promise<boolean | string | undefined> => {
   const realm = await Realm.open( realmConfig );
   const userSettings = realm.objects( "UserSettingsRealm" );
 
@@ -96,7 +96,7 @@ const updateUserSetting = async ( key: string, value: boolean ): Promise<boolean
 const fetchFromAsyncStorage = async ( key: string ): Promise<string | null> => {
   try {
     return await AsyncStorage.getItem( key );
-  } catch ( error ) {
+  } catch {
     return "";
   }
 };
@@ -105,7 +105,7 @@ const deleteFromAsyncStorage = async ( key: string ): Promise<boolean> => {
   try {
     await AsyncStorage.removeItem( key );
     return true;
-  } catch ( e ) {
+  } catch {
     return false;
   }
 };

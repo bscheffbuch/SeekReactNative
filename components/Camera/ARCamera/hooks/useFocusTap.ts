@@ -1,5 +1,5 @@
 import {
-  useCallback, useMemo, useState,
+  useCallback, useEffect, useMemo, useRef, useState,
 } from "react";
 import {
   useSharedValue,
@@ -16,6 +16,7 @@ import {
 import type { Camera } from "../helpers/visionCameraWrapper";
 
 export const HALF_SIZE_FOCUS_BOX = 40;
+const FOCUS_BOX_FADE_MS = 2000;
 
 export interface Coordinates {
   x: number;
@@ -24,9 +25,17 @@ export interface Coordinates {
 
 const useFocusTap = ( cameraRef: React.RefObject<Camera | null>, supportsFocus: boolean ) => {
   const [tappedCoordinates, setTappedCoordinates] = useState<Coordinates | null>( null );
+  const clearFocusBoxTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>( null );
   const focusOpacity = useSharedValue( 0 );
   const focusLeft = useSharedValue( 0 );
   const focusTop = useSharedValue( 0 );
+
+  const clearFocusBoxTimeout = useCallback( () => {
+    if ( clearFocusBoxTimeoutRef.current ) {
+      clearTimeout( clearFocusBoxTimeoutRef.current );
+      clearFocusBoxTimeoutRef.current = null;
+    }
+  }, [] );
 
   const animatedStyle = useAnimatedStyle( ( ) => ( {
     left: focusLeft.value,
@@ -42,14 +51,29 @@ const useFocusTap = ( cameraRef: React.RefObject<Camera | null>, supportsFocus: 
     focusLeft.set( x - HALF_SIZE_FOCUS_BOX );
     focusTop.set( y - HALF_SIZE_FOCUS_BOX );
     focusOpacity.set( 1 );
+    clearFocusBoxTimeout();
     setTappedCoordinates( { x, y } );
-    focusOpacity.set( withTiming( 0, { duration: 2000 } ) );
+    focusOpacity.set( withTiming( 0, { duration: FOCUS_BOX_FADE_MS } ) );
+    clearFocusBoxTimeoutRef.current = setTimeout( () => {
+      clearFocusBoxTimeoutRef.current = null;
+      setTappedCoordinates( null );
+    }, FOCUS_BOX_FADE_MS );
     await cameraRef?.current?.focus( { x, y } ).catch( () => null );
-  }, [cameraRef, focusLeft, focusTop, focusOpacity, supportsFocus] );
+  }, [cameraRef, clearFocusBoxTimeout, focusLeft, focusTop, focusOpacity, supportsFocus] );
+
+  useEffect( () => {
+    if ( !supportsFocus ) {
+      clearFocusBoxTimeout();
+      focusOpacity.set( 0 );
+      setTappedCoordinates( null );
+    }
+    return clearFocusBoxTimeout;
+  }, [clearFocusBoxTimeout, focusOpacity, supportsFocus] );
 
   const tapToFocus = useMemo( ( ) => Gesture.Tap( )
+    .enabled( supportsFocus )
     .runOnJS( true )
-    .onStart( onFocus ), [onFocus] );
+    .onStart( onFocus ), [onFocus, supportsFocus] );
 
   return {
     animatedStyle,

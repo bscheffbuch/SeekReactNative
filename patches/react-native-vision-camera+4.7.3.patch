@@ -1,45 +1,1061 @@
-diff --git a/node_modules/react-native-vision-camera/ios/Core/MetadataProvider.swift b/node_modules/react-native-vision-camera/ios/Core/MetadataProvider.swift
-index 4855d31..ece8024 100644
---- a/node_modules/react-native-vision-camera/ios/Core/MetadataProvider.swift
-+++ b/node_modules/react-native-vision-camera/ios/Core/MetadataProvider.swift
-@@ -26,12 +26,6 @@ class MetadataProvider: NSObject, AVCapturePhotoFileDataRepresentationCustomizer
-   func replacementMetadata(for photo: AVCapturePhoto) -> [String: Any]? {
-     var properties = photo.metadata
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/androidx/camera/core/processing/util/FocusPeakingOpenGlRenderer.java b/node_modules/react-native-vision-camera/android/src/main/java/androidx/camera/core/processing/util/FocusPeakingOpenGlRenderer.java
+new file mode 100644
+index 0000000..b0a85c4
+--- /dev/null
++++ b/node_modules/react-native-vision-camera/android/src/main/java/androidx/camera/core/processing/util/FocusPeakingOpenGlRenderer.java
+@@ -0,0 +1,106 @@
++package androidx.camera.core.processing.util;
++
++import static androidx.camera.core.processing.util.GLUtils.NO_OUTPUT_SURFACE;
++import static androidx.camera.core.processing.util.GLUtils.checkGlErrorOrThrow;
++import static androidx.camera.core.processing.util.GLUtils.checkGlThreadOrThrow;
++import static androidx.camera.core.processing.util.GLUtils.checkInitializedOrThrow;
++
++import android.opengl.EGL14;
++import android.opengl.EGLExt;
++import android.opengl.GLES20;
++import android.view.Surface;
++
++import androidx.annotation.NonNull;
++import androidx.camera.core.processing.OpenGlRenderer;
++import androidx.camera.core.processing.util.GLUtils.Program2D;
++import androidx.camera.core.processing.util.GLUtils.SamplerShaderProgram;
++
++public class FocusPeakingOpenGlRenderer extends OpenGlRenderer {
++  private volatile boolean peakingEnabled;
++  private volatile float peakingSensitivity;
++  private volatile float texelWidth = 1.0f / 1280.0f;
++  private volatile float texelHeight = 1.0f / 720.0f;
++  private int lastProgramHandle = -1;
++  private int enabledLocation = -1;
++  private int sensitivityLocation = -1;
++  private int texelWidthLocation = -1;
++  private int texelHeightLocation = -1;
++
++  public FocusPeakingOpenGlRenderer(boolean enabled, float sensitivity) {
++    setPeakingParameters(enabled, sensitivity);
++  }
++
++  public void setPeakingParameters(boolean enabled, float sensitivity) {
++    peakingEnabled = enabled;
++    peakingSensitivity = Math.max(0.0f, Math.min(1.0f, sensitivity));
++  }
++
++  public void setInputSize(int width, int height) {
++    texelWidth = 1.0f / Math.max(width, 1);
++    texelHeight = 1.0f / Math.max(height, 1);
++  }
++
++  @Override
++  public void render(long timestampNs, @NonNull float[] textureTransform, @NonNull Surface surface) {
++    checkInitializedOrThrow(mInitialized, true);
++    checkGlThreadOrThrow(mGlThread);
++
++    OutputSurface outputSurface = getOutSurfaceOrThrow(surface);
++    if (outputSurface == NO_OUTPUT_SURFACE) {
++      outputSurface = createOutputSurfaceInternal(surface);
++      if (outputSurface == null) {
++        return;
++      }
++      mOutputSurfaceMap.put(surface, outputSurface);
++    }
++
++    if (surface != mCurrentSurface) {
++      makeCurrent(outputSurface.getEglSurface());
++      mCurrentSurface = surface;
++      GLES20.glViewport(0, 0, outputSurface.getWidth(), outputSurface.getHeight());
++      GLES20.glScissor(0, 0, outputSurface.getWidth(), outputSurface.getHeight());
++    }
++
++    Program2D program = mCurrentProgram;
++    if (program == null) {
++      return;
++    }
++    if (program instanceof SamplerShaderProgram) {
++      ((SamplerShaderProgram) program).updateTextureMatrix(textureTransform);
++    }
++    updatePeakingUniforms(program);
++
++    GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
++    checkGlErrorOrThrow("glDrawArrays");
++
++    EGLExt.eglPresentationTimeANDROID(mEglDisplay, outputSurface.getEglSurface(), timestampNs);
++    if (!EGL14.eglSwapBuffers(mEglDisplay, outputSurface.getEglSurface())) {
++      removeOutputSurfaceInternal(surface, false);
++    }
++  }
++
++  private void updatePeakingUniforms(@NonNull Program2D program) {
++    int programHandle = program.mProgramHandle;
++    if (programHandle != lastProgramHandle) {
++      lastProgramHandle = programHandle;
++      enabledLocation = GLES20.glGetUniformLocation(programHandle, "uPeakingEnabled");
++      sensitivityLocation = GLES20.glGetUniformLocation(programHandle, "uPeakingSensitivity");
++      texelWidthLocation = GLES20.glGetUniformLocation(programHandle, "uTexelWidth");
++      texelHeightLocation = GLES20.glGetUniformLocation(programHandle, "uTexelHeight");
++    }
++
++    if (enabledLocation >= 0) {
++      GLES20.glUniform1f(enabledLocation, peakingEnabled ? 1.0f : 0.0f);
++    }
++    if (sensitivityLocation >= 0) {
++      GLES20.glUniform1f(sensitivityLocation, peakingSensitivity);
++    }
++    if (texelWidthLocation >= 0) {
++      GLES20.glUniform1f(texelWidthLocation, texelWidth);
++    }
++    if (texelHeightLocation >= 0) {
++      GLES20.glUniform1f(texelHeightLocation, texelHeight);
++    }
++    checkGlErrorOrThrow("focus peaking uniforms");
++  }
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
+index f91ce83..c36726a 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
+@@ -2,6 +2,7 @@ package com.mrousavy.camera.core
  
--    // Add branding info
--    if var exifDictionary = properties[kCGImagePropertyExifDictionary as String] as? [String: Any] {
--      exifDictionary[kCGImagePropertyExifUserComment as String] = "Captured with VisionCamera by mrousavy"
--      properties[kCGImagePropertyExifDictionary as String] = exifDictionary
--    }
--
-     // Add GPS Location EXIF info
-     if let locationProvider,
-        let location = locationProvider.location {
-@@ -47,10 +41,6 @@ class MetadataProvider: NSObject, AVCapturePhotoFileDataRepresentationCustomizer
-   func createVideoMetadata() -> [AVMetadataItem] {
-     var metadata: [AVMetadataItem] = []
+ import android.util.Range
+ import androidx.camera.core.Preview.SurfaceProvider
++import androidx.camera.core.ViewPort
+ import com.mrousavy.camera.core.types.CameraDeviceFormat
+ import com.mrousavy.camera.core.types.CodeType
+ import com.mrousavy.camera.core.types.OutputOrientation
+@@ -34,6 +35,8 @@ data class CameraConfiguration(
+   var enableLowLightBoost: Boolean = false,
+   var torch: Torch = Torch.OFF,
+   var videoStabilizationMode: VideoStabilizationMode = VideoStabilizationMode.OFF,
++  var focusPeakingEnabled: Boolean = false,
++  var focusPeakingSensitivity: Float = 0.35f,
+   var exposure: Double? = null,
  
--    // Add branding metadata
--    let brandingMetadata = createBrandingMetadaItem()
--    metadata.append(brandingMetadata)
--
-     if let location = locationProvider?.location {
-       // Add GPS Location metadata
-       let locationMetadata = createLocationMetadataItem(location: location)
-@@ -60,16 +50,6 @@ class MetadataProvider: NSObject, AVCapturePhotoFileDataRepresentationCustomizer
-     return metadata
+   // Zoom
+@@ -51,7 +54,7 @@ data class CameraConfiguration(
+   data class Video(val isMirrored: Boolean, val enableHdr: Boolean, val bitRateOverride: Double?, val bitRateMultiplier: Double?)
+   data class FrameProcessor(val isMirrored: Boolean, val pixelFormat: PixelFormat)
+   data class Audio(val nothing: Unit)
+-  data class Preview(val surfaceProvider: SurfaceProvider)
++  data class Preview(val surfaceProvider: SurfaceProvider, val viewPort: ViewPort?)
+ 
+   val targetFpsRange: Range<Int>?
+     get() {
+@@ -125,10 +128,10 @@ data class CameraConfiguration(
+       val outputsChanged = left?.photo != right.photo ||
+         left.video != right.video ||
+         left.enableLowLightBoost != right.enableLowLightBoost ||
+-        left.videoStabilizationMode != right.videoStabilizationMode ||
+         left.frameProcessor != right.frameProcessor ||
+         left.codeScanner != right.codeScanner ||
+         left.preview != right.preview ||
++        left.focusPeakingEnabled != right.focusPeakingEnabled ||
+         left.format != right.format ||
+         left.minFps != right.minFps ||
+         left.maxFps != right.maxFps
+@@ -138,6 +141,8 @@ data class CameraConfiguration(
+ 
+       // repeating request
+       val sidePropsChanged = deviceChanged ||
++        left?.videoStabilizationMode != right.videoStabilizationMode ||
++        left?.focusPeakingSensitivity != right.focusPeakingSensitivity ||
+         left?.torch != right.torch ||
+         left.zoom != right.zoom ||
+         left.exposure != right.exposure
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
+index 1e9c0de..8d039ca 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
+@@ -1,8 +1,19 @@
+ package com.mrousavy.camera.core
+ 
+ import android.annotation.SuppressLint
++import android.content.Context
++import android.hardware.camera2.CameraCharacteristics
++import android.hardware.camera2.CameraManager
++import android.hardware.camera2.CameraMetadata
++import android.hardware.camera2.CaptureRequest
++import android.os.Build
+ import android.util.Log
+ import androidx.annotation.OptIn
++import androidx.camera.camera2.interop.Camera2CameraControl
++import androidx.camera.camera2.interop.Camera2CameraInfo
++import androidx.camera.camera2.interop.Camera2Interop
++import androidx.camera.camera2.interop.CaptureRequestOptions
++import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+ import androidx.camera.core.CameraSelector
+ import androidx.camera.core.CameraState
+ import androidx.camera.core.DynamicRange
+@@ -12,19 +23,37 @@ import androidx.camera.core.ImageCapture
+ import androidx.camera.core.MirrorMode
+ import androidx.camera.core.Preview
+ import androidx.camera.core.TorchState
++import androidx.camera.core.UseCaseGroup
+ import androidx.camera.core.resolutionselector.ResolutionSelector
+ import androidx.camera.extensions.ExtensionMode
+ import androidx.camera.lifecycle.ProcessCameraProvider
+ import androidx.camera.video.Recorder
+ import androidx.camera.video.VideoCapture
+ import androidx.lifecycle.Lifecycle
++import com.mrousavy.camera.core.effects.FocusPeakingPreviewEffect
+ import com.mrousavy.camera.core.extensions.*
+ import com.mrousavy.camera.core.types.CameraDeviceFormat
+ import com.mrousavy.camera.core.types.Torch
+ import com.mrousavy.camera.core.types.VideoStabilizationMode
++import java.lang.Byte as JavaByte
++import java.lang.Integer as JavaInteger
+ import com.mrousavy.camera.core.utils.CamcorderProfileUtils
+ import kotlin.math.roundToInt
+ 
++private const val QCOM_EIS_MODE_KEY_NAME = "org.codeaurora.qcamera3.sessionParameters.EISMode"
++private const val SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME = "samsung.android.control.swVideoStabilization"
++private const val SAMSUNG_OIS_OPERATION_MODE_KEY_NAME = "samsung.android.lens.opticalStabilizationOperationMode"
++
++private val qcomEisModeKey = CaptureRequest.Key<Int>(QCOM_EIS_MODE_KEY_NAME, JavaInteger.TYPE)
++private val samsungSwVideoStabilizationKey = CaptureRequest.Key<Byte>(
++  SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME,
++  JavaByte.TYPE
++)
++private val samsungOisOperationModeKey = CaptureRequest.Key<Int>(
++  SAMSUNG_OIS_OPERATION_MODE_KEY_NAME,
++  JavaInteger.TYPE
++)
++
+ private fun assertFormatRequirement(
+   propName: String,
+   format: CameraDeviceFormat?,
+@@ -60,6 +89,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+   if (previewConfig != null) {
+     Log.i(CameraSession.TAG, "Creating Preview output...")
+     val preview = Preview.Builder().also { preview ->
++      configureStabilizationCaptureRequestOptions(Camera2Interop.Extender(preview), configuration)
+       // Configure Preview Output
+       if (configuration.videoStabilizationMode.isAtLeast(VideoStabilizationMode.CINEMATIC)) {
+         assertFormatRequirement("videoStabilizationMode", format, InvalidVideoStabilizationMode(configuration.videoStabilizationMode)) {
+@@ -95,6 +125,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+   if (photoConfig != null) {
+     Log.i(CameraSession.TAG, "Creating Photo output...")
+     val photo = ImageCapture.Builder().also { photo ->
++      configureStabilizationCaptureRequestOptions(Camera2Interop.Extender(photo), configuration)
+       // Configure Photo Output
+       photo.setCaptureMode(photoConfig.config.photoQualityBalance.toCaptureMode())
+       if (format != null) {
+@@ -146,6 +177,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+     }
+ 
+     val video = VideoCapture.Builder(recorder).also { video ->
++      configureStabilizationCaptureRequestOptions(Camera2Interop.Extender(video), configuration)
+       // Configure Video Output
+       if (videoConfig.config.isMirrored) {
+         video.setMirrorMode(MirrorMode.MIRROR_MODE_ON)
+@@ -191,7 +223,8 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+     val pixelFormat = frameProcessorConfig.config.pixelFormat
+     Log.i(CameraSession.TAG, "Creating $pixelFormat Frame Processor output...")
+     val analyzer = ImageAnalysis.Builder().also { analysis ->
+-      analysis.setBackpressureStrategy(ImageAnalysis.STRATEGY_BLOCK_PRODUCER)
++      configureStabilizationCaptureRequestOptions(Camera2Interop.Extender(analysis), configuration)
++      analysis.setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+       analysis.setOutputImageFormat(pixelFormat.toImageAnalysisFormat())
+       if (fpsRange != null) {
+         assertFormatRequirement("fps", format, InvalidFpsError(fpsRange.upper)) {
+@@ -220,7 +253,9 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+   val codeScannerConfig = configuration.codeScanner as? CameraConfiguration.Output.Enabled<CameraConfiguration.CodeScanner>
+   if (codeScannerConfig != null) {
+     Log.i(CameraSession.TAG, "Creating CodeScanner output...")
+-    val analyzer = ImageAnalysis.Builder().build()
++    val analyzer = ImageAnalysis.Builder().also { analysis ->
++      configureStabilizationCaptureRequestOptions(Camera2Interop.Extender(analysis), configuration)
++    }.build()
+     val pipeline = CodeScannerPipeline(codeScannerConfig.config, callback)
+     analyzer.setAnalyzer(CameraQueues.analyzerExecutor, pipeline)
+     codeScannerOutput = analyzer
+@@ -248,6 +283,7 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
+   // Wrap input with a vendor extension if needed (see https://developer.android.com/media/camera/camera-extensions)
+   val isStreamingHDR = useCases.any { !it.currentConfig.dynamicRange.isSDR }
+   val needsImageAnalysis = codeScannerOutput != null || frameProcessorOutput != null
++  val previewOptions = configuration.preview as? CameraConfiguration.Output.Enabled<CameraConfiguration.Preview>
+   val photoOptions = configuration.photo as? CameraConfiguration.Output.Enabled<CameraConfiguration.Photo>
+   val enableHdrExtension = photoOptions != null && photoOptions.config.enableHdr
+   if (enableHdrExtension) {
+@@ -276,10 +312,28 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
+     Log.i(CameraSession.TAG, "Unbinding ${currentUseCases.size} use-cases for Camera #${camera?.cameraInfo?.id}...")
+     provider.unbind(*currentUseCases.toTypedArray())
+   }
++  focusPeakingEffect?.release()
++  focusPeakingEffect = null
+ 
+   // Bind it all together (must be on UI Thread)
+   Log.i(CameraSession.TAG, "Binding ${useCases.size} use-cases...")
+-  camera = provider.bindToLifecycle(this, cameraSelector, *useCases.toTypedArray())
++  val nextFocusPeakingEffect = if (configuration.focusPeakingEnabled && previewOutput != null) {
++    FocusPeakingPreviewEffect(true, configuration.focusPeakingSensitivity)
++  } else {
++    null
++  }
++  camera = if (nextFocusPeakingEffect != null) {
++    val useCaseGroup = UseCaseGroup.Builder().also { builder ->
++      previewOptions?.config?.viewPort?.let { viewPort -> builder.setViewPort(viewPort) }
++      useCases.forEach { useCase -> builder.addUseCase(useCase) }
++      builder.addEffect(nextFocusPeakingEffect)
++    }.build()
++    provider.bindToLifecycle(this, cameraSelector, useCaseGroup)
++  } else {
++    provider.bindToLifecycle(this, cameraSelector, *useCases.toTypedArray())
++  }
++  focusPeakingEffect = nextFocusPeakingEffect
++  isManualFocusActive = false
+   // Notify callback
+   callback.onInitialized()
+ 
+@@ -336,6 +390,201 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
+   if (currentExposureCompensation != exposureCompensation) {
+     camera.cameraControl.setExposureCompensationIndex(exposureCompensation)
+   }
++
++  configureStabilizationCaptureRequestOptions(config)
++  focusPeakingEffect?.update(config.focusPeakingEnabled, config.focusPeakingSensitivity)
++}
++
++@OptIn(ExperimentalCamera2Interop::class)
++private fun CameraSession.configureStabilizationCaptureRequestOptions(config: CameraConfiguration) {
++  val camera = camera ?: return
++  val camera2Info = try {
++    Camera2CameraInfo.from(camera.cameraInfo)
++  } catch (_: RuntimeException) {
++    return
++  }
++  val camera2Control = try {
++    Camera2CameraControl.from(camera.cameraControl)
++  } catch (_: RuntimeException) {
++    return
++  }
++  val characteristics = try {
++    Camera2CameraInfo.extractCameraCharacteristics(camera.cameraInfo)
++  } catch (_: RuntimeException) {
++    null
++  }
++
++  var hasOptions = false
++  val builder = CaptureRequestOptions.Builder()
++  val videoStabilizationModes = camera2Info.getCameraCharacteristic(
++    CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES
++  )
++  val videoStabilizationMode = getVideoStabilizationRequestMode(
++    videoStabilizationModes,
++    config.videoStabilizationMode
++  )
++  if (videoStabilizationMode != null) {
++    builder.setCaptureRequestOption(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, videoStabilizationMode)
++    hasOptions = true
++  }
++
++  val opticalStabilizationModes = camera2Info.getCameraCharacteristic(
++    CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION
++  )
++  if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
++    builder.setCaptureRequestOption(
++      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
++      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++    )
++    hasOptions = true
++  }
++  if (characteristics != null && configureVendorStabilizationCaptureRequestOptions(
++      builder,
++      characteristics,
++      config.videoStabilizationMode
++    )
++  ) {
++    hasOptions = true
++  }
++
++  if (hasOptions) {
++    camera2Control.addCaptureRequestOptions(builder.build())
++  }
++}
++
++@OptIn(ExperimentalCamera2Interop::class)
++private fun <T> CameraSession.configureStabilizationCaptureRequestOptions(
++  extender: Camera2Interop.Extender<T>,
++  config: CameraConfiguration
++) {
++  val characteristics = getCameraCharacteristics(config.cameraId) ?: return
++  val videoStabilizationMode = getVideoStabilizationRequestMode(
++    characteristics.get(CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES),
++    config.videoStabilizationMode
++  )
++  if (videoStabilizationMode != null) {
++    extender.setCaptureRequestOption(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE, videoStabilizationMode)
++  }
++  configureStreamUseCase(extender, characteristics, config.videoStabilizationMode)
++
++  val opticalStabilizationModes = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)
++  if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
++    extender.setCaptureRequestOption(
++      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
++      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++    )
++  }
++  configureVendorStabilizationCaptureRequestOptions(extender, characteristics, config.videoStabilizationMode)
++}
++
++@OptIn(ExperimentalCamera2Interop::class)
++private fun <T> configureStreamUseCase(
++  extender: Camera2Interop.Extender<T>,
++  characteristics: CameraCharacteristics,
++  requestedMode: VideoStabilizationMode
++) {
++  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++    return
++  }
++
++  val availableStreamUseCases = characteristics.get(CameraCharacteristics.SCALER_AVAILABLE_STREAM_USE_CASES) ?: return
++  val preferredStreamUseCases = longArrayOf(
++    CameraMetadata.SCALER_AVAILABLE_STREAM_USE_CASES_PREVIEW_VIDEO_STILL.toLong(),
++    CameraMetadata.SCALER_AVAILABLE_STREAM_USE_CASES_PREVIEW.toLong(),
++    CameraMetadata.SCALER_AVAILABLE_STREAM_USE_CASES_VIDEO_RECORD.toLong()
++  )
++  val streamUseCase = preferredStreamUseCases.firstOrNull { availableStreamUseCases.contains(it) } ?: return
++  extender.setStreamUseCase(streamUseCase)
++}
++
++private fun configureVendorStabilizationCaptureRequestOptions(
++  builder: CaptureRequestOptions.Builder,
++  characteristics: CameraCharacteristics,
++  requestedMode: VideoStabilizationMode
++): Boolean {
++  val enableStabilization = requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)
++  var hasOptions = false
++
++  if (characteristics.supportsCaptureRequestKey(QCOM_EIS_MODE_KEY_NAME)) {
++    builder.setCaptureRequestOption(qcomEisModeKey, if (enableStabilization) 1 else 0)
++    hasOptions = true
++  }
++  if (characteristics.supportsCaptureRequestKey(SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME)) {
++    builder.setCaptureRequestOption(samsungSwVideoStabilizationKey, if (enableStabilization) 1.toByte() else 0.toByte())
++    hasOptions = true
++  }
++  if (characteristics.supportsCaptureRequestKey(SAMSUNG_OIS_OPERATION_MODE_KEY_NAME)) {
++    builder.setCaptureRequestOption(samsungOisOperationModeKey, if (enableStabilization) 1 else 0)
++    hasOptions = true
++  }
++
++  return hasOptions
++}
++
++@OptIn(ExperimentalCamera2Interop::class)
++private fun <T> configureVendorStabilizationCaptureRequestOptions(
++  extender: Camera2Interop.Extender<T>,
++  characteristics: CameraCharacteristics,
++  requestedMode: VideoStabilizationMode
++) {
++  val enableStabilization = requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)
++  if (characteristics.supportsCaptureRequestKey(QCOM_EIS_MODE_KEY_NAME)) {
++    extender.setCaptureRequestOption(qcomEisModeKey, if (enableStabilization) 1 else 0)
++  }
++  if (characteristics.supportsCaptureRequestKey(SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME)) {
++    extender.setCaptureRequestOption(samsungSwVideoStabilizationKey, if (enableStabilization) 1.toByte() else 0.toByte())
++  }
++  if (characteristics.supportsCaptureRequestKey(SAMSUNG_OIS_OPERATION_MODE_KEY_NAME)) {
++    extender.setCaptureRequestOption(samsungOisOperationModeKey, if (enableStabilization) 1 else 0)
++  }
++}
++
++private fun CameraSession.getCameraCharacteristics(cameraId: String?): CameraCharacteristics? {
++  if (cameraId == null) return null
++  return try {
++    val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
++    cameraManager.getCameraCharacteristics(cameraId)
++  } catch (_: Throwable) {
++    null
++  }
++}
++
++private fun CameraCharacteristics.supportsCaptureRequestKey(name: String): Boolean {
++  val requestKeySupported = availableCaptureRequestKeys.any { it.name == name }
++  val sessionKeySupported = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
++    availableSessionKeys.any { it.name == name }
++  } else {
++    false
++  }
++  return requestKeySupported || sessionKeySupported
++}
++
++private fun getVideoStabilizationRequestMode(
++  availableModes: IntArray?,
++  requestedMode: VideoStabilizationMode
++): Int? {
++  if (availableModes == null) return null
++  if (!requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++    return if (availableModes.contains(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF)) {
++      CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_OFF
++    } else {
++      null
++    }
++  }
++
++  val supportsPreviewStabilization = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
++    availableModes.contains(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION)
++  if (requestedMode.isAtLeast(VideoStabilizationMode.CINEMATIC_EXTENDED) && supportsPreviewStabilization) {
++    return CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
++  }
++  if (availableModes.contains(CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_ON)) {
++    return CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_ON
++  }
++  return if (supportsPreviewStabilization) {
++    CaptureRequest.CONTROL_VIDEO_STABILIZATION_MODE_PREVIEW_STABILIZATION
++  } else {
++    null
++  }
+ }
+ 
+ internal fun CameraSession.configureIsActive(config: CameraConfiguration) {
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
+index a295fdc..1c2187a 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
+@@ -1,11 +1,20 @@
+ package com.mrousavy.camera.core
+ 
+ import android.annotation.SuppressLint
++import android.hardware.camera2.CameraCharacteristics
++import android.hardware.camera2.CaptureRequest
+ import android.util.Log
++import androidx.annotation.OptIn
++import androidx.camera.camera2.interop.Camera2CameraControl
++import androidx.camera.camera2.interop.Camera2CameraInfo
++import androidx.camera.camera2.interop.CaptureRequestOptions
++import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+ import androidx.camera.core.CameraControl
+ import androidx.camera.core.FocusMeteringAction
+ import androidx.camera.core.MeteringPoint
+ import com.mrousavy.camera.core.extensions.await
++import kotlin.math.max
++import kotlin.math.min
+ 
+ @SuppressLint("RestrictedApi")
+ suspend fun CameraSession.focus(meteringPoint: MeteringPoint) {
+@@ -29,3 +38,64 @@ suspend fun CameraSession.focus(meteringPoint: MeteringPoint) {
+     throw FocusCanceledError()
+   }
+ }
++
++@OptIn(ExperimentalCamera2Interop::class)
++@SuppressLint("RestrictedApi")
++suspend fun CameraSession.setManualFocus(focusValue: Double) {
++  val camera = camera ?: throw CameraNotReadyError()
++  val camera2Info = try {
++    Camera2CameraInfo.from(camera.cameraInfo)
++  } catch (_: RuntimeException) {
++    throw FocusNotSupportedError()
++  }
++  val maxFocusDistance = camera2Info.getCameraCharacteristic(CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE)
++
++  if (maxFocusDistance == null || maxFocusDistance <= 0f || maxFocusDistance.isNaN() || maxFocusDistance.isInfinite()) {
++    throw FocusNotSupportedError()
++  }
++
++  val clampedFocusValue = min(max(focusValue, 0.0), 1.0).toFloat()
++  val lensFocusDistance = maxFocusDistance * (1f - clampedFocusValue)
++  val options = CaptureRequestOptions.Builder()
++    .setCaptureRequestOption(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_OFF)
++    .setCaptureRequestOption(CaptureRequest.LENS_FOCUS_DISTANCE, lensFocusDistance)
++    .build()
++
++  val camera2Control = try {
++    Camera2CameraControl.from(camera.cameraControl)
++  } catch (_: RuntimeException) {
++    throw FocusNotSupportedError()
++  }
++
++  if (!isManualFocusActive) {
++    camera.cameraControl.cancelFocusAndMetering()
++    isManualFocusActive = true
++  }
++
++  camera2Control.addCaptureRequestOptions(options)
++}
++
++@OptIn(ExperimentalCamera2Interop::class)
++suspend fun CameraSession.resetFocus() {
++  val camera = camera ?: throw CameraNotReadyError()
++  val camera2Control = try {
++    Camera2CameraControl.from(camera.cameraControl)
++  } catch (_: RuntimeException) {
++    throw FocusNotSupportedError()
++  }
++  val options = CaptureRequestOptions.Builder()
++    .setCaptureRequestOption(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
++    .build()
++
++  isManualFocusActive = false
++  camera2Control
++    .addCaptureRequestOptions(options)
++    .await(CameraQueues.cameraExecutor)
++  try {
++    camera.cameraControl
++      .cancelFocusAndMetering()
++      .await(CameraQueues.cameraExecutor)
++  } catch (_: CameraControl.OperationCanceledException) {
++    // Reset should leave the camera in auto focus even if there was no active metering.
++  }
++}
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
+index 13f6a76..b5b006c 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession.kt
+@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleRegistry
+ import com.facebook.react.bridge.UiThreadUtil
+ import com.google.mlkit.vision.barcode.common.Barcode
+ import com.mrousavy.camera.core.extensions.await
++import com.mrousavy.camera.core.effects.FocusPeakingPreviewEffect
+ import com.mrousavy.camera.core.types.Orientation
+ import com.mrousavy.camera.core.types.ShutterType
+ import com.mrousavy.camera.core.utils.runOnUiThread
+@@ -50,6 +51,7 @@ class CameraSession(internal val context: Context, internal val callback: Callba
+   internal var videoOutput: VideoCapture<Recorder>? = null
+   internal var frameProcessorOutput: ImageAnalysis? = null
+   internal var codeScannerOutput: ImageAnalysis? = null
++  internal var focusPeakingEffect: FocusPeakingPreviewEffect? = null
+   internal var currentUseCases: List<UseCase> = emptyList()
+ 
+   // Camera Outputs State
+@@ -63,6 +65,7 @@ class CameraSession(internal val context: Context, internal val callback: Callba
+   internal val lifecycleRegistry = LifecycleRegistry(this)
+   internal var recording: Recording? = null
+   internal var isRecordingCanceled = false
++  internal var isManualFocusActive = false
+   internal val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+ 
+   // Threading
+@@ -84,6 +87,8 @@ class CameraSession(internal val context: Context, internal val callback: Callba
+   override fun close() {
+     Log.i(TAG, "Closing CameraSession...")
+     isDestroyed = true
++    focusPeakingEffect?.release()
++    focusPeakingEffect = null
+     orientationManager.stopOrientationUpdates()
+     runOnUiThread {
+       lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/effects/FocusPeakingPreviewEffect.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/effects/FocusPeakingPreviewEffect.kt
+new file mode 100644
+index 0000000..78933d9
+--- /dev/null
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/effects/FocusPeakingPreviewEffect.kt
+@@ -0,0 +1,29 @@
++package com.mrousavy.camera.core.effects
++
++import android.util.Log
++import androidx.camera.core.CameraEffect
++import androidx.core.util.Consumer
++import com.mrousavy.camera.core.CameraQueues
++
++internal class FocusPeakingPreviewEffect private constructor(
++  private val processor: FocusPeakingSurfaceProcessor
++) : CameraEffect(
++  PREVIEW,
++  CameraQueues.videoQueue.executor,
++  processor,
++  Consumer { error -> Log.e(TAG, "Focus peaking preview effect failed.", error) }
++) {
++  constructor(enabled: Boolean, sensitivity: Float) : this(FocusPeakingSurfaceProcessor(enabled, sensitivity))
++
++  fun update(enabled: Boolean, sensitivity: Float) {
++    processor.update(enabled, sensitivity)
++  }
++
++  fun release() {
++    processor.release()
++  }
++
++  private companion object {
++    const val TAG = "FocusPeakingPreview"
++  }
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/effects/FocusPeakingSurfaceProcessor.java b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/effects/FocusPeakingSurfaceProcessor.java
+new file mode 100644
+index 0000000..43fd5a5
+--- /dev/null
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/effects/FocusPeakingSurfaceProcessor.java
+@@ -0,0 +1,243 @@
++package com.mrousavy.camera.core.effects;
++
++import android.graphics.SurfaceTexture;
++import android.os.Handler;
++import android.os.HandlerThread;
++import android.util.Log;
++import android.view.Surface;
++
++import androidx.annotation.NonNull;
++import androidx.camera.core.DynamicRange;
++import androidx.camera.core.SurfaceOutput;
++import androidx.camera.core.SurfaceProcessor;
++import androidx.camera.core.SurfaceRequest;
++import androidx.camera.core.processing.ShaderProvider;
++import androidx.camera.core.processing.util.FocusPeakingOpenGlRenderer;
++import androidx.camera.core.processing.util.GLUtils.InputFormat;
++
++import java.util.EnumMap;
++import java.util.LinkedHashMap;
++import java.util.Locale;
++import java.util.Map;
++import java.util.concurrent.Executor;
++import java.util.concurrent.RejectedExecutionException;
++import java.util.concurrent.atomic.AtomicBoolean;
++
++public class FocusPeakingSurfaceProcessor implements SurfaceProcessor, SurfaceTexture.OnFrameAvailableListener {
++  private static final String TAG = "FocusPeakingProcessor";
++
++  private final HandlerThread glThread = new HandlerThread("FocusPeakingGL");
++  private final Handler glHandler;
++  private final Executor glExecutor;
++  private final AtomicBoolean releaseRequested = new AtomicBoolean(false);
++  private final FocusPeakingOpenGlRenderer glRenderer;
++  private final float[] textureMatrix = new float[16];
++  private final float[] outputMatrix = new float[16];
++  private final Map<SurfaceOutput, Surface> outputSurfaces = new LinkedHashMap<>();
++  private boolean rendererInitialized = false;
++  private SurfaceTexture inputSurfaceTexture;
++  private Surface inputSurface;
++
++  public FocusPeakingSurfaceProcessor(boolean enabled, float sensitivity) {
++    glThread.start();
++    glHandler = new Handler(glThread.getLooper());
++    glExecutor = command -> glHandler.post(command);
++    glRenderer = new FocusPeakingOpenGlRenderer(enabled, sensitivity);
++  }
++
++  public void update(boolean enabled, float sensitivity) {
++    glRenderer.setPeakingParameters(enabled, sensitivity);
++  }
++
++  public void release() {
++    if (releaseRequested.getAndSet(true)) {
++      return;
++    }
++    executeOnGlThread(this::releaseOnGlThread, this::quitGlThread);
++  }
++
++  @Override
++  public void onInputSurface(@NonNull SurfaceRequest surfaceRequest) {
++    if (releaseRequested.get()) {
++      surfaceRequest.willNotProvideSurface();
++      return;
++    }
++
++    executeOnGlThread(() -> {
++      if (releaseRequested.get()) {
++        surfaceRequest.willNotProvideSurface();
++        return;
++      }
++      ensureRendererInitialized(surfaceRequest.getDynamicRange());
++      glRenderer.setInputFormat(InputFormat.DEFAULT);
++      glRenderer.setInputSize(surfaceRequest.getResolution().getWidth(), surfaceRequest.getResolution().getHeight());
++
++      SurfaceTexture surfaceTexture = new SurfaceTexture(glRenderer.getTextureName());
++      surfaceTexture.setDefaultBufferSize(surfaceRequest.getResolution().getWidth(), surfaceRequest.getResolution().getHeight());
++      Surface surface = new Surface(surfaceTexture);
++      inputSurfaceTexture = surfaceTexture;
++      inputSurface = surface;
++
++      surfaceRequest.provideSurface(surface, glExecutor, result -> {
++        surfaceTexture.setOnFrameAvailableListener(null);
++        surfaceTexture.release();
++        surface.release();
++        if (inputSurfaceTexture == surfaceTexture) {
++          inputSurfaceTexture = null;
++          inputSurface = null;
++        }
++      });
++      surfaceTexture.setOnFrameAvailableListener(this, glHandler);
++    }, surfaceRequest::willNotProvideSurface);
++  }
++
++  @Override
++  public void onOutputSurface(@NonNull SurfaceOutput surfaceOutput) {
++    if (releaseRequested.get()) {
++      surfaceOutput.close();
++      return;
++    }
++
++    executeOnGlThread(() -> {
++      if (releaseRequested.get()) {
++        surfaceOutput.close();
++        return;
++      }
++      ensureRendererInitialized(DynamicRange.SDR);
++      Surface surface = surfaceOutput.getSurface(glExecutor, event -> {
++        Surface removedSurface = outputSurfaces.remove(surfaceOutput);
++        if (removedSurface != null) {
++          glRenderer.unregisterOutputSurface(removedSurface);
++        }
++        surfaceOutput.close();
++      });
++      glRenderer.registerOutputSurface(surface);
++      outputSurfaces.put(surfaceOutput, surface);
++    }, surfaceOutput::close);
++  }
++
++  @Override
++  public void onFrameAvailable(@NonNull SurfaceTexture surfaceTexture) {
++    if (releaseRequested.get()) {
++      return;
++    }
++
++    surfaceTexture.updateTexImage();
++    surfaceTexture.getTransformMatrix(textureMatrix);
++    for (Map.Entry<SurfaceOutput, Surface> entry : outputSurfaces.entrySet()) {
++      SurfaceOutput surfaceOutput = entry.getKey();
++      Surface surface = entry.getValue();
++      surfaceOutput.updateTransformMatrix(outputMatrix, textureMatrix);
++      try {
++        glRenderer.render(surfaceTexture.getTimestamp(), outputMatrix, surface);
++      } catch (RuntimeException error) {
++        Log.e(TAG, "Failed to render focus peaking preview frame.", error);
++      }
++    }
++  }
++
++  private void ensureRendererInitialized(@NonNull DynamicRange dynamicRange) {
++    if (rendererInitialized) {
++      return;
++    }
++    glRenderer.init(dynamicRange, createShaderOverrides());
++    rendererInitialized = true;
++  }
++
++  private void executeOnGlThread(@NonNull Runnable runnable, @NonNull Runnable fallback) {
++    try {
++      glExecutor.execute(() -> {
++        try {
++          runnable.run();
++        } catch (RuntimeException error) {
++          Log.e(TAG, "Focus peaking GL task failed.", error);
++          fallback.run();
++        }
++      });
++    } catch (RejectedExecutionException error) {
++      fallback.run();
++    }
++  }
++
++  private void releaseOnGlThread() {
++    if (inputSurfaceTexture != null) {
++      inputSurfaceTexture.setOnFrameAvailableListener(null);
++      inputSurfaceTexture.release();
++      inputSurfaceTexture = null;
++    }
++    if (inputSurface != null) {
++      inputSurface.release();
++      inputSurface = null;
++    }
++    for (SurfaceOutput surfaceOutput : outputSurfaces.keySet()) {
++      surfaceOutput.close();
++    }
++    outputSurfaces.clear();
++    if (rendererInitialized) {
++      glRenderer.release();
++      rendererInitialized = false;
++    }
++    quitGlThread();
++  }
++
++  private void quitGlThread() {
++    glThread.quitSafely();
++  }
++
++  private static Map<InputFormat, ShaderProvider> createShaderOverrides() {
++    ShaderProvider shaderProvider = new ShaderProvider() {
++      @Override
++      public String createFragmentShader(@NonNull String samplerVarName, @NonNull String fragCoordsVarName) {
++        return String.format(
++          Locale.US,
++          "#extension GL_OES_EGL_image_external : require\n" +
++            "precision mediump float;\n" +
++            "varying vec2 %1$s;\n" +
++            "uniform samplerExternalOES %2$s;\n" +
++            "uniform float uAlphaScale;\n" +
++            "uniform float uPeakingEnabled;\n" +
++            "uniform float uPeakingSensitivity;\n" +
++            "uniform float uTexelWidth;\n" +
++            "uniform float uTexelHeight;\n" +
++            "float luma(vec3 color) {\n" +
++            "  return dot(color, vec3(0.299, 0.587, 0.114));\n" +
++            "}\n" +
++            "void main() {\n" +
++            "  vec2 uv = %1$s;\n" +
++            "  vec4 src = texture2D(%2$s, uv);\n" +
++            "  if (uPeakingEnabled < 0.5) {\n" +
++            "    gl_FragColor = vec4(src.rgb, src.a * uAlphaScale);\n" +
++            "    return;\n" +
++            "  }\n" +
++            "  vec2 dx = vec2(uTexelWidth, 0.0);\n" +
++            "  vec2 dy = vec2(0.0, uTexelHeight);\n" +
++            "  float c = luma(src.rgb);\n" +
++            "  float tl = luma(texture2D(%2$s, uv - dx - dy).rgb);\n" +
++            "  float tr = luma(texture2D(%2$s, uv + dx - dy).rgb);\n" +
++            "  float bl = luma(texture2D(%2$s, uv - dx + dy).rgb);\n" +
++            "  float br = luma(texture2D(%2$s, uv + dx + dy).rgb);\n" +
++            "  float l = luma(texture2D(%2$s, uv - dx).rgb);\n" +
++            "  float r = luma(texture2D(%2$s, uv + dx).rgb);\n" +
++            "  float t = luma(texture2D(%2$s, uv - dy).rgb);\n" +
++            "  float b = luma(texture2D(%2$s, uv + dy).rgb);\n" +
++            "  float mean = (tl + t + tr + l + r + bl + b + br) * 0.125;\n" +
++            "  float localContrast = (abs(tl - mean) + abs(t - mean) + abs(tr - mean) + abs(l - mean) + abs(r - mean) + abs(bl - mean) + abs(b - mean) + abs(br - mean)) * 0.125;\n" +
++            "  float laplace = abs(8.0 * c - (tl + t + tr + l + r + bl + b + br));\n" +
++            "  float sensitivity = pow(clamp(uPeakingSensitivity, 0.0, 1.0), 2.25);\n" +
++            "  float threshold = mix(0.55, 0.09, sensitivity) + localContrast * 0.65;\n" +
++            "  float edge = smoothstep(threshold, threshold * 1.65, laplace);\n" +
++            "  edge = edge * edge;\n" +
++            "  vec3 peak = vec3(0.86, 1.0, 0.12);\n" +
++            "  gl_FragColor = vec4(mix(src.rgb, peak, edge * 0.9), src.a * uAlphaScale);\n" +
++            "}\n",
++          fragCoordsVarName,
++          samplerVarName
++        );
++      }
++    };
++    Map<InputFormat, ShaderProvider> overrides = new EnumMap<>(InputFormat.class);
++    overrides.put(InputFormat.UNKNOWN, shaderProvider);
++    overrides.put(InputFormat.DEFAULT, shaderProvider);
++    return overrides;
++  }
++}
+\ No newline at end of file
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt
+index a9d5683..c854855 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView+Focus.kt
+@@ -4,6 +4,8 @@ import android.content.res.Resources
+ import com.facebook.react.bridge.ReadableMap
+ import com.mrousavy.camera.core.FocusRequiresPreviewError
+ import com.mrousavy.camera.core.focus
++import com.mrousavy.camera.core.resetFocus
++import com.mrousavy.camera.core.setManualFocus
+ import com.mrousavy.camera.core.utils.runOnUiThreadAndWait
+ 
+ suspend fun CameraView.focus(pointMap: ReadableMap) {
+@@ -17,3 +19,11 @@ suspend fun CameraView.focus(pointMap: ReadableMap) {
+   }
+   cameraSession.focus(point)
+ }
++
++suspend fun CameraView.setManualFocus(focusValue: Double) {
++  cameraSession.setManualFocus(focusValue)
++}
++
++suspend fun CameraView.resetFocus() {
++  cameraSession.resetFocus()
++}
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt
+index 64a751e..2caa87e 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt
+@@ -87,6 +87,8 @@ class CameraView(context: Context) :
+   var torch: Torch = Torch.OFF
+   var zoom: Float = 1f // in "factor"
+   var exposure: Double = 0.0
++  var focusPeakingEnabled = false
++  var focusPeakingSensitivity = 0.35f
+   var outputOrientation: OutputOrientation = OutputOrientation.DEVICE
+   var androidPreviewViewType: PreviewViewType = PreviewViewType.SURFACE_VIEW
+     set(value) {
+@@ -168,7 +170,7 @@ class CameraView(context: Context) :
+         // Preview
+         val previewView = previewView
+         if (previewView != null) {
+-          config.preview = CameraConfiguration.Output.Enabled.create(CameraConfiguration.Preview(previewView.surfaceProvider))
++          config.preview = CameraConfiguration.Output.Enabled.create(CameraConfiguration.Preview(previewView.surfaceProvider, previewView.viewPort))
+         } else {
+           config.preview = CameraConfiguration.Output.Disabled.create()
+         }
+@@ -228,6 +230,9 @@ class CameraView(context: Context) :
+         config.maxFps = maxFps
+         config.enableLowLightBoost = lowLightBoost
+         config.torch = torch
++        config.videoStabilizationMode = videoStabilizationMode ?: VideoStabilizationMode.OFF
++        config.focusPeakingEnabled = focusPeakingEnabled
++        config.focusPeakingSensitivity = focusPeakingSensitivity
+         config.exposure = exposure
+ 
+         // Zoom
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt
+index cc20b40..0c90c03 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt
+@@ -239,6 +239,16 @@ class CameraViewManager : ViewGroupManager<CameraView>() {
+     view.exposure = exposure
    }
  
--  private func createBrandingMetadaItem() -> AVMetadataItem {
--    let metadataItem = AVMutableMetadataItem()
--    metadataItem.keySpace = .quickTimeMetadata
--    metadataItem.key = AVMetadataKey.quickTimeMetadataKeyInformation as NSString
--    metadataItem.identifier = .quickTimeMetadataInformation
--    metadataItem.value = "Captured with VisionCamera by mrousavy" as NSString
--    metadataItem.dataType = kCMMetadataBaseDataType_UTF8 as String
--    return metadataItem
--  }
--
-   private func createLocationMetadataItem(location: CLLocation) -> AVMetadataItem {
-     let metadataItem = AVMutableMetadataItem()
-     metadataItem.keySpace = .quickTimeMetadata
++  @ReactProp(name = "focusPeakingEnabled")
++  fun setFocusPeakingEnabled(view: CameraView, focusPeakingEnabled: Boolean) {
++    view.focusPeakingEnabled = focusPeakingEnabled
++  }
++
++  @ReactProp(name = "focusPeakingSensitivity", defaultDouble = 0.35)
++  fun setFocusPeakingSensitivity(view: CameraView, focusPeakingSensitivity: Double) {
++    view.focusPeakingSensitivity = focusPeakingSensitivity.coerceIn(0.0, 1.0).toFloat()
++  }
++
+   @ReactProp(name = "outputOrientation")
+   fun setOrientation(view: CameraView, outputOrientation: String?) {
+     if (outputOrientation != null) {
+diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewModule.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewModule.kt
+index 059f677..5210260 100644
+--- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewModule.kt
++++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewModule.kt
+@@ -188,6 +188,28 @@ class CameraViewModule(reactContext: ReactApplicationContext) : ReactContextBase
+     }
+   }
+ 
++  @ReactMethod
++  fun setManualFocus(viewTag: Int, focusValue: Double, promise: Promise) {
++    backgroundCoroutineScope.launch {
++      val view = findCameraView(viewTag)
++      withPromise(promise) {
++        view.setManualFocus(focusValue)
++        return@withPromise null
++      }
++    }
++  }
++
++  @ReactMethod
++  fun resetFocus(viewTag: Int, promise: Promise) {
++    backgroundCoroutineScope.launch {
++      val view = findCameraView(viewTag)
++      withPromise(promise) {
++        view.resetFocus()
++        return@withPromise null
++      }
++    }
++  }
++
+   private fun canRequestPermission(permission: String): Boolean {
+     val activity = reactApplicationContext.currentActivity as? PermissionAwareActivity
+     return activity?.shouldShowRequestPermissionRationale(permission) ?: false
+diff --git a/node_modules/react-native-vision-camera/src/types/CameraProps.ts b/node_modules/react-native-vision-camera/src/types/CameraProps.ts
+index 18bfc9b..a9a4b0a 100644
+--- a/node_modules/react-native-vision-camera/src/types/CameraProps.ts
++++ b/node_modules/react-native-vision-camera/src/types/CameraProps.ts
+@@ -273,6 +273,21 @@ export interface CameraProps extends ViewProps {
+    * Make sure the given {@linkcode format} supports the given {@linkcode videoStabilizationMode}.
+    */
+   videoStabilizationMode?: VideoStabilizationMode
++  /**
++   * Enables a preview-only native focus peaking shader on Android.
++   * The shader modifies the displayed preview stream only, not captured photos.
++   *
++   * @platform Android
++   * @default false
++   */
++  focusPeakingEnabled?: boolean
++  /**
++   * Controls the native focus peaking threshold. Values closer to 1 show more highlights.
++   *
++   * @platform Android
++  * @default 0.35
++   */
++  focusPeakingSensitivity?: number
+   //#endregion
+ 
+   /**

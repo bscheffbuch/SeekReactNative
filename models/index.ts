@@ -26,6 +26,6 @@ export default {
     UploadPhotoRealm,
     UserSettingsRealm,
   ],
-  schemaVersion: 39,
+  schemaVersion: 40,
   path: "db.realm",
 };

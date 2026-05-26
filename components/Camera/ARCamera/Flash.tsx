@@ -8,28 +8,33 @@ import TransparentCircleButton from "../../UIComponents/Buttons/TransparentCircl
 interface Props {
   toggleFlash: ( ) => void;
   hasFlash?: boolean;
+  hasTorch?: boolean;
+  torch: "off" | "on";
   takePhotoOptions: TakePhotoOptions;
 }
 
 const Flash = ( {
   toggleFlash,
   hasFlash,
+  hasTorch,
+  torch,
   takePhotoOptions,
 }: Props ) => {
-  if ( !hasFlash ) return null;
+  if ( !hasFlash && !hasTorch ) return null;
   let testID = "";
   let accessibilityHint = "";
   let source;
-  switch ( takePhotoOptions.flash ) {
-    case "on":
-      source = icons.flash_on;
-      testID = "flash-button-label-flash";
-      accessibilityHint = i18n.t( "accessibility.disable_flash" );
-      break;
-    default: // default to off if no flash
-      source = icons.flash_off;
-      testID = "flash-button-label-flash-off";
-      accessibilityHint = i18n.t( "accessibility.enable_flash" );
+  const flashEnabled = hasTorch
+    ? torch === "on"
+    : takePhotoOptions.flash === "on";
+  if ( flashEnabled ) {
+    source = icons.flash_on;
+    testID = "flash-button-label-flash";
+    accessibilityHint = i18n.t( "accessibility.disable_flash" );
+  } else {
+    source = icons.flash_off;
+    testID = "flash-button-label-flash-off";
+    accessibilityHint = i18n.t( "accessibility.enable_flash" );
   }
 
   return (

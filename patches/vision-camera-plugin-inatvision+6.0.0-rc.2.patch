@@ -1,0 +1,238 @@
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java
+new file mode 100644
+index 0000000..1b2ce8e
+--- /dev/null
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java
+@@ -0,0 +1,220 @@
++package com.visioncameraplugininatvision;
++
++import android.media.Image;
++import android.util.Log;
++
++import androidx.annotation.NonNull;
++import androidx.annotation.Nullable;
++
++import com.mrousavy.camera.core.FrameInvalidError;
++import com.mrousavy.camera.frameprocessors.Frame;
++import com.mrousavy.camera.frameprocessors.FrameProcessorPlugin;
++import com.mrousavy.camera.frameprocessors.VisionCameraProxy;
++
++import java.nio.ByteBuffer;
++import java.util.ArrayList;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++public class FocusPeakingPlugin extends FrameProcessorPlugin {
++  private final static String TAG = "FocusPeakingPlugin";
++
++  FocusPeakingPlugin(@NonNull VisionCameraProxy proxy, @Nullable Map<String, Object> options) {
++    super();
++    Log.d(TAG, "initialized with options: " + options);
++  }
++
++  @Override
++  public Object callback(@NonNull Frame frame, @Nullable Map<String, Object> arguments) throws FrameInvalidError {
++    Image image = frame.getImage();
++    Image.Plane[] planes = image.getPlanes();
++    int maxSegments = getClampedIntArgument(arguments, "maxSegments", 1200, 0, 3000);
++    List<Map<String, Object>> points = new ArrayList<>(maxSegments);
++
++    if (planes.length == 0 || maxSegments == 0) {
++      return points;
++    }
++
++    int width = image.getWidth();
++    int height = image.getHeight();
++    int threshold = getClampedIntArgument(arguments, "threshold", 34, 1, 255);
++    int scanStride = getClampedIntArgument(arguments, "scanStride", 1, 1, 6);
++    int minRunLength = getClampedIntArgument(arguments, "minRunLength", 2, 1, 64);
++
++    Image.Plane lumaPlane = planes[0];
++    ByteBuffer lumaBuffer = lumaPlane.getBuffer();
++    int rowStride = lumaPlane.getRowStride();
++    int pixelStride = Math.max(lumaPlane.getPixelStride(), 1);
++    int capacity = lumaBuffer.capacity();
++    int[] segmentXs = new int[maxSegments];
++    int[] segmentYs = new int[maxSegments];
++    int[] segmentWidths = new int[maxSegments];
++    int[] segmentHeights = new int[maxSegments];
++    int[] segmentEdges = new int[maxSegments];
++    int[] segmentState = new int[]{0};
++
++    for (int y = 1; y < height - 1; y += scanStride) {
++      int runStartX = -1;
++      int runEndX = -1;
++      int runStrongestEdge = 0;
++
++      for (int x = 1; x < width - 1; x += scanStride) {
++        int edge = getLaplacianFocusStrength(lumaBuffer, rowStride, pixelStride, capacity, x, y);
++
++        if (edge > threshold) {
++          if (runStartX < 0) {
++            runStartX = x;
++          }
++          runEndX = x;
++          if (edge > runStrongestEdge) {
++            runStrongestEdge = edge;
++          }
++          continue;
++        }
++
++        if (runStartX >= 0) {
++          addSegment(
++            segmentXs,
++            segmentYs,
++            segmentWidths,
++            segmentHeights,
++            segmentEdges,
++            segmentState,
++            runStartX,
++            y,
++            (runEndX - runStartX) + scanStride,
++            scanStride,
++            runStrongestEdge,
++            minRunLength
++          );
++          runStartX = -1;
++          runEndX = -1;
++          runStrongestEdge = 0;
++        }
++      }
++
++      if (runStartX >= 0) {
++        addSegment(
++          segmentXs,
++          segmentYs,
++          segmentWidths,
++          segmentHeights,
++          segmentEdges,
++          segmentState,
++          runStartX,
++          y,
++          (runEndX - runStartX) + scanStride,
++          scanStride,
++          runStrongestEdge,
++          minRunLength
++        );
++      }
++    }
++
++    int segmentCount = segmentState[0];
++    for (int i = 0; i < segmentCount; i++) {
++      Map<String, Object> point = new HashMap<>(5);
++      point.put("x", segmentXs[i] / (double) width);
++      point.put("y", segmentYs[i] / (double) height);
++      point.put("width", Math.min(segmentWidths[i], width - segmentXs[i]) / (double) width);
++      point.put("height", Math.min(segmentHeights[i], height - segmentYs[i]) / (double) height);
++      point.put("strength", Math.min(segmentEdges[i] / 128.0, 1.0));
++      points.add(point);
++    }
++
++    return points;
++  }
++
++  private static int getClampedIntArgument(
++    @Nullable Map<String, Object> arguments,
++    String key,
++    int fallback,
++    int min,
++    int max
++  ) {
++    if (arguments == null) {
++      return fallback;
++    }
++    Object value = arguments.get(key);
++    int intValue = value instanceof Number ? ((Number) value).intValue() : fallback;
++    return Math.min(Math.max(intValue, min), max);
++  }
++
++  private static int getLaplacianFocusStrength(
++    ByteBuffer buffer,
++    int rowStride,
++    int pixelStride,
++    int capacity,
++    int x,
++    int y
++  ) {
++    int topLeft = getLuma(buffer, rowStride, pixelStride, capacity, x - 1, y - 1);
++    int top = getLuma(buffer, rowStride, pixelStride, capacity, x, y - 1);
++    int topRight = getLuma(buffer, rowStride, pixelStride, capacity, x + 1, y - 1);
++    int left = getLuma(buffer, rowStride, pixelStride, capacity, x - 1, y);
++    int right = getLuma(buffer, rowStride, pixelStride, capacity, x + 1, y);
++    int bottomLeft = getLuma(buffer, rowStride, pixelStride, capacity, x - 1, y + 1);
++    int bottom = getLuma(buffer, rowStride, pixelStride, capacity, x, y + 1);
++    int bottomRight = getLuma(buffer, rowStride, pixelStride, capacity, x + 1, y + 1);
++    int center = getLuma(buffer, rowStride, pixelStride, capacity, x, y);
++    int laplacian = (8 * center)
++      - topLeft
++      - top
++      - topRight
++      - left
++      - right
++      - bottomLeft
++      - bottom
++      - bottomRight;
++
++    return Math.abs(laplacian) / 8;
++  }
++
++  private static int getLuma(
++    ByteBuffer buffer,
++    int rowStride,
++    int pixelStride,
++    int capacity,
++    int x,
++    int y
++  ) {
++    int index = (y * rowStride) + (x * pixelStride);
++    if (index < 0 || index >= capacity) {
++      return 0;
++    }
++    return buffer.get(index) & 0xff;
++  }
++
++  private static void addSegment(
++    int[] segmentXs,
++    int[] segmentYs,
++    int[] segmentWidths,
++    int[] segmentHeights,
++    int[] segmentEdges,
++    int[] segmentState,
++    int x,
++    int y,
++    int width,
++    int height,
++    int edge,
++    int minRunLength
++  ) {
++    if (width < minRunLength) {
++      return;
++    }
++
++    int segmentCount = segmentState[0];
++    if (segmentCount >= segmentEdges.length) {
++      return;
++    }
++
++    segmentXs[segmentCount] = x;
++    segmentYs[segmentCount] = y;
++    segmentWidths[segmentCount] = width;
++    segmentHeights[segmentCount] = height;
++    segmentEdges[segmentCount] = edge;
++    segmentState[0] = segmentCount + 1;
++  }
++
++}
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
+index 18f1134..0bbf19f 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
+@@ -16,6 +16,7 @@ import javax.annotation.Nonnull;
+ public class VisionCameraPluginInatVisionPackage implements ReactPackage {
+   static {
+     FrameProcessorPluginRegistry.addFrameProcessorPlugin("inatVision", VisionCameraPluginInatVisionPlugin::new);
++    FrameProcessorPluginRegistry.addFrameProcessorPlugin("inatFocusPeaking", FocusPeakingPlugin::new);
+   }
+ 
+   @NonNull

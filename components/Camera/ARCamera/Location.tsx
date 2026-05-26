@@ -23,7 +23,7 @@ const Location = ( {
   } else {
     source = icons.location_off;
     testID = "location-button-label-location-off";
-    accessibilityHint = i18n.t( "accessibility.disable_location" );
+    accessibilityHint = i18n.t( "accessibility.enable_location" );
   }
 
   return (

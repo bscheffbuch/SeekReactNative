@@ -1,6 +1,8 @@
+// @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { View, Switch } from "react-native";
 import { RadioButton, RadioButtonInput, RadioButtonLabel } from "react-native-simple-radio-button";
+import RNPickerSelect from "react-native-picker-select";
 import Realm from "realm";
 
 import i18n from "../../i18n";
@@ -14,7 +16,20 @@ import { baseTextStyles } from "../../styles/textStyles";
 interface State {
   autoCapture?: boolean;
   scientificNames?: boolean;
+  cameraViewportResolution?: string;
 }
+
+const cameraViewportResolutionOptions = [
+  { label: "540p", value: "540p" },
+  { label: "720p", value: "720p" },
+  { label: "1080p", value: "1080p" },
+  { label: "1440p", value: "1440p" },
+  { label: "2160p", value: "2160p" },
+];
+const placeholder = {};
+const pickerStyles = { ...viewStyles };
+const showIcon = () => <></>;
+
 const CameraSettings = ( ) => {
   const [settings, setSettings] = useState<State>( {} );
   const radioButtons = [
@@ -29,7 +44,7 @@ const CameraSettings = ( ) => {
     }
     const value = await updateUserSetting( "scientificNames", newValue );
     const newSettings: Object = {
-      autoCapture: settings.autoCapture,
+      ...settings,
       scientificNames: value,
     };
     setSettings( newSettings );
@@ -38,10 +53,21 @@ const CameraSettings = ( ) => {
   const setAutoCapture = async ( ) => {
     const value = await updateUserSetting( "autoCapture", !settings.autoCapture );
     const newSettings: Object = {
-      scientificNames: settings.scientificNames,
+      ...settings,
       autoCapture: value,
     };
     setSettings( newSettings );
+  };
+
+  const updateCameraViewportResolution = async ( value: string ) => {
+    if ( !value || value === settings.cameraViewportResolution ) {
+      return;
+    }
+    const newValue = await updateUserSetting( "cameraViewportResolution", value );
+    setSettings( {
+      ...settings,
+      cameraViewportResolution: newValue,
+    } );
   };
 
   const switchTrackColor = { true: colors.seekForestGreen };
@@ -112,6 +138,22 @@ const CameraSettings = ( ) => {
         <StyledText style={[baseTextStyles.body, textStyles.autoCaptureText]}>
           {i18n.t( "settings.auto_capture" )}
         </StyledText>
+      </View>
+      <View style={viewStyles.donateMarginBottom}>
+        <StyledText style={baseTextStyles.header}>CAMERA STREAM RESOLUTION</StyledText>
+        <RNPickerSelect
+          hideIcon
+          Icon={showIcon}
+          items={cameraViewportResolutionOptions}
+          onValueChange={updateCameraViewportResolution}
+          placeholder={placeholder}
+          useNativeAndroidPickerStyle={false}
+          value={settings.cameraViewportResolution || "720p"}
+          style={pickerStyles}
+          pickerProps={{
+            themeVariant: "light",
+          }}
+        />
       </View>
     </>
   );

@@ -24,16 +24,24 @@ import { baseTextStyles } from "../../../styles/textStyles";
 import GalleryButton from "./GalleryButton";
 import Flash from "./Flash";
 import CameraFlip from "./CameraFlip";
-import CameraLensSwitch from "./CameraLensSwitch";
+import CameraZoomPresets from "./CameraZoomPresets";
+import FocusModeSwitch from "./FocusModeSwitch";
+import FocusPeakingToggle from "./FocusPeakingToggle";
+import HdrToggle from "./HdrToggle";
+import ManualFocusSlider from "./ManualFocusSlider";
+import FocusPeakingSensitivitySlider from "./FocusPeakingSensitivitySlider";
+import StabilizationToggle from "./StabilizationToggle";
 import Location from "./Location";
 import type { TakePhotoOptions } from "react-native-vision-camera";
 import ToastAnimationWithText from "../../UIComponents/ToastAnimationWithText";
 import { TOAST } from "./ARCamera";
+import type { BackCameraZoomPreset } from "./helpers/cameraDeviceHelpers";
 
 interface Prediction {
   name: string;
   taxon_id: number;
   rank_level: number;
+  rank?: string;
   combined_score: number;
   ancestor_ids: number[];
 }
@@ -46,11 +54,29 @@ interface Props {
   filterByTaxonId: ( taxonId: string | null, negativeFilter: boolean ) => void;
   setIsActive: ( arg0: boolean ) => void;
   flipCamera: ( ) => void;
-  switchLens: ( ) => void;
-  canSwitchLens: boolean;
-  lensLabel: string;
+  selectZoom: ( zoom: number ) => void;
+  canSelectZoom: boolean;
+  selectedZoom: number;
+  zoomPresets: BackCameraZoomPreset[];
+  toggleManualFocus: ( ) => void;
+  manualFocusEnabled: boolean;
+  manualFocusValue: number;
+  setManualFocusValue: ( focusValue: number ) => void;
+  supportsManualFocus: boolean;
+  focusPeakingEnabled: boolean;
+  toggleFocusPeaking: ( ) => void;
+  focusPeakingSensitivity: number;
+  setFocusPeakingSensitivity: ( sensitivity: number ) => void;
+  digitalStabilizationEnabled: boolean;
+  supportsDigitalStabilization: boolean;
+  toggleDigitalStabilization: ( ) => void;
+  photoHdrEnabled: boolean;
+  supportsPhotoHdr: boolean;
+  togglePhotoHdr: ( ) => void;
   toggleFlash: ( ) => void;
   hasFlash?: boolean;
+  hasTorch?: boolean;
+  torch: "off" | "on";
   takePhotoOptions: TakePhotoOptions;
   visibleToast: TOAST;
   toggleLocation: ( ) => void;
@@ -68,11 +94,29 @@ const ARCameraOverlay = ( {
   filterByTaxonId,
   setIsActive,
   flipCamera,
-  switchLens,
-  canSwitchLens,
-  lensLabel,
+  selectZoom,
+  canSelectZoom,
+  selectedZoom,
+  zoomPresets,
+  toggleManualFocus,
+  manualFocusEnabled,
+  manualFocusValue,
+  setManualFocusValue,
+  supportsManualFocus,
+  focusPeakingEnabled,
+  toggleFocusPeaking,
+  focusPeakingSensitivity,
+  setFocusPeakingSensitivity,
+  digitalStabilizationEnabled,
+  supportsDigitalStabilization,
+  toggleDigitalStabilization,
+  photoHdrEnabled,
+  supportsPhotoHdr,
+  togglePhotoHdr,
   toggleFlash,
   hasFlash,
+  hasTorch,
+  torch,
   takePhotoOptions,
   visibleToast,
   toggleLocation,
@@ -81,7 +125,7 @@ const ARCameraOverlay = ( {
 }: Props ) => {
   const { isLandscape } = useAppOrientation( );
   const { navigate } = useNavigation( );
-  const rankToRender = prediction?.rank || null;
+  const rankToRender = prediction?.rank;
   const helpText = setCameraHelpText( rankToRender );
   const userSettings = useFetchUserSettings( );
   const autoCapture = userSettings?.autoCapture;
@@ -180,15 +224,33 @@ const ARCameraOverlay = ( {
         <CameraFlip
           flipCamera={flipCamera}
         />
-        {canSwitchLens && (
-          <CameraLensSwitch
-            lensLabel={lensLabel}
-            switchLens={switchLens}
+        {supportsManualFocus && (
+          <FocusModeSwitch
+            manualFocusEnabled={manualFocusEnabled}
+            toggleManualFocus={toggleManualFocus}
+          />
+        )}
+        <FocusPeakingToggle
+          focusPeakingEnabled={focusPeakingEnabled}
+          toggleFocusPeaking={toggleFocusPeaking}
+        />
+        {supportsDigitalStabilization && (
+          <StabilizationToggle
+            digitalStabilizationEnabled={digitalStabilizationEnabled}
+            toggleDigitalStabilization={toggleDigitalStabilization}
+          />
+        )}
+        {supportsPhotoHdr && (
+          <HdrToggle
+            photoHdrEnabled={photoHdrEnabled}
+            togglePhotoHdr={togglePhotoHdr}
           />
         )}
         <Flash
           toggleFlash={toggleFlash}
           hasFlash={hasFlash}
+          hasTorch={hasTorch}
+          torch={torch}
           takePhotoOptions={takePhotoOptions}
         />
         <Location
@@ -253,6 +315,49 @@ const ARCameraOverlay = ( {
       <View style={setTaxonomicRankColorStyles( )}>
         <StyledText style={[baseTextStyles.buttonSmall, textStyles.scanText, !isLandscape && textStyles.textShadow]}>{helpText}</StyledText>
       </View>
+      {manualFocusEnabled && supportsManualFocus && (
+        <View
+          style={
+            isLandscape
+              ? viewStyles.manualFocusSliderContainerLandscape
+              : viewStyles.manualFocusSliderContainer
+          }
+        >
+          <ManualFocusSlider
+            focusValue={manualFocusValue}
+            setFocusValue={setManualFocusValue}
+          />
+        </View>
+      )}
+      {focusPeakingEnabled && (
+        <View
+          style={
+            isLandscape
+              ? viewStyles.peakingSensitivitySliderContainerLandscape
+              : viewStyles.peakingSensitivitySliderContainer
+          }
+        >
+          <FocusPeakingSensitivitySlider
+            sensitivity={focusPeakingSensitivity}
+            setSensitivity={setFocusPeakingSensitivity}
+          />
+        </View>
+      )}
+      {canSelectZoom && (
+        <View
+          style={
+            isLandscape
+              ? viewStyles.cameraZoomPresetsContainerLandscape
+              : viewStyles.cameraZoomPresetsContainer
+          }
+        >
+          <CameraZoomPresets
+            presets={zoomPresets}
+            selectedZoom={selectedZoom}
+            selectZoom={selectZoom}
+          />
+        </View>
+      )}
 
       <View style={
         isLandscape ? viewStyles.cameraControlsContainerLandscape : viewStyles.cameraControlsContainer

@@ -17,17 +17,18 @@ interface Prediction {
   name: string;
   taxon_id: number;
   rank_level: number;
+  rank?: string;
   combined_score: number;
   ancestor_ids: number[];
 }
 
 interface Props {
-  prediction: Prediction;
+  prediction?: Prediction;
 }
 
 const ARCameraHeader = ( { prediction }: Props ) => {
   const { isLandscape } = useAppOrientation( );
-  const rankToRender = prediction?.rank || null;
+  const rankToRender = prediction?.rank;
   const [commonName, setCommonName] = useState<string | void | null>( null );
   const settings = useFetchUserSettings( );
   const scientificNames = settings?.scientificNames;

@@ -13,6 +13,7 @@ import { checkForPhotoMetaData } from "../../../utility/photoHelpers";
 import { dirTaxonomy, dirModel, dirGeomodel } from "../../../utility/dirStorage";
 import { UserContext } from "../../UserContext";
 import { useObservation } from "../../Providers/ObservationProvider";
+import type { ObservationImage } from "../../Providers/ObservationProvider";
 import { viewStyles } from "../../../styles/camera/arCameraOverlay";
 import icons from "../../../assets/icons";
 import readExifFromMultiplePhotos from "../../../utility/parseExif";
@@ -28,35 +29,53 @@ interface Props {
   setIsActive: ( arg0: boolean ) => void;
 }
 
+interface PhotoLocation {
+  latitude?: number;
+  longitude?: number;
+}
+
 const GalleryButton = ( { setIsActive }: Props ) => {
   const { startObservationWithImage } = useObservation();
   const { login } = useContext( UserContext );
   const navigation = useNavigation( );
   const [imageSelected, setImageSelected] = useState( false );
 
-  const navigateToResults = ( uri, time, location: {
-    latitude: number;
-    longitude: number;
-  }, predictions: InatVision.Prediction[] ) => {
-    const image = {
+  const navigateToResults = (
+    uri: string,
+    time: number,
+    location: PhotoLocation,
+    predictions: InatVision.Prediction[]
+  ) => {
+    const image: ObservationImage = {
       time,
       uri,
       predictions: [],
       errorCode: 0,
       latitude: null,
       longitude: null,
-      preciseCoords: {},
+      preciseCoords: {
+        latitude: null,
+        longitude: null,
+        accuracy: null,
+      },
     };
 
-    if ( checkForPhotoMetaData( location ) ) {
+    const metadataLocation = location.latitude != null && location.longitude != null
+      ? {
+        latitude: location.latitude,
+        longitude: location.longitude,
+      }
+      : null;
+
+    if ( checkForPhotoMetaData( metadataLocation ) ) {
       const { latitude, longitude } = location;
-      image.latitude = latitude || null;
-      image.longitude = longitude || null;
+      image.latitude = latitude ?? null;
+      image.longitude = longitude ?? null;
 
       if ( login ) {
         image.preciseCoords = {
-          latitude,
-          longitude,
+          latitude: latitude ?? null,
+          longitude: longitude ?? null,
           accuracy: null,
         };
       }
@@ -91,14 +110,17 @@ const GalleryButton = ( { setIsActive }: Props ) => {
     }
   };
 
-  const getPredictions = ( uri, timestamp, location: {
-    latitude: number | undefined;
-    longitude: number | undefined;
-  } ) => {
+  const getPredictions = ( uri: string, timestamp: number, location: PhotoLocation ) => {
     const path = uri.split( "file://" );
     const reactUri = Platform.OS === "android" ? path[1] : uri;
 
-    const hasLocation = location?.latitude != null && location?.longitude != null;
+    const hasLocation = location.latitude != null && location.longitude != null;
+    const geomodelLocation = hasLocation
+      ? {
+        latitude: location.latitude as number,
+        longitude: location.longitude as number,
+      }
+      : undefined;
     InatVision.getPredictionsForImage( {
       version: "2.13",
       uri: reactUri,
@@ -106,9 +128,7 @@ const GalleryButton = ( { setIsActive }: Props ) => {
       taxonomyPath: dirTaxonomy,
       useGeomodel: hasLocation,
       geomodelPath: dirGeomodel,
-      location: hasLocation
-        ? location
-        : undefined,
+      location: geomodelLocation,
     } )
       .then( ( result ) => {
         const { predictions } = result;
@@ -149,8 +169,13 @@ const GalleryButton = ( { setIsActive }: Props ) => {
     const exif = await readExifFromMultiplePhotos( [uri] );
     const { latitude, longitude, observed_on_string } = exif;
     const location = { latitude, longitude };
-    const unixTimestamp = getUnixTime( new Date( observed_on_string ) );
-    getPredictions( uri, timestamp || unixTimestamp, location );
+    const unixTimestamp = observed_on_string
+      ? getUnixTime( new Date( observed_on_string ) )
+      : Math.floor( Date.now() / 1000 );
+    const selectedTimestamp = typeof timestamp === "string"
+      ? getUnixTime( new Date( timestamp ) )
+      : timestamp || unixTimestamp;
+    getPredictions( uri, selectedTimestamp, location );
   };
 
   if ( imageSelected ) {

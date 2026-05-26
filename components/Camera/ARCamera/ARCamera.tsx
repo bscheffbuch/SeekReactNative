@@ -53,23 +53,43 @@ import FrameProcessorCamera from "./FrameProcessorCamera";
 import { log } from "../../../react-native-logs.config";
 import { useCameraLocationPreference } from "../../Providers/CameraLocationPreferenceProvider";
 import { useObservation } from "../../Providers/ObservationProvider";
+import type { ObservationImage } from "../../Providers/ObservationProvider";
 import { LogLevels, logToApi } from "../../../utility/apiCalls";
 import {
   getCameraDevice,
   useCameraDevices,
 } from "./helpers/visionCameraWrapper";
+import { useFetchUserSettings } from "../../../utility/customHooks/useFetchUserSettings";
 import {
   useLocationPermission as useLocationPermissionCamera,
 } from "./helpers/visionCameraWrapper";
 import {
-  DEFAULT_BACK_CAMERA_LENS,
-  getAvailableBackCameraLenses,
-  getBackCameraLensLabel,
-  getNextBackCameraLens,
+  DEFAULT_BACK_CAMERA_ZOOM,
+  getBackCameraDeviceForZoom,
+  getBackCameraZoomPresets,
+  getBackCameraZoomValue,
+  getPreferredVideoStabilizationModeForDevice,
 } from "./helpers/cameraDeviceHelpers";
-import type { BackCameraLens } from "./helpers/cameraDeviceHelpers";
+import type { BackCameraZoomPreset } from "./helpers/cameraDeviceHelpers";
 
 const logger = log.extend( "ARCamera.js" );
+const CAMERA_RECOVERY_DELAY_MS = 650;
+const MAX_CAMERA_RECOVERY_ATTEMPTS = 5;
+const DEFAULT_FOCUS_PEAKING_SENSITIVITY = 0.35;
+
+type CameraViewportResolution = "540p" | "720p" | "1080p" | "1440p" | "2160p";
+
+const CAMERA_VIEWPORT_RESOLUTIONS: {
+  label: CameraViewportResolution;
+  width: number;
+  height: number;
+}[] = [
+  { label: "540p", width: 960, height: 540 },
+  { label: "720p", width: 1280, height: 720 },
+  { label: "1080p", width: 1920, height: 1080 },
+  { label: "1440p", width: 2560, height: 1440 },
+  { label: "2160p", width: 3840, height: 2160 },
+];
 
 interface State {
   allPredictions: Prediction[];
@@ -108,7 +128,7 @@ type Action = { type: ACTION.RESET_PREDICTIONS }
   | { type: ACTION.SET_PREDICTIONS; predictions: Prediction[] }
   | { type: ACTION.RESET_STATE }
   | { type: ACTION.FILTER_TAXON; taxonId: string | null; negativeFilter: boolean }
-  | { type: ACTION.ERROR; error: string; errorEvent: string };
+  | { type: ACTION.ERROR; error: string | null; errorEvent?: string };
 
 interface HandledPhoto extends PhotoFile {
   predictions: Prediction[];
@@ -125,28 +145,38 @@ const ARCamera = ( ) => {
   const camera = useRef<Camera>( null );
   const { startObservationWithImage, setObservation } = useObservation();
   const [isActive, setIsActive] = useState( true );
+  const [isCaptureInProgress, setIsCaptureInProgress] = useState( false );
 
   const [cameraPosition, setCameraPosition] = useState<"front" | "back">( "back" );
-  const [backCameraLens, setBackCameraLens] = useState<BackCameraLens>( DEFAULT_BACK_CAMERA_LENS );
+  const [backCameraZoom, setBackCameraZoom] = useState( DEFAULT_BACK_CAMERA_ZOOM );
+  const [manualFocusEnabled, setManualFocusEnabled] = useState( false );
+  const [manualFocusValue, setManualFocusValue] = useState( 0.5 );
+  const manualFocusValueRef = useRef( manualFocusValue );
+  const manualFocusEnabledRef = useRef( manualFocusEnabled );
+  const manualFocusGenerationRef = useRef( 0 );
+  const manualFocusRequestIdRef = useRef( 0 );
+  const cameraRecoveryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>( null );
+  const cameraRecoveryAttemptsRef = useRef( 0 );
+  const [cameraRecoveryCycle, setCameraRecoveryCycle] = useState( 0 );
+  const [cameraRecovering, setCameraRecovering] = useState( false );
+  const [focusPeakingEnabled, setFocusPeakingEnabled] = useState( false );
+  const [focusPeakingSensitivity, setFocusPeakingSensitivity] = useState( DEFAULT_FOCUS_PEAKING_SENSITIVITY );
+  const [digitalStabilizationEnabled, setDigitalStabilizationEnabled] = useState( false );
+  const [photoHdrEnabled, setPhotoHdrEnabled] = useState( false );
+  const [torch, setTorch] = useState<"off" | "on">( "off" );
   const cameraDevices = useCameraDevices();
   const backCameraDevices = useMemo( () => (
     cameraDevices.filter( ( cameraDevice: CameraDevice ) => cameraDevice.position === "back" )
   ), [cameraDevices] );
-  const availableBackLenses = useMemo( () => (
-    getAvailableBackCameraLenses( backCameraDevices )
-  ), [backCameraDevices] );
   const backDevice = useMemo( () => (
-    getCameraDevice( cameraDevices, "back", {
-      physicalDevices: [backCameraLens],
-    } )
-    || getCameraDevice( cameraDevices, "back", {
-      physicalDevices: [DEFAULT_BACK_CAMERA_LENS],
-    } )
-    || backCameraDevices[0]
-  ), [backCameraDevices, backCameraLens, cameraDevices] );
+    getBackCameraDeviceForZoom( backCameraDevices, backCameraZoom )
+  ), [backCameraDevices, backCameraZoom] );
   const frontDevice = useMemo( () => (
     getCameraDevice( cameraDevices, "front" )
   ), [cameraDevices] );
+  const backCameraZoomPresets: BackCameraZoomPreset[] = useMemo( () => (
+    getBackCameraZoomPresets( backCameraDevices )
+  ), [backCameraDevices] );
 
   let device = cameraPosition === "back" ? backDevice : frontDevice;
   // If there is no back camera, use the front camera
@@ -155,6 +185,10 @@ const ARCamera = ( ) => {
   }
 
   const hasFlash = device?.hasFlash;
+  const hasTorch = device?.hasTorch;
+  const supportsPhotoHdr = device?.formats.some( deviceFormat => deviceFormat.supportsPhotoHdr ) === true;
+  const supportsManualFocus = device?.supportsFocus === true;
+  const supportsDigitalStabilization = getPreferredVideoStabilizationModeForDevice( device ) !== undefined;
   const initialPhotoOptions = {
     // We had this set to true in Seek but received many reports of it not respecting OS-wide sound
     // level and scared away wildlife. So maybe better to just disable it.
@@ -163,15 +197,28 @@ const ARCamera = ( ) => {
   } as const;
   const [takePhotoOptions, setTakePhotoOptions] = useState<TakePhotoOptions>( initialPhotoOptions );
   const [visibleToast, setVisibleToast] = useState( TOAST.NONE );
+  const userSettings = useFetchUserSettings( );
+  const viewportResolution = CAMERA_VIEWPORT_RESOLUTIONS.find(
+    resolution => resolution.label === userSettings.cameraViewportResolution
+  ) || CAMERA_VIEWPORT_RESOLUTIONS[1];
 
   useEffect( () => {
-    const selectedLensAvailable = availableBackLenses.some(
-      lensOption => lensOption.id === backCameraLens
+    const selectedZoomAvailable = backCameraZoomPresets.some(
+      preset => Math.abs( preset.zoom - backCameraZoom ) < 0.05
     );
-    if ( !selectedLensAvailable ) {
-      setBackCameraLens( availableBackLenses[0].id );
+    if ( !selectedZoomAvailable && backCameraZoomPresets.length > 0 ) {
+      const defaultPreset = backCameraZoomPresets.find(
+        preset => preset.zoom === DEFAULT_BACK_CAMERA_ZOOM
+      ) || backCameraZoomPresets[0];
+      setBackCameraZoom( defaultPreset.zoom );
     }
-  }, [availableBackLenses, backCameraLens] );
+  }, [backCameraZoom, backCameraZoomPresets] );
+
+  useEffect( () => {
+    if ( !hasTorch && torch === "on" ) {
+      setTorch( "off" );
+    }
+  }, [hasTorch, torch] );
 
   useEffect( () => {
     setTakePhotoOptions( previousOptions => {
@@ -237,7 +284,7 @@ const ARCamera = ( ) => {
           allPredictions: [],
         };
       case ACTION.ERROR:
-        return { ...currentState, error: action.error, errorEvent: action.errorEvent };
+        return { ...currentState, error: action.error, errorEvent: action.errorEvent ?? null };
       default:
         throw new Error( );
     }
@@ -263,7 +310,7 @@ const ARCamera = ( ) => {
       taxon_id: p.taxon_id,
       ancestor_ids: p.ancestor_ids,
       rank: p.rank,
-    } ) )
+    } as Prediction ) )
     .sort( ( a, b ) => b.rank_level - a.rank_level );
   const lowestRankPrediction = sortedPredictions[sortedPredictions.length - 1];
 
@@ -276,34 +323,173 @@ const ARCamera = ( ) => {
     setCameraPosition( newPosition );
   };
 
-  const switchLens = useCallback( () => {
+  const selectBackCameraZoom = useCallback( ( zoom: number ) => {
     if ( cameraPosition !== "back" ) {
       setCameraPosition( "back" );
-      return;
     }
-    setBackCameraLens( currentLens => getNextBackCameraLens( currentLens, availableBackLenses ) );
-  }, [availableBackLenses, cameraPosition] );
+    setBackCameraZoom( zoom );
+  }, [cameraPosition] );
 
-  const lensLabel = getBackCameraLensLabel( backCameraLens );
-  const canSwitchLens = cameraPosition === "back" && availableBackLenses.length > 1;
+  const canSelectZoom = cameraPosition === "back" && backCameraZoomPresets.length > 1;
+  const cameraZoom = device && cameraPosition === "back"
+    ? getBackCameraZoomValue( device, backCameraZoom )
+    : device?.neutralZoom;
 
-  const toggleFlash = ( ) => {
-    setTakePhotoOptions( {
-      ...takePhotoOptions,
-      flash: takePhotoOptions.flash === "on"
-        ? "off"
-        : "on",
-    } );
-    setVisibleToast( takePhotoOptions.flash === "on" ? TOAST.FLASH_OFF : TOAST.FLASH_ON );
+  manualFocusEnabledRef.current = manualFocusEnabled;
+
+  const isSupersededManualFocusError = ( focusError: unknown ) => {
+    const message = focusError instanceof Error
+      ? focusError.message
+      : String( focusError );
+    return message.includes( "Camera2CameraControl was updated with new options" )
+      || message.includes( "OperationCanceledException" );
   };
 
-  const updateError = useCallback( ( err, errEvent?: string ) => {
+  const clearCameraRecoveryTimeout = useCallback( () => {
+    if ( cameraRecoveryTimeoutRef.current ) {
+      clearTimeout( cameraRecoveryTimeoutRef.current );
+      cameraRecoveryTimeoutRef.current = null;
+    }
+  }, [] );
+
+  const resetCameraFocus = useCallback( () => {
+    manualFocusGenerationRef.current += 1;
+    manualFocusRequestIdRef.current += 1;
+    manualFocusValueRef.current = 0.5;
+    setManualFocusValue( 0.5 );
+    camera.current?.resetFocus?.().catch( focusError => logger.warn( focusError ) );
+  }, [] );
+
+  const queueManualFocus = useCallback( ( focusValue: number ) => {
+    if ( !manualFocusEnabledRef.current || !camera.current?.setManualFocus ) {
+      return;
+    }
+
+    const generation = manualFocusGenerationRef.current;
+    const requestId = manualFocusRequestIdRef.current + 1;
+    manualFocusRequestIdRef.current = requestId;
+    camera.current.setManualFocus( focusValue )
+      .catch( focusError => {
+        if (
+          generation === manualFocusGenerationRef.current
+          && requestId === manualFocusRequestIdRef.current
+          && manualFocusEnabledRef.current
+          && !isSupersededManualFocusError( focusError )
+        ) {
+          logger.warn( focusError );
+        }
+      } );
+  }, [] );
+
+  useEffect( () => () => {
+    clearCameraRecoveryTimeout();
+  }, [clearCameraRecoveryTimeout] );
+
+  const toggleManualFocus = useCallback( () => {
+    setManualFocusEnabled( currentManualFocusEnabled => {
+      const nextManualFocusEnabled = !currentManualFocusEnabled;
+      if ( !nextManualFocusEnabled ) {
+        manualFocusEnabledRef.current = false;
+        resetCameraFocus();
+      } else {
+        manualFocusEnabledRef.current = true;
+        queueManualFocus( manualFocusValueRef.current );
+      }
+      return nextManualFocusEnabled;
+    } );
+  }, [queueManualFocus, resetCameraFocus] );
+
+  const updateManualFocusValue = useCallback( ( focusValue: number ) => {
+    manualFocusValueRef.current = focusValue;
+    setManualFocusValue( focusValue );
+    if ( manualFocusEnabled ) {
+      queueManualFocus( focusValue );
+    }
+  }, [manualFocusEnabled, queueManualFocus] );
+
+  useEffect( () => {
+    if ( !supportsManualFocus && manualFocusEnabled ) {
+      setManualFocusEnabled( false );
+      return;
+    }
+    if ( manualFocusEnabled ) {
+      queueManualFocus( manualFocusValueRef.current );
+    } else {
+      resetCameraFocus();
+    }
+  }, [device?.id, manualFocusEnabled, queueManualFocus, resetCameraFocus, supportsManualFocus] );
+
+  const toggleFocusPeaking = useCallback( () => {
+    setFocusPeakingEnabled( currentFocusPeakingEnabled => !currentFocusPeakingEnabled );
+  }, [] );
+
+  const updateFocusPeakingSensitivity = useCallback( ( sensitivity: number ) => {
+    setFocusPeakingSensitivity( Math.min( Math.max( sensitivity, 0 ), 1 ) );
+  }, [] );
+
+  const toggleDigitalStabilization = useCallback( () => {
+    setDigitalStabilizationEnabled( currentDigitalStabilizationEnabled => !currentDigitalStabilizationEnabled );
+  }, [] );
+
+  const togglePhotoHdr = useCallback( () => {
+    setPhotoHdrEnabled( currentPhotoHdrEnabled => !currentPhotoHdrEnabled );
+  }, [] );
+
+  const toggleFlash = ( ) => {
+    if ( hasTorch ) {
+      setTorch( currentTorch => {
+        const nextTorch = currentTorch === "on" ? "off" : "on";
+        setVisibleToast( nextTorch === "on" ? TOAST.FLASH_ON : TOAST.FLASH_OFF );
+        return nextTorch;
+      } );
+      return;
+    }
+
+    setTakePhotoOptions( previousOptions => {
+      const nextFlash = previousOptions.flash === "on" ? "off" : "on";
+      setVisibleToast( nextFlash === "on" ? TOAST.FLASH_ON : TOAST.FLASH_OFF );
+      return {
+        ...previousOptions,
+        flash: nextFlash,
+      };
+    } );
+  };
+
+  const updateError = useCallback( ( err: string | null, errEvent?: string ) => {
     // don't update error on first camera load
     if ( err === null && error === null ) {
       return;
     }
     dispatch( { type: ACTION.ERROR, error: err, errorEvent: errEvent } );
   }, [error] );
+
+  const handleRecoverableCameraError = useCallback( ( reason?: string ) => {
+    if ( cameraRecoveryTimeoutRef.current ) {
+      return;
+    }
+
+    const nextAttempt = cameraRecoveryAttemptsRef.current + 1;
+    if ( nextAttempt > MAX_CAMERA_RECOVERY_ATTEMPTS ) {
+      updateError( "camera", reason );
+      return;
+    }
+
+    cameraRecoveryAttemptsRef.current = nextAttempt;
+    setCameraRecovering( true );
+    cameraRecoveryTimeoutRef.current = setTimeout( () => {
+      cameraRecoveryTimeoutRef.current = null;
+      setCameraRecoveryCycle( cycle => cycle + 1 );
+      setCameraRecovering( false );
+      updateError( null );
+    }, CAMERA_RECOVERY_DELAY_MS * nextAttempt );
+  }, [updateError] );
+
+  const handleCameraStarted = useCallback( () => {
+    cameraRecoveryAttemptsRef.current = 0;
+    setCameraRecovering( false );
+    clearCameraRecoveryTimeout();
+    updateError( null );
+  }, [clearCameraRecoveryTimeout, updateError] );
 
   const navigateToResults = useCallback( async ( uri: string, predictions: Prediction[] ) => {
     const userImage = {
@@ -329,16 +515,21 @@ const ARCamera = ( ) => {
       context: "takePhoto rankLevel",
     } ).catch( ( logError ) => logger.error( "logToApi failed:", logError ) );
     logger.debug( "fetchImageLocationOrErrorCode resolved" );
-    image.errorCode = errorCode;
-    image.arCamera = true;
-    startObservationWithImage( image, () => {
+    const imageWithMetadata: ObservationImage = {
+      ...image,
+      errorCode,
+      arCamera: true,
+      latitude: image.latitude ?? null,
+      longitude: image.longitude ?? null,
+    };
+    startObservationWithImage( imageWithMetadata, () => {
       navigation.navigate( "Drawer", {
         screen: "Match",
       } );
     } );
   }, [startObservationWithImage, navigation, login] );
 
-  const handleCameraRollSaveError = useCallback( async ( uri: string, predictions: Prediction[], e ) => {
+  const handleCameraRollSaveError = useCallback( async ( uri: string, predictions: Prediction[], e: unknown ) => {
     // react-native-cameraroll does not yet have granular detail about read vs. write permissions
     // but there's a pull request for it as of March 2021
 
@@ -383,7 +574,9 @@ const ARCamera = ( ) => {
 
     // not looking at kingdom or phylum as we are currently not displaying results for those ranks
     const wantedRanks = ["species", "genus", "family", "order", "class"];
-    let wantedPredictions = predictions.filter( p => wantedRanks.includes( p.rank ) );
+    let wantedPredictions = predictions.filter( p => (
+      typeof p.rank === "string" && wantedRanks.includes( p.rank )
+    ) );
     const unwantedTaxa = [1044608, 1044607, 973699, 152504, 1128037];
     wantedPredictions = wantedPredictions.filter( p => !unwantedTaxa.includes( p.taxon_id ) );
 
@@ -432,16 +625,18 @@ const ARCamera = ( ) => {
   };
 
   const handleCaptureError = useCallback( ( event: ReasonMessage ) => {
+    setIsCaptureInProgress( false );
+    pictureTaken.value = false;
     if ( event.nativeEvent && event.nativeEvent.reason ) {
       updateError( "take", event.nativeEvent.reason );
     } else {
       updateError( "take" );
     }
-  }, [updateError] );
+  }, [pictureTaken, updateError] );
 
   const handleNativeShutter = useCallback( () => {
     pictureTaken.value = true;
-    setIsActive( false );
+    setIsCaptureInProgress( true );
   }, [pictureTaken] );
 
   const requestAndroidSavePermissions = useCallback( ( photo: HandledPhoto ) => {
@@ -459,22 +654,28 @@ const ARCamera = ( ) => {
     checkPermissions( );
   }, [savePhoto] );
 
-  const visionCameraTakePhoto = useCallback( async ( callback ) => {
+  const visionCameraTakePhoto = useCallback( async ( callback: ( photo: HandledPhoto ) => void | Promise<void> ) => {
     if ( !camera.current ) {
       return;
     }
 
     // Local copy of all predictions, so we can pass them to the photo after taking it
-    const predictions = [...sortedPredictions];
+    const predictions: Prediction[] = [...sortedPredictions];
 
     camera.current.takePhoto( takePhotoOptions ).then( async ( photo ) => {
       // pauseAfterCapture: true, would pause the classifier after taking a photo in legacy camera
       // setting the camera as inactive here is the closest thing to that, although there is a small delay visible
       // TODO: if the delay is too frustrating to users we would need to patch this into react-native-vision-camera directly
       setIsActive( false );
+      const uri = Platform.OS === "android" && !photo.path.startsWith( "file://" )
+        ? `file://${photo.path}`
+        : photo.path;
       // Use last prediction as the prediction for the photo, in legacy camera this was given by the classifier callback
-      photo.predictions = predictions;
-      photo.uri = photo.path;
+      const handledPhoto: HandledPhoto = {
+        ...photo,
+        predictions,
+        uri,
+      };
       // Photo:
       /*
         {
@@ -505,7 +706,7 @@ const ARCamera = ( ) => {
       */
 
       // TODO: this callback only ever uses photo.uri and photo.predictions, so we can just pass those directly
-      callback( photo );
+      callback( handledPhoto );
     } )
     .catch( ( e ) => {
       logToApi( {
@@ -521,6 +722,7 @@ const ARCamera = ( ) => {
 
   const takePicture = useCallback( async () => {
     pictureTaken.value = true;
+    setIsCaptureInProgress( true );
 
     if ( Platform.OS === "ios" ) {
       await visionCameraTakePhoto( ( photo: HandledPhoto ) => savePhoto( photo ) );
@@ -534,7 +736,10 @@ const ARCamera = ( ) => {
     pictureTaken,
   ] );
 
-  const resetState = ( ) => dispatch( { type: ACTION.RESET_STATE } );
+  const resetState = ( ) => {
+    setIsCaptureInProgress( false );
+    dispatch( { type: ACTION.RESET_STATE } );
+  };
 
   const requestAndroidPermissions = useCallback( ( ) => {
     if ( Platform.OS === "android" ) {
@@ -605,13 +810,16 @@ const ARCamera = ( ) => {
     }
     return (
       <FrameProcessorCamera
+        key={cameraRecoveryCycle}
         cameraRef={camera}
         device={device}
         confidenceThreshold={confidenceThresholdNumber}
         onCameraError={handleCameraError}
+        onCameraStarted={handleCameraStarted}
         // onCameraPermissionMissing was an empty callback
         onClassifierError={handleClassifierError}
         onDeviceNotSupported={handleDeviceNotSupported}
+        onRecoverableCameraError={handleRecoverableCameraError}
         onCaptureError={handleCaptureError}
         onTaxaDetected={handleTaxaDetected}
         onLog={handleLog}
@@ -619,7 +827,15 @@ const ARCamera = ( ) => {
         filterByTaxonId={taxonId}
         negativeFilter={negativeFilter}
         // type is replaced with logic in FrameProcessorCamera
-        isActive={isActive}
+        isActive={isActive && !cameraRecovering}
+        manualFocusEnabled={manualFocusEnabled}
+        digitalStabilizationEnabled={digitalStabilizationEnabled}
+        focusPeakingEnabled={focusPeakingEnabled}
+        focusPeakingSensitivity={focusPeakingSensitivity}
+        viewportResolution={viewportResolution}
+        photoHdrEnabled={photoHdrEnabled}
+        torch={torch}
+        zoom={cameraZoom || device.neutralZoom}
         useLocation={useLocation}
         hasPermission={hasPermission}
         onCaptureStarted={handleNativeShutter}
@@ -640,16 +856,34 @@ const ARCamera = ( ) => {
       ) : (
         <ARCameraOverlay
           prediction={lowestRankPrediction}
-          pictureTaken={pictureTaken.value}
+          pictureTaken={isCaptureInProgress || pictureTaken.value}
           takePicture={takePicture}
           cameraLoaded={cameraLoaded.value}
           filterByTaxonId={filterByTaxonId}
           setIsActive={setIsActive}
           flipCamera={flipCamera}
-          switchLens={switchLens}
-          canSwitchLens={canSwitchLens}
-          lensLabel={lensLabel}
+          selectZoom={selectBackCameraZoom}
+          canSelectZoom={canSelectZoom}
+          selectedZoom={backCameraZoom}
+          zoomPresets={backCameraZoomPresets}
+          toggleManualFocus={toggleManualFocus}
+          manualFocusEnabled={manualFocusEnabled}
+          manualFocusValue={manualFocusValue}
+          setManualFocusValue={updateManualFocusValue}
+          supportsManualFocus={supportsManualFocus}
+          focusPeakingEnabled={focusPeakingEnabled}
+          toggleFocusPeaking={toggleFocusPeaking}
+          focusPeakingSensitivity={focusPeakingSensitivity}
+          setFocusPeakingSensitivity={updateFocusPeakingSensitivity}
+          digitalStabilizationEnabled={digitalStabilizationEnabled}
+          supportsDigitalStabilization={supportsDigitalStabilization}
+          toggleDigitalStabilization={toggleDigitalStabilization}
+          photoHdrEnabled={photoHdrEnabled && supportsPhotoHdr}
+          supportsPhotoHdr={supportsPhotoHdr}
+          togglePhotoHdr={togglePhotoHdr}
           hasFlash={hasFlash}
+          hasTorch={hasTorch}
+          torch={torch}
           takePhotoOptions={takePhotoOptions}
           toggleFlash={toggleFlash}
           visibleToast={visibleToast}
