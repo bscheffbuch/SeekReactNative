@@ -1,0 +1,88 @@
+##
+# Build a Seek debug APK and publish it as a GitHub pre-release so you can
+# download it directly onto your phone.
+# Trigger manually from: Actions → "Build Debug APK" → Run workflow
+##
+name: Build Debug APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: node-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Create config.js
+        run: cp config.example.js config.js
+
+      - name: Download example model files
+        run: npm run add-example-model
+
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+      - name: Install required Android SDK components
+        run: |
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "ndk;27.1.12297006"
+
+      - name: Write local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
+      - name: Build debug APK
+        run: cd android && ./gradlew assembleDebug -x lint --no-daemon
+        env:
+          GRADLE_OPTS: "-Xmx4g -XX:MaxMetaspaceSize=512m"
+
+      - name: Find APK
+        id: apk
+        run: |
+          path=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -1)
+          echo "path=$path" >> $GITHUB_OUTPUT
+          echo "name=$(basename $path)" >> $GITHUB_OUTPUT
+
+      - name: Publish as GitHub pre-release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-build-${{ github.run_number }}
+          name: "Seek Debug APK (Build #${{ github.run_number }})"
+          body: |
+            Debug APK built automatically from commit ${{ github.sha }}.
+
+            **Install on Android:**
+            1. Open this URL on your phone (or scan the QR on the releases page).
+            2. Tap the `.apk` asset to download it.
+            3. Enable "Install from unknown sources" if prompted, then install.
+          files: ${{ steps.apk.outputs.path }}
+          prerelease: true
