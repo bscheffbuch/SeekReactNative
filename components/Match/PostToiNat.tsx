@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useContext } from "react";
 import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";

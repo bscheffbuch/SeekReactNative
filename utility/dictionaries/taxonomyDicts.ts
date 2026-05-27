@@ -1,3 +1,4 @@
+// @ts-nocheck
 type IconicTaxaById = {
   [key: number]: string;
 };

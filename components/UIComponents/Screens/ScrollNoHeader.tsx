@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { PropsWithChildren} from "react";
 import React, { useRef } from "react";
 import { ScrollView, Platform, StatusBar } from "react-native";

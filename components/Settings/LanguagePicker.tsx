@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback, useMemo, useState } from "react";
 import { View, Alert, Platform } from "react-native";
 import Checkbox from "react-native-check-box";

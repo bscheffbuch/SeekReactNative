@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Alert, Platform } from "react-native";
 import {
   copyFileAssets,

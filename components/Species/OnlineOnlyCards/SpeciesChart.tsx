@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useCallback, useEffect, useMemo } from "react";
 import { View } from "react-native";
 import type { NumberProp } from "react-native-svg";

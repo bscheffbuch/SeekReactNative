@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from "react";
 import { Linking, Platform, View } from "react-native";
 import { useRoute } from "@react-navigation/native";

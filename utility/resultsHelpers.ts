@@ -40,8 +40,10 @@ interface Image {
   time: number;
   uri: string;
   predictions: Prediction[];
-  latitude?: number;
-  longitude?: number;
+  errorCode?: number;
+  arCamera?: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
   preciseCoords?: {
     latitude: number | null;
     longitude: number | null;
@@ -64,10 +66,13 @@ const fetchImageLocationOrErrorCode = async ( image: Image, login: string | null
         return { image: setPreciseImageCoords( preciseCoords, image ), errorCode: 0 };
       }
     } catch ( code ) {
+      const errorCode = typeof code === "number"
+        ? code
+        : 1;
       if ( !login ) {
         return {
           image,
-          errorCode: code,
+          errorCode,
         };
       } else {
         return {
@@ -79,7 +84,7 @@ const fetchImageLocationOrErrorCode = async ( image: Image, login: string | null
               accuracy: null,
             },
           },
-          errorCode: code,
+          errorCode,
         };
       }
     }

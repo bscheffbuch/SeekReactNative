@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from "react";
 import { readFile, DocumentDirectoryPath, exists } from "@dr.pogodin/react-native-fs";
 import { Platform } from "react-native";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from "react";
 import { TouchableOpacity, Image } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";

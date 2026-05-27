@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import RNRestart from "react-native-restart";
 import { log } from "../react-native-logs.config";

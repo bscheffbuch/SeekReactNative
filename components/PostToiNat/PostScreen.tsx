@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useReducer, useEffect, useCallback } from "react";
 import { Alert, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";

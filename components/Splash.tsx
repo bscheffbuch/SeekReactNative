@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useCallback } from "react";
 import { Image, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";

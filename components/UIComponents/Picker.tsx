@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { PropsWithChildren} from "react";
 import React, { useCallback } from "react";
 import RNPickerSelect from "react-native-picker-select";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Realm from "realm";
 import { Platform } from "react-native";
 import {

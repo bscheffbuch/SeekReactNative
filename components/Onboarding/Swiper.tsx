@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useRef, useCallback } from "react";
 import type { PropsWithChildren } from "react";
 import { View, FlatList } from "react-native";

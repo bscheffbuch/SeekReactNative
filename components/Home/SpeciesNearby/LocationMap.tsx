@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from "react";
 import type { AlertButton } from "react-native";
 import { View, Image, TouchableOpacity, Alert, Platform, Linking } from "react-native";

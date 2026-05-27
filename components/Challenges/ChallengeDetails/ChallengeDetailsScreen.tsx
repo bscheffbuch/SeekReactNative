@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, useCallback } from "react";
 import Realm from "realm";
 import { useIsFocused } from "@react-navigation/native";

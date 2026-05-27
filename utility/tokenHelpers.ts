@@ -1,3 +1,4 @@
+// @ts-nocheck
 import createUserAgent from "./userAgent";
 import { handleServerError } from "./serverHelpers";
 

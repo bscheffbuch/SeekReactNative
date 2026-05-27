@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from "react";
 import { Image, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";

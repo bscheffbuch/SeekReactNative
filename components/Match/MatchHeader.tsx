@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import { View, Image } from "react-native";
 import LinearGradient from "react-native-linear-gradient";

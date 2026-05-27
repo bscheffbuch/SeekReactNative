@@ -105,6 +105,14 @@ export class mockCamera extends React.PureComponent {
       } );
   }
 
+  async setManualFocus() {
+    return null;
+  }
+
+  async resetFocus() {
+    return null;
+  }
+
   render() {
     return <View testID="mock-camera" style={style} />;
   }

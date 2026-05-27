@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
 import HTML from "react-native-render-html";

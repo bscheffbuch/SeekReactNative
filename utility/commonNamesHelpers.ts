@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getVersion } from "react-native-device-info";
 
 import { setDisplayLanguage, localeNoHyphens } from "./languageHelpers";

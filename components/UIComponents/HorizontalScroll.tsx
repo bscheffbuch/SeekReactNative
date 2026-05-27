@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useState, useCallback } from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";

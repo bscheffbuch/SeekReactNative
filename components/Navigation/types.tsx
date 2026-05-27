@@ -10,6 +10,7 @@ import type { StackScreenProps } from "@react-navigation/stack";
 // Note from the documentation:
 // The type containing the mapping must be a type alias. It cannot be an interface.
 export type DrawerParamList = {
+  [key: string]: object | undefined;
   Home: undefined;
   Achievements: undefined;
   Challenges: undefined;
@@ -29,6 +30,7 @@ export type DrawerParamList = {
 // Note from the documentation:
 // The type containing the mapping must be a type alias. It cannot be an interface.
 export type RootStackParamList = {
+  [key: string]: object | undefined;
   Splash: undefined;
   Onboarding: undefined;
   Camera: undefined;
@@ -59,7 +61,7 @@ export type RootStackParamList = {
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> = StackScreenProps<RootStackParamList, T>;
 
-export type DrawerStackScreenProps<T extends keyof DrawerParamList> =
+export type DrawerStackScreenProps<T extends Extract<keyof DrawerParamList, string>> =
   CompositeScreenProps<
     DrawerScreenProps<DrawerParamList, T>,
     RootStackScreenProps<"Drawer">
@@ -68,7 +70,6 @@ export type DrawerStackScreenProps<T extends keyof DrawerParamList> =
 // https://reactnavigation.org/docs/typescript/?config=dynamic#specifying-default-types-for-usenavigation-link-ref-etc
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList {}
+    interface RootParamList extends RootStackParamList, DrawerParamList {}
   }
 }
-

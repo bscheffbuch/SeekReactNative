@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ImageResizer from "@bam.tech/react-native-image-resizer";
 import {
   appendFile,

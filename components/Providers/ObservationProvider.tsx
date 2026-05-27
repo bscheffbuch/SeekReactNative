@@ -11,14 +11,21 @@ interface Prediction {
   name: string;
   taxon_id: number;
   rank_level: number;
+  rank?: any;
   combined_score: number;
   ancestor_ids: number[];
 }
 export interface ObservationImage {
   predictions: Prediction[];
   errorCode: number;
-  latitude: number;
-  longitude: number;
+  latitude?: number | null;
+  longitude?: number | null;
+  arCamera?: boolean;
+  preciseCoords?: {
+    latitude: number | null;
+    longitude: number | null;
+    accuracy: number | null;
+  };
   uri: string;
   time: number;
 }
@@ -26,10 +33,10 @@ export interface Observation {
   image: ObservationImage;
   taxon?: {
     taxaId?: number;
-    speciesSeenImage?: string;
+    speciesSeenImage?: string | null;
     scientificName?: string;
     rank?: any;
-    seenDate?: string;
+    seenDate?: string | null;
   };
 }
 const ObservationContext = React.createContext<
@@ -91,7 +98,7 @@ const ObservationProvider = ( { children }: PropsWithChildren ) => {
     const { errorCode, latitude } = image;
     const species = Object.assign( { }, param );
 
-    const createSpecies = ( photo: string | null, seenDate: string | null ) => {
+    const createSpecies = ( photo: string | null | undefined, seenDate: string | null ) => {
       return {
         taxaId: Number( species.taxon_id ),
         speciesSeenImage: photo,

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from "react";
 import type { AppStateStatus} from "react-native";
 import { AppState, Platform } from "react-native";

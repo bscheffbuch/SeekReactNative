@@ -1,6 +1,6 @@
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java
 new file mode 100644
-index 0000000..1b2ce8e
+index 0000000..d93241f
 --- /dev/null
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java
 @@ -0,0 +1,220 @@
@@ -224,6 +224,227 @@ index 0000000..1b2ce8e
 +  }
 +
 +}
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
+index dd91fb5..b69dc4a 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
+@@ -2,6 +2,7 @@ package com.visioncameraplugininatvision;
+ 
+ import android.graphics.Bitmap;
+ import android.graphics.Color;
++import android.media.Image;
+ import android.util.Log;
+ 
+ import org.tensorflow.lite.Interpreter;
+@@ -52,6 +53,10 @@ public class ImageClassifier {
+     /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
+     private ByteBuffer imgData;
+ 
++    private Object[] inputArray;
++    private float[][] outputScores;
++    private final Map<Integer, Object> expectedOutputs = new HashMap<>();
++
+     private float[][] mGeomodelScores;
+ 
+     public void setFilterByTaxonId(Integer taxonId) {
+@@ -88,6 +93,9 @@ public class ImageClassifier {
+ 
+         mTaxonomy = new Taxonomy(new FileInputStream(mTaxonomyFilename), mModelVersion);
+         mModelSize = mTaxonomy.getModelSize();
++        inputArray = new Object[]{ imgData };
++        outputScores = new float[1][mModelSize];
++        expectedOutputs.put(0, outputScores);
+     }
+ 
+     /** Classifies a frame from the preview stream. */
+@@ -102,20 +110,33 @@ public class ImageClassifier {
+         }
+         convertBitmapToByteBuffer(bitmap);
+ 
+-        byte[] arr = new byte[imgData.remaining()];
+-        imgData.get(arr);
++        return runInference(taxonomyRollupCutoff, commonAncestorMode);
++    }
+ 
+-        Map<Integer, Object> expectedOutputs = new HashMap<>();
+-        for (int i = 0; i < 1; i++) {
+-            expectedOutputs.put(i, new float[1][mModelSize]);
++    public List<Prediction> classifyImage(Image image, double cropRatio, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
++        if (mTFlite == null) {
++            Timber.tag(TAG).e("Image classifier has not been initialized; Skipped.");
++            return new ArrayList<Prediction>();
++        }
++        if (image == null) {
++            Timber.tag(TAG).e("Null input image");
++            return new ArrayList<Prediction>();
++        }
++        if (image.getPlanes().length < 3) {
++            Timber.tag(TAG).e("Expected YUV image with three planes");
++            return new ArrayList<Prediction>();
+         }
++        convertImageToByteBuffer(image, cropRatio);
+ 
+-        Object[] input = { imgData };
++        return runInference(taxonomyRollupCutoff, commonAncestorMode);
++    }
++
++    private List<Prediction> runInference(Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
+         List<Prediction> predictions = null;
+         try {
+-            mTFlite.runForMultipleInputsOutputs(input, expectedOutputs);
++            mTFlite.runForMultipleInputsOutputs(inputArray, expectedOutputs);
+             // Get raw vision scores
+-            float[] visionScores = ((float[][]) expectedOutputs.get(0))[0];
++            float[] visionScores = outputScores[0];
+             float[] combinedScores = new float[visionScores.length];
+             float[] geoScores;
+             if (mGeomodelScores != null) {
+@@ -158,43 +179,119 @@ public class ImageClassifier {
+         }
+         imgData.rewind();
+ 
+-        // Convert pixel values to be float from 0 to 1
+-        float[][][][] input = new float[1][ImageClassifier.DIM_IMG_SIZE_X][ImageClassifier.DIM_IMG_SIZE_Y][3];
+-        for (int x = 0; x < ImageClassifier.DIM_IMG_SIZE_X; x++) {
+-            for (int y = 0; y < ImageClassifier.DIM_IMG_SIZE_Y; y++) {
+-                int pixel = bitmap.getPixel(x, y);
+-                if (mModelVersion.equals("1.0")) {
+-                  // Normalize channel values to [0.0, 1.0] for version 1.0
+-                  input[0][x][y][0] = Color.red(pixel) / 255.0f;
+-                  input[0][x][y][1] = Color.green(pixel) / 255.0f;
+-                  input[0][x][y][2] = Color.blue(pixel) / 255.0f;
+-                } else {
+-                  input[0][x][y][0] = Color.red(pixel);
+-                  input[0][x][y][1] = Color.green(pixel);
+-                  input[0][x][y][2] = Color.blue(pixel);
++        try {
++            bitmap.getPixels(intValues, 0, DIM_IMG_SIZE_X, 0, 0, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
++            for (int x = 0; x < DIM_IMG_SIZE_X; x++) {
++                for (int y = 0; y < DIM_IMG_SIZE_Y; y++) {
++                    int pixel = intValues[(y * DIM_IMG_SIZE_X) + x];
++                    putRgb(Color.red(pixel), Color.green(pixel), Color.blue(pixel));
+                 }
+             }
++            imgData.rewind();
++        } catch (BufferOverflowException exc) {
++            Timber.tag(TAG).w("Exception while converting to byte buffer: " + exc);
+         }
+-        // Convert to ByteBuffer
++    }
++
++    private void convertImageToByteBuffer(Image image, double cropRatio) {
++        if (imgData == null) {
++            return;
++        }
++        imgData.rewind();
++
++        Image.Plane[] planes = image.getPlanes();
++        Image.Plane yPlane = planes[0];
++        Image.Plane uPlane = planes[1];
++        Image.Plane vPlane = planes[2];
++        ByteBuffer yBuffer = yPlane.getBuffer();
++        ByteBuffer uBuffer = uPlane.getBuffer();
++        ByteBuffer vBuffer = vPlane.getBuffer();
++        int imageWidth = image.getWidth();
++        int imageHeight = image.getHeight();
++        int cropSize = Math.max(1, (int)Math.round(Math.min(imageWidth, imageHeight) * cropRatio));
++        cropSize = Math.min(cropSize, Math.min(imageWidth, imageHeight));
++        int cropLeft = (imageWidth - cropSize) / 2;
++        int cropTop = (imageHeight - cropSize) / 2;
++
+         try {
+-            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * input.length * input[0].length * input[0][0].length * input[0][0][0].length);
+-            byteBuffer.order(ByteOrder.nativeOrder());
+-            for (int i = 0; i < input.length; i++) {
+-                for (int j = 0; j < input[0].length; j++) {
+-                    for (int k = 0; k < input[0][0].length; k++) {
+-                        for (int l = 0; l < input[0][0][0].length; l++) {
+-                            byteBuffer.putFloat(input[i][j][k][l]);
+-                        }
+-                    }
++            for (int x = 0; x < DIM_IMG_SIZE_X; x++) {
++                int sourceX = cropLeft + Math.min(cropSize - 1, (int)(((x + 0.5f) * cropSize) / DIM_IMG_SIZE_X));
++                for (int y = 0; y < DIM_IMG_SIZE_Y; y++) {
++                    int sourceY = cropTop + Math.min(cropSize - 1, (int)(((y + 0.5f) * cropSize) / DIM_IMG_SIZE_Y));
++                    putYuvPixel(
++                        yBuffer,
++                        uBuffer,
++                        vBuffer,
++                        yPlane.getRowStride(),
++                        yPlane.getPixelStride(),
++                        uPlane.getRowStride(),
++                        uPlane.getPixelStride(),
++                        vPlane.getRowStride(),
++                        vPlane.getPixelStride(),
++                        sourceX,
++                        sourceY
++                    );
+                 }
+             }
+-            byteBuffer.rewind();
+-            imgData.put(byteBuffer);
++            imgData.rewind();
+         } catch (BufferOverflowException exc) {
+             Timber.tag(TAG).w("Exception while converting to byte buffer: " + exc);
+         }
+     }
+ 
++    private void putYuvPixel(
++        ByteBuffer yBuffer,
++        ByteBuffer uBuffer,
++        ByteBuffer vBuffer,
++        int yRowStride,
++        int yPixelStride,
++        int uRowStride,
++        int uPixelStride,
++        int vRowStride,
++        int vPixelStride,
++        int x,
++        int y
++    ) {
++        int uvX = x / 2;
++        int uvY = y / 2;
++        int yValue = getPlaneValue(yBuffer, yRowStride, yPixelStride, x, y);
++        int uValue = getPlaneValue(uBuffer, uRowStride, uPixelStride, uvX, uvY);
++        int vValue = getPlaneValue(vBuffer, vRowStride, vPixelStride, uvX, uvY);
++        int c = Math.max(yValue - 16, 0);
++        int d = uValue - 128;
++        int e = vValue - 128;
++        int red = clampRgb((298 * c + 409 * e + 128) >> 8);
++        int green = clampRgb((298 * c - 100 * d - 208 * e + 128) >> 8);
++        int blue = clampRgb((298 * c + 516 * d + 128) >> 8);
++
++        putRgb(red, green, blue);
++    }
++
++    private int getPlaneValue(ByteBuffer buffer, int rowStride, int pixelStride, int x, int y) {
++        int index = (y * rowStride) + (x * pixelStride);
++        if (index < 0 || index >= buffer.capacity()) {
++            return 0;
++        }
++
++        return buffer.get(index) & 0xff;
++    }
++
++    private int clampRgb(int value) {
++        return Math.max(0, Math.min(255, value));
++    }
++
++    private void putRgb(int red, int green, int blue) {
++        if (mModelVersion.equals("1.0")) {
++            imgData.putFloat(red / 255.0f);
++            imgData.putFloat(green / 255.0f);
++            imgData.putFloat(blue / 255.0f);
++        } else {
++            imgData.putFloat(red);
++            imgData.putFloat(green);
++            imgData.putFloat(blue);
++        }
++    }
++
+     /** Combines vision and geo model scores */
+     private float[] combineVisionScores(float[] visionScores, float[] geoScores) {
+         float[] combinedScores = new float[visionScores.length];
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
 index 18f1134..0bbf19f 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
@@ -236,3 +457,43 @@ index 18f1134..0bbf19f 100644
    }
  
    @NonNull
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
+index 0c2b46a..c1b8f03 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
+@@ -1,6 +1,5 @@
+ package com.visioncameraplugininatvision;
+ 
+-import android.graphics.Bitmap;
+ import android.media.Image;
+ import android.os.SystemClock;
+ import android.util.Log;
+@@ -167,27 +166,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+     List<Map> cleanedPredictions = new ArrayList<>();
+     if (mImageClassifier != null) {
+       mImageClassifier.setGeomodelScores(geomodelScores);
+-      Bitmap bmp = BitmapUtils.getBitmap(image);
+-      Log.d(TAG, "originalBitmap: " + bmp + ": " + bmp.getWidth() + " x " + bmp.getHeight());
+-      // Crop the center square of the frame
+-      int minDim = (int) Math.round(Math.min(bmp.getWidth(), bmp.getHeight()) * mCropRatio);
+-      int cropX = (bmp.getWidth() - minDim) / 2;
+-      int cropY = (bmp.getHeight() - minDim) / 2;
+-      Log.d(TAG, "croppingParams: " + minDim + "; " + cropX + "; " + cropY);
+-      Bitmap croppedBitmap = Bitmap.createBitmap(bmp, cropX, cropY, minDim, minDim);
+-
+-      // Resize to expected classifier input size
+-      Bitmap rescaledBitmap = Bitmap.createScaledBitmap(
+-        croppedBitmap,
+-        ImageClassifier.DIM_IMG_SIZE_X,
+-        ImageClassifier.DIM_IMG_SIZE_Y,
+-        true);
+-      bmp.recycle();
+-      bmp = rescaledBitmap;
+-      Log.d(TAG, "rescaledBitmap: " + bmp + ": " + bmp.getWidth() + " x " + bmp.getHeight());
+-      List<Prediction> predictions = mImageClassifier.classifyBitmap(bmp, taxonomyRollupCutoff, false);
+-      bmp.recycle();
+-      croppedBitmap.recycle();
++      List<Prediction> predictions = mImageClassifier.classifyImage(image, mCropRatio, taxonomyRollupCutoff, false);
+ 
+       Log.d(TAG, "Predictions: " + predictions.size());
+ 

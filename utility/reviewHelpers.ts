@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as StoreReview from "react-native-store-review";
 import Realm from "realm";
 

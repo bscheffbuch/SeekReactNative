@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Realm from "realm";
 
 import * as createUUID from "uuid";

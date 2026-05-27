@@ -20,6 +20,7 @@ const usePatchedRunAsync = () => {
     console.log( "logOnJs - ", log, " - error?:", error?.message ?? "no error" );
   } );
   const isAsyncContextBusy = useWorkletSharedValue( false );
+  const queuedFrame = useWorkletSharedValue( null );
   const customRunOnAsyncContext = Worklets.defaultContext.createRunAsync(
     ( frame, func ) => {
       "worklet";
@@ -30,7 +31,14 @@ const usePatchedRunAsync = () => {
         logOnJs( "customRunOnAsyncContext error", e );
       } finally {
         frame.decrementRefCount();
-        isAsyncContextBusy.value = false;
+        const nextFrame = queuedFrame.value;
+        queuedFrame.value = null;
+
+        if ( nextFrame != null ) {
+          customRunOnAsyncContext( nextFrame, func );
+        } else {
+          isAsyncContextBusy.value = false;
+        }
       }
     }
   );
@@ -38,12 +46,17 @@ const usePatchedRunAsync = () => {
   function customRunAsync( frame, func ) {
     "worklet";
 
+    const internal = frame;
+    internal.incrementRefCount();
     if ( isAsyncContextBusy.value ) {
+      const previousQueuedFrame = queuedFrame.value;
+      if ( previousQueuedFrame != null ) {
+        previousQueuedFrame.decrementRefCount();
+      }
+      queuedFrame.value = internal;
       return;
     }
     isAsyncContextBusy.value = true;
-    const internal = frame;
-    internal.incrementRefCount();
     customRunOnAsyncContext( internal, func );
   }
 

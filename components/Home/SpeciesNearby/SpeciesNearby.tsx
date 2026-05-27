@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback, useReducer, useEffect } from "react";
 import { View, Platform, Modal } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";

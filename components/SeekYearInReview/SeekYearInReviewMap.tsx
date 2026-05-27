@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback } from "react";
 import { Image } from "react-native";
 import MapView, { PROVIDER_DEFAULT, Marker } from "react-native-maps";

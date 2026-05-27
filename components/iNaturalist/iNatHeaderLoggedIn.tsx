@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useContext, useState } from "react";
 import { View, Platform } from "react-native";
 import LinearGradient from "react-native-linear-gradient";

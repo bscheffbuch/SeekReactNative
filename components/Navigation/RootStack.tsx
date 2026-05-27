@@ -56,7 +56,7 @@ const App = ( ) => {
   
   return (
     <NavigationContainer ref={navigationRef}>
-      <Stack.Navigator >
+      <Stack.Navigator id={undefined}>
         <Stack.Group screenOptions={screenOptions}>
           <Stack.Screen name="Splash" component={Splash} options={defaultConfig} />
           <Stack.Screen name="Onboarding" component={Onboarding} options={defaultConfig} />
@@ -72,7 +72,7 @@ const App = ( ) => {
           <Stack.Screen name="Parent" component={ParentalConsentScreen} options={defaultConfig} />
           <Stack.Screen name="ParentCheck" component={ParentCheckEmailScreen} options={defaultConfig} />
           <Stack.Screen name="LicensePhotos" component={LicensePhotosScreen} options={defaultConfig} />
-          <Stack.Screen name="Signup" component={SignUpScreen} options={defaultConfig} />
+          <Stack.Screen name="Signup" component={SignUpScreen as React.ComponentType<any>} options={defaultConfig} />
           <Stack.Screen name="LoginSuccess" component={LoginSuccessScreen} options={defaultConfig} />
           {/* TODO: Social screen needs Lato font restyling, or can it be deleted? */}
           <Stack.Screen name="Social" component={Social} options={defaultConfig} />

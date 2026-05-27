@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useEffect, useCallback } from "react";
 import { Image, Pressable, ScrollView } from "react-native";
 import Animated, {

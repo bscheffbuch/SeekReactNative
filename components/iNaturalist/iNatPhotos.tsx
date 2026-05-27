@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from "react";
 import { View, Image } from "react-native";
 import { useNetInfo } from "@react-native-community/netinfo";

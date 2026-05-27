@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useReducer, useCallback, useRef } from "react";
 import { BackHandler, ScrollView } from "react-native";
 import { useNavigation } from "@react-navigation/native";

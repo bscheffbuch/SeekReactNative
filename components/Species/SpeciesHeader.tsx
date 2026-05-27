@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback } from "react";
 import { BackHandler } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";

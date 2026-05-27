@@ -17,6 +17,7 @@ import {
   mockUseCameraDevice,
   mockUseCameraDevices,
   mockUseCameraFormat,
+  mockUseLocationPermission,
 } from "./vision-camera/vision-camera";
 
 require( "react-native-reanimated" ).setUpTests();
@@ -204,6 +205,7 @@ jest.mock( "react-native-vision-camera", () => ( {
   useCameraDevices: mockUseCameraDevices,
   useCameraFormat: mockUseCameraFormat,
   useFrameProcessor: jest.fn(),
+  useLocationPermission: mockUseLocationPermission,
   VisionCameraProxy: {
     initFrameProcessorPlugin: jest.fn(),
   },
@@ -246,5 +248,4 @@ jest.mock( "@react-native-camera-roll/camera-roll", () => ( {
     save: jest.fn( ( _uri, _options = {} ) => "test_url" ),
   },
 } ) );
-
 

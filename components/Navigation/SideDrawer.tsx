@@ -19,7 +19,7 @@ import Notifications from "../Notifications/Notifications";
 import type { DrawerParamList } from "./types";
 
 const Drawer = createDrawerNavigator<DrawerParamList>( );
-const drawerContent = props => <SideMenu {...props} />;
+const drawerContent = ( props: any ) => <SideMenu {...props} />;
 
 const screenOptions = {
   headerShown: false,
@@ -28,6 +28,7 @@ const screenOptions = {
 
 const SideDrawer = ( ) => (
   <Drawer.Navigator
+    id={undefined}
     initialRouteName="Home"
     drawerContent={drawerContent}
     screenOptions={screenOptions}

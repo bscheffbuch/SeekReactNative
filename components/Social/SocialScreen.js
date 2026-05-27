@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import Checkbox from "react-native-check-box";
-import { Node } from "react";
 
 import { colors, dimensions } from "../../styles/global";
 import { viewStyles, textStyles, imageStyles } from "../../styles/social/social";
@@ -26,7 +25,7 @@ import CropScreen from "./CropScreen";
 import StyledText from "../UIComponents/StyledText";
 import { useObservation } from "../Providers/ObservationProvider";
 
-const SocialScreen = ( ): Node => {
+const SocialScreen = ( ) => {
   const { observation } = useObservation();
   const { image } = observation;
   const { uri } = image;
@@ -112,7 +111,7 @@ const SocialScreen = ( ): Node => {
 
   const toggleWatermark = ( ) => dispatch( { type: "TOGGLE_WATERMARK", showWatermark: !showWatermark } );
 
-  const createWatermark = useCallback( async ( uriToWatermark: string, type: string ) => {
+  const createWatermark = useCallback( async ( uriToWatermark, type ) => {
     if ( noWatermark ) {
       return;
     }

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useCallback } from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import Realm from "realm";

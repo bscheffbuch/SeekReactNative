@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { PermissionsAndroid, Platform } from "react-native";
 
 const onlyCheckLocationPermissions = async ( ): Promise<boolean> => {

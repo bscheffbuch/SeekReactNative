@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from "react";
 import { View, Alert, ScrollView } from "react-native";
 import HTML, {

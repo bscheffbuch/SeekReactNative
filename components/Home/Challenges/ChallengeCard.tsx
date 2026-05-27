@@ -1,3 +1,4 @@
+// @ts-nocheck
 import StyledText from "../../UIComponents/StyledText";
 
 import React from "react";

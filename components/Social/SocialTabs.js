@@ -5,12 +5,7 @@ import { viewStyles, textStyles } from "../../styles/social/social";
 import i18n from "../../i18n";
 import StyledText from "../UIComponents/StyledText";
 
-type Props = {
-  tab: string,
-  toggleTab: Function
-}
-
-const SocialTabs = ( { tab, toggleTab }: Props ): React.Node => {
+const SocialTabs = ( { tab, toggleTab } ) => {
   const renderTab = selectedTab => (
     <TouchableOpacity onPress={toggleTab}>
       <StyledText style={[textStyles.photoSizeText, tab === selectedTab && textStyles.selectedPhotoSizeText]}>

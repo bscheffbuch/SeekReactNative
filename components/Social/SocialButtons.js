@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Node } from "react";
 
 import { viewStyles, textStyles } from "../../styles/social/social";
 import { dimensions, colors } from "../../styles/global";
@@ -11,13 +10,7 @@ import { shareToFacebook, saveToCameraRoll } from "../../utility/socialHelpers";
 import { UserContext } from "../UserContext";
 import StyledText from "../UIComponents/StyledText";
 
-type Props = {
-  image: ?string,
-  tab: string,
-  disabled: boolean
-};
-
-const SocialButtons = ( { image, tab, disabled }: Props ): Node => {
+const SocialButtons = ( { image, tab, disabled } ) => {
   const { login } = useContext( UserContext );
 
   const [saved, setSaved] = useState( false );

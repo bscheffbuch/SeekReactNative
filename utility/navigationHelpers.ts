@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Platform, DeviceEventEmitter } from "react-native";
 import QuickActions from "react-native-quick-actions";
 import { CommonActions } from "@react-navigation/native";

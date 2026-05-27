@@ -9,21 +9,13 @@ import GreenText from "../UIComponents/GreenText";
 import CustomBackArrow from "../UIComponents/Buttons/CustomBackArrow";
 import { viewStyles } from "../../styles/social/social";
 
-type Props = {
-  saveCrop: Function,
-  uri: ?string,
-  cropViewRef: any,
-  handleImageCrop: Function,
-  closeModal: Function
-}
-
 const CropScreen = ( {
   saveCrop,
   uri,
   cropViewRef,
   handleImageCrop,
   closeModal,
-}: Props ): React.Node => (
+} ) => (
   <SafeAreaView style={viewStyles.cropScreenContainer} edges={["top"]}>
     <View style={viewStyles.header}>
       <CustomBackArrow handlePress={closeModal} style={viewStyles.backButton} green />

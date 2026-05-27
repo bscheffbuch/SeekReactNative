@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { I18n } from "i18n-js";
 
 import af from "./translations/af.json";

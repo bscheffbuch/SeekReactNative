@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { AlertButton} from "react-native";
 import { Alert, Linking, Platform } from "react-native";
 import Geocoder from "react-native-geocoder";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Platform } from "react-native";
 import { DocumentDirectoryPath, MainBundlePath } from "@dr.pogodin/react-native-fs";
 

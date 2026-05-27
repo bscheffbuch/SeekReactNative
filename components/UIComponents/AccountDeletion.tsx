@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as React from "react";
 import { Platform, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";

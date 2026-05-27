@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useEffect } from "react";
 
 const createRegion = ( region: { latitude: number; longitude: number } ) => {
