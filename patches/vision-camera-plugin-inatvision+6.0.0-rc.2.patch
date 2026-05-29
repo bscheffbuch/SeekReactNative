@@ -237,7 +237,7 @@ index 0000000..d93241f
 +
 +}
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-index dd91fb5..5acfdb2 100644
+index dd91fb5..6b59797 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 @@ -2,9 +2,11 @@ package com.visioncameraplugininatvision;
@@ -252,7 +252,13 @@ index dd91fb5..5acfdb2 100644
  
  import java.io.FileInputStream;
  import java.io.IOException;
-@@ -52,6 +54,16 @@ public class ImageClassifier {
+@@ -49,9 +51,22 @@ public class ImageClassifier {
+     /** An instance of the driver class to run model inference with Tensorflow Lite. */
+     private Interpreter mTFlite;
+ 
++    /** Optional GPU delegate kept alive for the lifetime of the interpreter. */
++    private GpuDelegate mGpuDelegate;
++
      /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
      private ByteBuffer imgData;
  
@@ -269,25 +275,16 @@ index dd91fb5..5acfdb2 100644
      private float[][] mGeomodelScores;
  
      public void setFilterByTaxonId(Integer taxonId) {
-@@ -79,7 +91,16 @@ public class ImageClassifier {
+@@ -79,7 +94,7 @@ public class ImageClassifier {
          mModelFilename = modelPath;
          mTaxonomyFilename = taxonomyPath;
          mModelVersion = version;
 -        mTFlite = new Interpreter(loadModelFile());
-+        Interpreter.Options options = new Interpreter.Options();
-+        try {
-+            GpuDelegate gpuDelegate = new GpuDelegate();
-+            options.addDelegate(gpuDelegate);
-+        } catch (Exception e) {
-+            try {
-+                options.setUseNNAPI(true);
-+            } catch (Exception e2) { /* CPU fallback */ }
-+        }
-+        mTFlite = new Interpreter(loadModelFile(), options);
++        mTFlite = createInterpreter(loadModelFile());
          imgData =
                  ByteBuffer.allocateDirect(
                          4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
-@@ -88,6 +109,10 @@ public class ImageClassifier {
+@@ -88,6 +103,10 @@ public class ImageClassifier {
  
          mTaxonomy = new Taxonomy(new FileInputStream(mTaxonomyFilename), mModelVersion);
          mModelSize = mTaxonomy.getModelSize();
@@ -298,7 +295,7 @@ index dd91fb5..5acfdb2 100644
      }
  
      /** Classifies a frame from the preview stream. */
-@@ -102,31 +127,45 @@ public class ImageClassifier {
+@@ -102,31 +121,45 @@ public class ImageClassifier {
          }
          convertBitmapToByteBuffer(bitmap);
  
@@ -324,11 +321,11 @@ index dd91fb5..5acfdb2 100644
 +            return new ArrayList<Prediction>();
 +        }
 +        convertImageToByteBuffer(image, cropRatio);
- 
--        Object[] input = { imgData };
++
 +        return runInference(taxonomyRollupCutoff, commonAncestorMode);
 +    }
-+
+ 
+-        Object[] input = { imgData };
 +    private List<Prediction> runInference(Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
          List<Prediction> predictions = null;
          try {
@@ -359,7 +356,48 @@ index dd91fb5..5acfdb2 100644
          } catch (Exception exc) {
              exc.printStackTrace();
              return new ArrayList<Prediction>();
-@@ -158,46 +197,139 @@ public class ImageClassifier {
+@@ -140,8 +173,39 @@ public class ImageClassifier {
+ 
+     /** Closes tflite to release resources. */
+     public void close() {
+-        mTFlite.close();
++        if (mTFlite != null) {
++            mTFlite.close();
++        }
+         mTFlite = null;
++        if (mGpuDelegate != null) {
++            mGpuDelegate.close();
++        }
++        mGpuDelegate = null;
++    }
++
++    private Interpreter createInterpreter(MappedByteBuffer modelBuffer) {
++        try {
++            Interpreter.Options gpuOptions = new Interpreter.Options();
++            mGpuDelegate = new GpuDelegate();
++            gpuOptions.addDelegate(mGpuDelegate);
++            return new Interpreter(modelBuffer, gpuOptions);
++        } catch (Exception exc) {
++            Timber.tag(TAG).w("Failed to initialize GPU delegate, falling back: " + exc);
++            if (mGpuDelegate != null) {
++                mGpuDelegate.close();
++                mGpuDelegate = null;
++            }
++        }
++
++        try {
++            Interpreter.Options nnapiOptions = new Interpreter.Options();
++            nnapiOptions.setUseNNAPI(true);
++            return new Interpreter(modelBuffer, nnapiOptions);
++        } catch (Exception exc) {
++            Timber.tag(TAG).w("Failed to initialize NNAPI delegate, falling back to CPU: " + exc);
++        }
++
++        return new Interpreter(modelBuffer, new Interpreter.Options());
+     }
+ 
+     /** Memory-map the model file in Assets. */
+@@ -158,46 +222,139 @@ public class ImageClassifier {
          }
          imgData.rewind();
  
@@ -527,7 +565,7 @@ index dd91fb5..5acfdb2 100644
          float sum = 0.0f;
  
          // First multiply the scores
-@@ -214,8 +346,6 @@ public class ImageClassifier {
+@@ -214,8 +371,6 @@ public class ImageClassifier {
                  combinedScores[i] = combinedScores[i] / sum;
              }
          }
