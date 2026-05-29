@@ -17,6 +17,7 @@ interface State {
   autoCapture?: boolean;
   scientificNames?: boolean;
   cameraViewportResolution?: string;
+  photoQualityBalance?: string;
 }
 
 const cameraViewportResolutionOptions = [
@@ -25,6 +26,12 @@ const cameraViewportResolutionOptions = [
   { label: "1080p", value: "1080p" },
   { label: "1440p", value: "1440p" },
   { label: "2160p", value: "2160p" },
+];
+
+const photoQualityBalanceOptions = [
+  { label: i18n.t( "settings.photo_quality_speed" ), value: "speed" },
+  { label: i18n.t( "settings.photo_quality_balanced" ), value: "balanced" },
+  { label: i18n.t( "settings.photo_quality_quality" ), value: "quality" },
 ];
 const placeholder = {};
 const pickerStyles = { ...viewStyles };
@@ -67,6 +74,17 @@ const CameraSettings = ( ) => {
     setSettings( {
       ...settings,
       cameraViewportResolution: newValue,
+    } );
+  };
+
+  const updatePhotoQualityBalance = async ( value: string ) => {
+    if ( !value || value === settings.photoQualityBalance ) {
+      return;
+    }
+    const newValue = await updateUserSetting( "photoQualityBalance", value );
+    setSettings( {
+      ...settings,
+      photoQualityBalance: newValue,
     } );
   };
 
@@ -149,6 +167,22 @@ const CameraSettings = ( ) => {
           placeholder={placeholder}
           useNativeAndroidPickerStyle={false}
           value={settings.cameraViewportResolution || "720p"}
+          style={pickerStyles}
+          pickerProps={{
+            themeVariant: "light",
+          }}
+        />
+      </View>
+      <View style={viewStyles.donateMarginBottom}>
+        <StyledText style={baseTextStyles.header}>{i18n.t( "settings.photo_quality_balance" ).toLocaleUpperCase()}</StyledText>
+        <RNPickerSelect
+          hideIcon
+          Icon={showIcon}
+          items={photoQualityBalanceOptions}
+          onValueChange={updatePhotoQualityBalance}
+          placeholder={placeholder}
+          useNativeAndroidPickerStyle={false}
+          value={settings.photoQualityBalance || "balanced"}
           style={pickerStyles}
           pickerProps={{
             themeVariant: "light",

@@ -9,6 +9,7 @@ const useFetchUserSettings = ( ) => {
     localSeasonality?: boolean;
     scientificNames?: boolean;
     cameraViewportResolution?: string;
+    photoQualityBalance?: string;
     appVersion?: string;
   }>( { } );
 

@@ -5,6 +5,7 @@ class UserSettingsRealm extends Realm.Object<UserSettingsRealm> {
   localSeasonality!: boolean;
   scientificNames!: boolean;
   cameraViewportResolution!: string;
+  photoQualityBalance!: string;
   appVersion!: string;
 
   static schema: Realm.ObjectSchema = {
@@ -14,6 +15,7 @@ class UserSettingsRealm extends Realm.Object<UserSettingsRealm> {
       localSeasonality: { type: "bool", default: false },
       scientificNames: { type: "bool", default: false },
       cameraViewportResolution: { type: "string", default: "720p" },
+      photoQualityBalance: { type: "string", default: "balanced" },
       appVersion: { type: "string", default: "2.0.0" },
     },
   };

@@ -201,6 +201,7 @@ const ARCamera = ( ) => {
   const viewportResolution = CAMERA_VIEWPORT_RESOLUTIONS.find(
     resolution => resolution.label === userSettings.cameraViewportResolution
   ) || CAMERA_VIEWPORT_RESOLUTIONS[1];
+  const photoQualityBalance = ( userSettings.photoQualityBalance as "speed" | "balanced" | "quality" | undefined ) || "balanced";
 
   useEffect( () => {
     const selectedZoomAvailable = backCameraZoomPresets.some(
@@ -833,6 +834,7 @@ const ARCamera = ( ) => {
         focusPeakingEnabled={focusPeakingEnabled}
         focusPeakingSensitivity={focusPeakingSensitivity}
         viewportResolution={viewportResolution}
+        photoQualityBalance={photoQualityBalance}
         photoHdrEnabled={photoHdrEnabled}
         torch={torch}
         zoom={cameraZoom || device.neutralZoom}

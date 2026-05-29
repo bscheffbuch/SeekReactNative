@@ -157,7 +157,7 @@ const checkInactiveTaxonIds = async ( id ) => {
       // if no longer active or taxon replaced by 2 taxa, roll up to nearest common ancestor
       return ancestorIds[ancestorIds.length - 1];
     }
-  } catch ( e ) {
+  } catch {
     return id;
   }
 };
@@ -287,6 +287,31 @@ const saveObservationToRealm = async ( observation: Observation, uri: string ): 
   }
 };
 
+const saveObservationLocally = async ( observation: Observation, uri: string ): Promise<void> => {
+  const realm = await Realm.open( realmConfig );
+  const obsUUID = createUUID.v4();
+  const photoUUID = createUUID.v4();
+
+  try {
+    realm.write( ( ) => {
+      const photo = realm.create( "UploadPhotoRealm", {
+        uri,
+        uploadSucceeded: false,
+        uuid: photoUUID,
+        notificationShown: false,
+      } );
+      realm.create( "UploadObservationRealm", {
+        ...observation,
+        uuid: obsUUID,
+        photo,
+      }, true );
+    } );
+  } catch ( e ) {
+    console.log( "couldn't save observation locally", e );
+    logger.debug( `saveObservationLocally error: ${e}` );
+  }
+};
+
 const checkForNumSuccessfulUploads = async ( ): Promise<number> => {
   const realm = await Realm.open( realmConfig );
 
@@ -337,6 +362,7 @@ const checkForUploads = async ( ) => {
 export {
   resizeImageForUpload,
   saveObservationToRealm,
+  saveObservationLocally,
   checkForNumSuccessfulUploads,
   markUploadsAsSeen,
   checkForUploads,

@@ -80,6 +80,7 @@ interface Props {
   useLocation: boolean;
   hasPermission: boolean;
   onCaptureStarted: ( ) => void;
+  photoQualityBalance?: "speed" | "balanced" | "quality";
 }
 
 const PEAKING_SAMPLE_INTERVAL_MS = 33;
@@ -340,6 +341,7 @@ const FrameProcessorCamera = ( props: Props ) => {
     useLocation,
     hasPermission,
     onCaptureStarted,
+    photoQualityBalance = "balanced",
   } = props;
 
   const navigation = useNavigation( );
@@ -743,9 +745,10 @@ const FrameProcessorCamera = ( props: Props ) => {
             onStarted={onCameraStarted}
             onShutter={onCaptureStarted}
             outputOrientation="device"
-            photoQualityBalance="speed"
+            photoQualityBalance={photoQualityBalance}
             videoStabilizationMode={videoStabilizationMode}
-            focusPeakingEnabled={USE_NATIVE_FOCUS_PEAKING && focusPeakingEnabled}
+            focusPeakingEnabled={USE_NATIVE_FOCUS_PEAKING}
+            focusPeakingActive={USE_NATIVE_FOCUS_PEAKING && focusPeakingEnabled}
             focusPeakingSensitivity={focusPeakingSensitivity}
             enableLocation={hasPermission}
             onPreviewOrientationChanged={handlePreviewOrientationChanged}
