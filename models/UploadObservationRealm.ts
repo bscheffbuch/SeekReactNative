@@ -18,6 +18,11 @@ class UploadObservationRealm extends Realm.Object {
       description: "string?",
       photo: "UploadPhotoRealm",
       vision: "bool",
+      // marks a locally-saved "save for later" draft that has not been uploaded yet
+      queued: { type: "bool", default: false },
+      // JSON-encoded array of photo paths, used for multi-photo observations
+      // created by combining queued drafts. Falls back to `photo.uri` when null.
+      photoUris: "string?",
     },
   };
 }

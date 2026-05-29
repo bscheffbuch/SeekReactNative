@@ -337,6 +337,26 @@
     "tap": "Tap to load species nearby",
     "social": "Share on social"
   },
+  "queue": {
+    "header": "Queued Observations",
+    "view_queue": "View queued observations",
+    "save_for_later": "Save for later",
+    "saved_pending": "Saved — {{count}} pending",
+    "empty": "No queued observations yet. Use the Save for Later button on the camera to add some.",
+    "select_draft": "Select observation",
+    "selected": "Selected",
+    "no_location": "No location",
+    "combine": "Combine into one observation",
+    "upload_all": "Upload all",
+    "login_hint": "Log in to upload your queued observations to iNaturalist.",
+    "delete_title": "Delete observation?",
+    "delete_message": "This will remove the queued observation and its photo.",
+    "delete_confirm": "Delete",
+    "login_required_title": "Log in required",
+    "login_required_message": "You need to be logged in to upload observations to iNaturalist.",
+    "upload_complete_title": "Upload complete",
+    "upload_complete_message": "{{success}} uploaded, {{failed}} failed."
+  },
   "banner": {
     "view": "View badge",
     "badge": "Badge",

@@ -16,6 +16,7 @@ export type DrawerParamList = {
   Challenges: undefined;
   ChallengeDetails: undefined;
   Observations: undefined;
+  QueuedObservations: undefined;
   iNatStats: undefined;
   About: undefined;
   Settings: undefined;

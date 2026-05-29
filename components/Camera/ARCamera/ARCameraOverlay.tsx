@@ -82,6 +82,8 @@ interface Props {
   toggleLocation: ( ) => void;
   useLocation: boolean;
   handleToastEnd: ( ) => void;
+  saveForLater: ( ) => void;
+  queueCount: number;
 }
 
 const isAndroid = Platform.OS === "android";
@@ -122,6 +124,8 @@ const ARCameraOverlay = ( {
   toggleLocation,
   useLocation,
   handleToastEnd,
+  saveForLater,
+  queueCount,
 }: Props ) => {
   const { isLandscape } = useAppOrientation( );
   const { navigate } = useNavigation( );
@@ -312,6 +316,14 @@ const ARCameraOverlay = ( {
         toastText={i18n.t( "camera.flash_off" )}
         rectangleColor={colors.plantsFilter}
       />
+      <ToastAnimation
+        testID="savedForLaterToast"
+        visible={visibleToast === TOAST.SAVED_FOR_LATER}
+        finishAnimation={handleToastEnd}
+        styles={viewStyles.plantFilter}
+        toastText={i18n.t( "queue.saved_pending", { count: queueCount } )}
+        rectangleColor={colors.seekGreen}
+      />
       <View style={setTaxonomicRankColorStyles( )}>
         <StyledText style={[baseTextStyles.buttonSmall, textStyles.scanText, !isLandscape && textStyles.textShadow]}>{helpText}</StyledText>
       </View>
@@ -379,6 +391,23 @@ const ARCameraOverlay = ( {
           >
             <Image source={icons.cameraHelp} />
           </TouchableOpacity>
+          <TouchableOpacityWithDebounce
+            accessibilityLabel={i18n.t( "queue.save_for_later" )}
+            accessible
+            testID="saveForLaterButton"
+            onPress={saveForLater}
+            style={viewStyles.saveForLaterButton}
+            disabled={pictureTaken}
+          >
+            <Image tintColor={colors.white} source={icons.checklist} />
+            {queueCount > 0 && (
+              <View style={viewStyles.saveForLaterBadge}>
+                <StyledText style={textStyles.saveForLaterBadgeText}>
+                  {queueCount}
+                </StyledText>
+              </View>
+            )}
+          </TouchableOpacityWithDebounce>
         </View>
 
         <TouchableOpacityWithDebounce

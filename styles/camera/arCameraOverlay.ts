@@ -124,15 +124,39 @@ const viewStyles = StyleSheet.create( {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 20,
-    width: 100,
+    gap: 16,
+    width: 130,
     height: 60,
   },
   rightControls: {
     justifyContent: "center",
-    width: 100,
+    width: 130,
     height: 60,
     alignItems: "center",
+  },
+  saveForLaterButton: {
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: colors.white,
+    borderWidth: 2,
+    borderRadius: 30,
+    width: 56,
+    height: 56,
+  },
+  saveForLaterBadge: {
+    position: "absolute",
+    top: -4,
+    right: -4,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.seekGreen,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 5,
+    borderColor: colors.white,
+    borderWidth: 1,
   },
   galleryButton: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -149,6 +173,12 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   scanText: {
+    textAlign: "center",
+  },
+  saveForLaterBadgeText: {
+    color: colors.white,
+    fontSize: 13,
+    fontWeight: "700",
     textAlign: "center",
   },
   textShadow: {

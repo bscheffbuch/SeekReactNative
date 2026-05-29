@@ -112,36 +112,65 @@ index 0000000..b0a85c4
 +}
 \ No newline at end of file
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
-index f91ce83..c36726a 100644
+index f91ce83..3f48cc0 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
 @@ -2,6 +2,7 @@ package com.mrousavy.camera.core
- 
+
  import android.util.Range
  import androidx.camera.core.Preview.SurfaceProvider
 +import androidx.camera.core.ViewPort
  import com.mrousavy.camera.core.types.CameraDeviceFormat
  import com.mrousavy.camera.core.types.CodeType
  import com.mrousavy.camera.core.types.OutputOrientation
-@@ -34,6 +35,8 @@ data class CameraConfiguration(
+@@ -34,6 +35,9 @@ data class CameraConfiguration(
    var enableLowLightBoost: Boolean = false,
    var torch: Torch = Torch.OFF,
    var videoStabilizationMode: VideoStabilizationMode = VideoStabilizationMode.OFF,
 +  var focusPeakingEnabled: Boolean = false,
++  var focusPeakingActive: Boolean = false,
 +  var focusPeakingSensitivity: Float = 0.35f,
    var exposure: Double? = null,
- 
+
    // Zoom
-@@ -51,7 +54,7 @@ data class CameraConfiguration(
+@@ -51,7 +55,35 @@ data class CameraConfiguration(
    data class Video(val isMirrored: Boolean, val enableHdr: Boolean, val bitRateOverride: Double?, val bitRateMultiplier: Double?)
    data class FrameProcessor(val isMirrored: Boolean, val pixelFormat: PixelFormat)
    data class Audio(val nothing: Unit)
 -  data class Preview(val surfaceProvider: SurfaceProvider)
-+  data class Preview(val surfaceProvider: SurfaceProvider, val viewPort: ViewPort?)
- 
++  class Preview(val surfaceProvider: SurfaceProvider, val viewPort: ViewPort?) {
++    private val viewPortKey = viewPort?.let { viewPort ->
++      ViewPortKey(
++        viewPort.aspectRatio.numerator,
++        viewPort.aspectRatio.denominator,
++        viewPort.rotation,
++        viewPort.scaleType,
++        viewPort.layoutDirection
++      )
++    }
++
++    override fun equals(other: Any?): Boolean {
++      return other is Preview &&
++        surfaceProvider == other.surfaceProvider &&
++        viewPortKey == other.viewPortKey
++    }
++
++    override fun hashCode(): Int {
++      return 31 * surfaceProvider.hashCode() + (viewPortKey?.hashCode() ?: 0)
++    }
++  }
++
++  private data class ViewPortKey(
++    val aspectRatioNumerator: Int,
++    val aspectRatioDenominator: Int,
++    val rotation: Int,
++    val scaleType: Int,
++    val layoutDirection: Int
++  )
+
    val targetFpsRange: Range<Int>?
      get() {
-@@ -125,10 +128,10 @@ data class CameraConfiguration(
+@@ -125,10 +157,10 @@ data class CameraConfiguration(
        val outputsChanged = left?.photo != right.photo ||
          left.video != right.video ||
          left.enableLowLightBoost != right.enableLowLightBoost ||
@@ -153,22 +182,23 @@ index f91ce83..c36726a 100644
          left.format != right.format ||
          left.minFps != right.minFps ||
          left.maxFps != right.maxFps
-@@ -138,6 +141,8 @@ data class CameraConfiguration(
- 
+@@ -138,6 +170,9 @@ data class CameraConfiguration(
+
        // repeating request
        val sidePropsChanged = deviceChanged ||
 +        left?.videoStabilizationMode != right.videoStabilizationMode ||
++        left?.focusPeakingActive != right.focusPeakingActive ||
 +        left?.focusPeakingSensitivity != right.focusPeakingSensitivity ||
          left?.torch != right.torch ||
          left.zoom != right.zoom ||
          left.exposure != right.exposure
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
-index 1e9c0de..8d039ca 100644
+index 1e9c0de..0970d3b 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 @@ -1,8 +1,19 @@
  package com.mrousavy.camera.core
- 
+
  import android.annotation.SuppressLint
 +import android.content.Context
 +import android.hardware.camera2.CameraCharacteristics
@@ -206,7 +236,7 @@ index 1e9c0de..8d039ca 100644
 +import java.lang.Integer as JavaInteger
  import com.mrousavy.camera.core.utils.CamcorderProfileUtils
  import kotlin.math.roundToInt
- 
+
 +private const val QCOM_EIS_MODE_KEY_NAME = "org.codeaurora.qcamera3.sessionParameters.EISMode"
 +private const val SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME = "samsung.android.control.swVideoStabilization"
 +private const val SAMSUNG_OIS_OPERATION_MODE_KEY_NAME = "samsung.android.lens.opticalStabilizationOperationMode"
@@ -242,7 +272,7 @@ index 1e9c0de..8d039ca 100644
        if (format != null) {
 @@ -146,6 +177,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
      }
- 
+
      val video = VideoCapture.Builder(recorder).also { video ->
 +      configureStabilizationCaptureRequestOptions(Camera2Interop.Extender(video), configuration)
        // Configure Video Output
@@ -283,12 +313,12 @@ index 1e9c0de..8d039ca 100644
    }
 +  focusPeakingEffect?.release()
 +  focusPeakingEffect = null
- 
+
    // Bind it all together (must be on UI Thread)
    Log.i(CameraSession.TAG, "Binding ${useCases.size} use-cases...")
 -  camera = provider.bindToLifecycle(this, cameraSelector, *useCases.toTypedArray())
 +  val nextFocusPeakingEffect = if (configuration.focusPeakingEnabled && previewOutput != null) {
-+    FocusPeakingPreviewEffect(true, configuration.focusPeakingSensitivity)
++    FocusPeakingPreviewEffect(configuration.focusPeakingActive, configuration.focusPeakingSensitivity)
 +  } else {
 +    null
 +  }
@@ -306,14 +336,14 @@ index 1e9c0de..8d039ca 100644
 +  isManualFocusActive = false
    // Notify callback
    callback.onInitialized()
- 
+
 @@ -336,6 +390,201 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
    if (currentExposureCompensation != exposureCompensation) {
      camera.cameraControl.setExposureCompensationIndex(exposureCompensation)
    }
 +
 +  configureStabilizationCaptureRequestOptions(config)
-+  focusPeakingEffect?.update(config.focusPeakingEnabled, config.focusPeakingSensitivity)
++  focusPeakingEffect?.update(config.focusPeakingActive, config.focusPeakingSensitivity)
 +}
 +
 +@OptIn(ExperimentalCamera2Interop::class)
@@ -507,7 +537,7 @@ index 1e9c0de..8d039ca 100644
 +    null
 +  }
  }
- 
+
  internal fun CameraSession.configureIsActive(config: CameraConfiguration) {
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
 index a295fdc..1c2187a 100644
@@ -515,7 +545,7 @@ index a295fdc..1c2187a 100644
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
 @@ -1,11 +1,20 @@
  package com.mrousavy.camera.core
- 
+
  import android.annotation.SuppressLint
 +import android.hardware.camera2.CameraCharacteristics
 +import android.hardware.camera2.CaptureRequest
@@ -531,7 +561,7 @@ index a295fdc..1c2187a 100644
  import com.mrousavy.camera.core.extensions.await
 +import kotlin.math.max
 +import kotlin.math.min
- 
+
  @SuppressLint("RestrictedApi")
  suspend fun CameraSession.focus(meteringPoint: MeteringPoint) {
 @@ -29,3 +38,64 @@ suspend fun CameraSession.focus(meteringPoint: MeteringPoint) {
@@ -617,7 +647,7 @@ index 13f6a76..b5b006c 100644
    internal var codeScannerOutput: ImageAnalysis? = null
 +  internal var focusPeakingEffect: FocusPeakingPreviewEffect? = null
    internal var currentUseCases: List<UseCase> = emptyList()
- 
+
    // Camera Outputs State
 @@ -63,6 +65,7 @@ class CameraSession(internal val context: Context, internal val callback: Callba
    internal val lifecycleRegistry = LifecycleRegistry(this)
@@ -625,7 +655,7 @@ index 13f6a76..b5b006c 100644
    internal var isRecordingCanceled = false
 +  internal var isManualFocusActive = false
    internal val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
- 
+
    // Threading
 @@ -84,6 +87,8 @@ class CameraSession(internal val context: Context, internal val callback: Callba
    override fun close() {
@@ -933,7 +963,7 @@ index a9d5683..c854855 100644
 +import com.mrousavy.camera.core.resetFocus
 +import com.mrousavy.camera.core.setManualFocus
  import com.mrousavy.camera.core.utils.runOnUiThreadAndWait
- 
+
  suspend fun CameraView.focus(pointMap: ReadableMap) {
 @@ -17,3 +19,11 @@ suspend fun CameraView.focus(pointMap: ReadableMap) {
    }
@@ -948,19 +978,20 @@ index a9d5683..c854855 100644
 +  cameraSession.resetFocus()
 +}
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt
-index 64a751e..2caa87e 100644
+index 64a751e..36df5d5 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraView.kt
-@@ -87,6 +87,8 @@ class CameraView(context: Context) :
+@@ -87,6 +87,9 @@ class CameraView(context: Context) :
    var torch: Torch = Torch.OFF
    var zoom: Float = 1f // in "factor"
    var exposure: Double = 0.0
 +  var focusPeakingEnabled = false
++  var focusPeakingActive = false
 +  var focusPeakingSensitivity = 0.35f
    var outputOrientation: OutputOrientation = OutputOrientation.DEVICE
    var androidPreviewViewType: PreviewViewType = PreviewViewType.SURFACE_VIEW
      set(value) {
-@@ -168,7 +170,7 @@ class CameraView(context: Context) :
+@@ -168,7 +171,7 @@ class CameraView(context: Context) :
          // Preview
          val previewView = previewView
          if (previewView != null) {
@@ -969,27 +1000,33 @@ index 64a751e..2caa87e 100644
          } else {
            config.preview = CameraConfiguration.Output.Disabled.create()
          }
-@@ -228,6 +230,9 @@ class CameraView(context: Context) :
+@@ -228,6 +231,10 @@ class CameraView(context: Context) :
          config.maxFps = maxFps
          config.enableLowLightBoost = lowLightBoost
          config.torch = torch
 +        config.videoStabilizationMode = videoStabilizationMode ?: VideoStabilizationMode.OFF
 +        config.focusPeakingEnabled = focusPeakingEnabled
++        config.focusPeakingActive = focusPeakingActive
 +        config.focusPeakingSensitivity = focusPeakingSensitivity
          config.exposure = exposure
- 
+
          // Zoom
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt
-index cc20b40..0c90c03 100644
+index cc20b40..af72fc0 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt
-@@ -239,6 +239,16 @@ class CameraViewManager : ViewGroupManager<CameraView>() {
+@@ -239,6 +239,21 @@ class CameraViewManager : ViewGroupManager<CameraView>() {
      view.exposure = exposure
    }
- 
+
 +  @ReactProp(name = "focusPeakingEnabled")
 +  fun setFocusPeakingEnabled(view: CameraView, focusPeakingEnabled: Boolean) {
 +    view.focusPeakingEnabled = focusPeakingEnabled
++  }
++
++  @ReactProp(name = "focusPeakingActive")
++  fun setFocusPeakingActive(view: CameraView, focusPeakingActive: Boolean) {
++    view.focusPeakingActive = focusPeakingActive
 +  }
 +
 +  @ReactProp(name = "focusPeakingSensitivity", defaultDouble = 0.35)
@@ -1007,7 +1044,7 @@ index 059f677..5210260 100644
 @@ -188,6 +188,28 @@ class CameraViewModule(reactContext: ReactApplicationContext) : ReactContextBase
      }
    }
- 
+
 +  @ReactMethod
 +  fun setManualFocus(viewTag: Int, focusValue: Double, promise: Promise) {
 +    backgroundCoroutineScope.launch {
@@ -1033,11 +1070,45 @@ index 059f677..5210260 100644
    private fun canRequestPermission(permission: String): Boolean {
      val activity = reactApplicationContext.currentActivity as? PermissionAwareActivity
      return activity?.shouldShowRequestPermissionRationale(permission) ?: false
+diff --git a/node_modules/react-native-vision-camera/src/Camera.tsx b/node_modules/react-native-vision-camera/src/Camera.tsx
+index afe056a..708d737 100644
+--- a/node_modules/react-native-vision-camera/src/Camera.tsx
++++ b/node_modules/react-native-vision-camera/src/Camera.tsx
+@@ -380,6 +380,29 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
+       throw tryParseNativeCameraError(e)
+     }
+   }
++
++  /**
++   * Lock focus to a manual lens position.
++   * @param {number} focusValue A value from 0.0 (closest focus) to 1.0 (infinity).
++   */
++  public async setManualFocus(focusValue: number): Promise<void> {
++    try {
++      return await CameraModule.setManualFocus(this.handle, focusValue)
++    } catch (e) {
++      throw tryParseNativeCameraError(e)
++    }
++  }
++
++  /**
++   * Restore continuous auto-focus.
++   */
++  public async resetFocus(): Promise<void> {
++    try {
++      return await CameraModule.resetFocus(this.handle)
++    } catch (e) {
++      throw tryParseNativeCameraError(e)
++    }
++  }
+   //#endregion
+
+   //#region Static Functions (NativeModule)
 diff --git a/node_modules/react-native-vision-camera/src/types/CameraProps.ts b/node_modules/react-native-vision-camera/src/types/CameraProps.ts
-index 18bfc9b..a9a4b0a 100644
+index 18bfc9b..606fb7b 100644
 --- a/node_modules/react-native-vision-camera/src/types/CameraProps.ts
 +++ b/node_modules/react-native-vision-camera/src/types/CameraProps.ts
-@@ -273,6 +273,21 @@ export interface CameraProps extends ViewProps {
+@@ -273,6 +273,29 @@ export interface CameraProps extends ViewProps {
     * Make sure the given {@linkcode format} supports the given {@linkcode videoStabilizationMode}.
     */
    videoStabilizationMode?: VideoStabilizationMode
@@ -1050,6 +1121,14 @@ index 18bfc9b..a9a4b0a 100644
 +   */
 +  focusPeakingEnabled?: boolean
 +  /**
++   * Toggles highlights in an already-enabled native focus peaking shader pipeline.
++   * This can change without rebinding the Android camera session.
++   *
++   * @platform Android
++   * @default false
++   */
++  focusPeakingActive?: boolean
++  /**
 +   * Controls the native focus peaking threshold. Values closer to 1 show more highlights.
 +   *
 +   * @platform Android
@@ -1057,5 +1136,5 @@ index 18bfc9b..a9a4b0a 100644
 +   */
 +  focusPeakingSensitivity?: number
    //#endregion
- 
+
    /**

@@ -250,6 +250,119 @@ const uploadObservation = async ( observation: Observation ): Promise<boolean | 
   }
 };
 
+// Uploads a queued "save for later" draft. Unlike uploadObservation, this
+// supports multiple photos per observation (stored as a JSON array in
+// observation.photoUris) so combined drafts upload as a single iNat observation.
+const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorType | undefined> => {
+  const login = await fetchAccessToken( );
+  const token = await fetchJSONWebToken( login );
+
+  if ( typeof token === "object" ) {
+    return token;
+  }
+  const options = { api_token: token };
+
+  let photoUris: string[] = [];
+  try {
+    photoUris = observation.photoUris ? JSON.parse( observation.photoUris ) : [];
+  } catch {
+    photoUris = [];
+  }
+  if ( photoUris.length === 0 && observation.photo?.uri ) {
+    photoUris = [observation.photo.uri];
+  }
+
+  if ( photoUris.length === 0 ) {
+    return {
+      error: {
+        type: "photo",
+        errorText: i18n.t( "post_to_inat_card.error_photo" ),
+      },
+    };
+  }
+
+  const params = {
+    observation: {
+      uuid: observation.uuid,
+      observed_on_string: observation.observed_on_string,
+      taxon_id: observation.taxon_id || undefined,
+      geoprivacy: observation.geoprivacy,
+      captive_flag: observation.captive_flag,
+      place_guess: observation.place_guess,
+      latitude: observation.latitude,
+      longitude: observation.longitude,
+      positional_accuracy: observation.positional_accuracy,
+      description: observation.description,
+      owners_identification_from_vision_requested: observation.vision,
+    },
+  };
+
+  try {
+    let id = observation.photo?.id;
+    if ( !id ) {
+      const response = await inatjs.observations.create( params, options );
+      id = response[0].id;
+      logger.debug( `queued observation created with id: ${id}` );
+      if ( observation.photo ) {
+        await saveObservationId( id, observation.photo );
+      }
+    }
+
+    let uploadedPhotoCount = 0;
+    const remainingPhotoUris: string[] = [];
+    let firstPhotoError: ErrorType | undefined;
+    for ( const uri of photoUris ) {
+      const resizedPhoto = await resizeImageForUpload( uri );
+      if ( !resizedPhoto ) {
+        remainingPhotoUris.push( uri );
+        continue;
+      }
+      const photoUpload = await appendPhotoToObservation(
+        { id, uuid: createUUID.v4(), uri: resizedPhoto },
+        token,
+        resizedPhoto
+      );
+      if ( photoUpload === true ) {
+        uploadedPhotoCount += 1;
+      } else if ( photoUpload ) {
+        firstPhotoError = firstPhotoError || photoUpload;
+        remainingPhotoUris.push( uri );
+      } else {
+        remainingPhotoUris.push( uri );
+      }
+    }
+
+    if ( uploadedPhotoCount > 0 && remainingPhotoUris.length > 0 ) {
+      const realm = await Realm.open( realmConfig );
+      realm.write( ( ) => {
+        observation.photoUris = JSON.stringify( remainingPhotoUris );
+      } );
+      return firstPhotoError || {
+        error: {
+          type: "photo",
+          errorText: i18n.t( "post_to_inat_card.error_photo" ),
+        },
+      };
+    }
+
+    if ( uploadedPhotoCount === 0 ) {
+      return firstPhotoError || {
+        error: {
+          type: "photo",
+          errorText: i18n.t( "post_to_inat_card.error_photo" ),
+        },
+      };
+    }
+    return true;
+  } catch ( e ) {
+    logger.debug( `uploadQueuedObservation error: ${e}` );
+    if ( e.message === "timeout" ) {
+      return { error: { type: "timeout" } };
+    }
+    return { error: { type: "observation", errorText: e.message } };
+  }
+};
+
 const saveObservationToRealm = async ( observation: Observation, uri: string ): Promise<boolean | ErrorType | undefined> => {
   const realm = await Realm.open( realmConfig );
   const obsUUID = createUUID.v4();
@@ -367,5 +480,6 @@ export {
   markUploadsAsSeen,
   checkForUploads,
   uploadObservation,
+  uploadQueuedObservation,
   markCurrentUploadAsSeen,
 };

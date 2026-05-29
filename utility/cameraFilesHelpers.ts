@@ -87,7 +87,11 @@ const removeDeprecatedModelFilesIOS = () => {
 const removeDeprecatedModelFilesAndroid = () => {
   readDir( DocumentDirectoryPath ).then( ( results ) => {
     results.forEach( ( result ) => {
-      if ( result.name === modelFiles.ANDROIDMODEL || result.name === modelFiles.ANDROIDTAXONOMY ) {
+      if (
+        result.name === modelFiles.ANDROIDMODEL
+        || result.name === modelFiles.ANDROIDTAXONOMY
+        || result.name === modelFiles.ANDROIDGEOMODEL
+      ) {
         console.log( "Not removing model asset with filename", result.name );
         return;
       }

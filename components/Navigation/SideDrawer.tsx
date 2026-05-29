@@ -5,6 +5,7 @@ import SideMenu from "../UIComponents/SideMenu";
 import Achievements from "../Achievements/AchievementsScreen";
 import Challenges from "../Challenges/ChallengeScreen/ChallengeScreen";
 import Observations from "../Observations/Observations";
+import QueuedObservations from "../Observations/QueuedObservations";
 import iNatStats from "../iNaturalist/iNatStats";
 import About from "../About/AboutScreen";
 import Settings from "../Settings/Settings";
@@ -39,6 +40,7 @@ const SideDrawer = ( ) => (
     <Drawer.Screen name="Challenges" component={Challenges} />
     <Drawer.Screen name="ChallengeDetails" component={ChallengeDetails} />
     <Drawer.Screen name="Observations" component={Observations} />
+    <Drawer.Screen name="QueuedObservations" component={QueuedObservations} />
     <Drawer.Screen name="iNatStats" component={iNatStats} />
     <Drawer.Screen name="About" component={About} />
     <Drawer.Screen name="Settings" component={Settings} />

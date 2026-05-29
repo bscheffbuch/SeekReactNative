@@ -26,8 +26,9 @@ import type {
 } from "react-native-vision-camera";
 
 import i18n from "../../../i18n";
-import { viewStyles, imageStyles } from "../../../styles/camera/arCamera";
+import { viewStyles, imageStyles, textStyles } from "../../../styles/camera/arCamera";
 import icons from "../../../assets/icons";
+import StyledText from "../../UIComponents/StyledText";
 import CameraError from "../CameraError";
 import {
   checkForSystemVersion,
@@ -54,6 +55,7 @@ import { log } from "../../../react-native-logs.config";
 import { useCameraLocationPreference } from "../../Providers/CameraLocationPreferenceProvider";
 import { useObservation } from "../../Providers/ObservationProvider";
 import type { ObservationImage } from "../../Providers/ObservationProvider";
+import { saveQueuedObservation, getQueuedCount } from "../../../utility/observationQueueHelpers";
 import { LogLevels, logToApi } from "../../../utility/apiCalls";
 import {
   getCameraDevice,
@@ -122,6 +124,7 @@ export enum TOAST {
   FLASH_ON = "FLASH_ON",
   LOCATION_OFF = "LOCATION_OFF",
   LOCATION_ON = "LOCATION_ON",
+  SAVED_FOR_LATER = "SAVED_FOR_LATER",
 }
 
 type Action = { type: ACTION.RESET_PREDICTIONS }
@@ -146,6 +149,7 @@ const ARCamera = ( ) => {
   const { startObservationWithImage, setObservation } = useObservation();
   const [isActive, setIsActive] = useState( true );
   const [isCaptureInProgress, setIsCaptureInProgress] = useState( false );
+  const [queueCount, setQueueCount] = useState( 0 );
 
   const [cameraPosition, setCameraPosition] = useState<"front" | "back">( "back" );
   const [backCameraZoom, setBackCameraZoom] = useState( DEFAULT_BACK_CAMERA_ZOOM );
@@ -760,6 +764,43 @@ const ARCamera = ( ) => {
     pictureTaken,
   ] );
 
+  // "Save for Later": persist the photo + current GPS + timestamp to the local
+  // observation queue without running classification, then stay on the camera.
+  const saveForLaterToQueue = useCallback( async ( uri: string ) => {
+    const time = createTimestamp( );
+    const userImage = { time, uri, predictions: [] };
+    const { image } = await fetchImageLocationOrErrorCode( userImage, login );
+    const coords = image.preciseCoords || {
+      latitude: image.latitude ?? null,
+      longitude: image.longitude ?? null,
+      accuracy: null,
+    };
+
+    await saveQueuedObservation( coords, time, uri );
+
+    const count = await getQueuedCount( );
+    setQueueCount( count );
+    setVisibleToast( TOAST.SAVED_FOR_LATER );
+
+    // remain on the camera screen, ready for the next capture
+    setIsActive( true );
+    setIsCaptureInProgress( false );
+    pictureTaken.value = false;
+    dispatch( { type: ACTION.RESET_STATE } );
+  }, [login, pictureTaken] );
+
+  const saveForLaterPhoto = useCallback( ( photo: HandledPhoto ) => {
+    // keep a copy in the user's camera roll, like a normal capture
+    CameraRoll.save( photo.uri, { } ).catch( ( e ) => logger.warn( e ) );
+    saveForLaterToQueue( photo.uri );
+  }, [saveForLaterToQueue] );
+
+  const takePictureForLater = useCallback( async ( ) => {
+    pictureTaken.value = true;
+    setIsCaptureInProgress( true );
+    await visionCameraTakePhoto( ( photo: HandledPhoto ) => saveForLaterPhoto( photo ) );
+  }, [visionCameraTakePhoto, saveForLaterPhoto, pictureTaken] );
+
   const resetState = ( ) => {
     setIsCaptureInProgress( false );
     dispatch( { type: ACTION.RESET_STATE } );
@@ -792,6 +833,7 @@ const ARCamera = ( ) => {
       resetState( );
       checkForFirstCameraLaunch( );
       requestAndroidPermissions( );
+      getQueuedCount( ).then( setQueueCount ).catch( ( e ) => logger.warn( e ) );
     } );
 
     return unsubscribe;
@@ -816,6 +858,10 @@ const ARCamera = ( ) => {
   const navToSettings = () =>
     navigation.navigate( "Drawer", {
       screen: "Settings",
+    } );
+  const navToQueue = () =>
+    navigation.navigate( "Drawer", {
+      screen: "QueuedObservations",
     } );
 
 
@@ -917,6 +963,8 @@ const ARCamera = ( ) => {
           toggleLocation={toggleLocation}
           useLocation={useLocation}
           handleToastEnd={handleToastEnd}
+          saveForLater={takePictureForLater}
+          queueCount={queueCount}
         />
       )}
       <TouchableOpacity
@@ -939,6 +987,26 @@ const ARCamera = ( ) => {
           source={icons.menuSettings}
         />
       </TouchableOpacity>
+      {queueCount > 0 && (
+        <TouchableOpacity
+          accessibilityLabel={i18n.t( "queue.view_queue" )}
+          accessible
+          testID="queueIndicator"
+          onPress={navToQueue}
+          style={[viewStyles.queueButton, viewStyles.shadow]}
+        >
+          <Image
+            tintColor={colors.white}
+            style={imageStyles.settingsIcon}
+            source={icons.checklist}
+          />
+          <View style={viewStyles.queueBadge}>
+            <StyledText style={textStyles.queueBadgeText}>
+              {queueCount}
+            </StyledText>
+          </View>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

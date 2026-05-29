@@ -27,6 +27,30 @@ const viewStyles = StyleSheet.create( {
     position: "absolute",
     top: height > 700 ? 31 : 0,
   },
+  queueButton: {
+    right: 18,
+    position: "absolute",
+    top: ( height > 700 ? 31 : 0 ) + 64,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    borderColor: colors.white,
+    borderWidth: 1,
+    borderRadius: 18,
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    gap: 6,
+  },
+  queueBadge: {
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: colors.seekGreen,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 6,
+  },
   camera: {
     zIndex: -1,
   },
@@ -45,7 +69,16 @@ const imageStyles = StyleSheet.create( {
   },
 } );
 
+const textStyles = StyleSheet.create( {
+  queueBadgeText: {
+    color: colors.white,
+    fontSize: 13,
+    fontWeight: "700",
+  },
+} );
+
 export {
   viewStyles,
   imageStyles,
+  textStyles,
 };
