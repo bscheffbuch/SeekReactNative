@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import React, { useRef, useState } from "react";
-import type { GestureResponderEvent, ViewStyle } from "react-native";
+import type { GestureResponderEvent, StyleProp, ViewStyle } from "react-native";
 import { TouchableOpacity } from "react-native";
 
 interface Props extends PropsWithChildren {
@@ -8,7 +8,7 @@ interface Props extends PropsWithChildren {
   accessible?: boolean;
   testID?: string;
   onPress: ( _event?: GestureResponderEvent ) => void;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
   disabled: boolean;
   debounceTime?: number;
   preventMultipleTaps?: boolean;

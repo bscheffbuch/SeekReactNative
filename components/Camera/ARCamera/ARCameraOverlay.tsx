@@ -371,6 +371,29 @@ const ARCameraOverlay = ( {
         </View>
       )}
 
+      <TouchableOpacityWithDebounce
+        accessibilityLabel={i18n.t( "queue.save_for_later" )}
+        accessible
+        testID="saveForLaterButton"
+        onPress={saveForLater}
+        style={[
+          viewStyles.saveForLaterButton,
+          isLandscape
+            ? viewStyles.saveForLaterButtonLandscape
+            : viewStyles.saveForLaterButtonPortrait,
+        ]}
+        disabled={pictureTaken}
+      >
+        <Image tintColor={colors.white} source={icons.checklist} />
+        {queueCount > 0 && (
+          <View style={viewStyles.saveForLaterBadge}>
+            <StyledText style={textStyles.saveForLaterBadgeText}>
+              {queueCount}
+            </StyledText>
+          </View>
+        )}
+      </TouchableOpacityWithDebounce>
+
       <View style={
         isLandscape ? viewStyles.cameraControlsContainerLandscape : viewStyles.cameraControlsContainer
       }>
@@ -391,23 +414,6 @@ const ARCameraOverlay = ( {
           >
             <Image source={icons.cameraHelp} />
           </TouchableOpacity>
-          <TouchableOpacityWithDebounce
-            accessibilityLabel={i18n.t( "queue.save_for_later" )}
-            accessible
-            testID="saveForLaterButton"
-            onPress={saveForLater}
-            style={viewStyles.saveForLaterButton}
-            disabled={pictureTaken}
-          >
-            <Image tintColor={colors.white} source={icons.checklist} />
-            {queueCount > 0 && (
-              <View style={viewStyles.saveForLaterBadge}>
-                <StyledText style={textStyles.saveForLaterBadgeText}>
-                  {queueCount}
-                </StyledText>
-              </View>
-            )}
-          </TouchableOpacityWithDebounce>
         </View>
 
         <TouchableOpacityWithDebounce

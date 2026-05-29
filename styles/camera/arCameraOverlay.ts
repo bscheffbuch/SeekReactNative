@@ -135,6 +135,7 @@ const viewStyles = StyleSheet.create( {
     alignItems: "center",
   },
   saveForLaterButton: {
+    position: "absolute",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     alignItems: "center",
     justifyContent: "center",
@@ -143,6 +144,14 @@ const viewStyles = StyleSheet.create( {
     borderRadius: 30,
     width: 56,
     height: 56,
+  },
+  saveForLaterButtonPortrait: {
+    bottom: 112,
+    left: 32,
+  },
+  saveForLaterButtonLandscape: {
+    bottom: 32,
+    left: 32,
   },
   saveForLaterBadge: {
     position: "absolute",
