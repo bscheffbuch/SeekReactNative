@@ -225,10 +225,10 @@ index 0000000..d93241f
 +
 +}
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-index dd91fb5..b69dc4a 100644
+index dd91fb5..5acfdb2 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-@@ -2,6 +2,7 @@ package com.visioncameraplugininatvision;
+@@ -2,9 +2,11 @@ package com.visioncameraplugininatvision;
  
  import android.graphics.Bitmap;
  import android.graphics.Color;
@@ -236,28 +236,57 @@ index dd91fb5..b69dc4a 100644
  import android.util.Log;
  
  import org.tensorflow.lite.Interpreter;
-@@ -52,6 +53,10 @@ public class ImageClassifier {
++import org.tensorflow.lite.gpu.GpuDelegate;
+ 
+ import java.io.FileInputStream;
+ import java.io.IOException;
+@@ -52,6 +54,16 @@ public class ImageClassifier {
      /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
      private ByteBuffer imgData;
  
 +    private Object[] inputArray;
 +    private float[][] outputScores;
 +    private final Map<Integer, Object> expectedOutputs = new HashMap<>();
++    private float[] combinedScores;
++    private int[] sourceXs = new int[DIM_IMG_SIZE_X];
++    private int[] sourceYs = new int[DIM_IMG_SIZE_Y];
++    private int lastImageWidth = -1;
++    private int lastImageHeight = -1;
++    private double lastCropRatio = -1.0;
 +
      private float[][] mGeomodelScores;
  
      public void setFilterByTaxonId(Integer taxonId) {
-@@ -88,6 +93,9 @@ public class ImageClassifier {
+@@ -79,7 +91,16 @@ public class ImageClassifier {
+         mModelFilename = modelPath;
+         mTaxonomyFilename = taxonomyPath;
+         mModelVersion = version;
+-        mTFlite = new Interpreter(loadModelFile());
++        Interpreter.Options options = new Interpreter.Options();
++        try {
++            GpuDelegate gpuDelegate = new GpuDelegate();
++            options.addDelegate(gpuDelegate);
++        } catch (Exception e) {
++            try {
++                options.setUseNNAPI(true);
++            } catch (Exception e2) { /* CPU fallback */ }
++        }
++        mTFlite = new Interpreter(loadModelFile(), options);
+         imgData =
+                 ByteBuffer.allocateDirect(
+                         4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
+@@ -88,6 +109,10 @@ public class ImageClassifier {
  
          mTaxonomy = new Taxonomy(new FileInputStream(mTaxonomyFilename), mModelVersion);
          mModelSize = mTaxonomy.getModelSize();
 +        inputArray = new Object[]{ imgData };
 +        outputScores = new float[1][mModelSize];
++        combinedScores = new float[mModelSize];
 +        expectedOutputs.put(0, outputScores);
      }
  
      /** Classifies a frame from the preview stream. */
-@@ -102,20 +110,33 @@ public class ImageClassifier {
+@@ -102,31 +127,45 @@ public class ImageClassifier {
          }
          convertBitmapToByteBuffer(bitmap);
  
@@ -277,11 +306,11 @@ index dd91fb5..b69dc4a 100644
 +        if (image == null) {
 +            Timber.tag(TAG).e("Null input image");
 +            return new ArrayList<Prediction>();
-+        }
+         }
 +        if (image.getPlanes().length < 3) {
 +            Timber.tag(TAG).e("Expected YUV image with three planes");
 +            return new ArrayList<Prediction>();
-         }
++        }
 +        convertImageToByteBuffer(image, cropRatio);
  
 -        Object[] input = { imgData };
@@ -295,11 +324,30 @@ index dd91fb5..b69dc4a 100644
 +            mTFlite.runForMultipleInputsOutputs(inputArray, expectedOutputs);
              // Get raw vision scores
 -            float[] visionScores = ((float[][]) expectedOutputs.get(0))[0];
+-            float[] combinedScores = new float[visionScores.length];
 +            float[] visionScores = outputScores[0];
-             float[] combinedScores = new float[visionScores.length];
++            float[] scoresForPrediction;
              float[] geoScores;
              if (mGeomodelScores != null) {
-@@ -158,43 +179,119 @@ public class ImageClassifier {
+-              // Combine vision and geo scores
+-              geoScores = mGeomodelScores[0];
+-              combinedScores = combineVisionScores(visionScores, geoScores);
++                // Combine vision and geo scores
++                geoScores = mGeomodelScores[0];
++                combineVisionScores(visionScores, geoScores, combinedScores);
++                scoresForPrediction = combinedScores;
+             } else {
+-              geoScores = null;
+-              combinedScores = visionScores;
++                geoScores = null;
++                scoresForPrediction = visionScores;
+             }
+-            predictions = mTaxonomy.predict(combinedScores, visionScores, geoScores, taxonomyRollupCutoff, commonAncestorMode);
++            predictions = mTaxonomy.predict(scoresForPrediction, visionScores, geoScores, taxonomyRollupCutoff, commonAncestorMode);
+         } catch (Exception exc) {
+             exc.printStackTrace();
+             return new ArrayList<Prediction>();
+@@ -158,46 +197,139 @@ public class ImageClassifier {
          }
          imgData.rewind();
  
@@ -347,10 +395,7 @@ index dd91fb5..b69dc4a 100644
 +        ByteBuffer vBuffer = vPlane.getBuffer();
 +        int imageWidth = image.getWidth();
 +        int imageHeight = image.getHeight();
-+        int cropSize = Math.max(1, (int)Math.round(Math.min(imageWidth, imageHeight) * cropRatio));
-+        cropSize = Math.min(cropSize, Math.min(imageWidth, imageHeight));
-+        int cropLeft = (imageWidth - cropSize) / 2;
-+        int cropTop = (imageHeight - cropSize) / 2;
++        updateCropMaps(imageWidth, imageHeight, cropRatio);
 +
          try {
 -            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * input.length * input[0].length * input[0][0].length * input[0][0][0].length);
@@ -363,9 +408,8 @@ index dd91fb5..b69dc4a 100644
 -                        }
 -                    }
 +            for (int x = 0; x < DIM_IMG_SIZE_X; x++) {
-+                int sourceX = cropLeft + Math.min(cropSize - 1, (int)(((x + 0.5f) * cropSize) / DIM_IMG_SIZE_X));
++                int sourceX = sourceXs[x];
 +                for (int y = 0; y < DIM_IMG_SIZE_Y; y++) {
-+                    int sourceY = cropTop + Math.min(cropSize - 1, (int)(((y + 0.5f) * cropSize) / DIM_IMG_SIZE_Y));
 +                    putYuvPixel(
 +                        yBuffer,
 +                        uBuffer,
@@ -377,7 +421,7 @@ index dd91fb5..b69dc4a 100644
 +                        vPlane.getRowStride(),
 +                        vPlane.getPixelStride(),
 +                        sourceX,
-+                        sourceY
++                        sourceYs[y]
 +                    );
                  }
              }
@@ -389,6 +433,28 @@ index dd91fb5..b69dc4a 100644
          }
      }
  
++    private void updateCropMaps(int imageWidth, int imageHeight, double cropRatio) {
++        if (imageWidth == lastImageWidth && imageHeight == lastImageHeight && Double.compare(cropRatio, lastCropRatio) == 0) {
++            return;
++        }
++
++        int cropSize = Math.max(1, (int)Math.round(Math.min(imageWidth, imageHeight) * cropRatio));
++        cropSize = Math.min(cropSize, Math.min(imageWidth, imageHeight));
++        int cropLeft = (imageWidth - cropSize) / 2;
++        int cropTop = (imageHeight - cropSize) / 2;
++
++        for (int x = 0; x < DIM_IMG_SIZE_X; x++) {
++            sourceXs[x] = cropLeft + Math.min(cropSize - 1, (int)(((x + 0.5f) * cropSize) / DIM_IMG_SIZE_X));
++        }
++        for (int y = 0; y < DIM_IMG_SIZE_Y; y++) {
++            sourceYs[y] = cropTop + Math.min(cropSize - 1, (int)(((y + 0.5f) * cropSize) / DIM_IMG_SIZE_Y));
++        }
++
++        lastImageWidth = imageWidth;
++        lastImageHeight = imageHeight;
++        lastCropRatio = cropRatio;
++    }
++
 +    private void putYuvPixel(
 +        ByteBuffer yBuffer,
 +        ByteBuffer uBuffer,
@@ -443,8 +509,21 @@ index dd91fb5..b69dc4a 100644
 +    }
 +
      /** Combines vision and geo model scores */
-     private float[] combineVisionScores(float[] visionScores, float[] geoScores) {
-         float[] combinedScores = new float[visionScores.length];
+-    private float[] combineVisionScores(float[] visionScores, float[] geoScores) {
+-        float[] combinedScores = new float[visionScores.length];
++    private void combineVisionScores(float[] visionScores, float[] geoScores, float[] combinedScores) {
+         float sum = 0.0f;
+ 
+         // First multiply the scores
+@@ -214,8 +346,6 @@ public class ImageClassifier {
+                 combinedScores[i] = combinedScores[i] / sum;
+             }
+         }
+-
+-        return combinedScores;
+     }
+ 
+ }
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
 index 18f1134..0bbf19f 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
@@ -458,17 +537,50 @@ index 18f1134..0bbf19f 100644
  
    @NonNull
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
-index 0c2b46a..c1b8f03 100644
+index 0c2b46a..31aed21 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
-@@ -1,6 +1,5 @@
+@@ -1,9 +1,7 @@
  package com.visioncameraplugininatvision;
  
 -import android.graphics.Bitmap;
  import android.media.Image;
  import android.os.SystemClock;
- import android.util.Log;
-@@ -167,27 +166,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+-import android.util.Log;
+ 
+ import androidx.annotation.NonNull;
+ import androidx.annotation.Nullable;
+@@ -24,7 +22,6 @@ import timber.log.Timber;
+ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+   VisionCameraPluginInatVisionPlugin(@NonNull VisionCameraProxy proxy, @Nullable Map<String, Object> options) {
+     super();
+-    Log.d("VisionCameraPluginInatVisionPlugin", "initialized with options: " + options);
+   }
+ 
+   private final static String TAG = "VisionCameraPluginInatVisionPlugin";
+@@ -60,12 +57,6 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+     // This should give the orientation of the passed in frame, as of vision-camera v3.2.2 this is not working though
+     // instead we use a string passed in via the arguments to signify the device orientation
+     // String orientation = frame.getOrientation();
+-    Log.d(TAG, "1: " + image.getWidth() + " x " + image.getHeight() + " Image with format #" + image.getFormat() + ". Logging " + arguments.size());
+-
+-    for (String key : arguments.keySet()) {
+-        Object value = arguments.get(key);
+-        Log.d(TAG, "2: " + "  -> " + (value == null ? "(null)" : value + " (" + value.getClass().getName() + ")"));
+-    }
+ 
+     if (arguments == null) {
+       throw new RuntimeException("Options object is null");
+@@ -139,7 +130,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+         }
+         geomodelScores = mGeoClassifier.predictionsForLocation(latitude, longitude, elevation);
+     } else {
+-        Timber.tag(TAG).d("Not using geomodel for this frame.");
++      geomodelScores = null;
+     }
+ 
+     // Image classifier initialization with model and taxonomy files
+@@ -167,29 +158,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
      List<Map> cleanedPredictions = new ArrayList<>();
      if (mImageClassifier != null) {
        mImageClassifier.setGeomodelScores(geomodelScores);
@@ -493,7 +605,23 @@ index 0c2b46a..c1b8f03 100644
 -      List<Prediction> predictions = mImageClassifier.classifyBitmap(bmp, taxonomyRollupCutoff, false);
 -      bmp.recycle();
 -      croppedBitmap.recycle();
+-
+-      Log.d(TAG, "Predictions: " + predictions.size());
 +      List<Prediction> predictions = mImageClassifier.classifyImage(image, mCropRatio, taxonomyRollupCutoff, false);
  
-       Log.d(TAG, "Predictions: " + predictions.size());
+       for (Prediction prediction : predictions) {
+         Map map = Taxonomy.nodeToMap(prediction);
+diff --git a/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m b/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m
+index 76960db..5d12b3d 100644
+--- a/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m
++++ b/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m
+@@ -63,7 +63,9 @@ - (id)callback:(Frame*)frame withArguments:(NSDictionary*)arguments {
+     NSDate *startDate = [NSDate date];
  
+     // Log arguments
++#if DEBUG
+     NSLog(@"inatVision arguments: %@", arguments);
++#endif
+     // Destructure version out of options
+     NSString *version = arguments[@"version"];
+     // Destructure model path out of options

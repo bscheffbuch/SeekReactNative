@@ -10,6 +10,7 @@ const useFetchUserSettings = ( ) => {
     scientificNames?: boolean;
     cameraViewportResolution?: string;
     photoQualityBalance?: string;
+    confidenceThreshold?: number;
     appVersion?: string;
   }>( { } );
 

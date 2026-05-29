@@ -318,6 +318,8 @@ const ARCamera = ( ) => {
   const [showModal, setShowModal] = useState( false );
   const cameraLoaded = useSharedValue( false );
   const speciesTimeoutSet = useSharedValue( false );
+  const frozenSpeciesScore = useSharedValue( 0 );
+  const speciesTimeoutId = useRef<ReturnType<typeof setTimeout> | null>( null );
 
   const flipCamera = () => {
     const newPosition = cameraPosition === "back" ? "front" : "back";
@@ -568,9 +570,27 @@ const ARCamera = ( ) => {
     if ( predictions && !cameraLoaded.value ) {
       cameraLoaded.value = true;
     }
-    // don't bother with trying to set predictions if a species timeout is in place
+
+    // Find species prediction
+    const speciesPredictions = predictions.filter( p => p.rank === "species" );
+    const topSpeciesScore = speciesPredictions.reduce(
+      ( max, p ) => Math.max( max, p.combined_score || 0 ),
+      0
+    );
+
+    // don't bother with trying to set predictions if a species timeout is in place,
+    // unless a new result comes in with notably higher confidence than the frozen one
     if ( speciesTimeoutSet.value ) {
-      return;
+      if ( topSpeciesScore > frozenSpeciesScore.value + 10 ) {
+        // interrupt the freeze early for the more confident result
+        if ( speciesTimeoutId.current ) {
+          clearTimeout( speciesTimeoutId.current );
+          speciesTimeoutId.current = null;
+        }
+        speciesTimeoutSet.value = false;
+      } else {
+        return;
+      }
     }
 
     // not looking at kingdom or phylum as we are currently not displaying results for those ranks
@@ -583,14 +603,17 @@ const ARCamera = ( ) => {
 
     dispatch( { type: ACTION.SET_PREDICTIONS, predictions: wantedPredictions } );
 
-    // Find species prediction
-    const speciesPredictions = predictions.filter( p => p.rank === "species" );
     if ( speciesPredictions.length > 0 ) {
-      // this block keeps the last species seen displayed for 2.5 seconds
+      // this block keeps the last species seen displayed for 1 second
       speciesTimeoutSet.value = true;
-      setTimeout( () => {
+      frozenSpeciesScore.value = topSpeciesScore;
+      if ( speciesTimeoutId.current ) {
+        clearTimeout( speciesTimeoutId.current );
+      }
+      speciesTimeoutId.current = setTimeout( () => {
         speciesTimeoutSet.value = false;
-      }, 2500 );
+        speciesTimeoutId.current = null;
+      }, 1000 );
     }
   };
 
@@ -796,7 +819,9 @@ const ARCamera = ( ) => {
     } );
 
 
-  const confidenceThresholdNumber = 70;
+  const confidenceThresholdNumber = ( typeof userSettings.confidenceThreshold === "number" )
+    ? userSettings.confidenceThreshold
+    : 50;
 
   if ( !isFocused ) {
     // this is necessary for camera to load properly in iOS

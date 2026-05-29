@@ -18,6 +18,7 @@ interface State {
   scientificNames?: boolean;
   cameraViewportResolution?: string;
   photoQualityBalance?: string;
+  confidenceThreshold?: number;
 }
 
 const cameraViewportResolutionOptions = [
@@ -33,6 +34,14 @@ const photoQualityBalanceOptions = [
   { label: i18n.t( "settings.photo_quality_balanced" ), value: "balanced" },
   { label: i18n.t( "settings.photo_quality_quality" ), value: "quality" },
 ];
+
+const confidenceThresholdOptions = ( () => {
+  const options = [];
+  for ( let value = 30; value <= 80; value += 5 ) {
+    options.push( { label: `${value}%`, value } );
+  }
+  return options;
+} )();
 const placeholder = {};
 const pickerStyles = { ...viewStyles };
 const showIcon = () => <></>;
@@ -85,6 +94,17 @@ const CameraSettings = ( ) => {
     setSettings( {
       ...settings,
       photoQualityBalance: newValue,
+    } );
+  };
+
+  const updateConfidenceThreshold = async ( value: number ) => {
+    if ( value === null || value === undefined || value === settings.confidenceThreshold ) {
+      return;
+    }
+    const newValue = await updateUserSetting( "confidenceThreshold", value );
+    setSettings( {
+      ...settings,
+      confidenceThreshold: newValue,
     } );
   };
 
@@ -183,6 +203,22 @@ const CameraSettings = ( ) => {
           placeholder={placeholder}
           useNativeAndroidPickerStyle={false}
           value={settings.photoQualityBalance || "balanced"}
+          style={pickerStyles}
+          pickerProps={{
+            themeVariant: "light",
+          }}
+        />
+      </View>
+      <View style={viewStyles.donateMarginBottom}>
+        <StyledText style={baseTextStyles.header}>{i18n.t( "settings.confidence_threshold" ).toLocaleUpperCase()}</StyledText>
+        <RNPickerSelect
+          hideIcon
+          Icon={showIcon}
+          items={confidenceThresholdOptions}
+          onValueChange={updateConfidenceThreshold}
+          placeholder={placeholder}
+          useNativeAndroidPickerStyle={false}
+          value={settings.confidenceThreshold || 50}
           style={pickerStyles}
           pickerProps={{
             themeVariant: "light",

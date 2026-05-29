@@ -734,6 +734,7 @@
     "photo_quality_speed": "Speed",
     "photo_quality_balanced": "Balanced",
     "photo_quality_quality": "Quality",
+    "confidence_threshold": "Confidence Threshold",
     "species_detail": "Species detail",
     "seasonality": "Seasonality",
     "seasonality_option_1": "Display seasonality based on worldwide iNaturalist observations",

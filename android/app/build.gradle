@@ -68,6 +68,7 @@ def enableProguardInReleaseBuilds = false
 // If global gradle.properties has SEEK_RELEASE_KEY_PASSWORD defined, use it, otherwise use the keychain
 // Do not add the keychain password to android/app/gradle.properties to not add it to version control instead use global
 def pass = project.hasProperty('SEEK_RELEASE_KEY_PASSWORD') ? project.property('SEEK_RELEASE_KEY_PASSWORD') : getPassword("iNaturalist.org","inaturalist-android");
+def includeDebugCameraAssetsInRelease = project.hasProperty('SEEK_INCLUDE_DEBUG_CAMERA_ASSETS') && project.property('SEEK_INCLUDE_DEBUG_CAMERA_ASSETS').toString().toBoolean()
 
 /**
  * The preferred build flavor of JavaScriptCore (JSC)
@@ -126,6 +127,14 @@ android {
             }
         }
     }
+
+    if (includeDebugCameraAssetsInRelease) {
+        sourceSets {
+            release {
+                assets.srcDirs += ["src/debug/assets"]
+            }
+        }
+    }
     
 }
 
@@ -137,4 +146,5 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.13.0'
 }

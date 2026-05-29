@@ -6,6 +6,7 @@ class UserSettingsRealm extends Realm.Object<UserSettingsRealm> {
   scientificNames!: boolean;
   cameraViewportResolution!: string;
   photoQualityBalance!: string;
+  confidenceThreshold!: number;
   appVersion!: string;
 
   static schema: Realm.ObjectSchema = {
@@ -16,6 +17,7 @@ class UserSettingsRealm extends Realm.Object<UserSettingsRealm> {
       scientificNames: { type: "bool", default: false },
       cameraViewportResolution: { type: "string", default: "720p" },
       photoQualityBalance: { type: "string", default: "balanced" },
+      confidenceThreshold: { type: "int", default: 50 },
       appVersion: { type: "string", default: "2.0.0" },
     },
   };
