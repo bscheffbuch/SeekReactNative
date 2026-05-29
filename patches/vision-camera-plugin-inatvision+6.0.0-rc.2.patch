@@ -1,3 +1,15 @@
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/build.gradle b/node_modules/vision-camera-plugin-inatvision/android/build.gradle
+index 4c7855d..9b45bb1 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/build.gradle
++++ b/node_modules/vision-camera-plugin-inatvision/android/build.gradle
+@@ -70,6 +70,7 @@ dependencies {
+   // CV model 1.0 works with TF Lite 1.15.0
+   // CV model 2.3 works with TF Lite 2.?
+   implementation "com.google.ai.edge.litert:litert:${getExtOrDefault("litertVersion")}"
++  implementation "com.google.ai.edge.litert:litert-gpu:${getExtOrDefault("litertVersion")}"
+   implementation 'com.jakewharton.timber:timber:4.7.0'
+ }
+ 
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/FocusPeakingPlugin.java
 new file mode 100644
 index 0000000..d93241f
