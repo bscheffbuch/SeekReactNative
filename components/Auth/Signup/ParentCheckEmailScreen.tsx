@@ -13,7 +13,7 @@ const ParentCheckEmailScreen = ( { navigation } ) => (
   <ScrollWithHeader header="login.sign_up">
     <View style={styles.flexCenter}>
       <StyledText style={[baseTextStyles.passwordEmailHeader, styles.headerText]}>
-        {i18n.t( "inat_signup.thanks" ).toLocaleUpperCase()}
+        {i18n.t( "inat_signup.thanks" )}
       </StyledText>
       <StyledText style={[baseTextStyles.body, styles.text]}>
         {i18n.t( "inat_signup.parent_instructions" )}
@@ -21,7 +21,7 @@ const ParentCheckEmailScreen = ( { navigation } ) => (
       <View style={styles.marginTop} />
       <GreenButton
         fontSize={16}
-        handlePress={() => navigation.popTo( "Drawer" )}
+        handlePress={() => navigation.popTo( "MainTabs", { screen: "Home" } )}
         login
         text="inat_signup.continue_no_log_in"
       />

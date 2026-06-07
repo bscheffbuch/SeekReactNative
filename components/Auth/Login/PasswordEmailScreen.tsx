@@ -14,7 +14,7 @@ const PasswordEmailScreen = ( { navigation } ) => (
   <ScrollWithHeader header="inat_login.forgot_password_header">
     <View style={styles.flexCenter}>
       <StyledText style={[baseTextStyles.passwordEmailHeader, styles.greenHeaderText]}>
-        {i18n.t( "inat_login.check_email" ).toLocaleUpperCase()}
+        {i18n.t( "inat_login.check_email" )}
       </StyledText>
       <StyledText style={[baseTextStyles.emptyState, styles.email]}>
         {i18n.t( "inat_login.reset_instructions" )}

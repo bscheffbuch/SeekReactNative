@@ -14,9 +14,9 @@ const viewStyles = StyleSheet.create( {
     paddingTop: dimensions.height > 570 ? 28 : 26,
   },
   header: {
-    backgroundColor: colors.seekForestGreen,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    backgroundColor: colors.seekPrimaryContainer,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     height: 67,
     justifyContent: "center",
     width: "100%",
@@ -31,10 +31,27 @@ const viewStyles = StyleSheet.create( {
     marginTop: dimensions.height > 570 ? 26 : 24,
   },
   row,
+  checkbox: {
+    alignItems: "center",
+    borderRadius: 5,
+    borderWidth: 2,
+    height: 24,
+    justifyContent: "center",
+    marginRight: 12,
+    width: 24,
+  },
+  reminderRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    marginTop: dimensions.height > 570 ? 20 : 14,
+    paddingHorizontal: 26,
+    width: "100%",
+  },
 } );
 
 const textStyles = StyleSheet.create( {
   headerText: {
+    color: colors.seekInk,
     paddingTop: Platform.OS === "ios" ? 9 : 0,
     textAlign: "center",
   },
@@ -44,6 +61,9 @@ const textStyles = StyleSheet.create( {
   wideText: {
     maxWidth: 270,
     textAlign: "center",
+  },
+  reminderText: {
+    flex: 1,
   },
 } );
 

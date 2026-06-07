@@ -4,7 +4,7 @@ import { colors, center } from "../global";
 const viewStyles = StyleSheet.create( {
   center,
   background: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
   },
   challengeBackground: {
     flex: 1,
@@ -27,7 +27,7 @@ const viewStyles = StyleSheet.create( {
     paddingHorizontal: 35,
   },
   whiteContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
   },
   loadingWheelContainer: {
     height: 223,
@@ -45,7 +45,6 @@ const textStyles = StyleSheet.create( {
   },
   viewText: {
     textAlign: "center",
-    textDecorationLine: "underline",
   },
   speciesNearbyErrorText: {
     maxWidth: 245,
@@ -89,4 +88,3 @@ const imageStyles = StyleSheet.create( {
     textStyles,
     imageStyles,
   };
-

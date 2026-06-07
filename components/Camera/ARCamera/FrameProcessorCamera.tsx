@@ -89,7 +89,18 @@ const PEAKING_MIN_THRESHOLD = 5;
 const PEAKING_MAX_THRESHOLD = 34;
 const PEAKING_SCAN_STRIDE = 2;
 const PEAKING_MIN_RUN_LENGTH = 1;
-const USE_NATIVE_FOCUS_PEAKING = Platform.OS === "android";
+// The native Android preview shader can alter preview color even when inactive
+// on some devices. Keep focus peaking in the JS overlay path so normal scanning
+// stays on the unmodified camera preview.
+const USE_NATIVE_FOCUS_PEAKING = false;
+// Classifier cadence. Inference now runs on the GPU delegate (with NNAPI/CPU fallback),
+// so 1 fps left the device idle between frames and made the live ID feel laggy/stale.
+// 2 fps keeps results fresh; lower this if low-end devices on the CPU fallback overheat.
+const CLASSIFICATION_FPS = 2;
+// How many recent frame results the plugin keeps and serves the best of. Smaller window =
+// less temporal lag when the camera is swung to a new subject (old high-confidence result
+// stops winning sooner). At CLASSIFICATION_FPS=2 this is a ~1.5s memory.
+const NUM_STORED_RESULTS = 3;
 
 const orientationToDegrees = ( orientation: Orientation ): number => {
   "worklet";
@@ -486,8 +497,11 @@ const FrameProcessorCamera = ( props: Props ) => {
   const lastClassificationTimestamp = useSharedValue( 0 );
   const lastPeakingTimestamp = useSharedValue( 0 );
   const previewOrientation = useSharedValue<Orientation>( "portrait" );
-  const fps = 1;
-  const handleResult = Worklets.createRunOnJS( ( result: InatVision.Result, timeTaken: number ) => {
+  const fps = CLASSIFICATION_FPS;
+  // These createRunOnJS bindings are captured by the frame-processor worklet below.
+  // Memoize them so their identity only changes when the underlying JS callback does,
+  // otherwise the worklet is rebuilt on every render.
+  const handleResult = useMemo( () => Worklets.createRunOnJS( ( result: InatVision.Result, timeTaken: number ) => {
     framesProcessingTime.current.push( timeTaken );
     if ( framesProcessingTime.current.length >= 10 ) {
       const avgTime = framesProcessingTime.current.reduce( ( a, b ) => a + b, 0 ) / 10;
@@ -499,16 +513,16 @@ const FrameProcessorCamera = ( props: Props ) => {
       } );
     }
     onTaxaDetected( result );
-  } );
+  } ), [onLog, onTaxaDetected] );
 
-  const handleError = Worklets.createRunOnJS( ( error: ErrorMessage ) => {
+  const handleError = useMemo( () => Worklets.createRunOnJS( ( error: ErrorMessage ) => {
     onClassifierError( error );
-  } );
+  } ), [onClassifierError] );
 
   const peakingPathRef = useRef<any>( null );
-  const handlePeakingPath = Worklets.createRunOnJS( ( path: string ) => {
+  const handlePeakingPath = useMemo( () => Worklets.createRunOnJS( ( path: string ) => {
     peakingPathRef.current?.setNativeProps( { d: path } );
-  } );
+  } ), [] );
   useEffect( () => {
     if ( !useOverlayFocusPeaking ) {
       peakingPathRef.current?.setNativeProps( { d: "" } );
@@ -522,9 +536,16 @@ const FrameProcessorCamera = ( props: Props ) => {
   // unfortunately, I was not able to run this new function in the worklets directly,
   // so we need to do this here before calling the frame processor hook.
   // For predictions from file this function runs in the vision-plugin code directly.
-  const geoModelCellLocation = hasUserLocation
-    ? InatVision.getCellLocation( coords )
-    : null;
+  // Memoized: getCellLocation runs h3-js + an elevation-table lookup on the JS thread,
+  // and returns a fresh object. Without memoization it ran on every render (~1/sec from
+  // prediction dispatches) and, being a new reference, rebuilt the frame processor worklet
+  // every time. Keyed on the rounded coords so it only recomputes when the user actually moves.
+  // useTruncatedUserCoords only swaps in a new coords object when the latitude
+  // actually changes, so depending on coords here is stable across renders.
+  const geoModelCellLocation = useMemo(
+    () => ( hasUserLocation ? InatVision.getCellLocation( coords ) : null ),
+    [hasUserLocation, coords]
+  );
   const frameProcessor = useFrameProcessor(
     ( frame: any ) => {
       "worklet";
@@ -574,6 +595,7 @@ const FrameProcessorCamera = ( props: Props ) => {
             version: "2.13",
             modelPath: dirModel,
             taxonomyPath: dirTaxonomy,
+            numStoredResults: NUM_STORED_RESULTS,
             confidenceThreshold,
             filterByTaxonId,
             negativeFilter,
@@ -720,6 +742,11 @@ const FrameProcessorCamera = ( props: Props ) => {
       return { width, height };
     } );
   }, [] );
+  const nativeFocusPeakingProps = {
+    focusPeakingEnabled: USE_NATIVE_FOCUS_PEAKING && focusPeakingEnabled,
+    focusPeakingActive: USE_NATIVE_FOCUS_PEAKING && focusPeakingEnabled,
+    focusPeakingSensitivity,
+  };
 
   return (
     device && cameraPermissionStatus === "granted" && (
@@ -733,7 +760,6 @@ const FrameProcessorCamera = ( props: Props ) => {
             exposure={exposure}
             isActive={active}
             photo={true}
-            video={formatStabilizationMode != null}
             photoHdr={photoHdr}
             torch={torch}
             enableZoomGesture
@@ -746,10 +772,9 @@ const FrameProcessorCamera = ( props: Props ) => {
             onShutter={onCaptureStarted}
             outputOrientation="device"
             photoQualityBalance={photoQualityBalance}
-            videoStabilizationMode={videoStabilizationMode}
-            focusPeakingEnabled={USE_NATIVE_FOCUS_PEAKING}
-            focusPeakingActive={USE_NATIVE_FOCUS_PEAKING && focusPeakingEnabled}
-            focusPeakingSensitivity={focusPeakingSensitivity}
+            video={digitalStabilizationEnabled && formatStabilizationMode != null}
+            videoStabilizationMode={digitalStabilizationEnabled ? videoStabilizationMode : undefined}
+            {...nativeFocusPeakingProps}
             enableLocation={hasPermission}
             onPreviewOrientationChanged={handlePreviewOrientationChanged}
             androidPreviewViewType="surface-view"

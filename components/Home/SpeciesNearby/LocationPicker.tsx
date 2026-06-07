@@ -118,10 +118,10 @@ const LocationPicker = ( {
         <BackArrow handlePress={closeLocationPicker} />
         <View style={viewStyles.marginLarge} />
         <StyledText style={[baseTextStyles.button, textStyles.headerText]}>
-          {i18n.t( "location_picker.species_nearby" ).toLocaleUpperCase()}
+          {i18n.t( "location_picker.species_nearby" )}
         </StyledText>
         <View style={[viewStyles.row, viewStyles.inputRow]}>
-          <Image source={posting.location} tintColor={colors.white} style={imageStyles.white} />
+          <Image source={posting.location} tintColor={colors.seekDeepGreen} style={imageStyles.white} />
           <TextInput
             accessibilityLabel={inputLocation}
             accessible
@@ -142,7 +142,6 @@ const LocationPicker = ( {
       <View style={viewStyles.footer}>
         <GreenButton
           handlePress={searchNearLocation}
-          letterSpacing={0.68}
           text="location_picker.button"
         />
       </View>

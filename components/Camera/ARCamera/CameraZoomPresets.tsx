@@ -50,7 +50,9 @@ const CameraZoomPresets = ( {
 const styles = StyleSheet.create( {
   container: {
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.45)",
+    backgroundColor: "rgba(10, 14, 11, 0.58)",
+    borderColor: "rgba(255, 255, 255, 0.14)",
+    borderWidth: 1,
     borderRadius: 24,
     flexDirection: "row",
     gap: 4,
@@ -65,7 +67,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: 6,
   },
   selectedButton: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekGold,
   },
   presetLabel: {
     color: colors.white,
@@ -74,7 +76,7 @@ const styles = StyleSheet.create( {
     textAlign: "center",
   },
   selectedLabel: {
-    color: colors.seekForestGreen,
+    color: colors.seekInk,
   },
 } );
 

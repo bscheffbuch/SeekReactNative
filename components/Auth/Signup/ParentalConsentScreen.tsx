@@ -86,7 +86,7 @@ const ParentalConsentScreen = ( { navigation } ) => {
       />
       <View style={styles.center}>
         {error ? <ErrorMessage error={error} /> : <View style={styles.greenButtonMargin} />}
-        {loading ? <LoadingWheel color={colors.seekForestGreen} /> : null}
+        {loading ? <LoadingWheel color={colors.seekDeepGreen} /> : null}
       </View>
       <GreenButton
         handlePress={() => {

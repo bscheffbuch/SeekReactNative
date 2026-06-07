@@ -10,6 +10,7 @@ import NoChallenges from "../../Home/Challenges/NoChallenges";
 import EmptyChallengesCard from "./EmptyChallengesCard";
 import ViewWithHeader from "../../UIComponents/Screens/ViewWithHeader";
 import { useFetchChallenges } from "../hooks/challengeHooks";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Item {
   type: string;
@@ -26,8 +27,13 @@ interface Item {
 
 const ChallengeScreen = ( ) => {
   const list: Item[] = useFetchChallenges( );
+  const { theme } = useTheme( );
 
-  const extractKey = ( item: Item, index: number ) => item + index;
+  const extractKey = useCallback( ( item: Item, index: number ) => (
+    item.type
+      ? `${item.type}-${item.header || item.empty || item.name || index}`
+      : `challenge-${item.name}-${item.availableDate?.toString?.() || index}`
+  ), [] );
 
   const renderItem = useCallback( ( { item }: { item: Item } ) => {
     if ( item.type === "header" ) {
@@ -57,8 +63,11 @@ const ChallengeScreen = ( ) => {
   return (
     <ViewWithHeader testID="challenge-screen-container" header="challenges.header">
       <FlashList
-        scrollEventThrottle={1}
-        contentContainerStyle={styles.challengeList}
+        scrollEventThrottle={16}
+        contentContainerStyle={[
+          styles.challengeList,
+          { backgroundColor: theme.colors.canvas },
+        ]}
         data={list}
         keyExtractor={extractKey}
         renderItem={renderItem}

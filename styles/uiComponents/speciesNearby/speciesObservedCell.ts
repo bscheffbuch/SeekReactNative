@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 const viewStyles = StyleSheet.create( {
   cellImage: {
-    borderRadius: 108 / 2,
+    borderRadius: 14,
     height: 108,
     width: 108,
   },

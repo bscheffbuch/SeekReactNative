@@ -1,6 +1,7 @@
 /*
     This file contains patches for handling the react-native-vision-camera library.
 */
+import { useMemo } from "react";
 import {
   useSharedValue as useWorkletSharedValue,
   Worklets,
@@ -13,54 +14,61 @@ import {
 // version 4 of vision-camera.
 // Originally, posted on this currently open issue: https://github.com/mrousavy/react-native-vision-camera/issues/2589
 const usePatchedRunAsync = () => {
-  /**
-   * Print worklets logs/errors on js thread
-   */
-  const logOnJs = Worklets.createRunOnJS( ( log, error ) => {
-    console.log( "logOnJs - ", log, " - error?:", error?.message ?? "no error" );
-  } );
   const isAsyncContextBusy = useWorkletSharedValue( false );
   const queuedFrame = useWorkletSharedValue( null );
-  const customRunOnAsyncContext = Worklets.defaultContext.createRunAsync(
-    ( frame, func ) => {
-      "worklet";
 
-      try {
-        func( frame );
-      } catch ( e ) {
-        logOnJs( "customRunOnAsyncContext error", e );
-      } finally {
-        frame.decrementRefCount();
-        const nextFrame = queuedFrame.value;
-        queuedFrame.value = null;
+  // Everything below is memoized so the returned customRunAsync keeps a stable
+  // identity across renders. It is captured by the frame-processor worklet's
+  // dependency list, so a fresh function each render would rebuild that worklet
+  // (and re-create the async context) on every render.
+  return useMemo( () => {
+    /**
+     * Print worklets logs/errors on js thread
+     */
+    const logOnJs = Worklets.createRunOnJS( ( log, error ) => {
+      console.log( "logOnJs - ", log, " - error?:", error?.message ?? "no error" );
+    } );
+    const customRunOnAsyncContext = Worklets.defaultContext.createRunAsync(
+      ( frame, func ) => {
+        "worklet";
 
-        if ( nextFrame != null ) {
-          customRunOnAsyncContext( nextFrame, func );
-        } else {
-          isAsyncContextBusy.value = false;
+        try {
+          func( frame );
+        } catch ( e ) {
+          logOnJs( "customRunOnAsyncContext error", e );
+        } finally {
+          frame.decrementRefCount();
+          const nextFrame = queuedFrame.value;
+          queuedFrame.value = null;
+
+          if ( nextFrame != null ) {
+            customRunOnAsyncContext( nextFrame, func );
+          } else {
+            isAsyncContextBusy.value = false;
+          }
         }
       }
-    }
-  );
+    );
 
-  function customRunAsync( frame, func ) {
-    "worklet";
+    function customRunAsync( frame, func ) {
+      "worklet";
 
-    const internal = frame;
-    internal.incrementRefCount();
-    if ( isAsyncContextBusy.value ) {
-      const previousQueuedFrame = queuedFrame.value;
-      if ( previousQueuedFrame != null ) {
-        previousQueuedFrame.decrementRefCount();
+      const internal = frame;
+      internal.incrementRefCount();
+      if ( isAsyncContextBusy.value ) {
+        const previousQueuedFrame = queuedFrame.value;
+        if ( previousQueuedFrame != null ) {
+          previousQueuedFrame.decrementRefCount();
+        }
+        queuedFrame.value = internal;
+        return;
       }
-      queuedFrame.value = internal;
-      return;
+      isAsyncContextBusy.value = true;
+      customRunOnAsyncContext( internal, func );
     }
-    isAsyncContextBusy.value = true;
-    customRunOnAsyncContext( internal, func );
-  }
 
-  return customRunAsync;
+    return customRunAsync;
+  }, [isAsyncContextBusy, queuedFrame] );
 };
 
 export default usePatchedRunAsync;

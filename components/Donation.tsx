@@ -35,7 +35,7 @@ const Donation = ( { navigation, route } ) => {
     <SafeAreaView style={viewStyles.container} edges={["top"]}>
       <View style={viewStyles.header}>
         <StyledText style={[baseTextStyles.button, textStyles.text]}>
-          {i18n.t( "settings.donate" ).toLocaleUpperCase( )}
+          {i18n.t( "settings.donate" )}
         </StyledText>
         <TouchableOpacity
           onPress={goBack}

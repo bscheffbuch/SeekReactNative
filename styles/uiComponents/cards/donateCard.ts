@@ -7,8 +7,18 @@ const maxColumnWidth = 455;
 
 const viewStyles = StyleSheet.create( {
   whiteContainer: {
-    paddingTop: 35,
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekSurface,
+    borderColor: colors.seekBorder,
+    borderRadius: 18,
+    borderWidth: 1,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    shadowColor: colors.seekShadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.07,
+    shadowRadius: 14,
+    elevation: 2,
   },
   marginGreenButton: {
     marginTop: 22,
@@ -17,14 +27,13 @@ const viewStyles = StyleSheet.create( {
     marginTop: 33,
   },
   marginBottom: {
-    marginTop: 48,
+    marginTop: 12,
   },
   textContainer: {
-    paddingHorizontal: 33,
-    paddingTop: 21,
+    paddingTop: 10,
   },
   paddingAboveText: {
-    paddingTop: 15,
+    paddingTop: 10,
   },
   landscapeContainerRestrictedWidth: {
     width: maxColumnWidth,
@@ -34,7 +43,7 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   header: {
-    paddingLeft: 22,
+    paddingLeft: 0,
   },
 } );
 

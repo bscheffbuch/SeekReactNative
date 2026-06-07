@@ -43,7 +43,7 @@ const SpeciesHeader = ( { loading, photos, taxon, id, selectedText, highlightSel
         || routeName === StoredRoutes.SeekYearInReview
         || routeName === StoredRoutes.ChallengeDetails
       ) {
-        navigation.popTo( "Drawer", { screen: routeName } );
+        navigation.navigate( routeName === StoredRoutes.SideMenu ? "More" : routeName );
       } else {
         navigation.popTo( routeName );
       }

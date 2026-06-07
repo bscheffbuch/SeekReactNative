@@ -11,7 +11,7 @@ const viewStyles = StyleSheet.create( {
     right: 15,
     zIndex: 1,
     backgroundColor: colors.ccGray,
-    borderRadius: 50,
+    borderRadius: 8,
   },
   photoContainer: {
     backgroundColor: colors.black,
@@ -33,6 +33,7 @@ const textStyles = StyleSheet.create( {
 
 const imageStyles = StyleSheet.create( {
   image: {
+    borderRadius: 0,
     height: 250,
     resizeMode: "contain",
     width,

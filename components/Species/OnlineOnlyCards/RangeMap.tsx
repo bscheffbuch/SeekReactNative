@@ -122,7 +122,7 @@ const RangeMap = () => {
         style={viewStyles.legend}
       >
         <StyledText style={[baseTextStyles.modalBanner, textStyles.whiteText]}>
-          {i18n.t( "species_detail.legend" ).toLocaleUpperCase()}
+          {i18n.t( "species_detail.legend" )}
         </StyledText>
       </TouchableOpacity>
       {user.latitude && (

@@ -4,14 +4,14 @@ import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   bottomPadding: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
     height: Platform.OS === "android" ? 17 : 60,
   },
   empty: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
   },
   similarSpeciesContainer: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekPrimaryContainer,
     height: 231,
   },
   similarSpeciesHeader: {

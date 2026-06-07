@@ -14,16 +14,16 @@ const viewStyles = StyleSheet.create( {
     marginHorizontal: 22,
   },
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   containerWhite: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
   },
   divider: {
-    backgroundColor: colors.dividerGray,
+    backgroundColor: "#E6E9E4",
     height: 1,
-    marginHorizontal: 23,
+    marginHorizontal: 18,
   },
   flex: {
     flex: 1,

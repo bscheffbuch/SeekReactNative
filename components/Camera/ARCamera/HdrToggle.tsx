@@ -41,7 +41,7 @@ const HdrToggle = ( {
 
 const styles = StyleSheet.create( {
   enabled: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekGold,
   },
   hdrLabel: {
     color: colors.white,
@@ -50,7 +50,7 @@ const styles = StyleSheet.create( {
     textAlign: "center",
   },
   enabledLabel: {
-    color: colors.seekForestGreen,
+    color: colors.seekInk,
   },
 } );
 

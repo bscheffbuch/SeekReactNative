@@ -6,11 +6,11 @@ import {
 
 const viewStyles = StyleSheet.create( {
   container: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
+    paddingTop: 8,
   },
   header: {
+    color: colors.seekInk,
     marginBottom: 22,
     marginLeft: 23,
     marginTop: 23,
@@ -29,16 +29,21 @@ const viewStyles = StyleSheet.create( {
   },
   row,
   speciesNearbyContainer: {
-    backgroundColor: colors.speciesNearbyGreen,
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E6E9E4",
+    borderRadius: 18,
+    borderWidth: 1,
     height: 223,
+    marginHorizontal: 16,
+    overflow: "hidden",
   },
   speciesNearbyPadding: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     paddingBottom: 20,
   },
   whiteButton: {
-    backgroundColor: colors.white,
-    borderRadius: 6,
+    backgroundColor: "#DEF0E7",
+    borderRadius: 999,
     paddingBottom: 4,
     paddingHorizontal: 9,
     paddingTop: 4,
@@ -55,7 +60,7 @@ const imageStyles = StyleSheet.create( {
     marginLeft: 10,
     marginRight: 13,
     resizeMode: "contain",
-    tintColor: colors.white,
+    tintColor: colors.seekDeepGreen,
     width: 16,
   },
 } );

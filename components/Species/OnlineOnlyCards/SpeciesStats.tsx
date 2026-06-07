@@ -90,7 +90,7 @@ const SpeciesStats = ( { loading, stats, region, id, seenDate }: Props ) => {
             style={viewStyles.tag}
             key={tag}
           >
-            <StyledText style={[baseTextStyles.button, textStyles.tagText]}>{i18n.t( `species_detail.${tag}` ).toLocaleUpperCase()}</StyledText>
+            <StyledText style={[baseTextStyles.button, textStyles.tagText]}>{i18n.t( `species_detail.${tag}` )}</StyledText>
           </TouchableOpacity>
         ) )}
       </View>

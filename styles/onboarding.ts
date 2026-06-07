@@ -8,14 +8,14 @@ const { width, height } = Dimensions.get( "window" );
 
 const viewStyles = StyleSheet.create( {
   activeDot: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekSurface,
     borderRadius: 10 / 2,
     height: 10,
     width: 10,
   },
   button: {
-    backgroundColor: colors.seekTeal,
-    borderRadius: 34,
+    backgroundColor: colors.seekDeepGreen,
+    borderRadius: 14,
     height: 50,
     justifyContent: "center",
     width: 293,
@@ -32,6 +32,7 @@ const viewStyles = StyleSheet.create( {
   },
   center,
   container: {
+    backgroundColor: colors.seekCanvas,
     flex: 1,
   },
   contentContainer: {
@@ -40,7 +41,7 @@ const viewStyles = StyleSheet.create( {
     width,
   },
   dot: {
-    backgroundColor: colors.darkGray,
+    backgroundColor: colors.seekMuted,
     borderRadius: 6 / 2,
     height: 6,
     marginBottom: 3,

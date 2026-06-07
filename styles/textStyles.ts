@@ -11,12 +11,12 @@ const { height } = Dimensions.get( "window" );
 const fontScale = PixelRatio.getFontScale( );
 
 const regular = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.regular,
 } as const;
 
 const bold = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.bold,
 } as const;
 
@@ -25,20 +25,20 @@ const boldItalic = {
 } as const;
 
 const italic = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.italic,
 } as const;
 
 const medium = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.medium,
 } as const;
 
 const header = {
-  color: colors.seekForestGreen,
+  color: colors.seekInk,
   fontFamily: fonts.bold,
   fontSize: 18,
-  letterSpacing: 1,
+  letterSpacing: 0,
   lineHeight: 22,
 } as const;
 
@@ -58,7 +58,7 @@ const buttonSmall = {
 } as const;
 
 const body = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.regular,
   fontSize: 15,
   letterSpacing: 0,
@@ -66,7 +66,7 @@ const body = {
 } as const;
 
 const bodySpaced = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.regular,
   fontSize: 15,
   letterSpacing: 0,
@@ -74,7 +74,7 @@ const bodySpaced = {
 } as const;
 
 const bodySmall = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.regular,
   fontSize: 13,
   letterSpacing: 0,
@@ -82,7 +82,7 @@ const bodySmall = {
 } as const;
 
 const bodyBlackSmallScreens = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.regular,
   fontSize: 14,
   letterSpacing: 0,
@@ -90,7 +90,7 @@ const bodyBlackSmallScreens = {
 } as const;
 
 const emptyState = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.medium,
   fontSize: 18,
   letterSpacing: 0,
@@ -98,10 +98,10 @@ const emptyState = {
 } as const;
 
 const highlight = {
-  color: colors.seekForestGreen,
+  color: colors.seekInk,
   fontFamily: fonts.bold,
   fontSize: 17,
-  letterSpacing: 1,
+  letterSpacing: 0,
   lineHeight: 24,
 } as const;
 
@@ -159,7 +159,7 @@ const challengeDescription = {
 } as const;
 
 const smallLightHeading = {
-  color: colors.black,
+  color: colors.seekInk,
   fontFamily: fonts.regular,
   fontSize: 13,
   letterSpacing: 0.75,
@@ -167,15 +167,15 @@ const smallLightHeading = {
 } as const;
 
 const challengeItemTitle = {
-  color: colors.seekForestGreen,
+  color: colors.seekInk,
   fontFamily: fonts.bold,
   fontSize: 16,
-  letterSpacing: 0.89,
+  letterSpacing: 0,
   lineHeight: 20,
 } as const;
 
 const challengeItemButton = {
-  color: colors.seekForestGreen,
+  color: colors.seekDeepGreen,
   fontFamily: fonts.bold,
   fontSize: 13,
   lineHeight: 17,
@@ -211,7 +211,7 @@ const link = {
 } as const;
 
 const forgotPasswordLink = {
-  color: colors.seekForestGreen,
+  color: colors.seekDeepGreen,
   fontFamily: fonts.regular,
   fontSize: 16,
   lineHeight: 21,
@@ -245,7 +245,7 @@ const prediction = {
 } as const;
 
 const picker = {
-  color: colors.seekForestGreen,
+  color: colors.seekDeepGreen,
   fontFamily: fonts.bold,
   fontSize: enabledLargeFonts() ? 13 : 18,
   letterSpacing: Platform.OS === "ios" ? 1.0 : 0,
@@ -258,7 +258,7 @@ const inputField = {
 } as const;
 
 const postSectionHeader = {
-  color: colors.seekForestGreen,
+  color: colors.seekDeepGreen,
   fontFamily: fonts.bold,
   fontSize: 17,
   letterSpacing: 1.0,
@@ -278,7 +278,7 @@ const loginError = {
 } as const;
 
 const passwordEmailHeader = {
-  color: colors.seekForestGreen,
+  color: colors.seekDeepGreen,
   fontFamily: fonts.bold,
   fontSize: 23,
   letterSpacing: 1.0,
@@ -339,7 +339,7 @@ const baseTextStyles = StyleSheet.create( {
   buttonSmall,
   buttonGreen: {
     ...button,
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
   },
   buttonRegular: {
     ...button,
@@ -358,7 +358,7 @@ const baseTextStyles = StyleSheet.create( {
   },
   bodyGreen: {
     ...body,
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
   },
   bodyTeal: {
     ...body,
@@ -371,7 +371,7 @@ const baseTextStyles = StyleSheet.create( {
   },
   bodyMediumGreen: {
     ...body,
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
     fontFamily: fonts.medium,
   },
   bodyMediumWhite: {
@@ -401,7 +401,7 @@ const baseTextStyles = StyleSheet.create( {
   emptyState,
   emptyStateGreen: {
     ...emptyState,
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
   },
   emptyStateWhite: {
     ...emptyState,
@@ -417,7 +417,7 @@ const baseTextStyles = StyleSheet.create( {
   modalBanner,
   modalBannerGreen: {
     ...modalBanner,
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
   },
   challengeMonth,
   challengeTitle,

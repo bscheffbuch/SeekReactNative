@@ -169,6 +169,12 @@
     "achievements": "Achievements",
     "challenges": "Challenges",
     "observations": "My Observations",
+    "scan": "Scan",
+    "more": "More",
+    "queued_observations": "Queued Observations",
+    "inaturalist": "iNaturalist",
+    "notifications": "Notifications",
+    "help": "Help",
     "about": "About",
     "settings": "Settings"
   },
@@ -340,11 +346,17 @@
   "queue": {
     "header": "Queued Observations",
     "view_queue": "View queued observations",
+    "view_saved": "View {{count}} saved observations",
     "save_for_later": "Save for later",
+    "saving_on": "Saving",
+    "save_mode_hint": "Turns save-for-later mode on or off. Long-press to view saved observations.",
     "saved_pending": "Saved — {{count}} pending",
-    "empty": "No queued observations yet. Use the Save for Later button on the camera to add some.",
+    "empty": "No queued observations yet. Turn on Save for Later on the camera, then tap the shutter to add some.",
     "select_draft": "Select observation",
     "selected": "Selected",
+    "done": "Done",
+    "open_id": "Open identification",
+    "unidentified": "Not identified",
     "no_location": "No location",
     "combine": "Combine into one observation",
     "upload_all": "Upload all",
@@ -672,7 +684,8 @@
     "tip_1": "Always be aware of your surroundings, stay safe, and don’t trespass.",
     "tip_2": "Don’t eat anything you find in the wild.",
     "tip_3": "Respect other living things by not harassing or touching them. Some may sting or bite.",
-    "tip_4": "Children may require adult supervision."
+    "tip_4": "Children may require adult supervision.",
+    "hide_future": "Don’t show this reminder again"
   },
   "accessibility": {
     "menu": "Open menu",
@@ -703,6 +716,9 @@
     "manual_focus": "Manual focus",
     "increase_focus_distance": "Increase focus distance",
     "decrease_focus_distance": "Decrease focus distance",
+    "macro_mode": "Macro mode",
+    "enable_macro": "Switch to the ultra-wide lens and focus on very close subjects.",
+    "disable_macro": "Exit macro mode and return to automatic focus.",
     "focus_peaking": "Focus peaking",
     "enable_focus_peaking": "Enable focus peaking",
     "disable_focus_peaking": "Disable focus peaking",
@@ -738,6 +754,10 @@
     "subtitle": "For quick identifications"
   },
   "settings": {
+    "appearance": "Appearance",
+    "appearance_system": "System",
+    "appearance_light": "Light",
+    "appearance_dark": "Dark",
     "header": "Seek Camera",
     "common_names": "Display Common Names",
     "scientific_names": "Display Scientific Names",

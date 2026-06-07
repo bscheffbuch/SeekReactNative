@@ -9,6 +9,7 @@ import SpeciesDetailCard from "../UIComponents/SpeciesDetailCard";
 import i18n from "../../i18n";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Taxon {
   rank: string;
@@ -27,6 +28,7 @@ interface Props {
 
 const SpeciesTaxonomy = ( { ancestors, predictions, id }: Props ) => {
   const [taxonomyList, setTaxonomyList] = useState<Taxon[]>( [] );
+  const { theme } = useTheme( );
 
   let marginLeft = 0;
 
@@ -96,6 +98,7 @@ const SpeciesTaxonomy = ( { ancestors, predictions, id }: Props ) => {
             <View>
               <StyledText style={[
                 baseTextStyles.bodyBold,
+                { color: theme.colors.text },
                 ancestor.rank === "species" && baseTextStyles.boldItalic,
               ]}>
                 {ancestor.rank !== "species" && `${capitalizeNames( i18n.t( `camera.${ancestor.rank}` ) ) || ""} `}
@@ -104,6 +107,7 @@ const SpeciesTaxonomy = ( { ancestors, predictions, id }: Props ) => {
               <StyledText style={[
                 baseTextStyles.body,
                 textStyles.taxonomyText,
+                { color: theme.colors.muted },
                 !ancestor.preferred_common_name && baseTextStyles.italic,
               ]}>
                 {ancestor.preferred_common_name

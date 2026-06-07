@@ -46,7 +46,7 @@ const DatePicker = ( { dateToDisplay, handleDatePicked }: Props ) => {
         <Image source={posting.date} />
         <View style={styles.row}>
           <StyledText style={baseTextStyles.postSectionHeader}>
-            {i18n.t( "posting.date" ).toLocaleUpperCase( )}
+            {i18n.t( "posting.date" )}
           </StyledText>
           <StyledText style={[baseTextStyles.body, styles.text]}>{displayDate( )}</StyledText>
         </View>

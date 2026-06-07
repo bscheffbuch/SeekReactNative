@@ -57,7 +57,7 @@ const SpeciesNearbyChallenge = ( { challenge }: Props ) => {
         }
         setLoading( false );
         setLoaded( true );
-      } catch ( e ) {
+      } catch {
         updateError( "unknown" );
       }
     };
@@ -110,7 +110,7 @@ const SpeciesNearbyChallenge = ( { challenge }: Props ) => {
     } else if ( loading ) {
       return (
         <View style={viewStyles.loadingWheelContainer}>
-          <LoadingWheel color={colors.seekForestGreen} />
+          <LoadingWheel color={colors.seekDeepGreen} />
         </View>
       );
     } else {

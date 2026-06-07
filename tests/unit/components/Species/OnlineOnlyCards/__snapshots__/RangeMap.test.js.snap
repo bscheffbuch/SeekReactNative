@@ -5,37 +5,216 @@ exports[`RangeMap should change map region to user's location when button is pre
   edges={
     {
       "bottom": "off",
-      "left": "off",
-      "right": "off",
+      "left": "additive",
+      "right": "additive",
       "top": "additive",
     }
   }
   style={
-    {
-      "backgroundColor": "#38976d",
-      "flex": 1,
-    }
+    [
+      {
+        "backgroundColor": "#38976d",
+        "flex": 1,
+      },
+      {
+        "backgroundColor": "#F7F6F0",
+      },
+    ]
   }
   testID="range-map-container"
 >
   <View
     style={
-      [
-        {
-          "backgroundColor": "#38976d",
-          "flexDirection": "row",
-          "paddingBottom": 18,
-          "paddingTop": 20.5,
-        },
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-        },
-      ]
+      {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderBottomColor": "#D8E1DA",
+        "borderBottomWidth": 0.5,
+        "flexDirection": "row",
+        "minHeight": 64,
+        "paddingHorizontal": 16,
+        "paddingVertical": 8,
+      }
     }
   >
     <View
-      accessibilityLabel="Go back to previous screen"
+      style={
+        {
+          "height": 48,
+          "width": 48,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      numberOfLines={2}
+      style={
+        {
+          "color": "#17251F",
+          "flex": 1,
+          "fontFamily": "Lato-Bold",
+          "fontSize": 20,
+          "lineHeight": 26,
+          "marginHorizontal": 8,
+        }
+      }
+    >
+      Range map
+    </Text>
+    <View>
+      <View
+        accessibilityLabel="View notifications"
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": false,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={8}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          [
+            {
+              "alignItems": "center",
+              "borderRadius": 24,
+              "height": 48,
+              "justifyContent": "center",
+              "minHeight": 48,
+              "minWidth": 48,
+              "width": 48,
+            },
+            false,
+            false,
+          ]
+        }
+      >
+        <Image
+          accessibilityIgnoresInvertColors={true}
+          resizeMode="contain"
+          source={
+            {
+              "testUri": "../../../assets/navbar/Notifications-inactive.webp",
+            }
+          }
+          style={
+            [
+              {
+                "height": 24,
+                "width": 24,
+              },
+              null,
+              undefined,
+            ]
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#E5B84B",
+            "borderColor": "#FFFFFF",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "height": 10,
+            "position": "absolute",
+            "right": 11,
+            "top": 11,
+            "width": 10,
+          }
+        }
+        testID="unreadNotificationsIndicator"
+      />
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#F7F6F0",
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      onRegionChangeComplete={[Function]}
+      provider="default"
+      region={
+        {
+          "latitude": 42.42,
+          "latitudeDelta": 0.2,
+          "longitude": 42.42,
+          "longitudeDelta": 0.2,
+        }
+      }
+      style={
+        {
+          "height": 1259,
+          "width": 750,
+        }
+      }
+      testID="range-map"
+      zoomEnabled={true}
+    >
+      <View
+        tileSize={512}
+        urlTemplate="https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?taxon_id=some_id&color=%2377B300&verifiable=true"
+      />
+      <View
+        coordinate={
+          {
+            "latitude": 42.1234567,
+            "longitude": 42.1234567,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/icons/icon-camerabutton-onmap.webp",
+            }
+          }
+        />
+      </View>
+      <View
+        coordinate={
+          {
+            "latitude": 42.42,
+            "longitude": 42.42,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/icons/icon-location-onmap.webp",
+            }
+          }
+        />
+      </View>
+    </View>
+    <View
       accessibilityState={
         {
           "busy": undefined,
@@ -65,244 +244,89 @@ exports[`RangeMap should change map region to user's location when button is pre
       onStartShouldSetResponder={[Function]}
       style={
         {
+          "backgroundColor": "#38976d",
+          "borderTopRightRadius": 40,
+          "bottom": 0,
           "left": 0,
           "opacity": 1,
-          "paddingHorizontal": 23,
-          "paddingVertical": 18,
+          "paddingBottom": 23,
+          "paddingLeft": 22,
+          "paddingRight": 28,
           "position": "absolute",
-          "transform": [
-            {
-              "scaleX": 1,
-            },
-          ],
         }
       }
+    >
+      <Text
+        style={
+          [
+            {
+              "textAlign": "left",
+            },
+            [
+              {
+                "color": "#ffffff",
+                "fontFamily": "Lato-Bold",
+                "fontSize": 18,
+                "letterSpacing": 1.12,
+              },
+              {
+                "marginTop": 18,
+                "textAlign": "center",
+              },
+            ],
+          ]
+        }
+      >
+        LEGEND
+      </Text>
+    </View>
+    <View
+      accessibilityLabel="Return to your current location"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "bottom": 19,
+          "opacity": 1,
+          "position": "absolute",
+          "right": 19,
+        }
+      }
+      testID="user-location-button"
     >
       <Image
         source={
           {
-            "testUri": "../../../assets/icons/back.webp",
+            "testUri": "../../../assets/icons/icon-locationindicator.webp",
           }
         }
-        style={false}
       />
     </View>
-    <Text
-      allowFontScaling={false}
-      style={
-        [
-          {
-            "textAlign": "left",
-          },
-          [
-            {
-              "color": "#ffffff",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 15,
-              "letterSpacing": 1,
-              "lineHeight": 21,
-            },
-            {
-              "maxWidth": 650,
-            },
-          ],
-        ]
-      }
-    >
-      RANGE MAP
-    </Text>
-  </View>
-  <AIRMap
-    initialRegion={null}
-    onChange={[Function]}
-    onMapReady={[Function]}
-    onRegionChangeComplete={[Function]}
-    region={
-      {
-        "latitude": 42.42,
-        "latitudeDelta": 0.2,
-        "longitude": 42.42,
-        "longitudeDelta": 0.2,
-      }
-    }
-    style={
-      {
-        "height": 1259,
-        "width": 750,
-      }
-    }
-    testID="range-map"
-    zoomEnabled={true}
-  >
-    <AIRMapUrlTile
-      tileSize={512}
-      urlTemplate="https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?taxon_id=some_id&color=%2377B300&verifiable=true"
-    />
-    <AIRMapMarker
-      coordinate={
-        {
-          "latitude": 42.1234567,
-          "longitude": 42.1234567,
-        }
-      }
-      onPress={[Function]}
-      style={
-        [
-          {
-            "backgroundColor": "transparent",
-            "position": "absolute",
-          },
-          undefined,
-        ]
-      }
-    >
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-camerabutton-onmap.webp",
-          }
-        }
-      />
-    </AIRMapMarker>
-    <AIRMapMarker
-      coordinate={
-        {
-          "latitude": 42.42,
-          "longitude": 42.42,
-        }
-      }
-      onPress={[Function]}
-      style={
-        [
-          {
-            "backgroundColor": "transparent",
-            "position": "absolute",
-          },
-          undefined,
-        ]
-      }
-    >
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-location-onmap.webp",
-          }
-        }
-      />
-    </AIRMapMarker>
-  </AIRMap>
-  <View
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": undefined,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "backgroundColor": "#38976d",
-        "borderTopRightRadius": 40,
-        "bottom": 0,
-        "left": 0,
-        "opacity": 1,
-        "paddingBottom": 23,
-        "paddingLeft": 22,
-        "paddingRight": 28,
-        "position": "absolute",
-      }
-    }
-  >
-    <Text
-      style={
-        [
-          {
-            "textAlign": "left",
-          },
-          [
-            {
-              "color": "#ffffff",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 18,
-              "letterSpacing": 1.12,
-            },
-            {
-              "marginTop": 18,
-              "textAlign": "center",
-            },
-          ],
-        ]
-      }
-    >
-      LEGEND
-    </Text>
-  </View>
-  <View
-    accessibilityLabel="Return to your current location"
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": undefined,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "bottom": 19,
-        "opacity": 1,
-        "position": "absolute",
-        "right": 19,
-      }
-    }
-    testID="user-location-button"
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/icons/icon-locationindicator.webp",
-        }
-      }
-    />
   </View>
 </RNCSafeAreaView>
 `;
@@ -312,37 +336,214 @@ exports[`RangeMap should render correctly 1`] = `
   edges={
     {
       "bottom": "off",
-      "left": "off",
-      "right": "off",
+      "left": "additive",
+      "right": "additive",
       "top": "additive",
     }
   }
   style={
-    {
-      "backgroundColor": "#38976d",
-      "flex": 1,
-    }
+    [
+      {
+        "backgroundColor": "#38976d",
+        "flex": 1,
+      },
+      {
+        "backgroundColor": "#F7F6F0",
+      },
+    ]
   }
   testID="range-map-container"
 >
   <View
     style={
-      [
-        {
-          "backgroundColor": "#38976d",
-          "flexDirection": "row",
-          "paddingBottom": 18,
-          "paddingTop": 20.5,
-        },
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-        },
-      ]
+      {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderBottomColor": "#D8E1DA",
+        "borderBottomWidth": 0.5,
+        "flexDirection": "row",
+        "minHeight": 64,
+        "paddingHorizontal": 16,
+        "paddingVertical": 8,
+      }
     }
   >
     <View
-      accessibilityLabel="Go back to previous screen"
+      style={
+        {
+          "height": 48,
+          "width": 48,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      numberOfLines={2}
+      style={
+        {
+          "color": "#17251F",
+          "flex": 1,
+          "fontFamily": "Lato-Bold",
+          "fontSize": 20,
+          "lineHeight": 26,
+          "marginHorizontal": 8,
+        }
+      }
+    >
+      Range map
+    </Text>
+    <View>
+      <View
+        accessibilityLabel="View notifications"
+        accessibilityRole="button"
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": false,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={8}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          [
+            {
+              "alignItems": "center",
+              "borderRadius": 24,
+              "height": 48,
+              "justifyContent": "center",
+              "minHeight": 48,
+              "minWidth": 48,
+              "width": 48,
+            },
+            false,
+            false,
+          ]
+        }
+      >
+        <Image
+          accessibilityIgnoresInvertColors={true}
+          resizeMode="contain"
+          source={
+            {
+              "testUri": "../../../assets/navbar/Notifications-inactive.webp",
+            }
+          }
+          style={
+            [
+              {
+                "height": 24,
+                "width": 24,
+              },
+              null,
+              undefined,
+            ]
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#E5B84B",
+            "borderColor": "#FFFFFF",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "height": 10,
+            "position": "absolute",
+            "right": 11,
+            "top": 11,
+            "width": 10,
+          }
+        }
+        testID="unreadNotificationsIndicator"
+      />
+    </View>
+  </View>
+  <View
+    style={
+      {
+        "backgroundColor": "#F7F6F0",
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      onRegionChangeComplete={[Function]}
+      provider="default"
+      region={
+        {
+          "latitude": 42.1234567,
+          "longitude": 42.1234567,
+        }
+      }
+      style={
+        {
+          "height": 1259,
+          "width": 750,
+        }
+      }
+      testID="range-map"
+      zoomEnabled={true}
+    >
+      <View
+        tileSize={512}
+        urlTemplate="https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?taxon_id=some_id&color=%2377B300&verifiable=true"
+      />
+      <View
+        coordinate={
+          {
+            "latitude": 42.1234567,
+            "longitude": 42.1234567,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/icons/icon-camerabutton-onmap.webp",
+            }
+          }
+        />
+      </View>
+      <View
+        coordinate={
+          {
+            "latitude": 42.42,
+            "longitude": 42.42,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/icons/icon-location-onmap.webp",
+            }
+          }
+        />
+      </View>
+    </View>
+    <View
       accessibilityState={
         {
           "busy": undefined,
@@ -372,242 +573,89 @@ exports[`RangeMap should render correctly 1`] = `
       onStartShouldSetResponder={[Function]}
       style={
         {
+          "backgroundColor": "#38976d",
+          "borderTopRightRadius": 40,
+          "bottom": 0,
           "left": 0,
           "opacity": 1,
-          "paddingHorizontal": 23,
-          "paddingVertical": 18,
+          "paddingBottom": 23,
+          "paddingLeft": 22,
+          "paddingRight": 28,
           "position": "absolute",
-          "transform": [
-            {
-              "scaleX": 1,
-            },
-          ],
         }
       }
+    >
+      <Text
+        style={
+          [
+            {
+              "textAlign": "left",
+            },
+            [
+              {
+                "color": "#ffffff",
+                "fontFamily": "Lato-Bold",
+                "fontSize": 18,
+                "letterSpacing": 1.12,
+              },
+              {
+                "marginTop": 18,
+                "textAlign": "center",
+              },
+            ],
+          ]
+        }
+      >
+        LEGEND
+      </Text>
+    </View>
+    <View
+      accessibilityLabel="Return to your current location"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "bottom": 19,
+          "opacity": 1,
+          "position": "absolute",
+          "right": 19,
+        }
+      }
+      testID="user-location-button"
     >
       <Image
         source={
           {
-            "testUri": "../../../assets/icons/back.webp",
+            "testUri": "../../../assets/icons/icon-locationindicator.webp",
           }
         }
-        style={false}
       />
     </View>
-    <Text
-      allowFontScaling={false}
-      style={
-        [
-          {
-            "textAlign": "left",
-          },
-          [
-            {
-              "color": "#ffffff",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 15,
-              "letterSpacing": 1,
-              "lineHeight": 21,
-            },
-            {
-              "maxWidth": 650,
-            },
-          ],
-        ]
-      }
-    >
-      RANGE MAP
-    </Text>
-  </View>
-  <AIRMap
-    initialRegion={null}
-    onChange={[Function]}
-    onMapReady={[Function]}
-    onRegionChangeComplete={[Function]}
-    region={
-      {
-        "latitude": 42.1234567,
-        "longitude": 42.1234567,
-      }
-    }
-    style={
-      {
-        "height": 1259,
-        "width": 750,
-      }
-    }
-    testID="range-map"
-    zoomEnabled={true}
-  >
-    <AIRMapUrlTile
-      tileSize={512}
-      urlTemplate="https://api.inaturalist.org/v1/grid/{z}/{x}/{y}.png?taxon_id=some_id&color=%2377B300&verifiable=true"
-    />
-    <AIRMapMarker
-      coordinate={
-        {
-          "latitude": 42.1234567,
-          "longitude": 42.1234567,
-        }
-      }
-      onPress={[Function]}
-      style={
-        [
-          {
-            "backgroundColor": "transparent",
-            "position": "absolute",
-          },
-          undefined,
-        ]
-      }
-    >
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-camerabutton-onmap.webp",
-          }
-        }
-      />
-    </AIRMapMarker>
-    <AIRMapMarker
-      coordinate={
-        {
-          "latitude": 42.42,
-          "longitude": 42.42,
-        }
-      }
-      onPress={[Function]}
-      style={
-        [
-          {
-            "backgroundColor": "transparent",
-            "position": "absolute",
-          },
-          undefined,
-        ]
-      }
-    >
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-location-onmap.webp",
-          }
-        }
-      />
-    </AIRMapMarker>
-  </AIRMap>
-  <View
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": undefined,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "backgroundColor": "#38976d",
-        "borderTopRightRadius": 40,
-        "bottom": 0,
-        "left": 0,
-        "opacity": 1,
-        "paddingBottom": 23,
-        "paddingLeft": 22,
-        "paddingRight": 28,
-        "position": "absolute",
-      }
-    }
-  >
-    <Text
-      style={
-        [
-          {
-            "textAlign": "left",
-          },
-          [
-            {
-              "color": "#ffffff",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 18,
-              "letterSpacing": 1.12,
-            },
-            {
-              "marginTop": 18,
-              "textAlign": "center",
-            },
-          ],
-        ]
-      }
-    >
-      LEGEND
-    </Text>
-  </View>
-  <View
-    accessibilityLabel="Return to your current location"
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": undefined,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "bottom": 19,
-        "opacity": 1,
-        "position": "absolute",
-        "right": 19,
-      }
-    }
-    testID="user-location-button"
-  >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/icons/icon-locationindicator.webp",
-        }
-      }
-    />
   </View>
 </RNCSafeAreaView>
 `;

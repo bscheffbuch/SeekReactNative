@@ -26,7 +26,7 @@ const Legend = ( { closeModal }: Props ) => {
     <WhiteModal closeModal={closeModal}>
       <View style={viewStyles.legendHeader}>
         <StyledText style={[baseTextStyles.modalBanner, textStyles.whiteText]}>
-          {i18n.t( "species_detail.legend" ).toLocaleUpperCase()}
+          {i18n.t( "species_detail.legend" )}
         </StyledText>
       </View>
       <View>

@@ -16,6 +16,40 @@ interface QueueCoords {
   accuracy?: number | null;
 }
 
+interface QueuePrediction {
+  name?: string;
+  taxon_id?: number;
+  rank_level?: number;
+  rank?: number;
+  combined_score?: number;
+  ancestor_ids?: number[];
+}
+
+// Returns the AR-camera predictions stored with a queued draft, or [] when the
+// draft was saved without an identification (older drafts / unidentified).
+const parsePredictions = ( obs ): QueuePrediction[] => {
+  if ( !obs || !obs.predictions ) {
+    return [];
+  }
+  try {
+    const parsed = JSON.parse( obs.predictions );
+    return Array.isArray( parsed ) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+// Picks the most specific (lowest rank_level) prediction as the representative
+// identification for a queued draft.
+const representativePrediction = ( predictions: QueuePrediction[] ): QueuePrediction | null => {
+  if ( !predictions || predictions.length === 0 ) {
+    return null;
+  }
+  return [...predictions].sort(
+    ( a, b ) => ( a.rank_level ?? 100 ) - ( b.rank_level ?? 100 )
+  )[0];
+};
+
 // Returns the list of photo paths attached to a queued observation. Newly
 // queued drafts hold a single photo; combined drafts hold several. Falls back
 // to the representative `photo.uri` for any record missing the JSON array.
@@ -38,7 +72,8 @@ const parsePhotoUris = ( obs ): string[] => {
 const saveQueuedObservation = async (
   coords: QueueCoords,
   time: number,
-  uri: string
+  uri: string,
+  predictions: any[] = []
 ): Promise<void> => {
   const realm = await Realm.open( realmConfig );
   const obsUUID = createUUID.v4( );
@@ -48,6 +83,7 @@ const saveQueuedObservation = async (
   // OS clearing the camera cache, and so it remains available for later upload
   const displayUri = ( await createBackupUri( uri ) ) || uri;
   const date = formatGMTTimeWithTimeZone( setISOTime( time ) );
+  const topPrediction = representativePrediction( predictions );
 
   try {
     realm.write( ( ) => {
@@ -60,7 +96,7 @@ const saveQueuedObservation = async (
       realm.create( "UploadObservationRealm", {
         uuid: obsUUID,
         observed_on_string: date.dateForServer,
-        taxon_id: null,
+        taxon_id: topPrediction?.taxon_id ?? null,
         geoprivacy: "open",
         captive_flag: false,
         place_guess: null,
@@ -69,9 +105,10 @@ const saveQueuedObservation = async (
         positional_accuracy: coords?.accuracy != null ? Math.trunc( coords.accuracy ) : null,
         description: null,
         photo,
-        vision: false,
+        vision: predictions.length > 0,
         queued: true,
         photoUris: JSON.stringify( [displayUri] ),
+        predictions: predictions.length > 0 ? JSON.stringify( predictions ) : null,
       }, true );
     } );
   } catch ( e ) {
@@ -184,6 +221,8 @@ const uploadAllQueuedObservations = async ( ): Promise<{ success: number; failed
 
 export {
   parsePhotoUris,
+  parsePredictions,
+  representativePrediction,
   saveQueuedObservation,
   getQueuedObservations,
   getQueuedCount,

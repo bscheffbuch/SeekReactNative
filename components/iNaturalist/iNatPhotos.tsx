@@ -9,10 +9,12 @@ import HorizontalScroll from "../UIComponents/HorizontalScroll";
 import { useFetchPhotos } from "./hooks/inatHooks";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const INatStatsPhotos = ( ) => {
   const netInfo = useNetInfo();
   const { isConnected } = netInfo;
+  const { theme } = useTheme( );
 
   const photos: {
     photoUrl?: string;
@@ -26,7 +28,7 @@ const INatStatsPhotos = ( ) => {
         source={{ uri: photo.photoUrl }}
         style={imageStyles.image}
       />}
-      <StyledText style={[baseTextStyles.body, textStyles.caption]}>
+      <StyledText style={[baseTextStyles.body, textStyles.caption, { color: theme.colors.text }]}>
         {i18n.t( "about_inat.x_seen_by_user", { speciesName: photo.commonName, user: photo.attribution } )}
       </StyledText>
     </View>

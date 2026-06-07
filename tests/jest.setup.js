@@ -20,6 +20,74 @@ import {
   mockUseLocationPermission,
 } from "./vision-camera/vision-camera";
 
+const mockReact = require( "react" );
+const { View: mockView } = require( "react-native" );
+
+const mockRenderComponent = component => {
+  if ( !component ) {
+    return null;
+  }
+  return typeof component === "function"
+    ? mockReact.createElement( component )
+    : component;
+};
+
+const mockFlashList = mockReact.forwardRef( ( props, ref ) => {
+  const {
+    data = [],
+    horizontal,
+    keyExtractor,
+    ListEmptyComponent,
+    ListFooterComponent,
+    ListHeaderComponent,
+    onScroll,
+    onViewableItemsChanged,
+    renderItem,
+    testID,
+  } = props;
+  const [visibleIndex, setVisibleIndex] = mockReact.useState( 0 );
+
+  const setIndex = index => {
+    setVisibleIndex( index );
+    onViewableItemsChanged?.( {
+      changed: [{ index, item: data[index], isViewable: true }],
+      viewableItems: [{ index, item: data[index], isViewable: true }],
+    } );
+  };
+
+  mockReact.useImperativeHandle( ref, () => ( {
+    scrollToIndex: ( { index } ) => setIndex( index ),
+  } ) );
+
+  const handleScroll = event => {
+    onScroll?.( event );
+    if ( horizontal && data.length > 1 ) {
+      const x = event?.nativeEvent?.contentOffset?.x || 0;
+      if ( x > 0 ) {
+        setIndex( data.length - 1 );
+      }
+    }
+  };
+
+  const renderRow = ( item, index ) => mockReact.createElement(
+    mockReact.Fragment,
+    { key: keyExtractor?.( item, index ) || index },
+    renderItem?.( { item, index } )
+  );
+
+  const items = horizontal
+    ? ( data[visibleIndex] ? [renderRow( data[visibleIndex], visibleIndex )] : [] )
+    : data.map( renderRow );
+
+  return mockReact.createElement(
+    mockView,
+    { testID, onScroll: handleScroll },
+    mockRenderComponent( ListHeaderComponent ),
+    items.length > 0 ? items : mockRenderComponent( ListEmptyComponent ),
+    mockRenderComponent( ListFooterComponent )
+  );
+} );
+
 require( "react-native-reanimated" ).setUpTests();
 // Reanimated 4.2 + Worklets 0.7: Jest loads native worklets which fails in Node. See:
 // https://github.com/software-mansion/react-native-reanimated/discussions/8806
@@ -31,6 +99,32 @@ jest.mock( "react-native-device-info", () => mockRNDeviceInfo );
 jest.mock( "react-native-localize", () => mockRNLocalize );
 jest.mock( "@react-native-community/netinfo", () => mockRNCNetInfo );
 jest.mock( "react-native-safe-area-context", () => mockSafeAreaContext );
+jest.mock( "uuid", () => ( {
+  v4: jest.fn( () => "00000000-0000-4000-8000-000000000000" ),
+} ) );
+jest.mock( "@shopify/flash-list", () => ( { FlashList: mockFlashList } ) );
+jest.mock( "react-native-webview", () => {
+  const React = require( "react" );
+  const { View } = require( "react-native" );
+  return {
+    WebView: React.forwardRef( ( props, ref ) => React.createElement( View, { ...props, ref } ) ),
+  };
+} );
+jest.mock( "react-native-maps", () => {
+  const React = require( "react" );
+  const { View } = require( "react-native" );
+  const MockMapView = React.forwardRef( ( props, ref ) => React.createElement( View, { ...props, ref } ) );
+  const MockMapChild = props => React.createElement( View, props );
+  MockMapView.Marker = MockMapChild;
+  MockMapView.UrlTile = MockMapChild;
+  return {
+    __esModule: true,
+    default: MockMapView,
+    Marker: MockMapChild,
+    PROVIDER_DEFAULT: "default",
+    UrlTile: MockMapChild,
+  };
+} );
 
 jest.mock( "vision-camera-plugin-inatvision" );
 jest.mock( "react-native-worklets-core", () => ( {
@@ -117,84 +211,90 @@ jest.mock( "react-native-geocoder", () => ( {
 } ) );
 
 jest.mock( "realm", () => {
-  const actualRealm = jest.requireActual( "realm" );
-  actualRealm.open = jest.fn(
-    ( config ) =>
-      new Promise( ( resolve ) => {
-        resolve( {
-          objects: jest.fn( ( table ) => {
-            switch ( table ) {
-              case "BadgeRealm":
-                return {
-                  filtered: jest.fn( () => {
-                    return new Array( 0 );
-                  } ),
-                };
-              case "LoginRealm":
-                return [{ observationCount: 42 }];
-              case "NotificationRealm":
-                return [
-                  {
-                    challengeIndex: 36,
-                    iconName: "badge_empty",
-                    index: 0,
-                    message: "notifications.view_challenges",
-                    nextScreen: "ChallengeDetails",
-                    seen: true,
-                    title: "notifications.new_challenge",
-                    viewed: true,
-                  },
-                ];
-              case "TaxonRealm":
-                return new Array( 42 );
-              case "ObservationRealm":
-                return [
-                  {
-                    date: new Date( "2022-12-02T10:19:54.000Z" ),
-                    latitude: 42,
-                    longitude: 42,
-                    taxon: {
-                      ancestorIds: [1, 2, 3],
-                      defaultPhoto: {
-                        backupUri: "some_uri",
-                        lastUpdated: null,
-                        mediumUrl: "some_medium_url",
-                      },
-                      iconicTaxonId: 1,
-                      id: 4242,
-                      name: "some_name_1",
-                      preferredCommonName: "some_common_name_1",
-                    },
-                    uuidString: "some_uuid_2",
-                  },
-                  {
-                    date: new Date( "2022-12-02T10:19:54.000Z" ),
-                    latitude: 42,
-                    longitude: 42,
-                    taxon: {
-                      ancestorIds: [1, 2, 3],
-                      defaultPhoto: {
-                        backupUri: "some_uri",
-                        lastUpdated: null,
-                        mediumUrl: "some_medium_url",
-                      },
-                      iconicTaxonId: 1,
-                      id: 4242,
-                      name: "some_name_2",
-                      preferredCommonName: null,
-                    },
-                    uuidString: "some_uuid_2",
-                  },
-                ];
-              default:
-                break;
-            }
-          } ),
-          write: jest.fn( () => {} ),
-        } );
-      } )
-  );
-  return actualRealm;
+  const withRealmCollectionMethods = ( collection ) => Object.assign( collection, {
+    filtered: jest.fn( () => collection ),
+    sorted: jest.fn( () => collection ),
+  } );
+
+  const collections = {
+    BadgeRealm: withRealmCollectionMethods( [] ),
+    LoginRealm: withRealmCollectionMethods( [{ observationCount: 42 }] ),
+    NotificationRealm: withRealmCollectionMethods( [
+      {
+        challengeIndex: 36,
+        iconName: "badge_empty",
+        index: 0,
+        message: "notifications.view_challenges",
+        nextScreen: "ChallengeDetails",
+        seen: true,
+        title: "notifications.new_challenge",
+        viewed: true,
+      },
+    ] ),
+    TaxonRealm: withRealmCollectionMethods( new Array( 42 ) ),
+    UserSettingsRealm: withRealmCollectionMethods( [
+      {
+        autoCapture: false,
+        localSeasonality: false,
+        scientificNames: false,
+        cameraViewportResolution: "720p",
+        photoQualityBalance: "balanced",
+        confidenceThreshold: 50,
+        hideCameraReminder: false,
+        themePreference: "system",
+        appVersion: "2.0.0",
+      },
+    ] ),
+    ObservationRealm: withRealmCollectionMethods( [
+      {
+        date: new Date( "2022-12-02T10:19:54.000Z" ),
+        latitude: 42,
+        longitude: 42,
+        taxon: {
+          ancestorIds: [1, 2, 3],
+          defaultPhoto: {
+            backupUri: "some_uri",
+            lastUpdated: null,
+            mediumUrl: "some_medium_url",
+          },
+          iconicTaxonId: 1,
+          id: 4242,
+          name: "some_name_1",
+          preferredCommonName: "some_common_name_1",
+        },
+        uuidString: "some_uuid_2",
+      },
+      {
+        date: new Date( "2022-12-02T10:19:54.000Z" ),
+        latitude: 42,
+        longitude: 42,
+        taxon: {
+          ancestorIds: [1, 2, 3],
+          defaultPhoto: {
+            backupUri: "some_uri",
+            lastUpdated: null,
+            mediumUrl: "some_medium_url",
+          },
+          iconicTaxonId: 1,
+          id: 4242,
+          name: "some_name_2",
+          preferredCommonName: null,
+        },
+        uuidString: "some_uuid_2",
+      },
+    ] ),
+  };
+
+  class MockRealm {}
+  MockRealm.Object = class {};
+  MockRealm.open = jest.fn( () => Promise.resolve( {
+    create: jest.fn( ( table, value ) => value ),
+    delete: jest.fn( () => {} ),
+    objects: jest.fn( ( table ) => collections[table] || withRealmCollectionMethods( [] ) ),
+    write: jest.fn( callback => callback?.() ),
+  } ) );
+
+  return MockRealm;
 } );
 
 jest.mock( "react-native-vision-camera", () => ( {
@@ -248,4 +348,3 @@ jest.mock( "@react-native-camera-roll/camera-roll", () => ( {
     save: jest.fn( ( _uri, _options = {} ) => "test_url" ),
   },
 } ) );
-

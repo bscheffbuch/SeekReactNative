@@ -126,14 +126,14 @@ const SeekYearInReviewScreen = () => {
               <StyledText style={[baseTextStyles.challengeMonth, textStyles.lightText]}>
                 {i18n
                   .t( "seek_year_in_review.in_year_observed", { year } )
-                  .toLocaleUpperCase()}
+                  }
               </StyledText>
               <StyledText style={baseTextStyles.challengeTitle}>
                 {i18n
                   .t( "seek_year_in_review.x_new_species", {
                     count: countObservationsThisYear,
                   } )
-                  .toLocaleUpperCase()}
+                  }
               </StyledText>
             </View>
             <Image
@@ -154,7 +154,7 @@ const SeekYearInReviewScreen = () => {
             <BannerHeader
               text={i18n
                 .t( "seek_year_in_review.top_species" )
-                .toLocaleUpperCase()}
+                }
             />
             <SpeciesBadges speciesBadges={state.topThreeSpeciesBadges} />
             <View style={viewStyles.badgesTextContainer}>
@@ -208,7 +208,7 @@ const SeekYearInReviewScreen = () => {
           </>
         )}
         <BannerHeader
-          text={i18n.t( "seek_year_in_review.observations" ).toLocaleUpperCase()}
+          text={i18n.t( "seek_year_in_review.observations" )}
         />
         <GreenText text="seek_year_in_review.observations_by_month" />
         <View style={viewStyles.smallDivider} />
@@ -227,7 +227,7 @@ const SeekYearInReviewScreen = () => {
         )}
         {login && (
           <>
-            <GreenText noTranslation text={"iNaturalist".toLocaleUpperCase()} />
+            <GreenText noTranslation text={"iNaturalist"} />
             <View style={viewStyles.smallDivider} />
             <SubstringStyledText
               text={i18n.t(
@@ -263,7 +263,7 @@ const SeekYearInReviewScreen = () => {
             <BannerHeader
               text={i18n
                 .t( "seek_year_in_review.challenges" )
-                .toLocaleUpperCase()}
+                }
             />
             <SubstringStyledText
               text={i18n.t( "seek_year_in_review.x_challenges_earned_text", {

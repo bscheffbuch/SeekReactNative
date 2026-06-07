@@ -1,7 +1,6 @@
 import { StyleSheet, Platform } from "react-native";
 
 import {
-  colors,
   row,
   center,
   dimensions,
@@ -10,7 +9,7 @@ import {
 export default StyleSheet.create( {
   center,
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   email: {
@@ -27,7 +26,9 @@ export default StyleSheet.create( {
   },
   greenHeader: {
     alignItems: "center",
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
+    borderBottomColor: "#E6E9E4",
+    borderBottomWidth: 1,
     height: 55,
     justifyContent: "center",
   },

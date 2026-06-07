@@ -9,19 +9,21 @@ const viewStyles = StyleSheet.create( {
     top: 0,
   },
   bottom: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
     height: 60,
   },
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
     flex: 1,
   },
   header: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
+    borderBottomColor: colors.seekBorder,
+    borderBottomWidth: 1,
     height: 55,
   },
   whiteContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
     flexGrow: 1,
   },
   selectedPressableArea: {

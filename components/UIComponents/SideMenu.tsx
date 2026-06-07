@@ -23,7 +23,7 @@ const SideMenu = ( { navigation } ) => {
 
   const renderMenuItems = ( ) => menuItems.map( ( item, i ) => {
     const titleCase = capitalizeNames( item ) || "";
-    const name = ( item === "inat" ? "iNaturalist" : i18n.t( `menu.${item}` ) ).toLocaleUpperCase();
+    const name = ( item === "inat" ? "iNaturalist" : i18n.t( `menu.${item}` ) );
     const path = item === "inat" ? "iNatStats" : titleCase;
 
     return (

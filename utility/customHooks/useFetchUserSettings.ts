@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from "react";
+import Realm from "realm";
 
 import realmConfig from "../../models";
 
@@ -11,6 +12,8 @@ const useFetchUserSettings = ( ) => {
     cameraViewportResolution?: string;
     photoQualityBalance?: string;
     confidenceThreshold?: number;
+    hideCameraReminder?: boolean;
+    themePreference?: "system" | "light" | "dark";
     appVersion?: string;
   }>( { } );
 

@@ -1,6 +1,11 @@
 // @ts-nocheck
-import React, { useState, useCallback } from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import React, { useState, useCallback, useMemo } from "react";
+import {
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Realm from "realm";
 import Modal from "react-native-modal";
 
@@ -11,6 +16,7 @@ import badgeImages from "../../assets/badges";
 import { viewStyles, imageStyles } from "../../styles/badges/achievements";
 import { createBadgeSetList } from "../../utility/badgeHelpers";
 import BadgeContainer from "./BadgeContainer";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface SpeciesBadge {
   name: string;
@@ -31,8 +37,14 @@ const SpeciesBadges = ( { speciesBadges }: Props ) => {
   const [showModal, setModal] = useState( false );
   const [iconicSpeciesCount, setIconicSpeciesCount] = useState( 0 );
   const [iconicTaxonBadges, setIconicTaxonBadges] = useState<SpeciesBadge[]>( [] );
+  const { theme } = useTheme( );
 
-  const sets = createBadgeSetList( speciesBadges );
+  const sets = useMemo( () => createBadgeSetList( speciesBadges ), [speciesBadges] );
+  const themedStyles = useMemo( () => StyleSheet.create( {
+    emptyBadge: {
+      tintColor: theme.colors.muted,
+    },
+  } ), [theme] );
 
   const openModal = useCallback( () => setModal( true ), [] );
   const closeModal = useCallback( () => setModal( false ), [] );
@@ -54,9 +66,11 @@ const SpeciesBadges = ( { speciesBadges }: Props ) => {
 
   const renderSpeciesBadge = ( item: SpeciesBadge ) => {
     let imageSrc = badgeImages.badge_empty;
+    let earned = false;
 
     if ( item && item.earned && item.earnedIconName ) {
       imageSrc = badgeImages[item.earnedIconName];
+      earned = true;
     }
     return (
       <TouchableOpacity
@@ -66,7 +80,7 @@ const SpeciesBadges = ( { speciesBadges }: Props ) => {
           accessible
           accessibilityLabel={i18n.t( item.infoText )}
           source={imageSrc}
-          style={imageStyles.badgeIcon}
+          style={[imageStyles.badgeIcon, !earned && themedStyles.emptyBadge]}
         />
       </TouchableOpacity>
     );

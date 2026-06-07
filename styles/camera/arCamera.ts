@@ -5,11 +5,17 @@ const { height } = Dimensions.get( "window" );
 
 const viewStyles = StyleSheet.create( {
   backButton: {
-    left: 0,
-    paddingHorizontal: 23,
-    paddingVertical: 19,
+    alignItems: "center",
+    backgroundColor: "rgba(10, 14, 11, 0.56)",
+    borderColor: "rgba(255, 255, 255, 0.18)",
+    borderRadius: 22,
+    borderWidth: 1,
+    height: 44,
+    justifyContent: "center",
+    left: 16,
     position: "absolute",
-    top: height > 700 ? 31 : 0,
+    top: height > 700 ? 44 : 18,
+    width: 44,
   },
   shadow: {
     shadowColor: colors.black,
@@ -21,34 +27,41 @@ const viewStyles = StyleSheet.create( {
     shadowRadius: 3,
   },
   settingsButton: {
-    right: 0,
-    paddingHorizontal: 23,
-    paddingVertical: 19,
+    alignItems: "center",
+    backgroundColor: "rgba(10, 14, 11, 0.56)",
+    borderColor: "rgba(255, 255, 255, 0.18)",
+    borderRadius: 22,
+    borderWidth: 1,
+    height: 44,
+    justifyContent: "center",
     position: "absolute",
-    top: height > 700 ? 31 : 0,
+    right: 16,
+    top: height > 700 ? 44 : 18,
+    width: 44,
   },
   queueButton: {
-    right: 18,
-    position: "absolute",
-    top: ( height > 700 ? 31 : 0 ) + 64,
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    borderColor: colors.white,
+    backgroundColor: "rgba(10, 14, 11, 0.58)",
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    borderRadius: 24,
     borderWidth: 1,
-    borderRadius: 18,
-    paddingHorizontal: 12,
-    paddingVertical: 7,
+    flexDirection: "row",
     gap: 6,
+    height: 48,
+    justifyContent: "center",
+    minWidth: 48,
+    paddingHorizontal: 12,
+    position: "absolute",
+    right: 18,
+    top: ( height > 700 ? 31 : 0 ) + 64,
   },
   queueBadge: {
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.seekGreen,
     alignItems: "center",
+    backgroundColor: colors.seekGold,
+    borderRadius: 11,
+    height: 22,
     justifyContent: "center",
+    minWidth: 22,
     paddingHorizontal: 6,
   },
   camera: {
@@ -62,6 +75,10 @@ const viewStyles = StyleSheet.create( {
 } );
 
 const imageStyles = StyleSheet.create( {
+  helpIcon: {
+    height: 28,
+    width: 28,
+  },
   settingsIcon: {
     tintColor: colors.white,
     height: 20,
@@ -71,9 +88,9 @@ const imageStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   queueBadgeText: {
-    color: colors.white,
+    color: colors.seekInk,
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "800",
   },
 } );
 

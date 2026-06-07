@@ -10,7 +10,7 @@ const viewStyles = StyleSheet.create( {
   },
   row,
   textContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
     marginHorizontal: 30,
     marginTop: 20,
   },

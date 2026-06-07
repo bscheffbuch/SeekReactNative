@@ -54,7 +54,7 @@ const CameraError = ( { error, errorEvent }: Props ) => {
       <>
         <View style={viewStyles.margin} />
         <StyledText style={[baseTextStyles.banner, textStyles.whiteText]}>
-          {i18n.t( "camera.please_permissions" ).toLocaleUpperCase()}
+          {i18n.t( "camera.please_permissions" )}
         </StyledText>
       </>
     );

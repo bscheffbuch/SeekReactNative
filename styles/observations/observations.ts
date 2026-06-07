@@ -1,16 +1,16 @@
 import { StyleSheet, Platform } from "react-native";
 import {
   center,
-  colors,
 } from "../global";
 
 export default StyleSheet.create( {
   center,
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   emptyText: {
+    color: "#707A72",
     paddingTop: 14,
     paddingBottom: 31,
     textAlign: "center",
@@ -19,14 +19,14 @@ export default StyleSheet.create( {
     flexGrow: 1,
   },
   padding: {
-    backgroundColor: colors.white,
-    paddingBottom: Platform.OS === "android" ? 37 : 44,
+    backgroundColor: "#F3F1E8",
+    paddingBottom: Platform.OS === "android" ? 112 : 60,
   },
   hiddenSectionSeparator: {
     paddingBottom: 31,
   },
   sectionWithDataSeparator: {
-    paddingBottom: 22,
+    paddingBottom: 14,
   },
   bottomOfSectionPadding: {
     paddingBottom: 12,
@@ -35,7 +35,7 @@ export default StyleSheet.create( {
     textAlign: "center",
   },
   whiteContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
 } );

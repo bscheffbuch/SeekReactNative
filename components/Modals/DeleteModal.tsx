@@ -49,18 +49,18 @@ const DeleteModal = ( {
   return (
     <WhiteModal noButton>
       <LinearGradient
-        colors={[colors.grayGradientDark, colors.grayGradientLight]}
+        colors={[colors.seekPrimaryContainer, colors.seekPrimaryContainer]}
         style={viewStyles.flagHeader}
       >
         <View style={[viewStyles.flagTextContainer, viewStyles.row]}>
           <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText]}>
-            {i18n.t( "delete.header" ).toLocaleUpperCase()}
+            {i18n.t( "delete.header" )}
           </StyledText>
           <TouchableOpacity
             onPress={closeModal}
             style={viewStyles.flagBackButton}
           >
-            <Image source={icons.closeWhite} />
+            <Image source={icons.closeModal} />
           </TouchableOpacity>
         </View>
       </LinearGradient>

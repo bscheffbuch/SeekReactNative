@@ -1,15 +1,21 @@
 import { StyleSheet } from "react-native";
-import { center, colors, row } from "../global";
+import { center, row } from "../global";
 
 const viewStyles = StyleSheet.create( {
   center,
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E6E9E4",
+    borderRadius: 18,
+    borderWidth: 1,
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingBottom: 18,
   },
   header: {
-    paddingBottom: 21,
-    paddingHorizontal: 22,
-    paddingTop: 25,
+    paddingBottom: 14,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   row,
 } );

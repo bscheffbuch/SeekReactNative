@@ -4,14 +4,14 @@ import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
     flex: 1,
     flexGrow: 1,
     justifyContent: "center",
   },
   divider: {
     borderBottomWidth: 1,
-    borderBottomColor: colors.dividerWhite,
+    borderBottomColor: colors.seekBorder,
   },
   menuItem: {
     paddingVertical: 21,
@@ -27,7 +27,7 @@ const imageStyles = StyleSheet.create( {
     height: 25,
     marginHorizontal: 25,
     resizeMode: "contain",
-    tintColor: colors.menuItems,
+    tintColor: colors.seekDeepGreen,
     width: 27,
   },
   seekLogo: {
@@ -41,6 +41,7 @@ const imageStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   text: {
+    color: colors.seekInk,
     flex: 1,
     paddingEnd: 4,
   },

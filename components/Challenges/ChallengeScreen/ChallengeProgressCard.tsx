@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  StyleSheet,
   Image,
   TouchableOpacity,
   View,
@@ -16,6 +17,7 @@ import badges from "../../../assets/badges";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { useChallenge } from "../../Providers/ChallengeProvider";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   readonly challenge: {
@@ -32,6 +34,27 @@ interface Props {
 const ChallengeProgressCard = ( { challenge }: Props ) => {
   const { setIndex } = useChallenge( );
   const navigation = useNavigation( );
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    card: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      ...theme.elevation.card,
+    },
+    title: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.heading,
+    },
+    message: {
+      color: theme.colors.muted,
+      fontFamily: theme.typography.body,
+    },
+    start: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.heading,
+    },
+  } );
   const {
     name,
     availableDate,
@@ -71,9 +94,9 @@ const ChallengeProgressCard = ( { challenge }: Props ) => {
         accessible
         allowFontScaling={false}
         onPress={beginChallenge}
-        style={[baseTextStyles.challengeItemButton, textStyles.startText]}
+        style={[baseTextStyles.challengeItemButton, textStyles.startText, themedStyles.start]}
       >
-        {i18n.t( "challenges.start_now" ).toLocaleUpperCase( )}
+        {i18n.t( "challenges.start_now" )}
       </StyledText>
     );
   }
@@ -81,17 +104,15 @@ const ChallengeProgressCard = ( { challenge }: Props ) => {
   return (
     <TouchableOpacity
       onPress={navToChallengeDetails}
-      style={[viewStyles.card, viewStyles.row]}
+      style={[viewStyles.card, themedStyles.card, viewStyles.row]}
     >
       <Image source={leftIcon} style={imageStyles.challengeBadgeIcon} />
       <View style={viewStyles.textContainer}>
-        <StyledText style={[baseTextStyles.challengeItemTitle, textStyles.titleText]}>
-          {i18n.t( name ).toLocaleUpperCase( ).replace( /(- |-)/g, "-\n" )}
+        <StyledText style={[baseTextStyles.challengeItemTitle, textStyles.titleText, themedStyles.title]}>
+          {i18n.t( name ).replace( /(- |-)/g, "-\n" )}
         </StyledText>
-        <StyledText style={[baseTextStyles.regular, textStyles.messageText]}>
-          {challenge.sponsorName}
-          {" - "}
-          {formatMonthYear( availableDate )}
+        <StyledText style={[baseTextStyles.regular, textStyles.messageText, themedStyles.message]}>
+          {`${challenge.sponsorName} - ${formatMonthYear( availableDate )}`}
         </StyledText>
       </View>
       <View style={viewStyles.startButton}>

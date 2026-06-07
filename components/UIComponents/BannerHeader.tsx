@@ -1,10 +1,8 @@
 import React from "react";
-import { ImageBackground } from "react-native";
+import { View } from "react-native";
 
 import { viewStyles, textStyles } from "../../styles/badges/banner";
-import icons from "../../assets/icons";
 import StyledText from "./StyledText";
-import { baseTextStyles } from "../../styles/textStyles";
 
 interface Props {
   readonly text: string;
@@ -12,17 +10,16 @@ interface Props {
 }
 
 const BannerHeader = ( { text, modal = false }: Props ) => (
-  <ImageBackground
-    source={icons.titleBanner}
+  <View
     style={[viewStyles.banner, modal && viewStyles.modal]}
   >
     <StyledText
       allowFontScaling={false}
-      style={[baseTextStyles.banner, textStyles.bannerText]}
+      style={textStyles.bannerText}
     >
       {text}
     </StyledText>
-  </ImageBackground>
+  </View>
 );
 
 export default BannerHeader;

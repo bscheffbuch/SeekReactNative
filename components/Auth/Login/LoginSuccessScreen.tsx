@@ -37,7 +37,7 @@ const LoginSuccessScreen = ( ) => {
       </View>
       <View style={styles.marginLarge} />
       <GreenButton
-        handlePress={() => popTo( "Drawer" )}
+        handlePress={() => popTo( "MainTabs", { screen: "Home" } )}
         login
         text="inat_signup.continue"
       />

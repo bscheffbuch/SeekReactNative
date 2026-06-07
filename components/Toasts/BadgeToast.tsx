@@ -30,7 +30,7 @@ const BadgeToast = ( { badge }: Props ) => {
     >
       <View>
         <StyledText allowFontScaling={false} style={[baseTextStyles.header, textStyles.headerText]}>
-          {i18n.t( badge.intlName ).toLocaleUpperCase()}
+          {i18n.t( badge.intlName )}
         </StyledText>
         <StyledText allowFontScaling={false} style={[baseTextStyles.body, textStyles.description]}>
           {i18n.t( "badges.you_found" )}

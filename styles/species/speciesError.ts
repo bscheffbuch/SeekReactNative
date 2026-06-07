@@ -8,11 +8,12 @@ import {
 
 const viewStyles = StyleSheet.create( {
   background: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
   },
   center,
   errorContainer: {
-    backgroundColor: colors.speciesError,
+    backgroundColor: colors.seekInk,
+    borderRadius: 18,
     marginTop: 18,
     paddingHorizontal: 28,
     paddingVertical: 28,

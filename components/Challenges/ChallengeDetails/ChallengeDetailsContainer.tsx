@@ -28,7 +28,7 @@ interface Props {
 const ChallengeDetailsContainer = ( { challenge }: Props ) => {
   const { navigate } = useNavigation( );
 
-  const navToChallenges = ( ) => navigate( "Challenges" );
+  const navToChallenges = ( ) => navigate( "MainTabs", { screen: "Challenges" } );
 
   // only show for WWFOP, not NatGeo or future sponsors
   const photographerLogo = challenge.logo === "op" ? logos[challenge.secondLogo] : null;

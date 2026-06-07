@@ -5,7 +5,6 @@ import { useNavigation } from "@react-navigation/native";
 
 import i18n from "../../i18n";
 import { viewStyles, textStyles } from "../../styles/badges/achievements";
-import { colors } from "../../styles/global";
 import LevelHeader from "./LevelHeader";
 import SpeciesBadges from "./SpeciesBadges";
 import ChallengeBadges from "./ChallengeBadges";
@@ -19,15 +18,17 @@ import { useFetchAchievements } from "./hooks/achievementHooks";
 import { localizeNumber, setRoute, StoredRoutes } from "../../utility/helpers";
 import { useSpeciesCount } from "../../utility/customHooks";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const AchievementsScreen = ( ) => {
   const state = useFetchAchievements( );
   const speciesCount = useSpeciesCount();
   const navigation = useNavigation( );
+  const { theme } = useTheme( );
 
   const navToObservations = useCallback( ( ) => {
     setRoute( StoredRoutes.Achievements );
-    navigation.navigate( "Observations" );
+    navigation.navigate( "MainTabs", { screen: "Observations" } );
   }, [navigation] );
 
   const renderStats = ( disabled: boolean, headerText: string, text: number ) => (
@@ -37,7 +38,7 @@ const AchievementsScreen = ( ) => {
       disabled={disabled}
     >
       <GreenText center smaller text={headerText} />
-      <StyledText style={[baseTextStyles.regular, textStyles.number]}>
+      <StyledText style={[baseTextStyles.regular, textStyles.number, { color: theme.colors.text }]}>
         {text && localizeNumber( text )}
       </StyledText>
     </TouchableOpacity>
@@ -60,15 +61,15 @@ const AchievementsScreen = ( ) => {
       loading={state.level === null}
       footer
     >
-      <Spacer backgroundColor={colors.greenGradientDark} />
+      <Spacer backgroundColor={theme.colors.canvas} />
       <LevelHeader
         level={state.level}
         nextLevelCount={state.nextLevelCount}
         speciesCount={speciesCount}
       />
-      <BannerHeader text={i18n.t( "badges.species_badges" ).toLocaleUpperCase()} />
+      <BannerHeader text={i18n.t( "badges.species_badges" )} />
       <SpeciesBadges speciesBadges={state.speciesBadges} />
-      <BannerHeader text={i18n.t( "badges.challenge_badges" ).toLocaleUpperCase()} />
+      <BannerHeader text={i18n.t( "badges.challenge_badges" )} />
       <ChallengeBadges />
       {renderFooter( )}
     </ScrollWithHeader>

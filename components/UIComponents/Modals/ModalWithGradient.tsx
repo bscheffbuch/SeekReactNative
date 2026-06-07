@@ -33,20 +33,20 @@ const ModalWithGradient = ( {
 }: Props ) => (
   <View style={viewStyles.container}>
     <LinearGradient
-      colors={[colors[`${color}GradientDark`], colors[`${color}GradientLight`]]}
+      colors={[colors.seekPrimaryContainer, colors.seekPrimaryContainer]}
       style={viewStyles.header}
     >
       <View style={[viewStyles.headerTextContainer, viewStyles.row]}>
         <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText]}>
           {color === "green"
-            ? i18n.t( "replace_photo.header" ).toLocaleUpperCase()
-            : i18n.t( "results.flag" ).toLocaleUpperCase()}
+            ? i18n.t( "replace_photo.header" )
+            : i18n.t( "results.flag" )}
         </StyledText>
         <TouchableOpacity
           onPress={closeModal}
           style={viewStyles.backButton}
         >
-          <Image source={icons.closeWhite} />
+          <Image source={icons.closeModal} />
         </TouchableOpacity>
       </View>
       <View style={[viewStyles.images, viewStyles.row]}>

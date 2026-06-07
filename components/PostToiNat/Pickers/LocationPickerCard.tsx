@@ -63,7 +63,7 @@ const LocationPickerCard = ( { location, updateLocation, observation }: Props ) 
         <Image source={posting.location} style={styles.extraMargin} />
         <View style={styles.row}>
           <StyledText style={baseTextStyles.postSectionHeader}>
-            {i18n.t( "posting.location" ).toLocaleUpperCase()}
+            {i18n.t( "posting.location" )}
           </StyledText>
           <StyledText style={[baseTextStyles.body, styles.text]}>
             {location || i18n.t( "location_picker.undefined" )}

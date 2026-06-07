@@ -8,7 +8,6 @@ import React, {
   useState,
 } from "react";
 import {
-  Image,
   TouchableOpacity,
   View,
   Platform,
@@ -26,9 +25,7 @@ import type {
 } from "react-native-vision-camera";
 
 import i18n from "../../../i18n";
-import { viewStyles, imageStyles, textStyles } from "../../../styles/camera/arCamera";
-import icons from "../../../assets/icons";
-import StyledText from "../../UIComponents/StyledText";
+import { viewStyles } from "../../../styles/camera/arCamera";
 import CameraError from "../CameraError";
 import {
   checkForSystemVersion,
@@ -45,7 +42,6 @@ import ARCameraOverlay from "./ARCameraOverlay";
 import { resetRouter } from "../../../utility/navigationHelpers";
 import { fetchImageLocationOrErrorCode } from "../../../utility/resultsHelpers";
 import { checkIfCameraLaunched } from "../../../utility/helpers";
-import { colors } from "../../../styles/global";
 import Modal from "../../UIComponents/Modals/Modal";
 import WarningModal from "../../Modals/WarningModal";
 import { UserContext } from "../../UserContext";
@@ -62,6 +58,7 @@ import {
   useCameraDevices,
 } from "./helpers/visionCameraWrapper";
 import { useFetchUserSettings } from "../../../utility/customHooks/useFetchUserSettings";
+import { fetchUserSetting, updateUserSetting } from "../../../utility/settingsHelpers";
 import {
   useLocationPermission as useLocationPermissionCamera,
 } from "./helpers/visionCameraWrapper";
@@ -73,11 +70,17 @@ import {
   getPreferredVideoStabilizationModeForDevice,
 } from "./helpers/cameraDeviceHelpers";
 import type { BackCameraZoomPreset } from "./helpers/cameraDeviceHelpers";
+import { CircleHelpIcon, XIcon } from "../../UIComponents/AppIcons";
 
 const logger = log.extend( "ARCamera.js" );
 const CAMERA_RECOVERY_DELAY_MS = 650;
 const MAX_CAMERA_RECOVERY_ATTEMPTS = 5;
 const DEFAULT_FOCUS_PEAKING_SENSITIVITY = 0.35;
+const SPECIES_PREDICTION_HOLD_MS = 1000;
+const SPECIES_SCORE_IMPROVEMENT_TO_BREAK_HOLD = 10;
+const SPECIES_DISPLAY_CONFIDENCE_THRESHOLD = 70;
+const WANTED_PREDICTION_RANKS = ["species", "genus", "family", "order", "class"];
+const UNWANTED_TAXA = [1044608, 1044607, 973699, 152504, 1128037];
 
 type CameraViewportResolution = "540p" | "720p" | "1080p" | "1440p" | "2160p";
 
@@ -150,6 +153,10 @@ const ARCamera = ( ) => {
   const [isActive, setIsActive] = useState( true );
   const [isCaptureInProgress, setIsCaptureInProgress] = useState( false );
   const [queueCount, setQueueCount] = useState( 0 );
+  // "Save for later" mode: when on, the main shutter saves to the queue instead
+  // of opening the identification screen. The ref guards overlapping queue saves.
+  const [queueMode, setQueueMode] = useState( false );
+  const queueSaveInProgress = useRef( false );
 
   const [cameraPosition, setCameraPosition] = useState<"front" | "back">( "back" );
   const [backCameraZoom, setBackCameraZoom] = useState( DEFAULT_BACK_CAMERA_ZOOM );
@@ -206,18 +213,9 @@ const ARCamera = ( ) => {
     resolution => resolution.label === userSettings.cameraViewportResolution
   ) || CAMERA_VIEWPORT_RESOLUTIONS[1];
   const photoQualityBalance = ( userSettings.photoQualityBalance as "speed" | "balanced" | "quality" | undefined ) || "balanced";
-
-  useEffect( () => {
-    const selectedZoomAvailable = backCameraZoomPresets.some(
-      preset => Math.abs( preset.zoom - backCameraZoom ) < 0.05
-    );
-    if ( !selectedZoomAvailable && backCameraZoomPresets.length > 0 ) {
-      const defaultPreset = backCameraZoomPresets.find(
-        preset => preset.zoom === DEFAULT_BACK_CAMERA_ZOOM
-      ) || backCameraZoomPresets[0];
-      setBackCameraZoom( defaultPreset.zoom );
-    }
-  }, [backCameraZoom, backCameraZoomPresets] );
+  const confidenceThresholdNumber = ( typeof userSettings.confidenceThreshold === "number" )
+    ? userSettings.confidenceThreshold
+    : 50;
 
   useEffect( () => {
     if ( !hasTorch && torch === "on" ) {
@@ -307,7 +305,7 @@ const ARCamera = ( ) => {
   // worklets. The "object" returned is not possible to be used with ...spread syntax or Object.assign which
   // we are using in other places that reference these prediction objects here after thy are attached to a
   // taken photo.
-  const sortedPredictions = allPredictions
+  const sortedPredictions = useMemo( () => allPredictions
     .map( ( p: Prediction ) => ( {
       name: p.name,
       rank_level: p.rank_level,
@@ -316,8 +314,15 @@ const ARCamera = ( ) => {
       ancestor_ids: p.ancestor_ids,
       rank: p.rank,
     } as Prediction ) )
-    .sort( ( a, b ) => b.rank_level - a.rank_level );
-  const lowestRankPrediction = sortedPredictions[sortedPredictions.length - 1];
+    .sort( ( a, b ) => b.rank_level - a.rank_level ), [allPredictions] );
+  const displayPredictions = useMemo( () => sortedPredictions.filter( prediction => {
+    const score = prediction.combined_score || 0;
+    if ( prediction.rank === "species" ) {
+      return score >= SPECIES_DISPLAY_CONFIDENCE_THRESHOLD;
+    }
+    return score >= confidenceThresholdNumber;
+  } ), [sortedPredictions, confidenceThresholdNumber] );
+  const lowestRankPrediction = displayPredictions[displayPredictions.length - 1];
 
   const [showModal, setShowModal] = useState( false );
   const cameraLoaded = useSharedValue( false );
@@ -413,6 +418,40 @@ const ARCamera = ( ) => {
       queueManualFocus( focusValue );
     }
   }, [manualFocusEnabled, queueManualFocus] );
+
+  // The ultra-wide lens has the closest minimum focus distance, so macro mode
+  // selects it and locks manual focus to the closest possible distance.
+  const ultraWideZoomPreset = useMemo( () => (
+    backCameraZoomPresets.find( preset => preset.lens === "ultra-wide-angle-camera" )
+  ), [backCameraZoomPresets] );
+  const supportsMacro = supportsManualFocus && ultraWideZoomPreset !== undefined;
+  const macroEnabled = manualFocusEnabled
+    && cameraPosition === "back"
+    && ultraWideZoomPreset !== undefined
+    && Math.abs( backCameraZoom - ultraWideZoomPreset.zoom ) < 0.05
+    && manualFocusValue <= 0.05;
+
+  const toggleMacro = useCallback( () => {
+    if ( macroEnabled ) {
+      manualFocusEnabledRef.current = false;
+      setManualFocusEnabled( false );
+      setBackCameraZoom( DEFAULT_BACK_CAMERA_ZOOM );
+      resetCameraFocus();
+      return;
+    }
+    if ( !ultraWideZoomPreset ) {
+      return;
+    }
+    if ( cameraPosition !== "back" ) {
+      setCameraPosition( "back" );
+    }
+    setBackCameraZoom( ultraWideZoomPreset.zoom );
+    manualFocusValueRef.current = 0;
+    setManualFocusValue( 0 );
+    manualFocusEnabledRef.current = true;
+    setManualFocusEnabled( true );
+    queueManualFocus( 0 );
+  }, [cameraPosition, macroEnabled, queueManualFocus, resetCameraFocus, ultraWideZoomPreset] );
 
   useEffect( () => {
     if ( !supportsManualFocus && manualFocusEnabled ) {
@@ -530,9 +569,7 @@ const ARCamera = ( ) => {
       longitude: image.longitude ?? null,
     };
     startObservationWithImage( imageWithMetadata, () => {
-      navigation.navigate( "Drawer", {
-        screen: "Match",
-      } );
+      navigation.navigate( "Match", { origin: "camera" } );
     } );
   }, [startObservationWithImage, navigation, login] );
 
@@ -565,7 +602,7 @@ const ARCamera = ( ) => {
     dispatch( { type: ACTION.FILTER_TAXON, taxonId: id, negativeFilter: filter } );
   }, [] );
 
-  const handleTaxaDetected = ( event: { predictions: Prediction[] } ) => {
+  const handleTaxaDetected = useCallback( ( event: { predictions: Prediction[] } ) => {
     const { predictions } = event;
 
     if ( pictureTaken.value ) {
@@ -575,8 +612,16 @@ const ARCamera = ( ) => {
       cameraLoaded.value = true;
     }
 
-    // Find species prediction
-    const speciesPredictions = predictions.filter( p => p.rank === "species" );
+    // Keep camera results to ranks the UI can actually display, then ignore
+    // known placeholder/problem taxa before making stability decisions.
+    let wantedPredictions = predictions.filter( p => (
+      typeof p.rank === "string" && WANTED_PREDICTION_RANKS.includes( p.rank )
+    ) );
+    wantedPredictions = wantedPredictions.filter( p => !UNWANTED_TAXA.includes( p.taxon_id ) );
+    const speciesPredictions = wantedPredictions.filter( p => (
+      p.rank === "species"
+        && ( p.combined_score || 0 ) >= SPECIES_DISPLAY_CONFIDENCE_THRESHOLD
+    ) );
     const topSpeciesScore = speciesPredictions.reduce(
       ( max, p ) => Math.max( max, p.combined_score || 0 ),
       0
@@ -585,7 +630,7 @@ const ARCamera = ( ) => {
     // don't bother with trying to set predictions if a species timeout is in place,
     // unless a new result comes in with notably higher confidence than the frozen one
     if ( speciesTimeoutSet.value ) {
-      if ( topSpeciesScore > frozenSpeciesScore.value + 10 ) {
+      if ( topSpeciesScore > frozenSpeciesScore.value + SPECIES_SCORE_IMPROVEMENT_TO_BREAK_HOLD ) {
         // interrupt the freeze early for the more confident result
         if ( speciesTimeoutId.current ) {
           clearTimeout( speciesTimeoutId.current );
@@ -597,18 +642,10 @@ const ARCamera = ( ) => {
       }
     }
 
-    // not looking at kingdom or phylum as we are currently not displaying results for those ranks
-    const wantedRanks = ["species", "genus", "family", "order", "class"];
-    let wantedPredictions = predictions.filter( p => (
-      typeof p.rank === "string" && wantedRanks.includes( p.rank )
-    ) );
-    const unwantedTaxa = [1044608, 1044607, 973699, 152504, 1128037];
-    wantedPredictions = wantedPredictions.filter( p => !unwantedTaxa.includes( p.taxon_id ) );
-
     dispatch( { type: ACTION.SET_PREDICTIONS, predictions: wantedPredictions } );
 
     if ( speciesPredictions.length > 0 ) {
-      // this block keeps the last species seen displayed for 1 second
+      // This mirrors original Seek: keep the last confident species readable for 1 second.
       speciesTimeoutSet.value = true;
       frozenSpeciesScore.value = topSpeciesScore;
       if ( speciesTimeoutId.current ) {
@@ -617,9 +654,12 @@ const ARCamera = ( ) => {
       speciesTimeoutId.current = setTimeout( () => {
         speciesTimeoutSet.value = false;
         speciesTimeoutId.current = null;
-      }, 1000 );
+      }, SPECIES_PREDICTION_HOLD_MS );
     }
-  };
+  // Only reads stable shared values / refs / dispatch, so the identity stays
+  // constant. This keeps the frame-processor worklet (which captures it via
+  // onTaxaDetected) from being rebuilt on every render.
+  }, [cameraLoaded, dispatch, frozenSpeciesScore, pictureTaken, speciesTimeoutSet] );
 
   const handleCameraError = ( event: ErrorMessage ) => {
     const permissions = "Camera Input Failed: This app is not authorized to use Back Camera.";
@@ -636,13 +676,13 @@ const ARCamera = ( ) => {
     }
   };
 
-  const handleClassifierError = ( event: ErrorMessage ) => {
+  const handleClassifierError = useCallback( ( event: ErrorMessage ) => {
     if ( event.nativeEvent && event.nativeEvent.error ) {
       updateError( "classifier", event.nativeEvent.error );
     } else {
       updateError( "classifier" );
     }
-  };
+  }, [updateError] );
 
   const handleDeviceNotSupported = ( event: ReasonMessage ) => {
     if ( event.nativeEvent && event.nativeEvent.reason ) {
@@ -764,11 +804,12 @@ const ARCamera = ( ) => {
     pictureTaken,
   ] );
 
-  // "Save for Later": persist the photo + current GPS + timestamp to the local
-  // observation queue without running classification, then stay on the camera.
-  const saveForLaterToQueue = useCallback( async ( uri: string ) => {
+  // "Save for Later": persist the photo + the live AR-camera prediction + GPS +
+  // timestamp to the local observation queue, then stay on the camera. The
+  // stored predictions let the queue list reopen the identification screen.
+  const saveForLaterToQueue = useCallback( async ( uri: string, predictions: Prediction[] ) => {
     const time = createTimestamp( );
-    const userImage = { time, uri, predictions: [] };
+    const userImage = { time, uri, predictions };
     const { image } = await fetchImageLocationOrErrorCode( userImage, login );
     const coords = image.preciseCoords || {
       latitude: image.latitude ?? null,
@@ -776,30 +817,40 @@ const ARCamera = ( ) => {
       accuracy: null,
     };
 
-    await saveQueuedObservation( coords, time, uri );
+    await saveQueuedObservation( coords, time, uri, predictions );
 
     const count = await getQueuedCount( );
     setQueueCount( count );
     setVisibleToast( TOAST.SAVED_FOR_LATER );
-
-    // remain on the camera screen, ready for the next capture
-    setIsActive( true );
-    setIsCaptureInProgress( false );
-    pictureTaken.value = false;
-    dispatch( { type: ACTION.RESET_STATE } );
-  }, [login, pictureTaken] );
+    queueSaveInProgress.current = false;
+  }, [login] );
 
   const saveForLaterPhoto = useCallback( ( photo: HandledPhoto ) => {
     // keep a copy in the user's camera roll, like a normal capture
     CameraRoll.save( photo.uri, { } ).catch( ( e ) => logger.warn( e ) );
-    saveForLaterToQueue( photo.uri );
+    saveForLaterToQueue( photo.uri, photo.predictions || [] );
   }, [saveForLaterToQueue] );
 
   const takePictureForLater = useCallback( async ( ) => {
-    pictureTaken.value = true;
-    setIsCaptureInProgress( true );
-    await visionCameraTakePhoto( ( photo: HandledPhoto ) => saveForLaterPhoto( photo ) );
-  }, [visionCameraTakePhoto, saveForLaterPhoto, pictureTaken] );
+    // Keep the camera live & responsive: unlike a normal capture we deliberately
+    // do NOT flip `pictureTaken` / `isCaptureInProgress`, because those drive the
+    // full-screen loading wheel and freeze the preview. A ref guard prevents
+    // overlapping saves without showing any spinner.
+    if ( queueSaveInProgress.current ) {
+      return;
+    }
+    queueSaveInProgress.current = true;
+    try {
+      await visionCameraTakePhoto( ( photo: HandledPhoto ) => saveForLaterPhoto( photo ) );
+    } catch ( e ) {
+      queueSaveInProgress.current = false;
+      logger.warn( e );
+    }
+  }, [visionCameraTakePhoto, saveForLaterPhoto] );
+
+  const toggleQueueMode = useCallback( ( ) => {
+    setQueueMode( ( prev ) => !prev );
+  }, [] );
 
   const resetState = ( ) => {
     setIsCaptureInProgress( false );
@@ -817,10 +868,19 @@ const ARCamera = ( ) => {
     }
   }, [updateError] );
 
-  const closeModal = useCallback( ( ) => setShowModal( false ), [] );
+  const closeModal = useCallback( ( hideFuture?: boolean ) => {
+    if ( hideFuture ) {
+      updateUserSetting( "hideCameraReminder", true ).catch( ( e ) => logger.warn( e ) );
+    }
+    setShowModal( false );
+  }, [] );
 
   useEffect( ( ) => {
     const checkForFirstCameraLaunch = async ( ) => {
+      const hideReminder = await fetchUserSetting( "hideCameraReminder" );
+      if ( hideReminder === true ) {
+        return;
+      }
       const isFirstLaunch = await checkIfCameraLaunched( );
       if ( isFirstLaunch ) {
         setShowModal( true );
@@ -855,19 +915,11 @@ const ARCamera = ( ) => {
   );
 
   const navHome = ( ) => resetRouter( navigation );
-  const navToSettings = () =>
-    navigation.navigate( "Drawer", {
-      screen: "Settings",
-    } );
+  const navToCameraHelp = () =>
+    navigation.navigate( "CameraHelp" );
   const navToQueue = () =>
-    navigation.navigate( "Drawer", {
-      screen: "QueuedObservations",
-    } );
+    navigation.navigate( "QueuedObservations" );
 
-
-  const confidenceThresholdNumber = ( typeof userSettings.confidenceThreshold === "number" )
-    ? userSettings.confidenceThreshold
-    : 50;
 
   if ( !isFocused ) {
     // this is necessary for camera to load properly in iOS
@@ -944,6 +996,9 @@ const ARCamera = ( ) => {
           manualFocusValue={manualFocusValue}
           setManualFocusValue={updateManualFocusValue}
           supportsManualFocus={supportsManualFocus}
+          supportsMacro={supportsMacro}
+          macroEnabled={macroEnabled}
+          toggleMacro={toggleMacro}
           focusPeakingEnabled={focusPeakingEnabled}
           toggleFocusPeaking={toggleFocusPeaking}
           focusPeakingSensitivity={focusPeakingSensitivity}
@@ -965,6 +1020,9 @@ const ARCamera = ( ) => {
           handleToastEnd={handleToastEnd}
           saveForLater={takePictureForLater}
           queueCount={queueCount}
+          queueMode={queueMode}
+          toggleQueueMode={toggleQueueMode}
+          navToQueue={navToQueue}
         />
       )}
       <TouchableOpacity
@@ -973,40 +1031,16 @@ const ARCamera = ( ) => {
         onPress={navHome}
         style={[viewStyles.backButton, viewStyles.shadow]}
       >
-        <Image source={icons.closeWhite} />
+        <XIcon color="white" size={27} strokeWidth={2.5} />
       </TouchableOpacity>
       <TouchableOpacity
-        accessibilityLabel={i18n.t( "menu.settings" )}
+        accessibilityLabel={i18n.t( "accessibility.open_help" )}
         accessible
-        onPress={navToSettings}
+        onPress={navToCameraHelp}
         style={[viewStyles.settingsButton, viewStyles.shadow]}
       >
-        <Image
-          tintColor={colors.white}
-          style={imageStyles.settingsIcon}
-          source={icons.menuSettings}
-        />
+        <CircleHelpIcon color="white" size={29} strokeWidth={2.35} />
       </TouchableOpacity>
-      {queueCount > 0 && (
-        <TouchableOpacity
-          accessibilityLabel={i18n.t( "queue.view_queue" )}
-          accessible
-          testID="queueIndicator"
-          onPress={navToQueue}
-          style={[viewStyles.queueButton, viewStyles.shadow]}
-        >
-          <Image
-            tintColor={colors.white}
-            style={imageStyles.settingsIcon}
-            source={icons.checklist}
-          />
-          <View style={viewStyles.queueBadge}>
-            <StyledText style={textStyles.queueBadgeText}>
-              {queueCount}
-            </StyledText>
-          </View>
-        </TouchableOpacity>
-      )}
     </View>
   );
 };

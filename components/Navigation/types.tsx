@@ -4,28 +4,33 @@
  */
 
 import type { CompositeScreenProps, NavigatorScreenParams } from "@react-navigation/native";
-import type { DrawerScreenProps } from "@react-navigation/drawer";
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { StackScreenProps } from "@react-navigation/stack";
 
 // Note from the documentation:
 // The type containing the mapping must be a type alias. It cannot be an interface.
-export type DrawerParamList = {
-  [key: string]: object | undefined;
+export type BottomTabParamList = {
   Home: undefined;
-  Achievements: undefined;
-  Challenges: undefined;
-  ChallengeDetails: undefined;
   Observations: undefined;
-  QueuedObservations: undefined;
-  iNatStats: undefined;
-  About: undefined;
-  Settings: undefined;
-  Match: undefined;
-  DebugEmailScreen: undefined;
-  Species: undefined;
-  SeekYearInReview: undefined;
-  SeekYearInReviewMapScreen: undefined;
-  Notifications: undefined;
+  Scan: undefined;
+  Challenges: undefined;
+  More: undefined;
+};
+
+export type HomeStackParamList = {
+  Home: undefined;
+};
+
+export type ObservationsStackParamList = {
+  Observations: undefined;
+};
+
+export type ChallengesStackParamList = {
+  Challenges: undefined;
+};
+
+export type MoreStackParamList = {
+  More: undefined;
 };
 
 // Note from the documentation:
@@ -34,8 +39,20 @@ export type RootStackParamList = {
   [key: string]: object | undefined;
   Splash: undefined;
   Onboarding: undefined;
-  Camera: undefined;
-  Drawer: NavigatorScreenParams<DrawerParamList>;
+  MainTabs: NavigatorScreenParams<BottomTabParamList>;
+  Camera: { origin?: "camera" | "queue" } | undefined;
+  Match: { origin?: "camera" | "queue" } | undefined;
+  Species: undefined;
+  ChallengeDetails: undefined;
+  QueuedObservations: undefined;
+  Notifications: undefined;
+  Achievements: undefined;
+  iNatStats: undefined;
+  About: undefined;
+  Settings: undefined;
+  DebugEmailScreen: undefined;
+  SeekYearInReview: undefined;
+  SeekYearInReviewMapScreen: undefined;
   Post: undefined;
   PostStatus: undefined;
   LoginOrSignup: undefined;
@@ -62,15 +79,15 @@ export type RootStackParamList = {
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> = StackScreenProps<RootStackParamList, T>;
 
-export type DrawerStackScreenProps<T extends Extract<keyof DrawerParamList, string>> =
+export type BottomTabStackScreenProps<T extends keyof BottomTabParamList> =
   CompositeScreenProps<
-    DrawerScreenProps<DrawerParamList, T>,
-    RootStackScreenProps<"Drawer">
+    BottomTabScreenProps<BottomTabParamList, T>,
+    RootStackScreenProps<"MainTabs">
   >;
 
 // https://reactnavigation.org/docs/typescript/?config=dynamic#specifying-default-types-for-usenavigation-link-ref-etc
 declare global {
   namespace ReactNavigation {
-    interface RootParamList extends RootStackParamList, DrawerParamList {}
+    interface RootParamList extends RootStackParamList, BottomTabParamList {}
   }
 }

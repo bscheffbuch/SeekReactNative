@@ -156,7 +156,7 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
     <WhiteModal closeModal={closeModal}>
       <BannerHeader
         modal
-        text={i18n.t( badges[0].iconicTaxonName ).toLocaleUpperCase()}
+        text={i18n.t( badges[0].iconicTaxonName )}
       />
       <FlatList
         ref={flatList}

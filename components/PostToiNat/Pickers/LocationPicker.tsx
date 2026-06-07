@@ -160,12 +160,12 @@ const LocationPicker = ( {
         <BackArrow handlePress={closeLocationPicker} />
         <View style={viewStyles.marginLarge} />
         <StyledText style={[baseTextStyles.button, textStyles.headerText]}>
-          {i18n.t( "posting.edit_location" ).toLocaleUpperCase()}
+          {i18n.t( "posting.edit_location" )}
         </StyledText>
         <View style={[viewStyles.row, viewStyles.inputRow]}>
           <Image
             source={posting.location}
-            tintColor={colors.white}
+            tintColor={colors.seekDeepGreen}
             style={imageStyles.white}
           />
           <TextInput

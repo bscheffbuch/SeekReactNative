@@ -4,12 +4,24 @@ import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/
 import { NavigationContainer } from "@react-navigation/native";
 import { useReactNavigationDevTools } from "@rozenite/react-navigation-plugin";
 
-import Drawer from "./SideDrawer";
+import BottomTabs from "./BottomTabs";
 import Splash from "../Splash";
 import Onboarding from "../Onboarding/OnboardingScreen";
 import Wikipedia from "../Species/WikipediaView";
 import ARCamera from "../Camera/ARCamera/ARCamera";
 import CameraHelp from "../Camera/CameraHelpScreen";
+import Achievements from "../Achievements/AchievementsScreen";
+import ChallengeDetails from "../Challenges/ChallengeDetails/ChallengeDetailsScreen";
+import QueuedObservations from "../Observations/QueuedObservations";
+import iNatStats from "../iNaturalist/iNatStats";
+import About from "../About/AboutScreen";
+import Settings from "../Settings/Settings";
+import Match from "../Match/MatchScreen";
+import DebugEmailScreen from "../UIComponents/DebugEmailScreen";
+import Species from "../Species/SpeciesDetail";
+import SeekYearInReview from "../SeekYearInReview/SeekYearInReviewScreen";
+import SeekYearInReviewMapScreen from "../SeekYearInReview/SeekYearInReviewMapScreen";
+import Notifications from "../Notifications/Notifications";
 import Post from "../PostToiNat/PostScreen";
 import PostStatus from "../PostToiNat/PostStatus";
 import PostingHelp from "../PostToiNat/PostingHelpScreen";
@@ -40,7 +52,7 @@ const config = { headerShown: false } as const;
 const defaultConfig = { ...config, cardStyleInterpolator: forFade } as const;
 const verticalConfig = { ...config, cardStyleInterpolator: CardStyleInterpolators.forVerticalIOS } as const;
 // animation is off for resetting screen from AR Camera
-const drawerConfig = { ...config,  animation: "none" } as const;
+const tabConfig = { ...config, animation: "none" } as const;
 
 const screenOptions = { gestureEnabled: false } as const;
 const modal = { presentation: "modal" } as const;
@@ -53,7 +65,7 @@ const App = ( ) => {
   const navigationRef = useRef( null );
   // Enable React Navigation DevTools in development
   useReactNavigationDevTools( { ref: navigationRef } );
-  
+
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator id={undefined}>
@@ -61,7 +73,19 @@ const App = ( ) => {
           <Stack.Screen name="Splash" component={Splash} options={defaultConfig} />
           <Stack.Screen name="Onboarding" component={Onboarding} options={defaultConfig} />
           <Stack.Screen name="Camera" component={ARCamera} options={verticalConfig} />
-          <Stack.Screen name="Drawer" component={Drawer} options={drawerConfig} />
+          <Stack.Screen name="MainTabs" component={BottomTabs} options={tabConfig} />
+          <Stack.Screen name="Match" component={Match} options={defaultConfig} />
+          <Stack.Screen name="Species" component={Species} options={defaultConfig} />
+          <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} options={defaultConfig} />
+          <Stack.Screen name="QueuedObservations" component={QueuedObservations} options={defaultConfig} />
+          <Stack.Screen name="Notifications" component={Notifications} options={defaultConfig} />
+          <Stack.Screen name="Achievements" component={Achievements} options={defaultConfig} />
+          <Stack.Screen name="iNatStats" component={iNatStats} options={defaultConfig} />
+          <Stack.Screen name="About" component={About} options={defaultConfig} />
+          <Stack.Screen name="Settings" component={Settings} options={defaultConfig} />
+          <Stack.Screen name="DebugEmailScreen" component={DebugEmailScreen} options={defaultConfig} />
+          <Stack.Screen name="SeekYearInReview" component={SeekYearInReview} options={defaultConfig} />
+          <Stack.Screen name="SeekYearInReviewMapScreen" component={SeekYearInReviewMapScreen} options={defaultConfig} />
           <Stack.Screen name="Post" component={Post} options={defaultConfig} />
           <Stack.Screen name="PostStatus" component={PostStatus} options={defaultConfig} />
           <Stack.Screen name="LoginOrSignup" component={LoginOrSignupScreen} options={defaultConfig} />
@@ -76,7 +100,7 @@ const App = ( ) => {
           <Stack.Screen name="LoginSuccess" component={LoginSuccessScreen} options={defaultConfig} />
           {/* TODO: Social screen needs Lato font restyling, or can it be deleted? */}
           <Stack.Screen name="Social" component={Social} options={defaultConfig} />
-      </Stack.Group>
+        </Stack.Group>
         <Stack.Group screenOptions={modal}>
           <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} options={defaultConfig} />
           <Stack.Screen name="Privacy" component={PrivacyPolicyScreen} options={defaultConfig} />
@@ -98,6 +122,7 @@ const App = ( ) => {
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>
-);};
+  );
+};
 
 export default App;

@@ -9,8 +9,8 @@ import { enabledLargeFonts } from "../../../utility/textHelpers";
 const viewStyles = StyleSheet.create( {
   button: {
     backgroundColor: colors.red,
-    borderRadius: 40,
-    height: enabledLargeFonts() ? 79 : 46,
+    borderRadius: 14,
+    height: enabledLargeFonts() ? 64 : 48,
     width: 243,
   },
   center,

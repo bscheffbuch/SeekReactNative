@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import {
-  colors,
   center,
   row,
   dimensions,
@@ -11,11 +10,11 @@ const badgeIconWidth = Math.min( 455, dimensions.width ) / 4;
 const viewStyles = StyleSheet.create( {
   center,
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   containerWhite: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
   },
   gridRowWrap: {
     flexDirection: "row",
@@ -34,6 +33,11 @@ const viewStyles = StyleSheet.create( {
     maxWidth: 150,
   },
   header: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E6E9E4",
+    borderRadius: 18,
+    borderWidth: 1,
+    marginHorizontal: 16,
     minHeight: 117 + 25 + 26,
   },
   textContainer: {

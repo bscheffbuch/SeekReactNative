@@ -39,7 +39,7 @@ const Button = ( {
     ]}
   >
     <StyledText style={[greenText ? baseTextStyles.buttonGreen : baseTextStyles.button, textStyles.buttonText]}>
-      {i18n.t( text ).toLocaleUpperCase()}
+      {i18n.t( text )}
     </StyledText>
   </TouchableOpacity>
 );

@@ -3,26 +3,77 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   TouchableOpacity,
-  Image,
-  ImageBackground,
+  StyleSheet,
 } from "react-native";
 import Realm from "realm";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import realmConfig from "../../models";
-import { viewStyles, imageStyles } from "../../styles/uiComponents/footer";
-import icons from "../../assets/icons";
 import i18n from "../../i18n";
-import backgrounds from "../../assets/backgrounds";
-import { colors } from "../../styles/global";
-import logos from "../../assets/logos";
+import realmConfig from "../../models";
+import { BellIcon, CameraIcon, MenuIcon, TrophyIcon } from "./AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const Footer = () => {
   let challenge;
   const navigation = useNavigation();
   const route = useRoute();
   const [notifications, setNotifications] = useState( false );
+  const { theme } = useTheme();
+  const styles = StyleSheet.create( {
+    safeArea: {
+      backgroundColor: theme.colors.surface,
+    },
+    container: {
+      backgroundColor: theme.colors.surface,
+      borderTopColor: theme.colors.border,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      shadowColor: theme.colors.shadow,
+      shadowOffset: { width: 0, height: -6 },
+      shadowOpacity: theme.isDark ? 0.22 : 0.08,
+      shadowRadius: 14,
+    },
+    navbar: {
+      alignItems: "center",
+      flexDirection: "row",
+      height: 70,
+      justifyContent: "space-between",
+      paddingHorizontal: theme.spacing.lg,
+    },
+    iconButton: {
+      alignItems: "center",
+      height: 48,
+      justifyContent: "center",
+      width: 48,
+    },
+    cameraButton: {
+      alignItems: "center",
+      backgroundColor: theme.colors.primary,
+      borderColor: theme.colors.surface,
+      borderRadius: 27,
+      borderWidth: 2,
+      height: 54,
+      justifyContent: "center",
+      marginTop: -theme.spacing.lg,
+      shadowColor: theme.colors.primary,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.26,
+      shadowRadius: 16,
+      width: 54,
+      elevation: 5,
+    },
+    notificationDot: {
+      backgroundColor: theme.colors.accent,
+      borderColor: theme.colors.surface,
+      borderRadius: 5,
+      borderWidth: 2,
+      height: 10,
+      position: "absolute",
+      right: 10,
+      top: 9,
+      width: 10,
+    },
+  } );
 
   if ( route.name === "Challenges" || route.name === "ChallengeDetails" ) {
     challenge = true;
@@ -59,47 +110,48 @@ const Footer = () => {
   };
 
   return (
-    <SafeAreaView style={viewStyles.safeArea} edges={["right", "bottom", "left"]}>
-      <ImageBackground source={backgrounds.navBar} style={viewStyles.container}>
-        <View style={[viewStyles.navbar, viewStyles.row, viewStyles.shadow]}>
+    <SafeAreaView style={styles.safeArea} edges={["right", "bottom", "left"]}>
+      <View style={styles.container}>
+        <View style={styles.navbar}>
           <TouchableOpacity
             accessibilityLabel={i18n.t( "accessibility.menu" )}
             accessible
             onPress={navToDrawer}
-            style={viewStyles.leftIcon}
+            style={styles.iconButton}
           >
-            <Image source={icons.hamburger} />
+            <MenuIcon color={theme.colors.text} size={25} strokeWidth={2.2} />
           </TouchableOpacity>
           <TouchableOpacity
             testID="openCameraButton"
             accessibilityLabel={i18n.t( "accessibility.camera" )}
             accessible
             onPress={() => navigation.navigate( "Camera" )}
-            style={viewStyles.camera}
+            style={styles.cameraButton}
           >
-            <Image source={icons.cameraGreen} style={viewStyles.cameraImage} />
+            <CameraIcon color={theme.colors.inverseText} size={27} strokeWidth={2.25} />
           </TouchableOpacity>
           {challenge ? (
             <TouchableOpacity
               accessibilityLabel={i18n.t( "accessibility.iNatStats" )}
               accessible
               onPress={() => navigation.navigate( "iNatStats" )}
-              style={viewStyles.rightIcon}
+              style={styles.iconButton}
             >
-              <Image source={logos.bird} tintColor={colors.seekForestGreen} style={imageStyles.bird} />
+              <TrophyIcon color={theme.colors.text} size={25} strokeWidth={2.2} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
               accessibilityLabel={i18n.t( "accessibility.notifications" )}
               accessible
               onPress={() => navigation.navigate( "Notifications" )}
-              style={viewStyles.notificationPadding}
+              style={styles.iconButton}
             >
-              <Image source={notifications ? icons.notifications : icons.notificationsInactive} />
+              <BellIcon color={notifications ? theme.colors.primary : theme.colors.text} size={25} strokeWidth={2.2} />
+              {notifications ? <View style={styles.notificationDot} /> : null}
             </TouchableOpacity>
           )}
         </View>
-      </ImageBackground>
+      </View>
     </SafeAreaView>
   );
 };

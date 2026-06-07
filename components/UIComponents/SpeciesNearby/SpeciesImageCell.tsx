@@ -1,10 +1,9 @@
 // @ts-nocheck
 import * as React from "react";
-import { TouchableOpacity, Image } from "react-native";
+import { TouchableOpacity, Image, View, StyleSheet } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
 import { viewStyles, textStyles } from "../../../styles/uiComponents/speciesNearby/speciesObservedCell";
-import icons from "../../../assets/icons";
 import i18n from "../../../i18n";
 import { setRoute, StoredRoutes } from "../../../utility/helpers";
 import iconicTaxa from "../../../assets/iconicTaxa";
@@ -13,6 +12,8 @@ import { useSeenTaxa } from "../../../utility/customHooks/useSeenTaxa";
 import StyledText from "../StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { useSpeciesDetail } from "../../Providers/SpeciesDetailProvider";
+import { CheckIcon } from "../AppIcons";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   readonly item: {
@@ -44,6 +45,15 @@ const SpeciesImageCell = ( { item }: Props ) => {
   const { navigate } = navigation;
   const route = useRoute( );
   const { name } = route;
+  const { theme } = useTheme();
+  const themedStyles = StyleSheet.create( {
+    checkbox: {
+      alignItems: "center",
+      backgroundColor: theme.colors.primary,
+      borderRadius: 12,
+      justifyContent: "center",
+    },
+  } );
 
   const seenTaxa = useSeenTaxa( item.id );
   const commonName = useCommonName( item.id );
@@ -71,7 +81,7 @@ const SpeciesImageCell = ( { item }: Props ) => {
   const navToNextScreen = ( ) => {
     setId( item.id );
     if ( name === "Species" ) {
-      navigation.push( "Drawer", { screen: "Species" } );
+      navigation.push( "Species" );
     } else {
       // Match is for common ancestor match screen with species nearby card
       if ( name === "ChallengeDetails" ) {
@@ -88,7 +98,17 @@ const SpeciesImageCell = ( { item }: Props ) => {
   return (
     <TouchableOpacity onPress={navToNextScreen} style={viewStyles.gridCell}>
       {renderSpeciesImage( )}
-      {seenTaxa && <Image source={icons.speciesObserved} style={[viewStyles.checkbox, viewStyles.speciesImageCheckbox]} />}
+      {seenTaxa && (
+        <View
+          style={[
+            viewStyles.checkbox,
+            viewStyles.speciesImageCheckbox,
+            themedStyles.checkbox,
+          ]}
+        >
+          <CheckIcon color={theme.colors.inverseText} size={15} strokeWidth={3} />
+        </View>
+      )}
       <StyledText
         numberOfLines={3}
         style={[

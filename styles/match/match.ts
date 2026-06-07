@@ -20,7 +20,7 @@ export default StyleSheet.create( {
   },
   center,
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   flex: {
@@ -89,7 +89,7 @@ export default StyleSheet.create( {
     maxWidth: 317,
   },
   whiteContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     flexGrow: 1,
   },
 } );

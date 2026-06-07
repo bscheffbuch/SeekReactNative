@@ -1,5 +1,5 @@
 import React from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import i18n from "../../../i18n";
@@ -13,6 +13,7 @@ import { useCountObservationsForYear } from "../../SeekYearInReview/hooks/seekYe
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { useAppOrientation } from "../../Providers/AppOrientationProvider";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 
 const SeekYearInReviewCard = ( ) => {
@@ -27,6 +28,7 @@ const SeekYearInReviewCard = ( ) => {
   const { navigate } = useNavigation();
 
   const { isLandscape } = useAppOrientation();
+  const { theme } = useTheme( );
   const { userProfile } = React.useContext( UserContext );
   const countObservationsThisYear = useCountObservationsForYear( year );
 
@@ -40,17 +42,34 @@ const SeekYearInReviewCard = ( ) => {
   if ( !showCard ) {
     return null;
   }
+  const themedStyles = StyleSheet.create( {
+    container: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      ...theme.elevation.card,
+    },
+    title: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.heading,
+    },
+    body: {
+      color: theme.colors.muted,
+      fontFamily: theme.typography.body,
+    },
+  } );
 
   return (
-    <View testID="yir-card" style={viewStyles.whiteContainer}>
-      <StyledText style={[baseTextStyles.header, textStyles.header]}>
-        {i18n.t( "seek_year_in_review.header" ).toLocaleUpperCase()}
+    <View testID="yir-card" style={[viewStyles.whiteContainer, themedStyles.container]}>
+      <StyledText style={[baseTextStyles.header, textStyles.header, themedStyles.title]}>
+        {i18n.t( "seek_year_in_review.header" )}
       </StyledText>
       <View style={viewStyles.textContainer}>
         <StyledText
           style={[
             baseTextStyles.body,
             isLandscape && viewStyles.landscapeContainerRestrictedWidth,
+            themedStyles.body,
           ]}
         >
           {i18n.t( "seek_year_in_review.description" )}

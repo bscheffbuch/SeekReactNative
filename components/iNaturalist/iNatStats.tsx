@@ -15,10 +15,12 @@ import LoginCard from "../UIComponents/Login/LoginCard";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const INatStats = ( ) => {
   const { login } = useContext( UserContext );
   const { isTablet } = useAppOrientation( );
+  const { theme } = useTheme( );
 
   return (
     <ScrollWithHeader header="about_inat.inaturalist" footer>
@@ -47,7 +49,11 @@ const INatStats = ( ) => {
         <BulletedList text="about_inat.seek_bullet_3" />
         <View style={viewStyles.sectionMargin} />
         <GreenText text="about_inat.your_obs_could_make_difference" />
-        <StyledText style={[baseTextStyles.body, textStyles.everydayObs]}>{i18n.t( "about_inat.everyday_obs_help_scientists" )}</StyledText>
+        <StyledText style={[
+          baseTextStyles.body,
+          textStyles.everydayObs,
+          { color: theme.colors.text },
+        ]}>{i18n.t( "about_inat.everyday_obs_help_scientists" )}</StyledText>
       </View>
       <INatPhotos />
       <View style={[viewStyles.textContainer, isTablet && viewStyles.tabletContainer]}>

@@ -24,7 +24,7 @@ const viewStyles = StyleSheet.create( {
 const textStyles = StyleSheet.create( {
   ccButtonText: {
     backgroundColor: colors.black,
-    borderRadius: 40,
+    borderRadius: 8,
     paddingBottom: Platform.OS === "ios" ? 3 : 5,
     paddingHorizontal: 5,
     paddingTop: Platform.OS === "ios" ? 8 : 5,

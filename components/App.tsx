@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useEffect } from "react";
+import { LogBox } from "react-native";
 import {
   setJSExceptionHandler,
   setNativeExceptionHandler,
@@ -20,6 +21,7 @@ import { ObservationProvider } from "./Providers/ObservationProvider";
 import { AppOrientationProvider } from "./Providers/AppOrientationProvider";
 import { ChallengeProvider } from "./Providers/ChallengeProvider";
 import { SpeciesDetailProvider } from "./Providers/SpeciesDetailProvider";
+import { ThemeProvider } from "./Providers/ThemeProvider";
 import { log } from "../react-native-logs.config";
 import { LogLevels, logToApi } from "../utility/apiCalls";
 import ErrorBoundary from "./ErrorBoundary";
@@ -27,6 +29,10 @@ import { useNetworkActivityDevTools } from "@rozenite/network-activity-plugin";
 import { useRequireProfilerDevTools } from "@rozenite/require-profiler-plugin";
 
 const logger = log.extend( "App.tsx" );
+
+LogBox.ignoreLogs( [
+  "InteractionManager has been deprecated",
+] );
 
 const jsErrorHandler = ( e, isFatal ) => {
   // not 100% sure why jsErrorHandler logs e.name and e.message as undefined sometimes,
@@ -99,13 +105,15 @@ const App = ( ) => {
               <SpeciesNearbyProvider>
                 <ChallengeProvider>
                   <SpeciesDetailProvider>
-                    <GestureHandlerRootView style={style}>
-                      <SafeAreaProvider>
-                        <ErrorBoundary>
-                          <RootStack />
-                        </ErrorBoundary>
-                      </SafeAreaProvider>
-                    </GestureHandlerRootView>
+                    <ThemeProvider>
+                      <GestureHandlerRootView style={style}>
+                        <SafeAreaProvider>
+                          <ErrorBoundary>
+                            <RootStack />
+                          </ErrorBoundary>
+                        </SafeAreaProvider>
+                      </GestureHandlerRootView>
+                    </ThemeProvider>
                   </SpeciesDetailProvider>
                 </ChallengeProvider>
               </SpeciesNearbyProvider>

@@ -16,19 +16,19 @@ const PostingHelpScreen = ( ) => (
     <View style={viewStyles.textContainer}>
       <View style={viewStyles.row}>
         <Image source={icons.searchGreen} style={imageStyles.icon} />
-        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.identification" ).toLocaleUpperCase()}</StyledText>
+        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.identification" )}</StyledText>
       </View>
       <StyledText style={[baseTextStyles.body, textStyles.text]}>{i18n.t( "posting_help.id_description" )}</StyledText>
       <View style={viewStyles.row}>
         <Image source={icons.date} style={imageStyles.icon} />
         <View style={viewStyles.marginRight} />
         <Image source={icons.location} style={imageStyles.icon} />
-        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.date" ).toLocaleUpperCase()}</StyledText>
+        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.date" )}</StyledText>
       </View>
       <StyledText style={[baseTextStyles.body, textStyles.text]}>{i18n.t( "posting_help.date_description" )}</StyledText>
       <View style={viewStyles.row}>
         <Image source={icons.geoprivacy} style={imageStyles.icon} />
-        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.geoprivacy" ).toLocaleUpperCase()}</StyledText>
+        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.geoprivacy" )}</StyledText>
       </View>
       <View style={viewStyles.paragraph} />
       <StyledText style={viewStyles.paragraph}>
@@ -46,7 +46,7 @@ const PostingHelpScreen = ( ) => (
       <View style={viewStyles.margin} />
       <View style={viewStyles.row}>
         <Image source={icons.captive} style={imageStyles.icon} />
-        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.captive" ).toLocaleUpperCase()}</StyledText>
+        <StyledText style={[baseTextStyles.header, textStyles.headerText]}>{i18n.t( "posting_help.captive" )}</StyledText>
       </View>
       <View style={viewStyles.paragraph} />
       <StyledText style={viewStyles.paragraph}>

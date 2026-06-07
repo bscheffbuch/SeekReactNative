@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import {
-  colors,
   row,
   center,
   dimensions,
@@ -11,8 +10,11 @@ const { width } = dimensions;
 
 const greenButton = {
   ...baseTextStyles.button,
-  backgroundColor: colors.seekForestGreen,
-  borderRadius: 6,
+  backgroundColor: "#FAF8F1",
+  borderColor: "#E6E9E4",
+  borderRadius: 14,
+  borderWidth: 1,
+  color: "#111512",
   paddingBottom: 11,
   paddingHorizontal: 18,
   textAlign: "center" as const,
@@ -38,14 +40,14 @@ const viewStyles = StyleSheet.create( {
     marginLeft: 10,
   },
   margin: {
-    marginTop: 35,
+    marginTop: 18,
   },
   marginGreenButton: {
     marginTop: 19,
   },
   marginHorizontal: {
     justifyContent: "space-between",
-    marginHorizontal: 28,
+    marginHorizontal: 16,
   },
   tabletContainer: {
     maxWidth: 455,
@@ -58,20 +60,20 @@ const viewStyles = StyleSheet.create( {
     marginTop: 15,
   },
   marginTop: {
-    marginTop: 24,
+    marginTop: 16,
   },
   radioButtonSmallMargin: {
     paddingTop: 19 / 2,
   },
   radioMargin: {
-    paddingVertical: 19 / 2,
-    paddingLeft: 20,
+    paddingVertical: 10,
+    paddingLeft: 4,
   },
   donateMarginBottom: {
-    paddingTop: 35 - 19,
+    paddingTop: 16,
   },
   radioButtonMarginBottom: {
-    paddingTop: 35 - ( 19 / 2 ),
+    paddingTop: 16,
   },
   row,
   switch: {

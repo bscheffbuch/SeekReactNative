@@ -25,10 +25,10 @@ interface Props {
 const ChallengeTitle = ( { challenge }: Props ) => (
   <>
     <StyledText style={[baseTextStyles.challengeMonth, textStyles.challengeHeader]}>
-      {formatMonthYear( challenge.availableDate ).toLocaleUpperCase()}
+      {formatMonthYear( challenge.availableDate )}
     </StyledText>
     <StyledText style={[baseTextStyles.challengeTitle, textStyles.challengeName]}>
-      {i18n.t( challenge.name ).toLocaleUpperCase()}
+      {i18n.t( challenge.name )}
     </StyledText>
   </>
 );

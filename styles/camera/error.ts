@@ -3,12 +3,12 @@ import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
     flex: 1,
   },
   textContainer: {
     flex: 1,
-    backgroundColor: colors.black,
+    backgroundColor: colors.seekInk,
     justifyContent: "center",
   },
 } );
@@ -24,4 +24,3 @@ export {
   textStyles,
   viewStyles,
 };
-

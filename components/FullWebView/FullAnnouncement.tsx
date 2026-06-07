@@ -17,8 +17,8 @@ const FullAnnouncement = ( { navigation, route }: Props ) => {
     <FullWebView
       navigation={navigation}
       headerText={!loggedIn ?
-        i18n.t( "announcements.announcement" ).toLocaleUpperCase()
-        : i18n.t( "settings.danger_zone" ).toLocaleUpperCase()
+        i18n.t( "announcements.announcement" )
+        : i18n.t( "settings.danger_zone" )
       }
       uri={uri}
       loggedIn={loggedIn}

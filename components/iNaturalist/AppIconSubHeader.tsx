@@ -6,6 +6,7 @@ import logos from "../../assets/logos";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   icon: string;
@@ -15,6 +16,7 @@ interface Props {
 
 const AppIconSubHeader = ( { icon, text, largeIcon }: Props ) => {
   const { isTablet } = useAppOrientation( );
+  const { theme } = useTheme( );
 
   return (
     <View style={[
@@ -30,6 +32,7 @@ const AppIconSubHeader = ( { icon, text, largeIcon }: Props ) => {
       <StyledText style={[
         baseTextStyles.emptyState,
         largeIcon ? textStyles.smallerTextWidth : textStyles.secondHeaderText,
+        { color: theme.colors.text },
         isTablet && viewStyles.tabletContainer,
         ( isTablet && largeIcon ) && viewStyles.landscapeContainerLargeIcon,
       ]}>

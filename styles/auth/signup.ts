@@ -22,7 +22,7 @@ export default StyleSheet.create( {
     paddingTop: 18,
   },
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   darkText: {
@@ -32,8 +32,8 @@ export default StyleSheet.create( {
   },
   dateButton: {
     alignSelf: "center",
-    backgroundColor: colors.seekForestGreen,
-    borderRadius: 6,
+    backgroundColor: colors.seekDeepGreen,
+    borderRadius: 14,
     height: 43,
     width: 237,
   },
@@ -53,7 +53,7 @@ export default StyleSheet.create( {
     textAlign: "center",
   },
   whiteContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
   },
   keyboardText: {
     marginHorizontal: ( Platform.OS === "android" || dimensions.height < 570 ) ? 24 : 28,
@@ -101,7 +101,7 @@ export default StyleSheet.create( {
     textAlign: "center",
   },
   linkText: {
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
     textDecorationLine: "underline",
     padding: 10,
   },

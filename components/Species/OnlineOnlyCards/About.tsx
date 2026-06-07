@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { StyleSheet } from "react-native";
 import HTML from "react-native-render-html";
 
 import i18n from "../../../i18n";
@@ -11,6 +12,7 @@ import { useCommonName } from "../../../utility/customHooks/useCommonName";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { htmlFonts } from "../../../styles/global";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   readonly loading: boolean;
@@ -30,6 +32,13 @@ const About = ( {
   const navigation = useNavigation();
   // TODO: UserContext TS
   const { login } = useContext( UserContext );
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    source: {
+      color: theme.colors.muted,
+      fontFamily: theme.typography.body,
+    },
+  } );
   const commonName = useCommonName( id );
 
   const html = about ? `${about}`.replace( /<b>/g, "" ) : null;
@@ -48,16 +57,43 @@ const About = ( {
         {about && html && (
           <>
             <HTML
-              baseStyle={baseTextStyles.body}
+              baseStyle={{
+                ...baseTextStyles.body,
+                color: theme.colors.text,
+                fontFamily: theme.typography.body,
+              }}
               source={{ html }}
               systemFonts={htmlFonts}
               defaultTextProps={{ allowFontScaling: true, maxFontSizeMultiplier: 2 }}
               tagsStyles={{
-                strong: baseTextStyles.bodySpacedBold,
-                i: baseTextStyles.bodySpacedItalic,
+                b: {
+                  ...baseTextStyles.bodySpacedBold,
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.heading,
+                },
+                strong: {
+                  ...baseTextStyles.bodySpacedBold,
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.heading,
+                },
+                em: {
+                  ...baseTextStyles.bodySpacedItalic,
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.scientific,
+                },
+                i: {
+                  ...baseTextStyles.bodySpacedItalic,
+                  color: theme.colors.text,
+                  fontFamily: theme.typography.scientific,
+                },
               }}
             />
-            <StyledText style={baseTextStyles.body}>
+            <StyledText
+              style={[
+                baseTextStyles.body,
+                themedStyles.source,
+              ]}
+            >
               {/* TODO: the parentheses should probably be part of the string? Because in some cultures maybe they would different character for tis. */}
               {"\n("}
               {i18n.t( "species_detail.wikipedia" )}

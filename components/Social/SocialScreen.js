@@ -118,9 +118,9 @@ const SocialScreen = ( ) => {
     let preferredCommonName = "";
 
     if ( commonName ) {
-      preferredCommonName = commonName.toLocaleUpperCase( );
+      preferredCommonName = commonName;
     } else if ( scientificName ) {
-      preferredCommonName = scientificName.toLocaleUpperCase( );
+      preferredCommonName = scientificName;
     }
     const watermarkedImage = await addWatermark( uriToWatermark, preferredCommonName, scientificName );
 
@@ -195,7 +195,7 @@ const SocialScreen = ( ) => {
         >
           <Image source={icons.cropIconWhite} />
           <StyledText style={textStyles.buttonText}>
-            {i18n.t( "social.crop_image" ).toLocaleUpperCase( )}
+            {i18n.t( "social.crop_image" )}
           </StyledText>
         </TouchableOpacity>
       );
@@ -280,7 +280,7 @@ const SocialScreen = ( ) => {
         {tab === "square" ? showSquareImage( ) : showOriginalRatioImage( )}
         {!noWatermark && (
           <>
-            <StyledText style={textStyles.optionsText}>{i18n.t( "social.options" ).toLocaleUpperCase( )}</StyledText>
+            <StyledText style={textStyles.optionsText}>{i18n.t( "social.options" )}</StyledText>
             <View style={[viewStyles.row, viewStyles.checkboxRow]}>
               <Checkbox
                 checkBoxColor={colors.checkboxColor}

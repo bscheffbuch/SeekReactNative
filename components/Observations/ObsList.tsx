@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useMemo, useCallback } from "react";
-import { View, Keyboard } from "react-native";
+import { StyleSheet, View, Keyboard } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
 import i18n from "../../i18n";
@@ -13,6 +13,7 @@ import SearchBar from "./SearchBar";
 import SearchEmpty from "./SearchEmpty";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Observation {
   id: number;
@@ -59,6 +60,15 @@ const ObsList = ( {
   updateObs,
   clearText,
 }: Props ) => {
+  const { theme } = useTheme( );
+  const themedStyles = useMemo( () => StyleSheet.create( {
+    emptyText: {
+      color: theme.colors.muted,
+    },
+    padding: {
+      backgroundColor: theme.colors.canvas,
+    },
+  } ), [theme.colors.canvas, theme.colors.muted] );
   // TODO: preferably we should use setHiddenSections to change state
   const [hiddenSections] = useState<number[]>( [] );
   const [itemScrolledId, setItemScrolledId] = useState<number | null>( null );
@@ -90,34 +100,37 @@ const ObsList = ( {
     [hiddenSections]
   );
 
-  let convertedData: ConvertedDataItem[] = [];
-  observations.map( ( section ) => {
-    const { data, id } = section;
-    // Push header data
-    convertedData.push( { type: "header", id, dataLength: data.length } );
-    // Push observation data
-    if ( !sectionIsHidden( id ) ) {
-      const idData = data.map( ( item, index ) => {
-        if ( index === 0 && id === 47126 ) {
-          item.toAnimate = true;
-        }
-        item.sectionId = id;
-        if ( index === data.length - 1 ) {
-          item.isLast = true;
-        }
-        return item;
-      } );
-      convertedData = convertedData.concat( ...idData );
-    }
-    // Push footer data
-    if ( sectionIsHidden( id ) && data.length === 0 ) {
-      convertedData.push( { type: "footerHidden" } );
-    } else if ( data.length === 0 ) {
-      convertedData.push( { type: "footerEmpty", id } );
-    } else {
-      convertedData.push( { type: "footer" } );
-    }
-  } );
+  const convertedData: ConvertedDataItem[] = useMemo( () => {
+    const nextData: ConvertedDataItem[] = [];
+
+    observations.forEach( ( section ) => {
+      const { data, id } = section;
+      const hidden = sectionIsHidden( id );
+
+      nextData.push( { type: "header", id, dataLength: data.length } );
+
+      if ( !hidden ) {
+        data.forEach( ( item, index ) => {
+          nextData.push( {
+            ...item,
+            toAnimate: Boolean( item.toAnimate || ( index === 0 && id === 47126 ) ),
+            sectionId: id,
+            isLast: index === data.length - 1,
+          } );
+        } );
+      }
+
+      if ( hidden && data.length === 0 ) {
+        nextData.push( { type: "footerHidden" } );
+      } else if ( data.length === 0 ) {
+        nextData.push( { type: "footerEmpty", id } );
+      } else {
+        nextData.push( { type: "footer" } );
+      }
+    } );
+
+    return nextData;
+  }, [observations, sectionIsHidden] );
 
   const renderItem = useCallback(
     ( { item }: { item: ConvertedDataItem } ) => {
@@ -140,7 +153,7 @@ const ObsList = ( {
         // Render footer for hidden section
         const iconicTaxon = iconicTaxaNamesById[item.id].split( "." )[1];
         return (
-          <StyledText style={[baseTextStyles.body, styles.emptyText]}>
+          <StyledText style={[baseTextStyles.body, styles.emptyText, themedStyles.emptyText]}>
             {i18n.t( `observations.not_seen_${iconicTaxon}` )}
           </StyledText>
         );
@@ -174,10 +187,14 @@ const ObsList = ( {
       updateItemScrolledId,
       hasAnimated,
       setHasAnimated,
+      themedStyles.emptyText,
     ],
   );
 
-  const renderListFooter = () => <View style={styles.padding} />;
+  const renderListFooter = useCallback(
+    () => <View style={[styles.padding, themedStyles.padding]} />,
+    [themedStyles.padding]
+  );
 
   const renderListEmpty = () => {
     if ( searchText.length > 0 ) {
@@ -198,15 +215,20 @@ const ObsList = ( {
     [fetchFilteredObservations, searchText, clearText]
   );
 
-  const dismissKeyboard = () => Keyboard.dismiss();
+  const dismissKeyboard = useCallback( () => Keyboard.dismiss(), [] );
 
-  const extractKey = ( item: ConvertedDataItem, index: number ) => item + index;
+  const extractKey = useCallback( ( item: ConvertedDataItem, index: number ) => {
+    if ( item.type ) {
+      return `${item.type}-${item.id ?? "none"}-${index}`;
+    }
+    return `observation-${item.id}-${item.sectionId}-${index}`;
+  }, [] );
   return (
     <FlashList
       testID="observations-list"
       keyboardDismissMode="on-drag"
-      onScroll={dismissKeyboard}
-      scrollEventThrottle={1}
+      onScrollBeginDrag={dismissKeyboard}
+      scrollEventThrottle={16}
       data={convertedData}
       initialNumToRender={5}
       stickySectionHeadersEnabled={false}

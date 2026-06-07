@@ -58,7 +58,7 @@ const GreenButton = ( {
         ]}
         allowFontScaling={allowFontScaling}
       >
-        {i18n.t( text ).toLocaleUpperCase()}
+        {i18n.t( text )}
       </StyledText>
     </TouchableOpacity>
   );

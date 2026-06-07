@@ -36,7 +36,7 @@ const ChallengeToast = ( { challenge }: Props ) => {
     >
       <View>
         <StyledText allowFontScaling={false} style={[baseTextStyles.header, textStyles.headerText]}>
-          {i18n.t( challenge.name ).toLocaleUpperCase()}
+          {i18n.t( challenge.name )}
         </StyledText>
         <StyledText allowFontScaling={false} style={[baseTextStyles.body, textStyles.description]}>
           {i18n.t( "banner.challenge_progress" )}

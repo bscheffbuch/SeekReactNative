@@ -5,118 +5,160 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
   edges={
     {
       "bottom": "off",
-      "left": "off",
-      "right": "off",
+      "left": "additive",
+      "right": "additive",
       "top": "additive",
     }
   }
   style={
-    {
-      "backgroundColor": "#38976d",
-      "flex": 1,
-    }
+    [
+      {
+        "backgroundColor": "#38976d",
+        "flex": 1,
+      },
+      {
+        "backgroundColor": "#F7F6F0",
+      },
+    ]
   }
   testID="seek-yir-screen-container"
 >
   <View
     style={
-      [
-        {
-          "backgroundColor": "#38976d",
-          "flexDirection": "row",
-          "paddingBottom": 18,
-          "paddingTop": 20.5,
-        },
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-        },
-      ]
+      {
+        "alignItems": "center",
+        "backgroundColor": "#FFFFFF",
+        "borderBottomColor": "#D8E1DA",
+        "borderBottomWidth": 0.5,
+        "flexDirection": "row",
+        "minHeight": 64,
+        "paddingHorizontal": 16,
+        "paddingVertical": 8,
+      }
     }
   >
     <View
-      accessibilityLabel="Go back to previous screen"
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         {
-          "left": 0,
-          "opacity": 1,
-          "paddingHorizontal": 23,
-          "paddingVertical": 18,
-          "position": "absolute",
-          "transform": [
-            {
-              "scaleX": 1,
-            },
-          ],
+          "height": 48,
+          "width": 48,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      numberOfLines={2}
+      style={
+        {
+          "color": "#17251F",
+          "flex": 1,
+          "fontFamily": "Lato-Bold",
+          "fontSize": 20,
+          "lineHeight": 26,
+          "marginHorizontal": 8,
         }
       }
     >
-      <Image
-        source={
+      Seek Year in Review
+    </Text>
+    <View>
+      <View
+        accessibilityLabel="View notifications"
+        accessibilityRole="button"
+        accessibilityState={
           {
-            "testUri": "../../../assets/icons/back.webp",
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": false,
+            "expanded": undefined,
+            "selected": undefined,
           }
         }
-        style={false}
-      />
-    </View>
-    <Text
-      allowFontScaling={false}
-      style={
-        [
+        accessibilityValue={
           {
-            "textAlign": "left",
-          },
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={8}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
           [
             {
-              "color": "#ffffff",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 15,
-              "letterSpacing": 1,
-              "lineHeight": 21,
+              "alignItems": "center",
+              "borderRadius": 24,
+              "height": 48,
+              "justifyContent": "center",
+              "minHeight": 48,
+              "minWidth": 48,
+              "width": 48,
             },
+            false,
+            false,
+          ]
+        }
+      >
+        <Image
+          accessibilityIgnoresInvertColors={true}
+          resizeMode="contain"
+          source={
             {
-              "maxWidth": 650,
-            },
-          ],
-        ]
-      }
-    >
-      SEEK YEAR IN REVIEW
-    </Text>
+              "testUri": "../../../assets/navbar/Notifications-inactive.webp",
+            }
+          }
+          style={
+            [
+              {
+                "height": 24,
+                "width": 24,
+              },
+              null,
+              undefined,
+            ]
+          }
+        />
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#E5B84B",
+            "borderColor": "#FFFFFF",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "height": 10,
+            "position": "absolute",
+            "right": 11,
+            "top": 11,
+            "width": 10,
+          }
+        }
+        testID="unreadNotificationsIndicator"
+      />
+    </View>
   </View>
   <RCTScrollView
     contentContainerStyle={
-      {
-        "backgroundColor": "#ffffff",
-      }
+      [
+        {
+          "backgroundColor": "#ffffff",
+        },
+        {
+          "backgroundColor": "#F7F6F0",
+        },
+      ]
     }
     keyboardDismissMode="none"
     onScroll={[Function]}
@@ -233,15 +275,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   {
                     "textAlign": "left",
                   },
-                  [
-                    {
-                      "color": "#ffffff",
-                      "fontFamily": "Lato-Bold",
-                      "fontSize": 19,
-                      "letterSpacing": 1,
-                      "lineHeight": 27,
-                    },
-                  ],
+                  {
+                    "color": "#ffffff",
+                    "fontFamily": "Lato-Bold",
+                    "fontSize": 19,
+                    "letterSpacing": 1,
+                    "lineHeight": 27,
+                  },
                 ]
               }
             >
@@ -341,15 +381,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         <View>
           <View
             style={
-              [
-                {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "flexWrap": "wrap",
-                  "justifyContent": "center",
-                  "width": 377.20734908136484,
-                },
-              ]
+              {
+                "alignSelf": "center",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+                "width": 377.25,
+              }
             }
             testID="badge-container"
           >
@@ -398,10 +436,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -452,10 +490,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -506,10 +544,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -526,15 +564,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         />
         <View
           style={
-            [
-              {
-                "alignSelf": "center",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "justifyContent": "center",
-                "width": 377.20734908136484,
-              },
-            ]
+            {
+              "alignSelf": "center",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "justifyContent": "center",
+              "width": 377.20734908136484,
+            }
           }
         >
           <Text
@@ -651,15 +687,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         </View>
         <View
           style={
-            [
-              {
-                "alignSelf": "center",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "justifyContent": "center",
-                "width": 377.20734908136484,
-              },
-            ]
+            {
+              "alignSelf": "center",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "justifyContent": "center",
+              "width": 377.20734908136484,
+            }
           }
         >
           <Text
@@ -933,7 +967,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
             }
           }
         />
-        <AIRMap
+        <View
           initialRegion={
             {
               "latitude": 0.21,
@@ -942,9 +976,8 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               "longitudeDelta": 84.42,
             }
           }
-          onChange={[Function]}
-          onMapReady={[Function]}
           onPress={[Function]}
+          provider="default"
           region={
             {
               "latitude": 0.21,
@@ -963,22 +996,12 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           }
           zoomEnabled={false}
         >
-          <AIRMapMarker
+          <View
             coordinate={
               {
                 "latitude": 42,
                 "longitude": -42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
             testID="some-uuid1"
           >
@@ -989,23 +1012,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-          <AIRMapMarker
+          </View>
+          <View
             coordinate={
               {
                 "latitude": -42,
                 "longitude": 42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
             testID="some-uuid2"
           >
@@ -1016,23 +1029,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-          <AIRMapMarker
+          </View>
+          <View
             coordinate={
               {
                 "latitude": 42,
                 "longitude": 42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
             testID="some-uuid3"
           >
@@ -1043,23 +1046,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-          <AIRMapMarker
+          </View>
+          <View
             coordinate={
               {
                 "latitude": 42.42,
                 "longitude": 42.42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
           >
             <Image
@@ -1069,8 +1062,8 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-        </AIRMap>
+          </View>
+        </View>
         <View
           accessibilityState={
             {
@@ -1758,15 +1751,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         <View>
           <View
             style={
-              [
-                {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "flexWrap": "wrap",
-                  "justifyContent": "center",
-                  "width": 377.20734908136484,
-                },
-              ]
+              {
+                "alignSelf": "center",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+                "width": 377.25,
+              }
             }
             testID="badge-container"
           >
@@ -1813,10 +1804,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -1865,10 +1856,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -1917,10 +1908,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -2087,222 +2078,5 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
       />
     </View>
   </RCTScrollView>
-  <RNCSafeAreaView
-    edges={
-      {
-        "bottom": "additive",
-        "left": "additive",
-        "right": "additive",
-        "top": "off",
-      }
-    }
-    style={
-      {
-        "backgroundColor": "#ffffff",
-      }
-    }
-  >
-    <View
-      accessibilityIgnoresInvertColors={true}
-      style={
-        {
-          "height": 74,
-          "justifyContent": "flex-end",
-        }
-      }
-    >
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/backgrounds/img-navbar.webp",
-          }
-        }
-        style={
-          [
-            {
-              "bottom": 0,
-              "left": 0,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            },
-            {
-              "height": 74,
-              "width": undefined,
-            },
-            undefined,
-          ]
-        }
-      />
-      <View
-        style={
-          [
-            {
-              "backgroundColor": "#ffffff",
-              "height": 70,
-              "justifyContent": "space-between",
-            },
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-            },
-            {
-              "shadowColor": "#000000",
-              "shadowOffset": {
-                "height": -3,
-                "width": 0,
-              },
-              "shadowOpacity": 0.2,
-              "shadowRadius": 2,
-            },
-          ]
-        }
-      >
-        <View
-          accessibilityLabel="Open menu"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "left": 10,
-              "opacity": 1,
-              "padding": 20,
-            }
-          }
-        >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/navbar/Menu.webp",
-              }
-            }
-          />
-        </View>
-        <View
-          accessibilityLabel="Open camera"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "marginBottom": 50,
-              "marginLeft": 8,
-              "opacity": 1,
-            }
-          }
-          testID="openCameraButton"
-        >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/navbar/icon-camerabutton.webp",
-              }
-            }
-            style={
-              {
-                "height": 94,
-                "width": 94,
-              }
-            }
-          />
-        </View>
-        <View
-          accessibilityLabel="View notifications"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "opacity": 1,
-              "padding": 24,
-              "right": 10,
-            }
-          }
-        >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/navbar/Notifications-inactive.webp",
-              }
-            }
-          />
-        </View>
-      </View>
-    </View>
-  </RNCSafeAreaView>
 </RNCSafeAreaView>
 `;

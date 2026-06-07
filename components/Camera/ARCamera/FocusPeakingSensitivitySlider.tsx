@@ -112,7 +112,9 @@ const FocusPeakingSensitivitySlider = ( {
 const styles = StyleSheet.create( {
   container: {
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.55)",
+    backgroundColor: "rgba(10, 14, 11, 0.68)",
+    borderColor: "rgba(224, 168, 46, 0.72)",
+    borderWidth: 1,
     borderRadius: 20,
     flexDirection: "row",
     gap: 12,
@@ -132,14 +134,14 @@ const styles = StyleSheet.create( {
     justifyContent: "center",
   },
   trackFill: {
-    backgroundColor: "#dfff38",
+    backgroundColor: colors.seekGold,
     borderRadius: 2,
     height: 4,
     position: "absolute",
   },
   thumb: {
     backgroundColor: colors.white,
-    borderColor: "#dfff38",
+    borderColor: colors.seekGold,
     borderRadius: 10,
     borderWidth: 2,
     height: 20,

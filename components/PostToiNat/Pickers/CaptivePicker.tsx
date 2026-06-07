@@ -42,7 +42,7 @@ const CaptivePicker = ( { updateObservation, captive }: Props ) => {
         <Image source={posting.captive} />
         <View style={styles.row}>
           <StyledText style={baseTextStyles.postSectionHeader}>
-            {i18n.t( "posting.captive" ).toLocaleUpperCase()}
+            {i18n.t( "posting.captive" )}
           </StyledText>
           <StyledText style={[baseTextStyles.body, styles.text]}>
             {captive ? i18n.t( "posting.yes" ) : i18n.t( "posting.no" )}

@@ -7,9 +7,11 @@ import { removeAccessToken } from "../../../utility/loginHelpers";
 import { UserContext } from "../../UserContext";
 import StyledText from "../StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const INatSignOut = ( ) => {
   const { updateLogin } = useContext( UserContext );
+  const { theme } = useTheme( );
 
   const logUserOut = async ( ) => {
     const loggedOut = await removeAccessToken( );
@@ -20,7 +22,13 @@ const INatSignOut = ( ) => {
 
   return (
     <>
-      <StyledText style={[baseTextStyles.body, textStyles.loginLogoutText]}>
+      <StyledText
+        style={[
+          baseTextStyles.body,
+          textStyles.loginLogoutText,
+          { color: theme.colors.text },
+        ]}
+      >
         {i18n.t( "about_inat.upload_and_track_obs_using_inat" )}
       </StyledText>
       <GreenButton

@@ -1,5 +1,6 @@
 import { StyleSheet } from "react-native";
 import {
+  colors,
   row,
 } from "../global";
 
@@ -9,8 +10,8 @@ const viewStyles = StyleSheet.create( {
     marginRight: 29,
   },
   flagHeader: {
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     height: 62,
     width: "100%",
   },
@@ -32,6 +33,7 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   buttonText: {
+    color: colors.seekInk,
     marginRight: 15,
     paddingTop: 9,
     textAlign: "center",

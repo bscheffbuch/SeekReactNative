@@ -62,7 +62,7 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   bullets: {
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
     fontSize: 37,
     marginHorizontal: 41,
   },

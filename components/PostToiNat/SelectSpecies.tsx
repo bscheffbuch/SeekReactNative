@@ -159,7 +159,7 @@ const SelectSpecies = ( {
             <Image source={icons.backButton} />
           </TouchableOpacity>
           <StyledText style={[baseTextStyles.button, textStyles.topHeader]}>
-            {i18n.t( "posting.what_seen" ).toLocaleUpperCase()}
+            {i18n.t( "posting.what_seen" )}
           </StyledText>
         </View>
         <View style={viewStyles.photoContainer}>
@@ -168,7 +168,7 @@ const SelectSpecies = ( {
         <View style={viewStyles.row}>
           <Image
             source={posting.searchGreen}
-            tintColor={colors.white}
+            tintColor={colors.seekDeepGreen}
             style={imageStyles.search}
           />
           <TextInput
