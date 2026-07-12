@@ -2,6 +2,8 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
 
+import { colors } from "../../../styles/global";
+
 export interface PeakingPoint {
   x: number;
   y: number;
@@ -27,7 +29,7 @@ const FocusPeakingOverlay = ( { pathRef, visible }: Props ) => {
           ref={pathRef}
           d=""
           fill="none"
-          stroke="#dfff38"
+          stroke={colors.focusPeakingYellow}
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeOpacity={0.95}

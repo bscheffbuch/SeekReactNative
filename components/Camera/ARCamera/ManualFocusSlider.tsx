@@ -1,14 +1,13 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   PanResponder,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
 import type { AccessibilityActionEvent, LayoutChangeEvent } from "react-native";
 
 import i18n from "../../../i18n";
-import { colors } from "../../../styles/global";
+import { viewStyles, textStyles } from "../../../styles/camera/cameraControls";
 
 interface Props {
   focusValue: number;
@@ -16,6 +15,11 @@ interface Props {
 }
 
 const clampFocusValue = ( value: number ) => Math.min( Math.max( value, 0 ), 1 );
+
+// The slider UI updates locally on every pan move, but commits to the parent
+// (which re-renders the whole camera tree) at a bounded rate plus on gesture
+// end.
+const COMMIT_INTERVAL_MS = 66; // ~15Hz
 
 const ManualFocusSlider = ( {
   focusValue,
@@ -26,7 +30,62 @@ const ManualFocusSlider = ( {
     width: 1,
   } );
   const trackRef = useRef<View>( null );
-  const clampedFocusValue = clampFocusValue( focusValue );
+  const [localFocusValue, setLocalFocusValue] = useState( focusValue );
+  const isDraggingRef = useRef( false );
+  const commitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>( null );
+  const lastCommitAtRef = useRef( 0 );
+  const pendingValueRef = useRef<number | null>( null );
+  const clampedFocusValue = clampFocusValue( localFocusValue );
+
+  // Keep the local value in sync with external changes (e.g. focus reset),
+  // but not mid-gesture, when the parent echoes back throttled commits.
+  useEffect( () => {
+    if ( !isDraggingRef.current ) {
+      setLocalFocusValue( focusValue );
+    }
+  }, [focusValue] );
+
+  useEffect( () => () => {
+    if ( commitTimeoutRef.current ) {
+      clearTimeout( commitTimeoutRef.current );
+      commitTimeoutRef.current = null;
+    }
+  }, [] );
+
+  const commitValue = useCallback( ( value: number ) => {
+    lastCommitAtRef.current = Date.now();
+    pendingValueRef.current = null;
+    setFocusValue( value );
+  }, [setFocusValue] );
+
+  const scheduleCommit = useCallback( ( value: number ) => {
+    pendingValueRef.current = value;
+    if ( commitTimeoutRef.current ) {
+      // a trailing commit is already scheduled and will pick up the latest value
+      return;
+    }
+
+    const elapsed = Date.now() - lastCommitAtRef.current;
+    if ( elapsed >= COMMIT_INTERVAL_MS ) {
+      commitValue( value );
+      return;
+    }
+
+    commitTimeoutRef.current = setTimeout( () => {
+      commitTimeoutRef.current = null;
+      if ( pendingValueRef.current != null ) {
+        commitValue( pendingValueRef.current );
+      }
+    }, COMMIT_INTERVAL_MS - elapsed );
+  }, [commitValue] );
+
+  const flushCommit = useCallback( ( value: number ) => {
+    if ( commitTimeoutRef.current ) {
+      clearTimeout( commitTimeoutRef.current );
+      commitTimeoutRef.current = null;
+    }
+    commitValue( value );
+  }, [commitValue] );
 
   const measureTrack = useCallback( (
     onMeasured?: ( metrics: { pageX: number; width: number } ) => void
@@ -41,12 +100,19 @@ const ManualFocusSlider = ( {
     } );
   }, [] );
 
+  const valueFromPageX = useCallback( (
+    pageX: number,
+    metrics = trackMetricsRef.current
+  ) => clampFocusValue( ( pageX - metrics.pageX ) / metrics.width ), [] );
+
   const updateFocusFromPageX = useCallback( (
     pageX: number,
     metrics = trackMetricsRef.current
   ) => {
-    setFocusValue( clampFocusValue( ( pageX - metrics.pageX ) / metrics.width ) );
-  }, [setFocusValue] );
+    const value = valueFromPageX( pageX, metrics );
+    setLocalFocusValue( value );
+    scheduleCommit( value );
+  }, [scheduleCommit, valueFromPageX] );
 
   const panResponder = useMemo( () => PanResponder.create( {
     onStartShouldSetPanResponder: () => true,
@@ -54,24 +120,38 @@ const ManualFocusSlider = ( {
     onMoveShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponderCapture: () => true,
     onPanResponderGrant: event => {
+      isDraggingRef.current = true;
       const { pageX } = event.nativeEvent;
       measureTrack( metrics => updateFocusFromPageX( pageX, metrics ) );
     },
     onPanResponderMove: event => updateFocusFromPageX( event.nativeEvent.pageX ),
-    onPanResponderRelease: event => updateFocusFromPageX( event.nativeEvent.pageX ),
+    onPanResponderRelease: event => {
+      isDraggingRef.current = false;
+      const value = valueFromPageX( event.nativeEvent.pageX );
+      setLocalFocusValue( value );
+      flushCommit( value );
+    },
+    onPanResponderTerminate: () => {
+      isDraggingRef.current = false;
+    },
     onPanResponderTerminationRequest: () => false,
     onShouldBlockNativeResponder: () => true,
-  } ), [measureTrack, updateFocusFromPageX] );
+  } ), [flushCommit, measureTrack, updateFocusFromPageX, valueFromPageX] );
 
   const onTrackLayout = ( _event: LayoutChangeEvent ) => {
     measureTrack();
   };
 
   const handleAccessibilityAction = ( event: AccessibilityActionEvent ) => {
+    let value: number | null = null;
     if ( event.nativeEvent.actionName === "increment" ) {
-      setFocusValue( clampFocusValue( clampedFocusValue + 0.05 ) );
+      value = clampFocusValue( clampedFocusValue + 0.05 );
     } else if ( event.nativeEvent.actionName === "decrement" ) {
-      setFocusValue( clampFocusValue( clampedFocusValue - 0.05 ) );
+      value = clampFocusValue( clampedFocusValue - 0.05 );
+    }
+    if ( value !== null ) {
+      setLocalFocusValue( value );
+      flushCommit( value );
     }
   };
 
@@ -89,71 +169,24 @@ const ManualFocusSlider = ( {
         now: Math.round( clampedFocusValue * 100 ),
       }}
       onAccessibilityAction={handleAccessibilityAction}
-      style={styles.container}
+      style={viewStyles.sliderContainer}
       testID="manual-focus-slider"
     >
-      <Text maxFontSizeMultiplier={1.2} style={styles.label}>MF</Text>
+      <Text maxFontSizeMultiplier={1.2} style={textStyles.sliderLabel}>MF</Text>
       <View
         ref={trackRef}
         onLayout={onTrackLayout}
-        style={styles.track}
+        style={viewStyles.sliderTrack}
         {...panResponder.panHandlers}
       >
-        <View style={[styles.trackFill, { width: `${clampedFocusValue * 100}%` }]} />
-        <View style={[styles.thumb, { left: `${clampedFocusValue * 100}%` }]} />
+        <View style={[viewStyles.sliderTrackFill, { width: `${clampedFocusValue * 100}%` }]} />
+        <View style={[viewStyles.sliderThumb, { left: `${clampedFocusValue * 100}%` }]} />
       </View>
-      <Text maxFontSizeMultiplier={1.2} style={styles.valueLabel}>
+      <Text maxFontSizeMultiplier={1.2} style={textStyles.sliderValueLabel}>
         {Math.round( clampedFocusValue * 100 )}
       </Text>
     </View>
   );
 };
-
-const styles = StyleSheet.create( {
-  container: {
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.55)",
-    borderRadius: 20,
-    flexDirection: "row",
-    gap: 12,
-    height: 44,
-    paddingHorizontal: 14,
-    width: 292,
-  },
-  label: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: "700",
-    width: 24,
-  },
-  track: {
-    flex: 1,
-    height: 28,
-    justifyContent: "center",
-  },
-  trackFill: {
-    backgroundColor: colors.seekGreen,
-    borderRadius: 2,
-    height: 4,
-    position: "absolute",
-  },
-  thumb: {
-    backgroundColor: colors.white,
-    borderColor: colors.seekGreen,
-    borderRadius: 10,
-    borderWidth: 2,
-    height: 20,
-    marginLeft: -10,
-    position: "absolute",
-    width: 20,
-  },
-  valueLabel: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: "700",
-    textAlign: "right",
-    width: 28,
-  },
-} );
 
 export default ManualFocusSlider;

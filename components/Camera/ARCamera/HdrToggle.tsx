@@ -1,9 +1,12 @@
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 
 import i18n from "../../../i18n";
-import { colors } from "../../../styles/global";
 import viewStyles from "../../../styles/uiComponents/buttons/transparentCircleButton";
+import {
+  viewStyles as controlViewStyles,
+  textStyles as controlTextStyles,
+} from "../../../styles/camera/cameraControls";
 
 interface Props {
   photoHdrEnabled: boolean;
@@ -25,33 +28,18 @@ const HdrToggle = ( {
     onPress={togglePhotoHdr}
     style={( { pressed } ) => [
       viewStyles.wrapperStyle,
-      photoHdrEnabled && styles.enabled,
+      photoHdrEnabled && controlViewStyles.enabledToggle,
       { opacity: pressed ? 0.5 : 1 },
     ]}
     testID="hdr-toggle"
   >
     <Text
       maxFontSizeMultiplier={1.2}
-      style={[styles.hdrLabel, photoHdrEnabled && styles.enabledLabel]}
+      style={[controlTextStyles.hdrToggleLabel, photoHdrEnabled && controlTextStyles.enabledToggleLabel]}
     >
       HDR
     </Text>
   </Pressable>
 );
-
-const styles = StyleSheet.create( {
-  enabled: {
-    backgroundColor: colors.white,
-  },
-  hdrLabel: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  enabledLabel: {
-    color: colors.seekForestGreen,
-  },
-} );
 
 export default HdrToggle;

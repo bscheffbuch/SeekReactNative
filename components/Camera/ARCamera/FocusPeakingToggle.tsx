@@ -1,9 +1,12 @@
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 
 import i18n from "../../../i18n";
-import { colors } from "../../../styles/global";
 import viewStyles from "../../../styles/uiComponents/buttons/transparentCircleButton";
+import {
+  viewStyles as controlViewStyles,
+  textStyles as controlTextStyles,
+} from "../../../styles/camera/cameraControls";
 
 interface Props {
   focusPeakingEnabled: boolean;
@@ -25,33 +28,18 @@ const FocusPeakingToggle = ( {
     onPress={toggleFocusPeaking}
     style={( { pressed } ) => [
       viewStyles.wrapperStyle,
-      focusPeakingEnabled && styles.enabled,
+      focusPeakingEnabled && controlViewStyles.enabledToggle,
       { opacity: pressed ? 0.5 : 1 },
     ]}
     testID="focus-peaking-toggle"
   >
     <Text
       maxFontSizeMultiplier={1.2}
-      style={[styles.label, focusPeakingEnabled && styles.enabledLabel]}
+      style={[controlTextStyles.peakingToggleLabel, focusPeakingEnabled && controlTextStyles.enabledToggleLabel]}
     >
       PEAK
     </Text>
   </Pressable>
 );
-
-const styles = StyleSheet.create( {
-  enabled: {
-    backgroundColor: colors.white,
-  },
-  label: {
-    color: colors.white,
-    fontSize: 10,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  enabledLabel: {
-    color: colors.seekForestGreen,
-  },
-} );
 
 export default FocusPeakingToggle;

@@ -1,9 +1,12 @@
 import React from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, Text } from "react-native";
 
 import i18n from "../../../i18n";
-import { colors } from "../../../styles/global";
 import viewStyles from "../../../styles/uiComponents/buttons/transparentCircleButton";
+import {
+  viewStyles as controlViewStyles,
+  textStyles as controlTextStyles,
+} from "../../../styles/camera/cameraControls";
 
 interface Props {
   manualFocusEnabled: boolean;
@@ -25,33 +28,18 @@ const FocusModeSwitch = ( {
     onPress={toggleManualFocus}
     style={( { pressed } ) => [
       viewStyles.wrapperStyle,
-      manualFocusEnabled && styles.enabled,
+      manualFocusEnabled && controlViewStyles.enabledToggle,
       { opacity: pressed ? 0.5 : 1 },
     ]}
     testID="focus-mode-switch"
   >
     <Text
       maxFontSizeMultiplier={1.2}
-      style={[styles.focusLabel, manualFocusEnabled && styles.enabledLabel]}
+      style={[controlTextStyles.focusModeLabel, manualFocusEnabled && controlTextStyles.enabledToggleLabel]}
     >
       {manualFocusEnabled ? "MF" : "AF"}
     </Text>
   </Pressable>
 );
-
-const styles = StyleSheet.create( {
-  enabled: {
-    backgroundColor: colors.white,
-  },
-  focusLabel: {
-    color: colors.white,
-    fontSize: 13,
-    fontWeight: "700",
-    textAlign: "center",
-  },
-  enabledLabel: {
-    color: colors.seekForestGreen,
-  },
-} );
 
 export default FocusModeSwitch;

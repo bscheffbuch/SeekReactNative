@@ -422,6 +422,9 @@ const FrameProcessorCamera = ( props: Props ) => {
     )
   );
 
+  // Note: the peaking threshold is deliberately not logged here, because it
+  // changes at gesture frequency while the sensitivity slider is dragged and
+  // logging it would spam the log listener on every tick.
   useEffect( () => {
     onLog( {
       nativeEvent: {
@@ -430,7 +433,7 @@ const FrameProcessorCamera = ( props: Props ) => {
           `format ${format ? `${format.videoWidth}x${format.videoHeight}` : "none"}`,
           `viewport ${viewportResolution.label}`,
           `stabilization ${videoStabilizationMode || "off"}`,
-          `peaking ${USE_NATIVE_FOCUS_PEAKING ? "native-preview-shader" : `overlay threshold ${peakingThreshold}`}`,
+          `peaking ${USE_NATIVE_FOCUS_PEAKING ? "native-preview-shader" : "overlay"}`,
         ].join( " | " ),
       },
     } );
@@ -438,7 +441,6 @@ const FrameProcessorCamera = ( props: Props ) => {
     device.id,
     format,
     onLog,
-    peakingThreshold,
     viewportResolution.label,
     videoStabilizationMode,
   ] );
@@ -487,28 +489,41 @@ const FrameProcessorCamera = ( props: Props ) => {
   const lastPeakingTimestamp = useSharedValue( 0 );
   const previewOrientation = useSharedValue<Orientation>( "portrait" );
   const fps = 1;
-  const handleResult = Worklets.createRunOnJS( ( result: InatVision.Result, timeTaken: number ) => {
+
+  // Keep the latest callbacks in refs so the createRunOnJS wrappers below can
+  // be created once. Recreating them per render would rebuild the frame
+  // processor on every render (amplified by the slider gestures).
+  const onTaxaDetectedRef = useRef( onTaxaDetected );
+  const onClassifierErrorRef = useRef( onClassifierError );
+  const onLogRef = useRef( onLog );
+  useEffect( () => {
+    onTaxaDetectedRef.current = onTaxaDetected;
+    onClassifierErrorRef.current = onClassifierError;
+    onLogRef.current = onLog;
+  }, [onTaxaDetected, onClassifierError, onLog] );
+
+  const handleResult = useMemo( () => Worklets.createRunOnJS( ( result: InatVision.Result, timeTaken: number ) => {
     framesProcessingTime.current.push( timeTaken );
     if ( framesProcessingTime.current.length >= 10 ) {
       const avgTime = framesProcessingTime.current.reduce( ( a, b ) => a + b, 0 ) / 10;
       framesProcessingTime.current = [];
-      onLog( {
+      onLogRef.current( {
         nativeEvent: {
           log: `Average frame processing time over 10 frames: ${avgTime}ms`,
         },
       } );
     }
-    onTaxaDetected( result );
-  } );
+    onTaxaDetectedRef.current( result );
+  } ), [] );
 
-  const handleError = Worklets.createRunOnJS( ( error: ErrorMessage ) => {
-    onClassifierError( error );
-  } );
+  const handleError = useMemo( () => Worklets.createRunOnJS( ( error: ErrorMessage ) => {
+    onClassifierErrorRef.current( error );
+  } ), [] );
 
   const peakingPathRef = useRef<any>( null );
-  const handlePeakingPath = Worklets.createRunOnJS( ( path: string ) => {
+  const handlePeakingPath = useMemo( () => Worklets.createRunOnJS( ( path: string ) => {
     peakingPathRef.current?.setNativeProps( { d: path } );
-  } );
+  } ), [] );
   useEffect( () => {
     if ( !useOverlayFocusPeaking ) {
       peakingPathRef.current?.setNativeProps( { d: "" } );
@@ -619,6 +634,8 @@ const FrameProcessorCamera = ( props: Props ) => {
       useOverlayFocusPeaking,
       peakingThreshold,
       handlePeakingPath,
+      handleResult,
+      handleError,
       previewOrientation,
       previewLayout.height,
       previewLayout.width,
@@ -733,7 +750,10 @@ const FrameProcessorCamera = ( props: Props ) => {
             exposure={exposure}
             isActive={active}
             photo={true}
-            video={formatStabilizationMode != null}
+            // Only bind the VideoCapture use case while stabilization is
+            // actually enabled; binding it permanently exceeds guaranteed
+            // stream combinations on LIMITED devices and wastes power.
+            video={digitalStabilizationEnabled && formatStabilizationMode != null}
             photoHdr={photoHdr}
             torch={torch}
             enableZoomGesture
@@ -747,7 +767,10 @@ const FrameProcessorCamera = ( props: Props ) => {
             outputOrientation="device"
             photoQualityBalance={photoQualityBalance}
             videoStabilizationMode={videoStabilizationMode}
-            focusPeakingEnabled={USE_NATIVE_FOCUS_PEAKING}
+            // Only route the preview through the OpenGL focus-peaking pass
+            // while peaking is enabled; toggling triggers a session
+            // reconfigure, which is preferable to a permanent extra GL copy.
+            focusPeakingEnabled={USE_NATIVE_FOCUS_PEAKING && focusPeakingEnabled}
             focusPeakingActive={USE_NATIVE_FOCUS_PEAKING && focusPeakingEnabled}
             focusPeakingSensitivity={focusPeakingSensitivity}
             enableLocation={hasPermission}

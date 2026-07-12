@@ -228,17 +228,21 @@ const ARCameraOverlay = ( {
         <CameraFlip
           flipCamera={flipCamera}
         />
-        {supportsManualFocus && (
+        {/* Manual focus, focus peaking and stabilization are backed by
+            Android-only native patches, so their controls are hidden on iOS */}
+        {isAndroid && supportsManualFocus && (
           <FocusModeSwitch
             manualFocusEnabled={manualFocusEnabled}
             toggleManualFocus={toggleManualFocus}
           />
         )}
-        <FocusPeakingToggle
-          focusPeakingEnabled={focusPeakingEnabled}
-          toggleFocusPeaking={toggleFocusPeaking}
-        />
-        {supportsDigitalStabilization && (
+        {isAndroid && (
+          <FocusPeakingToggle
+            focusPeakingEnabled={focusPeakingEnabled}
+            toggleFocusPeaking={toggleFocusPeaking}
+          />
+        )}
+        {isAndroid && supportsDigitalStabilization && (
           <StabilizationToggle
             digitalStabilizationEnabled={digitalStabilizationEnabled}
             toggleDigitalStabilization={toggleDigitalStabilization}
@@ -327,7 +331,7 @@ const ARCameraOverlay = ( {
       <View style={setTaxonomicRankColorStyles( )}>
         <StyledText style={[baseTextStyles.buttonSmall, textStyles.scanText, !isLandscape && textStyles.textShadow]}>{helpText}</StyledText>
       </View>
-      {manualFocusEnabled && supportsManualFocus && (
+      {isAndroid && manualFocusEnabled && supportsManualFocus && (
         <View
           style={
             isLandscape
@@ -341,7 +345,7 @@ const ARCameraOverlay = ( {
           />
         </View>
       )}
-      {focusPeakingEnabled && (
+      {isAndroid && focusPeakingEnabled && (
         <View
           style={
             isLandscape

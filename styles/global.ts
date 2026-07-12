@@ -39,6 +39,7 @@ export const colors: Colors = {
   cameraFilterGray: "#858585",
   skeletonGray: "#d1d5da",
   ccGray: "#363636",
+  focusPeakingYellow: "#dfff38",
 };
 
 export const fonts = {

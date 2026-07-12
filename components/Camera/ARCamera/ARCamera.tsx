@@ -15,6 +15,8 @@ import {
 } from "react-native";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native";
+import { getManufacturerSync } from "react-native-device-info";
+import Realm from "realm";
 import isNumber from "lodash/isNumber";
 import { useSharedValue } from "react-native-worklets-core";
 import type { Prediction } from "vision-camera-plugin-inatvision";
@@ -37,8 +39,10 @@ import {
 } from "../../../utility/cameraHelpers";
 import {
   checkCameraPermissions,
+  checkLocationPermissions,
   checkSavePermissions,
 } from "../../../utility/androidHelpers.android";
+import { fetchUserLocation } from "../../../utility/locationHelpers";
 import { savePostingSuccess } from "../../../utility/loginHelpers";
 import { createTimestamp } from "../../../utility/dateHelpers";
 import ARCameraOverlay from "./ARCameraOverlay";
@@ -70,14 +74,23 @@ import {
   getBackCameraDeviceForZoom,
   getBackCameraZoomPresets,
   getBackCameraZoomValue,
+  getNeutralRelativeBackCameraZoomValue,
   getPreferredVideoStabilizationModeForDevice,
 } from "./helpers/cameraDeviceHelpers";
 import type { BackCameraZoomPreset } from "./helpers/cameraDeviceHelpers";
+import realmConfig from "../../../models/index";
 
 const logger = log.extend( "ARCamera.js" );
 const CAMERA_RECOVERY_DELAY_MS = 650;
 const MAX_CAMERA_RECOVERY_ATTEMPTS = 5;
 const DEFAULT_FOCUS_PEAKING_SENSITIVITY = 0.35;
+// Camera2 can't keep up with manual focus updates at drag frequency; bridged
+// calls are throttled to this interval with a trailing latest-wins call.
+const MANUAL_FOCUS_THROTTLE_MS = 80;
+// Camera ids beyond "0"/"1" are vendor-specific, so the optimized-logical-camera
+// ranking (id "20") must only apply on Samsung devices.
+const isSamsungDevice = Platform.OS === "android"
+  && getManufacturerSync( ).toLowerCase( ).includes( "samsung" );
 
 type CameraViewportResolution = "540p" | "720p" | "1080p" | "1440p" | "2160p";
 
@@ -173,7 +186,7 @@ const ARCamera = ( ) => {
     cameraDevices.filter( ( cameraDevice: CameraDevice ) => cameraDevice.position === "back" )
   ), [cameraDevices] );
   const backDevice = useMemo( () => (
-    getBackCameraDeviceForZoom( backCameraDevices, backCameraZoom )
+    getBackCameraDeviceForZoom( backCameraDevices, backCameraZoom, isSamsungDevice )
   ), [backCameraDevices, backCameraZoom] );
   const frontDevice = useMemo( () => (
     getCameraDevice( cameraDevices, "front" )
@@ -201,11 +214,20 @@ const ARCamera = ( ) => {
   } as const;
   const [takePhotoOptions, setTakePhotoOptions] = useState<TakePhotoOptions>( initialPhotoOptions );
   const [visibleToast, setVisibleToast] = useState( TOAST.NONE );
-  const userSettings = useFetchUserSettings( );
+  const fetchedUserSettings = useFetchUserSettings( );
+  // ARCamera stays mounted while blurred, so useFetchUserSettings (which reads
+  // once on mount) would keep serving stale values after a visit to Settings.
+  // Settings are therefore re-read on every focus of this screen.
+  const [refetchedUserSettings, setRefetchedUserSettings] = useState<{
+    cameraViewportResolution?: string;
+    photoQualityBalance?: string;
+    confidenceThreshold?: number;
+  } | null>( null );
+  const userSettings = refetchedUserSettings ?? fetchedUserSettings;
   const viewportResolution = CAMERA_VIEWPORT_RESOLUTIONS.find(
-    resolution => resolution.label === userSettings.cameraViewportResolution
+    resolution => resolution.label === userSettings?.cameraViewportResolution
   ) || CAMERA_VIEWPORT_RESOLUTIONS[1];
-  const photoQualityBalance = ( userSettings.photoQualityBalance as "speed" | "balanced" | "quality" | undefined ) || "balanced";
+  const photoQualityBalance = ( userSettings?.photoQualityBalance as "speed" | "balanced" | "quality" | undefined ) || "balanced";
 
   useEffect( () => {
     const selectedZoomAvailable = backCameraZoomPresets.some(
@@ -325,6 +347,13 @@ const ARCamera = ( ) => {
   const frozenSpeciesScore = useSharedValue( 0 );
   const speciesTimeoutId = useRef<ReturnType<typeof setTimeout> | null>( null );
 
+  useEffect( () => () => {
+    if ( speciesTimeoutId.current ) {
+      clearTimeout( speciesTimeoutId.current );
+      speciesTimeoutId.current = null;
+    }
+  }, [] );
+
   const flipCamera = () => {
     const newPosition = cameraPosition === "back" ? "front" : "back";
     setCameraPosition( newPosition );
@@ -338,8 +367,13 @@ const ARCamera = ( ) => {
   }, [cameraPosition] );
 
   const canSelectZoom = cameraPosition === "back" && backCameraZoomPresets.length > 1;
+  // On iOS multi-cam devices zoom factor 1 selects the ultra-wide lens, so zoom
+  // presets are mapped relative to device.neutralZoom (preset 1x -> neutralZoom)
+  // to keep the default view correct. Android keeps the existing mapping.
   const cameraZoom = device && cameraPosition === "back"
-    ? getBackCameraZoomValue( device, backCameraZoom )
+    ? ( Platform.OS === "ios"
+      ? getNeutralRelativeBackCameraZoomValue( device, backCameraZoom )
+      : getBackCameraZoomValue( device, backCameraZoom ) )
     : device?.neutralZoom;
 
   manualFocusEnabledRef.current = manualFocusEnabled;
@@ -359,19 +393,33 @@ const ARCamera = ( ) => {
     }
   }, [] );
 
+  const manualFocusThrottleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>( null );
+  const lastManualFocusSentAtRef = useRef( 0 );
+  const pendingManualFocusValueRef = useRef<number | null>( null );
+
+  const clearManualFocusThrottle = useCallback( () => {
+    if ( manualFocusThrottleTimeoutRef.current ) {
+      clearTimeout( manualFocusThrottleTimeoutRef.current );
+      manualFocusThrottleTimeoutRef.current = null;
+    }
+    pendingManualFocusValueRef.current = null;
+  }, [] );
+
   const resetCameraFocus = useCallback( () => {
     manualFocusGenerationRef.current += 1;
     manualFocusRequestIdRef.current += 1;
     manualFocusValueRef.current = 0.5;
+    clearManualFocusThrottle();
     setManualFocusValue( 0.5 );
     camera.current?.resetFocus?.().catch( focusError => logger.warn( focusError ) );
-  }, [] );
+  }, [clearManualFocusThrottle] );
 
-  const queueManualFocus = useCallback( ( focusValue: number ) => {
+  const sendManualFocus = useCallback( ( focusValue: number ) => {
     if ( !manualFocusEnabledRef.current || !camera.current?.setManualFocus ) {
       return;
     }
 
+    lastManualFocusSentAtRef.current = Date.now();
     const generation = manualFocusGenerationRef.current;
     const requestId = manualFocusRequestIdRef.current + 1;
     manualFocusRequestIdRef.current = requestId;
@@ -388,9 +436,36 @@ const ARCamera = ( ) => {
       } );
   }, [] );
 
+  // Throttles the bridged setManualFocus calls during slider drags; the latest
+  // value always wins via a trailing call.
+  const queueManualFocus = useCallback( ( focusValue: number ) => {
+    pendingManualFocusValueRef.current = focusValue;
+    if ( manualFocusThrottleTimeoutRef.current ) {
+      // A trailing call is already scheduled and will pick up the latest value
+      return;
+    }
+
+    const elapsed = Date.now() - lastManualFocusSentAtRef.current;
+    if ( elapsed >= MANUAL_FOCUS_THROTTLE_MS ) {
+      pendingManualFocusValueRef.current = null;
+      sendManualFocus( focusValue );
+      return;
+    }
+
+    manualFocusThrottleTimeoutRef.current = setTimeout( () => {
+      manualFocusThrottleTimeoutRef.current = null;
+      const pendingFocusValue = pendingManualFocusValueRef.current;
+      pendingManualFocusValueRef.current = null;
+      if ( pendingFocusValue != null ) {
+        sendManualFocus( pendingFocusValue );
+      }
+    }, MANUAL_FOCUS_THROTTLE_MS - elapsed );
+  }, [sendManualFocus] );
+
   useEffect( () => () => {
     clearCameraRecoveryTimeout();
-  }, [clearCameraRecoveryTimeout] );
+    clearManualFocusThrottle();
+  }, [clearCameraRecoveryTimeout, clearManualFocusThrottle] );
 
   const toggleManualFocus = useCallback( () => {
     setManualFocusEnabled( currentManualFocusEnabled => {
@@ -764,35 +839,62 @@ const ARCamera = ( ) => {
     pictureTaken,
   ] );
 
+  // Queue drafts always store full-precision coordinates; truncation for
+  // logged-out users only applies at display/upload time, not at persistence.
+  const fetchSaveForLaterCoords = useCallback( async ( ): Promise<{
+    latitude: number | null;
+    longitude: number | null;
+    accuracy: number | null;
+  }> => {
+    const emptyCoords = { latitude: null, longitude: null, accuracy: null };
+    try {
+      if ( Platform.OS === "android" ) {
+        const permissionAndroid = await checkLocationPermissions( );
+        if ( permissionAndroid !== true ) {
+          return emptyCoords;
+        }
+      }
+      return await fetchUserLocation( );
+    } catch ( locationError ) {
+      logger.debug( "saveForLater location unavailable:", locationError );
+      return emptyCoords;
+    }
+  }, [] );
+
   // "Save for Later": persist the photo + current GPS + timestamp to the local
   // observation queue without running classification, then stay on the camera.
   const saveForLaterToQueue = useCallback( async ( uri: string ) => {
-    const time = createTimestamp( );
-    const userImage = { time, uri, predictions: [] };
-    const { image } = await fetchImageLocationOrErrorCode( userImage, login );
-    const coords = image.preciseCoords || {
-      latitude: image.latitude ?? null,
-      longitude: image.longitude ?? null,
-      accuracy: null,
-    };
+    try {
+      const time = createTimestamp( );
+      const coords = await fetchSaveForLaterCoords( );
 
-    await saveQueuedObservation( coords, time, uri );
+      await saveQueuedObservation( coords, time, uri );
 
-    const count = await getQueuedCount( );
-    setQueueCount( count );
-    setVisibleToast( TOAST.SAVED_FOR_LATER );
-
-    // remain on the camera screen, ready for the next capture
+      const count = await getQueuedCount( );
+      setQueueCount( count );
+      setVisibleToast( TOAST.SAVED_FOR_LATER );
+    } catch ( e ) {
+      logger.error( "saveForLaterToQueue failed:", e );
+      logToApi( {
+        level: LogLevels.ERROR,
+        context: "saveForLaterToQueue",
+        message: e instanceof Error ? e.message : String( e ),
+        backtrace: e instanceof Error ? e.stack : undefined,
+      } ).catch( ( logError ) => logger.error( "logToApi failed:", logError ) );
+    }
+    // Always restore the camera state (the catch above swallows any error),
+    // even when persisting the draft failed; otherwise the preview stays
+    // frozen until the screen is re-entered.
     setIsActive( true );
     setIsCaptureInProgress( false );
     pictureTaken.value = false;
     dispatch( { type: ACTION.RESET_STATE } );
-  }, [login, pictureTaken] );
+  }, [fetchSaveForLaterCoords, pictureTaken] );
 
   const saveForLaterPhoto = useCallback( ( photo: HandledPhoto ) => {
     // keep a copy in the user's camera roll, like a normal capture
     CameraRoll.save( photo.uri, { } ).catch( ( e ) => logger.warn( e ) );
-    saveForLaterToQueue( photo.uri );
+    saveForLaterToQueue( photo.uri ).catch( ( e ) => logger.error( "saveForLaterToQueue rejected:", e ) );
   }, [saveForLaterToQueue] );
 
   const takePictureForLater = useCallback( async ( ) => {
@@ -819,6 +921,30 @@ const ARCamera = ( ) => {
 
   const closeModal = useCallback( ( ) => setShowModal( false ), [] );
 
+  // ARCamera stays mounted while blurred, so settings changed on the Settings
+  // screen are re-read here on every focus (useFetchUserSettings only reads
+  // once on mount and its API exposes no refetch).
+  const refetchUserSettings = useCallback( async ( ) => {
+    try {
+      const realm = await Realm.open( realmConfig );
+      const settings = realm.objects( "UserSettingsRealm" )[0] as unknown as {
+        cameraViewportResolution?: string;
+        photoQualityBalance?: string;
+        confidenceThreshold?: number;
+      } | undefined;
+      if ( settings ) {
+        // copy the fields used here instead of storing the live Realm object
+        setRefetchedUserSettings( {
+          cameraViewportResolution: settings.cameraViewportResolution,
+          photoQualityBalance: settings.photoQualityBalance,
+          confidenceThreshold: settings.confidenceThreshold,
+        } );
+      }
+    } catch ( e ) {
+      logger.warn( "could not refetch user settings:", e );
+    }
+  }, [] );
+
   useEffect( ( ) => {
     const checkForFirstCameraLaunch = async ( ) => {
       const isFirstLaunch = await checkIfCameraLaunched( );
@@ -833,11 +959,12 @@ const ARCamera = ( ) => {
       resetState( );
       checkForFirstCameraLaunch( );
       requestAndroidPermissions( );
+      refetchUserSettings( );
       getQueuedCount( ).then( setQueueCount ).catch( ( e ) => logger.warn( e ) );
     } );
 
     return unsubscribe;
-  }, [navigation, requestAndroidPermissions, setObservation] );
+  }, [navigation, refetchUserSettings, requestAndroidPermissions, setObservation] );
 
   useFocusEffect(
     useCallback( ( ) => {
@@ -865,7 +992,7 @@ const ARCamera = ( ) => {
     } );
 
 
-  const confidenceThresholdNumber = ( typeof userSettings.confidenceThreshold === "number" )
+  const confidenceThresholdNumber = ( typeof userSettings?.confidenceThreshold === "number" )
     ? userSettings.confidenceThreshold
     : 50;
 
