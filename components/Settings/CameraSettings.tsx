@@ -43,8 +43,25 @@ const confidenceThresholdOptions = ( () => {
   return options;
 } )();
 const placeholder = {};
-const pickerStyles = { ...viewStyles };
+// RNPickerSelect expects a style object keyed by its own style names
+const pickerStyles = {
+  inputIOS: viewStyles.inputIOS,
+  inputIOSContainer: viewStyles.inputIOSContainer,
+  inputAndroid: viewStyles.inputAndroid,
+  inputAndroidContainer: viewStyles.inputAndroidContainer,
+};
 const showIcon = () => <></>;
+
+// Realm object properties are prototype accessors, so spreading a live Realm
+// object copies nothing; copy the fields into a plain object before using it
+// as component state
+const settingsToPlainObject = ( userSettings ): State => ( {
+  autoCapture: userSettings.autoCapture,
+  scientificNames: userSettings.scientificNames,
+  cameraViewportResolution: userSettings.cameraViewportResolution,
+  photoQualityBalance: userSettings.photoQualityBalance,
+  confidenceThreshold: userSettings.confidenceThreshold,
+} );
 
 const CameraSettings = ( ) => {
   const [settings, setSettings] = useState<State>( {} );
@@ -117,9 +134,9 @@ const CameraSettings = ( ) => {
 
     const fetchUserSettings = async ( ) => {
       const realm = await Realm.open( realmConfig );
-      const userSettings = realm.objects( "UserSettingsRealm" );
-      if ( isCurrent ) {
-        setSettings( userSettings[0] );
+      const userSettings = realm.objects( "UserSettingsRealm" )[0];
+      if ( isCurrent && userSettings ) {
+        setSettings( settingsToPlainObject( userSettings ) );
       }
     };
     fetchUserSettings( );
@@ -150,7 +167,7 @@ const CameraSettings = ( ) => {
               buttonSize={12}
               buttonOuterSize={20}
               accessible
-              accessibilityLabel={radioButtons[i].value.toString( )}
+              accessibilityLabel={radioButtons[i].label}
             />
             <RadioButtonLabel
               obj={obj}
@@ -178,7 +195,7 @@ const CameraSettings = ( ) => {
         </StyledText>
       </View>
       <View style={viewStyles.donateMarginBottom}>
-        <StyledText style={baseTextStyles.header}>CAMERA STREAM RESOLUTION</StyledText>
+        <StyledText style={baseTextStyles.header}>{i18n.t( "settings.camera_stream_resolution" ).toLocaleUpperCase()}</StyledText>
         <RNPickerSelect
           hideIcon
           Icon={showIcon}

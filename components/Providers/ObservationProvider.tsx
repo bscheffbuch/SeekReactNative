@@ -89,7 +89,7 @@ const ObservationProvider = ( { children }: PropsWithChildren ) => {
       const { results } = await fetchWithTimeout( 5000 );
       const taxa = results[0];
       return taxa.default_photo.medium_url;
-    } catch ( e ) {
+    } catch {
       return null;
     }
   }, [] );

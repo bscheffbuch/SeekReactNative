@@ -4,7 +4,6 @@ import {
   View,
   Image,
   TouchableOpacity,
-  StyleSheet,
   Alert,
   Platform,
 } from "react-native";
@@ -13,6 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 import i18n from "../../i18n";
 import { colors } from "../../styles/global";
+import { viewStyles, textStyles, imageStyles } from "../../styles/observations/queuedObservations";
 import { baseTextStyles } from "../../styles/textStyles";
 import ScrollWithHeader from "../UIComponents/Screens/ScrollWithHeader";
 import StyledText from "../UIComponents/StyledText";
@@ -22,6 +22,7 @@ import { UserContext } from "../UserContext";
 import { formatDateToDisplayShort } from "../../utility/dateHelpers";
 import {
   getQueuedObservations,
+  parseObservedOnString,
   parsePhotoUris,
   deleteQueuedObservation,
   combineQueuedObservations,
@@ -36,6 +37,10 @@ interface QueuedDraft {
   latitude: number | null;
   longitude: number | null;
 }
+
+// module-scope so the in-flight guard survives component remounts; a second
+// concurrent "upload all" run would duplicate photos server-side
+let uploadAllInProgress = false;
 
 // Resolves a stored backup photo path to a source RN <Image> can render.
 // iOS can read the absolute path directly; Android needs base64.
@@ -72,16 +77,16 @@ const QueuedThumbnail = ( { uri }: { uri: string | null } ) => {
   );
 
   if ( !source ) {
-    return <View style={[styles.thumbnail, styles.thumbnailPlaceholder]} />;
+    return <View style={[imageStyles.thumbnail, viewStyles.thumbnailPlaceholder]} />;
   }
-  return <Image style={styles.thumbnail} source={{ uri: source }} />;
+  return <Image style={imageStyles.thumbnail} source={{ uri: source }} />;
 };
 
 const QueuedObservations = ( ) => {
   const { login } = useContext( UserContext );
   const [drafts, setDrafts] = useState<QueuedDraft[]>( [] );
   const [selected, setSelected] = useState<string[]>( [] );
-  const [uploading, setUploading] = useState( false );
+  const [uploading, setUploading] = useState( uploadAllInProgress );
 
   const loadDrafts = useCallback( async ( ) => {
     const queued = await getQueuedObservations( );
@@ -89,7 +94,9 @@ const QueuedObservations = ( ) => {
       const uris = parsePhotoUris( obs );
       return {
         uuid: obs.uuid,
-        thumbnailUri: uris[0] || obs.photo?.uri || null,
+        // photo.uri holds the small display copy; photoUris holds the
+        // high-resolution copies reserved for upload
+        thumbnailUri: obs.photo?.uri || uris[0] || null,
         photoCount: uris.length || 1,
         observedOn: obs.observed_on_string || null,
         latitude: obs.latitude ?? null,
@@ -116,11 +123,16 @@ const QueuedObservations = ( ) => {
   };
 
   const handleDelete = ( uuid: string ) => {
+    if ( uploading || uploadAllInProgress ) {
+      // deleting a draft mid-upload would pull realm objects out from under
+      // the in-flight upload
+      return;
+    }
     Alert.alert(
       i18n.t( "queue.delete_title" ),
       i18n.t( "queue.delete_message" ),
       [
-        { text: i18n.t( "results.no" ), style: "cancel" },
+        { text: i18n.t( "delete.no" ), style: "cancel" },
         {
           text: i18n.t( "queue.delete_confirm" ),
           style: "destructive",
@@ -134,7 +146,7 @@ const QueuedObservations = ( ) => {
   };
 
   const handleCombine = async ( ) => {
-    if ( selected.length < 2 ) {
+    if ( selected.length < 2 || uploading || uploadAllInProgress ) {
       return;
     }
     await combineQueuedObservations( selected );
@@ -143,6 +155,9 @@ const QueuedObservations = ( ) => {
   };
 
   const handleUploadAll = async ( ) => {
+    if ( uploadAllInProgress ) {
+      return;
+    }
     if ( !login ) {
       Alert.alert(
         i18n.t( "queue.login_required_title" ),
@@ -150,14 +165,19 @@ const QueuedObservations = ( ) => {
       );
       return;
     }
+    uploadAllInProgress = true;
     setUploading( true );
-    const { success, failed } = await uploadAllQueuedObservations( );
-    setUploading( false );
-    Alert.alert(
-      i18n.t( "queue.upload_complete_title" ),
-      i18n.t( "queue.upload_complete_message", { success, failed } )
-    );
-    loadDrafts( );
+    try {
+      const { success, failed } = await uploadAllQueuedObservations( );
+      Alert.alert(
+        i18n.t( "queue.upload_complete_title" ),
+        i18n.t( "queue.upload_complete_message", { success, failed } )
+      );
+    } finally {
+      uploadAllInProgress = false;
+      setUploading( false );
+      loadDrafts( );
+    }
   };
 
   const formatLocation = ( draft: QueuedDraft ): string => {
@@ -171,8 +191,8 @@ const QueuedObservations = ( ) => {
     if ( !observedOn ) {
       return "";
     }
-    const date = new Date( observedOn );
-    if ( Number.isNaN( date.getTime( ) ) ) {
+    const date = parseObservedOnString( observedOn );
+    if ( !date ) {
       return observedOn;
     }
     return formatDateToDisplayShort( date );
@@ -180,9 +200,9 @@ const QueuedObservations = ( ) => {
 
   return (
     <ScrollWithHeader header="queue.header">
-      <View style={styles.container}>
+      <View style={viewStyles.container}>
         {drafts.length === 0 ? (
-          <StyledText style={[baseTextStyles.body, styles.empty]}>
+          <StyledText style={[baseTextStyles.body, textStyles.empty]}>
             {i18n.t( "queue.empty" )}
           </StyledText>
         ) : (
@@ -190,51 +210,56 @@ const QueuedObservations = ( ) => {
             {drafts.map( ( draft ) => {
               const isSelected = selected.includes( draft.uuid );
               return (
-                <TouchableOpacity
+                <View
                   key={draft.uuid}
-                  testID={`queuedDraft-${draft.uuid}`}
-                  onPress={( ) => toggleSelect( draft.uuid )}
-                  style={[styles.row, isSelected && styles.rowSelected]}
-                  accessibilityLabel={i18n.t( "queue.select_draft" )}
-                  accessible
+                  style={[viewStyles.row, isSelected && viewStyles.rowSelected]}
                 >
-                  <View style={styles.thumbnailWrapper}>
-                    <QueuedThumbnail uri={draft.thumbnailUri} />
-                    {draft.photoCount > 1 && (
-                      <View style={styles.photoCountBadge}>
-                        <StyledText style={styles.photoCountText}>
-                          {draft.photoCount}
-                        </StyledText>
-                      </View>
-                    )}
-                  </View>
-                  <View style={styles.info}>
-                    <StyledText style={[baseTextStyles.body, styles.date]}>
-                      {formatDate( draft.observedOn )}
-                    </StyledText>
-                    <StyledText style={[baseTextStyles.bodySmall, styles.location]}>
-                      {formatLocation( draft )}
-                    </StyledText>
-                    {isSelected && (
-                      <StyledText style={[baseTextStyles.bodySmall, styles.selectedLabel]}>
-                        {i18n.t( "queue.selected" )}
+                  <TouchableOpacity
+                    testID={`queuedDraft-${draft.uuid}`}
+                    onPress={( ) => toggleSelect( draft.uuid )}
+                    style={viewStyles.rowPressable}
+                    accessibilityLabel={i18n.t( "queue.select_draft" )}
+                    accessible
+                  >
+                    <View style={viewStyles.thumbnailWrapper}>
+                      <QueuedThumbnail uri={draft.thumbnailUri} />
+                      {draft.photoCount > 1 && (
+                        <View style={viewStyles.photoCountBadge}>
+                          <StyledText style={textStyles.photoCountText}>
+                            {draft.photoCount}
+                          </StyledText>
+                        </View>
+                      )}
+                    </View>
+                    <View style={viewStyles.info}>
+                      <StyledText style={[baseTextStyles.body, textStyles.date]}>
+                        {formatDate( draft.observedOn )}
                       </StyledText>
-                    )}
-                  </View>
+                      <StyledText style={[baseTextStyles.bodySmall, textStyles.location]}>
+                        {formatLocation( draft )}
+                      </StyledText>
+                      {isSelected && (
+                        <StyledText style={[baseTextStyles.bodySmall, textStyles.selectedLabel]}>
+                          {i18n.t( "queue.selected" )}
+                        </StyledText>
+                      )}
+                    </View>
+                  </TouchableOpacity>
                   <TouchableOpacity
                     onPress={( ) => handleDelete( draft.uuid )}
-                    style={styles.deleteButton}
+                    style={viewStyles.deleteButton}
                     accessibilityLabel={i18n.t( "queue.delete_confirm" )}
                     accessible
+                    disabled={uploading}
                     testID={`deleteDraft-${draft.uuid}`}
                   >
-                    <Image source={icons.delete} style={styles.deleteIcon} />
+                    <Image source={icons.delete} style={imageStyles.deleteIcon} />
                   </TouchableOpacity>
-                </TouchableOpacity>
+                </View>
               );
             } )}
 
-            <View style={styles.actions}>
+            <View style={viewStyles.actions}>
               {selected.length >= 2 && (
                 <>
                   <GreenButton
@@ -242,7 +267,7 @@ const QueuedObservations = ( ) => {
                     handlePress={handleCombine}
                     text="queue.combine"
                   />
-                  <View style={styles.spacer} />
+                  <View style={viewStyles.spacer} />
                 </>
               )}
               <GreenButton
@@ -252,7 +277,7 @@ const QueuedObservations = ( ) => {
                 disabled={uploading}
               />
               {!login && (
-                <StyledText style={[baseTextStyles.bodySmall, styles.loginHint]}>
+                <StyledText style={[baseTextStyles.bodySmall, textStyles.loginHint]}>
                   {i18n.t( "queue.login_hint" )}
                 </StyledText>
               )}
@@ -263,91 +288,5 @@ const QueuedObservations = ( ) => {
     </ScrollWithHeader>
   );
 };
-
-const styles = StyleSheet.create( {
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-  empty: {
-    textAlign: "center",
-    marginTop: 40,
-    color: colors.seekForestGreen,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eeeeee",
-  },
-  rowSelected: {
-    backgroundColor: "#eef7f0",
-  },
-  thumbnailWrapper: {
-    width: 64,
-    height: 64,
-  },
-  thumbnail: {
-    width: 64,
-    height: 64,
-    borderRadius: 8,
-  },
-  thumbnailPlaceholder: {
-    backgroundColor: "#dddddd",
-  },
-  photoCountBadge: {
-    position: "absolute",
-    top: -6,
-    right: -6,
-    minWidth: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: colors.seekTeal,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 5,
-  },
-  photoCountText: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  info: {
-    flex: 1,
-    paddingHorizontal: 14,
-  },
-  date: {
-    color: colors.black,
-  },
-  location: {
-    color: "#666666",
-    marginTop: 2,
-  },
-  selectedLabel: {
-    color: colors.seekTeal,
-    marginTop: 2,
-    fontWeight: "700",
-  },
-  deleteButton: {
-    padding: 6,
-  },
-  deleteIcon: {
-    width: 28,
-    height: 28,
-  },
-  actions: {
-    marginTop: 24,
-    alignItems: "center",
-  },
-  spacer: {
-    height: 14,
-  },
-  loginHint: {
-    color: "#666666",
-    textAlign: "center",
-    marginTop: 10,
-  },
-} );
 
 export default QueuedObservations;
