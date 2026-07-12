@@ -1,7 +1,10 @@
-import { StyleSheet, PixelRatio } from "react-native";
-import { colors, center, fonts, dimensions, row, padding } from "../global";
+import { StyleSheet, PixelRatio, Platform } from "react-native";
+import { colors, center, fonts, dimensions, row } from "../global";
 
 const { getFontScale } = PixelRatio;
+
+// matches the paddingTop used for green button text in uiComponents/buttons/button.ts
+const iOSButtonPadding = Platform.OS === "ios" ? 3 : 0;
 
 
 const viewStyles = StyleSheet.create( {
@@ -104,12 +107,12 @@ const textStyles = StyleSheet.create( {
     letterSpacing: 0.78,
   },
   selectedPhotoSizeText: {
-    fontFamily: fonts.semibold,
+    fontFamily: fonts.bold,
   },
   linkText: {
     alignSelf: "center",
     color: colors.linkText,
-    fontFamily: fonts.book,
+    fontFamily: fonts.regular,
     fontSize: 18,
     textDecorationLine: "underline",
     paddingVertical: 27,
@@ -117,22 +120,22 @@ const textStyles = StyleSheet.create( {
   optionsText: {
     // modalBanner
     color: colors.seekForestGreen,
-    fontFamily: fonts.semibold,
+    fontFamily: fonts.bold,
     fontSize: 19,
     letterSpacing: 1.12,
     marginTop: 18,
     marginLeft: 24,
   },
   speciesIdText: {
-    fontFamily: fonts.book,
+    fontFamily: fonts.regular,
     fontSize: 16,
   },
   buttonText: {
     color: colors.white,
-    fontFamily: fonts.semibold,
+    fontFamily: fonts.bold,
     fontSize: 18,
     letterSpacing: 1.0,
-    paddingTop: padding.iOSButtonPadding,
+    paddingTop: iOSButtonPadding,
     textAlign: "center",
     marginLeft: 10,
   },

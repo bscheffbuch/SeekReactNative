@@ -38,6 +38,7 @@ interface ConvertedDataItem {
   isLast?: boolean;
   type?: "header" | "footer" | "footerHidden" | "footerEmpty" | "observation";
   id: number;
+  uuidString?: string;
   dataLength: number;
   sectionId: number;
 }
@@ -59,8 +60,7 @@ const ObsList = ( {
   updateObs,
   clearText,
 }: Props ) => {
-  // TODO: preferably we should use setHiddenSections to change state
-  const [hiddenSections] = useState<number[]>( [] );
+  const [hiddenSections, setHiddenSections] = useState<number[]>( [] );
   const [itemScrolledId, setItemScrolledId] = useState<number | null>( null );
   const [hasAnimated, setHasAnimated] = useState<boolean>( false );
 
@@ -72,17 +72,15 @@ const ObsList = ( {
   const toggleSection = useCallback(
     ( id: number ) => {
       const updatedObs = observations.slice(); // this is needed to force a refresh of SectionList
-      const idToHide = hiddenSections.indexOf( id );
-
-      if ( idToHide !== -1 ) {
-        hiddenSections.splice( idToHide, 1 );
-      } else {
-        hiddenSections.push( id );
-      }
+      setHiddenSections( ( prevHiddenSections ) => (
+        prevHiddenSections.includes( id )
+          ? prevHiddenSections.filter( ( sectionId ) => sectionId !== id )
+          : [...prevHiddenSections, id]
+      ) );
 
       updateObs( updatedObs );
     },
-    [observations, hiddenSections, updateObs],
+    [observations, updateObs],
   );
 
   const sectionIsHidden = useCallback(
@@ -111,11 +109,11 @@ const ObsList = ( {
     }
     // Push footer data
     if ( sectionIsHidden( id ) && data.length === 0 ) {
-      convertedData.push( { type: "footerHidden" } );
+      convertedData.push( { type: "footerHidden", id } );
     } else if ( data.length === 0 ) {
       convertedData.push( { type: "footerEmpty", id } );
     } else {
-      convertedData.push( { type: "footer" } );
+      convertedData.push( { type: "footer", id } );
     }
   } );
 
@@ -200,7 +198,12 @@ const ObsList = ( {
 
   const dismissKeyboard = () => Keyboard.dismiss();
 
-  const extractKey = ( item: ConvertedDataItem, index: number ) => item + index;
+  const extractKey = ( item: ConvertedDataItem ) => {
+    if ( item.type ) {
+      return `${item.type}-${item.id}`;
+    }
+    return `obs-${item.uuidString}`;
+  };
   return (
     <FlashList
       testID="observations-list"
@@ -208,8 +211,6 @@ const ObsList = ( {
       onScroll={dismissKeyboard}
       scrollEventThrottle={1}
       data={convertedData}
-      initialNumToRender={5}
-      stickySectionHeadersEnabled={false}
       keyExtractor={extractKey}
       ListHeaderComponent={renderHeader}
       renderItem={renderItem}

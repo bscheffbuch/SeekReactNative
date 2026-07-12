@@ -19,7 +19,7 @@ const OpenINatButton = ( ) => {
     try {
       const canOpen = await Linking.canOpenURL( iOSUrlScheme );
       openUrl( canOpen ? iOSUrlScheme : appStore );
-    } catch ( e ) {
+    } catch {
       openUrl( appStore );
     }
   };
@@ -35,7 +35,7 @@ const OpenINatButton = ( ) => {
       } else {
         openUrl( playStore );
       }
-    } catch ( e ) {
+    } catch {
       openUrl( playStore );
     }
   };

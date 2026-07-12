@@ -39,7 +39,7 @@ const NotificationsScreen = ( ) => {
       <BottomSpacer />
     </>
   );
-  const extractKey = ( item: Notification, index: number ) => item + index;
+  const extractKey = ( item: Notification ) => `notification-${item.index}`;
 
   return (
     <ViewWithHeader testID="notifications-screen-container" header="notifications.header">

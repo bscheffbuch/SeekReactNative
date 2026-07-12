@@ -1,12 +1,13 @@
 import createUserAgent from "./userAgent";
 import i18n from "../i18n";
 import { createJwtToken } from "./helpers";
+import { formatYearMonthDay } from "./dateHelpers";
 
 interface ApiParams {
   per_page: number;
   lat: number;
   lng: number | null;
-  observed_on: Date;
+  observed_on: string;
   seek_exceptions: boolean;
   locale: string;
   all_photos: boolean;
@@ -22,7 +23,7 @@ interface Params {
 const fetchSpeciesNearby = async ( params: Params ): Promise<string | any[]> => {
   const staticParams = {
     per_page: 20,
-    observed_on: new Date( ),
+    observed_on: formatYearMonthDay( new Date( ) ),
     seek_exceptions: true,
     locale: i18n.locale,
     all_photos: true, // this allows for ARR license filtering
@@ -34,7 +35,7 @@ const fetchSpeciesNearby = async ( params: Params ): Promise<string | any[]> => 
   };
 
   const site = "https://api.inaturalist.org/v1/taxa/nearby";
-  const queryString = Object.keys( allParams ).map( key => `${key}=${allParams[key.toString( ) as keyof ApiParams]}` ).join( "&" );
+  const queryString = Object.keys( allParams ).map( key => `${key}=${encodeURIComponent( String( allParams[key.toString( ) as keyof ApiParams] ) )}` ).join( "&" );
 
   const options = { headers: { "User-Agent": createUserAgent( ) } };
   const url = `${site}?${queryString}`;
@@ -44,7 +45,7 @@ const fetchSpeciesNearby = async ( params: Params ): Promise<string | any[]> => 
     const { results }: { results: { taxon: any }[] } = await response.json( );
     const newTaxa = results.map( r => r.taxon );
     return newTaxa;
-  } catch ( e ) {
+  } catch {
     return "unknown";
   }
 };
@@ -87,7 +88,7 @@ const logToApi = async ( { level, message, context, errorType, backtrace }: Log 
   try {
     const response = await fetch( site, options );
     return response;
-  } catch ( e ) {
+  } catch {
     return "unknown";
   }
 };

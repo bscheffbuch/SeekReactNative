@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from "react";
 import inatjs from "inaturalistjs";
+import { debounce } from "lodash";
 
 import i18n from "../../../i18n";
 import { capitalizeNames } from "../../../utility/helpers";
@@ -20,6 +21,8 @@ const useSearchSpecies = ( speciesName: string | null ) => {
   const [suggestions, setSuggestions] = useState<Suggestion[]>( [] );
 
   useEffect( ( ) => {
+    let isCurrent = true;
+
     const searchForSpecies = ( ) => {
       const params = {
         q: speciesName,
@@ -29,6 +32,7 @@ const useSearchSpecies = ( speciesName: string | null ) => {
       };
 
       inatjs.taxa.autocomplete( params ).then( ( { results } ) => {
+        if ( !isCurrent ) { return; }
         if ( results.length === 0 ) { return; }
 
         const newSuggestions = results.map( ( s: Suggestion ) => {
@@ -49,7 +53,14 @@ const useSearchSpecies = ( speciesName: string | null ) => {
       } ).catch( ( err: Error ) => console.log( err, "couldn't find species" ) );
     };
 
-    searchForSpecies( );
+    // debounce so we don't send a network request per keystroke
+    const debouncedSearch = debounce( searchForSpecies, 300 );
+    debouncedSearch( );
+
+    return ( ) => {
+      isCurrent = false;
+      debouncedSearch.cancel( );
+    };
   }, [speciesName] );
 
   return suggestions;

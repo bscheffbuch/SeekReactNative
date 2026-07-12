@@ -136,7 +136,12 @@ const SelectSpecies = ( {
     [updateTaxon, toggleSpeciesModal],
   );
 
-  const extractKey = ( item: any, index: number ) => item + index;
+  const extractKey = ( item: any ) => {
+    if ( item.type ) {
+      return `${item.type}-${item.header}`;
+    }
+    return `${item.scientificName}-${item.id}`;
+  };
 
   const renderPadding = ( ) => <Padding />;
   const dismissKeyboard = ( ) => Keyboard.dismiss( );
@@ -183,8 +188,6 @@ const SelectSpecies = ( {
           ref={sectionList}
           contentContainerStyle={viewStyles.whiteContainer}
           data={data}
-          initialNumToRender={5}
-          stickySectionHeadersEnabled={false}
           keyExtractor={extractKey}
           ListFooterComponent={renderPadding}
           renderItem={renderItem}

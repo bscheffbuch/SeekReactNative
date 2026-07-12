@@ -57,7 +57,7 @@ const SpeciesNearbyChallenge = ( { challenge }: Props ) => {
         }
         setLoading( false );
         setLoaded( true );
-      } catch ( e ) {
+      } catch {
         updateError( "unknown" );
       }
     };

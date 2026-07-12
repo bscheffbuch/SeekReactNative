@@ -108,23 +108,31 @@ const useFetchChallenges = ( ): any[] => {
   } );
 
   useEffect( ( ) => {
+    let isCurrent = true;
+    let dataQuery: any = null;
+
     recalculateChallenges( );
     Realm.open( realmConfig ).then( ( realm ) => {
+      if ( !isCurrent ) { return; }
       // add a realm listener to fetch challenge hook, to make sure data gets updated in flatlist
       // https://github.com/realm/realm-js/issues/2345#issuecomment-619565280
       const query = ( ) => realm.objects( "ChallengeRealm" ).sorted( "availableDate", true );
 
       const handleChange = ( newData: any, newChanges: any ) => {
+        if ( !isCurrent ) { return; }
         setList( { data: convertDataToFlashListFormat( createChallengeSections( newData ) ), changes: newChanges } );
       };
 
-      const dataQuery = query( );
+      dataQuery = query( );
       dataQuery.addListener( handleChange );
-
-      return ( ) => {
-        dataQuery.removeAllListeners( );
-      };
     } );
+
+    return ( ) => {
+      isCurrent = false;
+      if ( dataQuery ) {
+        dataQuery.removeAllListeners( );
+      }
+    };
    }, [] );
 
   return list.data;

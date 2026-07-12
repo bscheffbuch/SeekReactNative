@@ -77,13 +77,13 @@ const Observations = ( ) => {
 
   const closeModal = ( ) => setModal( false );
 
-  const setupObsList = ( species: any, hideSections: boolean = false ) => {
+  const setupObsList = useCallback( ( species: any, hideSections: boolean = false ) => {
     const obs = createSectionList( species, hideSections );
     setObservations( obs );
     setLoading( false );
-  };
+  }, [] );
 
-  const fetchCommonNames = ( realm: Realm, species: { taxon: { id: number  } }[] ) => {
+  const fetchCommonNames = useCallback( ( realm: Realm, species: { taxon: { id: number  } }[] ) => {
     const commonNames: Promise<void>[] = [];
 
     species.forEach( ( { taxon } ) => {
@@ -104,9 +104,9 @@ const Observations = ( ) => {
     Promise.all( commonNames ).then( ( ) => {
       setupObsList( species );
     } );
-  };
+  }, [setupObsList] );
 
-  const fetchObservations = ( ) => {
+  const fetchObservations = useCallback( ( ) => {
     Realm.open( realmConfig ).then( ( realm ) => {
       const species = realm.objects( "ObservationRealm" );
 
@@ -118,7 +118,7 @@ const Observations = ( ) => {
     } ).catch( ( ) => {
       // console.log( "Err: ", err )
     } );
-  };
+  }, [fetchCommonNames] );
 
   const resetObservations = useCallback( ( ) => {
     Realm.open( realmConfig ).then( ( realm ) => {
@@ -127,7 +127,7 @@ const Observations = ( ) => {
     } ).catch( ( ) => {
         // console.log( "Err: ", err )
     } );
-  }, [] );
+  }, [setupObsList] );
 
   const fetchFilteredObservations = useCallback( ( text: string ) => {
     setSearchText( text );
@@ -135,7 +135,7 @@ const Observations = ( ) => {
     // otherwise hard to use search in languages with characters
     if ( text.length >= 1 ) {
       Realm.open( realmConfig ).then( ( realm ) => {
-        const species = realm.objects( "ObservationRealm" ).filtered( `taxon.name CONTAINS[c] '${text}' OR taxon.preferredCommonName CONTAINS[c] '${text}'` );
+        const species = realm.objects( "ObservationRealm" ).filtered( "taxon.name CONTAINS[c] $0 OR taxon.preferredCommonName CONTAINS[c] $0", text );
         setupObsList( species, true );
       } ).catch( ( ) => {
         // console.log( "Err: ", err )
@@ -143,25 +143,25 @@ const Observations = ( ) => {
     } else {
       resetObservations( );
     }
-  }, [resetObservations] );
-
-  const fetchRoute = async ( ) => {
-    const routeName = await getRoute( );
-    // don't fetch if user is toggling back and forth from SpeciesDetail screens
-    if ( routeName !== StoredRoutes.Observations ) {
-      setSearchText( "" );
-      setLoading( true );
-      fetchObservations( );
-    }
-  };
+  }, [resetObservations, setupObsList] );
 
   useEffect( ( ) => {
+    const fetchRoute = async ( ) => {
+      const routeName = await getRoute( );
+      // don't fetch if user is toggling back and forth from SpeciesDetail screens
+      if ( routeName !== StoredRoutes.Observations ) {
+        setSearchText( "" );
+        setLoading( true );
+        fetchObservations( );
+      }
+    };
+
     const unsubscribe = navigation.addListener( "focus", ( ) => {
       fetchRoute( );
     } );
 
     return unsubscribe;
-  } );
+  }, [navigation, fetchObservations] );
 
   const deleteObservation = async ( id: number ) => {
     await removeFromCollection( id );

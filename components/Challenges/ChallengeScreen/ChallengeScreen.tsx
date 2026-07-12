@@ -27,7 +27,12 @@ interface Item {
 const ChallengeScreen = ( ) => {
   const list: Item[] = useFetchChallenges( );
 
-  const extractKey = ( item: Item, index: number ) => item + index;
+  const extractKey = ( item: Item ) => {
+    if ( item.type ) {
+      return `${item.type}-${item.header || item.empty || ""}`;
+    }
+    return `challenge-${item.name}`;
+  };
 
   const renderItem = useCallback( ( { item }: { item: Item } ) => {
     if ( item.type === "header" ) {
