@@ -8,6 +8,11 @@ name: Build Debug APK
 
 on:
   workflow_dispatch:
+  # Temporary: auto-build on pushes to the review branch so the APK can be
+  # produced without manual dispatch. Remove once testing is done.
+  push:
+    branches:
+      - claude/repo-redesign-review-cq6a33
 
 permissions:
   contents: write
