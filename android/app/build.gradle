@@ -5,6 +5,11 @@ apply plugin: "com.facebook.react"
 
 
 def getPassword(String currentUser, String keyChain) {
+    // The security CLI only exists on macOS; debug builds elsewhere
+    // (Linux CI, containers) don't need the release keystore password
+    if (!org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        return ""
+    }
     return providers.exec {
        commandLine 'security', '-q', 'find-generic-password', '-a', currentUser, '-s', keyChain, '-w'
        ignoreExitValue true
