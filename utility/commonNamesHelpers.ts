@@ -23,7 +23,7 @@ const getTaxonCommonName = ( taxonID?: number ) => (
       resolve( commonNamesRealm.length > 0 ? capitalizeNames( commonNamesRealm[0].name ) : null );
     } ).catch( ( err: Error ) => {
       console.log( "[DEBUG] Failed to open realm, error: ", err );
-      reject( );
+      reject( err );
     } );
   } )
 );

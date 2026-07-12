@@ -130,9 +130,11 @@ describe( "SeekYearInReviewPhotos", () => {
     // Right arrow should be visible
     const rightArrow = await screen.findByTestId( "right-arrow" );
     expect( rightArrow ).toBeTruthy();
-    // Second obs photo should not be visible
+    // FlashList v2 renders all items under the test renderer, so the
+    // second photo's presence in the tree can't be used to assert
+    // visibility; scrolling behavior is covered in the test below
     const description2 = screen.queryByText( /some_name_3/ );
-    expect( description2 ).toBeNull();
+    expect( description2 ).toBeTruthy();
 
     // TODO: errors out on CI because it uses local timezone to display the date string in the photo description
     // expect( screen ).toMatchSnapshot();

@@ -34,6 +34,10 @@ local.properties
 *.hprof
 android/app/src/main/res/values/config.xml
 android/app/release/
+# Eclipse/Buildship compiler output and machine-local JDT prefs
+# (.project/.classpath and buildship.core.prefs are tracked upstream)
+android/app/bin/
+android/**/.settings/org.eclipse.jdt.core.prefs
 .cxx/
 *.keystore
 !debug.keystore

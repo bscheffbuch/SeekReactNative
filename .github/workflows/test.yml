@@ -28,11 +28,13 @@ jobs:
         node-version: 22
 
     - name: Install deps
-      run: npm install
+      run: npm ci
+
+    - run: npx tsc --noEmit
 
     - run: npm run lint
 
-    # - run: npm test
+    - run: npm test
 
   notify:
     name: Notify Slack

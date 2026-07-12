@@ -71,6 +71,8 @@ jest.mock( "@react-navigation/native", () => {
         if ( event === "focus" ) {
           callback();
         }
+        // Real navigators return an unsubscribe function
+        return jest.fn();
       },
     } ),
     useRoute: () => ( {} ),
@@ -125,6 +127,12 @@ jest.mock( "realm", () => {
           objects: jest.fn( ( table ) => {
             switch ( table ) {
               case "BadgeRealm":
+                return {
+                  filtered: jest.fn( () => {
+                    return new Array( 0 );
+                  } ),
+                };
+              case "CommonNamesRealm":
                 return {
                   filtered: jest.fn( () => {
                     return new Array( 0 );
@@ -195,6 +203,41 @@ jest.mock( "realm", () => {
       } )
   );
   return actualRealm;
+} );
+
+// react-native-maps and react-native-webview register TurboModules
+// ( RNMapsAirModule / RNCWebViewModule ) which don't exist in the Jest
+// environment, so mock them with plain views.
+jest.mock( "react-native-maps", () => {
+  const React = require( "react" );
+  const { View } = require( "react-native" );
+  const mockComponent = ( name ) => {
+    const Component = React.forwardRef( ( props, ref ) =>
+      React.createElement( View, { ...props, ref }, props.children ) );
+    Component.displayName = name;
+    return Component;
+  };
+  return {
+    __esModule: true,
+    default: mockComponent( "MapView" ),
+    Marker: mockComponent( "Marker" ),
+    UrlTile: mockComponent( "UrlTile" ),
+    PROVIDER_DEFAULT: "default",
+    PROVIDER_GOOGLE: "google",
+  };
+} );
+
+jest.mock( "react-native-webview", () => {
+  const React = require( "react" );
+  const { View } = require( "react-native" );
+  const MockWebView = React.forwardRef( ( props, ref ) =>
+    React.createElement( View, { ...props, ref } ) );
+  MockWebView.displayName = "WebView";
+  return {
+    __esModule: true,
+    default: MockWebView,
+    WebView: MockWebView,
+  };
 } );
 
 jest.mock( "react-native-vision-camera", () => ( {

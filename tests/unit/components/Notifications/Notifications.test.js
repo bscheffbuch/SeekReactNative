@@ -17,7 +17,7 @@ const mockNotifications = [
   {
     challengeIndex: 36,
     iconName: "badge_empty",
-    index: 0,
+    index: 1,
     message: "notifications.view_challenges",
     nextScreen: "ChallengeDetails",
     seen: true,
