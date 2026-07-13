@@ -79,12 +79,23 @@ const setupUserSettings = async ( ) => {
   }
 };
 
-const updateUserSetting = async ( key: string, value: boolean | string ): Promise<boolean | string | undefined> => {
+const fetchUserSetting = async ( key: string ): Promise<boolean | string | number | undefined> => {
+  const realm = await Realm.open( realmConfig );
+  const userSettings = realm.objects( "UserSettingsRealm" );
+
+  return userSettings[0]?.[key] as boolean | string | number | undefined;
+};
+
+const updateUserSetting = async ( key: string, value: boolean | string | number ): Promise<boolean | string | number | undefined> => {
   const realm = await Realm.open( realmConfig );
   const userSettings = realm.objects( "UserSettingsRealm" );
 
   try {
     realm.write( ( ) => {
+      if ( userSettings.length === 0 ) {
+        realm.create( "UserSettingsRealm", { [key]: value } );
+        return;
+      }
       userSettings[0][key] = value;
     } );
     return value;
@@ -117,6 +128,7 @@ export {
   getAutoCapture,
   getSeasonality,
   setupUserSettings,
+  fetchUserSetting,
   updateUserSetting,
   deleteFromAsyncStorage,
   fetchFromAsyncStorage,

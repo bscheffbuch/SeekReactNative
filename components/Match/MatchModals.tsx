@@ -168,7 +168,7 @@ const MatchModals = ( {
       setNavigationPath( null );
       navigation.reset( {
         index: 0,
-        routes: [{ name: "Home" }],
+        routes: [{ name: "MainTabs", params: { screen: "Home" } }],
       } );
       navigation.navigate( "Camera" );
     } else if ( navPath === "Social" ) {
@@ -183,19 +183,19 @@ const MatchModals = ( {
       navigation.navigate( "Species" );
     } else if ( navPath === "Drawer" ) {
       setNavigationPath( null );
-      navigation.openDrawer( );
+      navigation.navigate( "MainTabs", { screen: "More" } );
     }
   }, [navPath, navigation, taxon, setNavigationPath, commonName, setId, taxaId] );
 
   const checkBadges = ( ) => {
-    checkForNewBadges( ).then( ( { latestLevel, latestBadge } ) => {
-      dispatch( { type: ACTION_TYPE.SET_BADGES, latestLevel, latestBadge } );
+    checkForNewBadges( ).then( ( { latestLevel: newLatestLevel, latestBadge } ) => {
+      dispatch( { type: ACTION_TYPE.SET_BADGES, latestLevel: newLatestLevel, latestBadge } );
     } ).catch( ( ) => console.log( "could not check for badges" ) );
   };
 
   const checkChallenges = ( ) => {
-    checkForChallengesCompleted( ).then( ( { challengeComplete, challengeInProgress } ) => {
-      dispatch( { type: ACTION_TYPE.SET_CHALLENGES, challenge: challengeComplete, challengeInProgress } );
+    checkForChallengesCompleted( ).then( ( { challengeComplete, challengeInProgress: newChallengeInProgress } ) => {
+      dispatch( { type: ACTION_TYPE.SET_CHALLENGES, challenge: challengeComplete, challengeInProgress: newChallengeInProgress } );
       setChallengeProgress( "none" );
     } ).catch( ( ) => console.log( "could not check for challenges" ) );
   };

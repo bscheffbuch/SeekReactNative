@@ -5,122 +5,214 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
   edges={
     {
       "bottom": "off",
-      "left": "off",
-      "right": "off",
+      "left": "additive",
+      "right": "additive",
       "top": "additive",
     }
   }
   style={
-    {
-      "backgroundColor": "#38976d",
-      "flex": 1,
-    }
+    [
+      {
+        "backgroundColor": "#F3F1E8",
+        "flex": 1,
+      },
+      {
+        "backgroundColor": "#F3F1E8",
+      },
+    ]
   }
   testID="seek-yir-screen-container"
 >
   <View
     style={
-      [
-        {
-          "backgroundColor": "#38976d",
-          "flexDirection": "row",
-          "paddingBottom": 18,
-          "paddingTop": 20.5,
-        },
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-        },
-      ]
+      {
+        "alignItems": "center",
+        "backgroundColor": "#F3F1E8",
+        "flexDirection": "row",
+        "minHeight": 64,
+        "paddingHorizontal": 16,
+        "paddingVertical": 8,
+      }
     }
   >
     <View
-      accessibilityLabel="Go back to previous screen"
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         {
-          "left": 0,
-          "opacity": 1,
-          "paddingHorizontal": 23,
-          "paddingVertical": 18,
-          "position": "absolute",
-          "transform": [
-            {
-              "scaleX": 1,
-            },
-          ],
+          "height": 48,
+          "width": 48,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      numberOfLines={2}
+      style={
+        {
+          "color": "#111512",
+          "flex": 1,
+          "fontFamily": "Lato-Bold",
+          "fontSize": 22,
+          "lineHeight": 28,
+          "marginHorizontal": 8,
         }
       }
     >
-      <Image
-        source={
+      Seek Year in Review
+    </Text>
+    <View>
+      <View
+        accessibilityLabel="View notifications"
+        accessibilityRole="button"
+        accessibilityState={
           {
-            "testUri": "../../../assets/icons/back.webp",
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": false,
+            "expanded": undefined,
+            "selected": undefined,
           }
         }
-        style={false}
-      />
-    </View>
-    <Text
-      allowFontScaling={false}
-      style={
-        [
+        accessibilityValue={
           {
-            "textAlign": "left",
-          },
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={8}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
           [
             {
-              "color": "#ffffff",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 15,
-              "letterSpacing": 1,
-              "lineHeight": 21,
+              "alignItems": "center",
+              "borderRadius": 24,
+              "height": 48,
+              "justifyContent": "center",
+              "minHeight": 48,
+              "minWidth": 48,
+              "width": 48,
             },
-            {
-              "maxWidth": 650,
-            },
-          ],
-        ]
-      }
-    >
-      SEEK YEAR IN REVIEW
-    </Text>
+            false,
+            false,
+          ]
+        }
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={24}
+          bbWidth={24}
+          fill="none"
+          focusable={false}
+          height={24}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#111512"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 24,
+                "width": 24,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={24}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4279309586,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2}
+          >
+            <RNSVGPath
+              d="M10.268 21a2 2 0 0 0 3.464 0"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+            <RNSVGPath
+              d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#E0A82E",
+            "borderColor": "#FFFFFF",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "height": 10,
+            "position": "absolute",
+            "right": 11,
+            "top": 11,
+            "width": 10,
+          }
+        }
+        testID="unreadNotificationsIndicator"
+      />
+    </View>
   </View>
   <RCTScrollView
     contentContainerStyle={
-      {
-        "backgroundColor": "#ffffff",
-      }
+      [
+        {
+          "backgroundColor": "#F3F1E8",
+        },
+        {
+          "backgroundColor": "#F3F1E8",
+        },
+      ]
     }
     keyboardDismissMode="none"
-    onScroll={[Function]}
-    scrollEventThrottle={0}
+    onScrollBeginDrag={[Function]}
   >
     <View>
       <View
@@ -222,10 +314,11 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                       "marginBottom": 10,
                     },
                   ],
+                  null,
                 ]
               }
             >
-              IN 2022, YOU OBSERVED
+              In 2022, you observed
             </Text>
             <Text
               style={
@@ -233,19 +326,18 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   {
                     "textAlign": "left",
                   },
-                  [
-                    {
-                      "color": "#ffffff",
-                      "fontFamily": "Lato-Bold",
-                      "fontSize": 19,
-                      "letterSpacing": 1,
-                      "lineHeight": 27,
-                    },
-                  ],
+                  {
+                    "color": "#ffffff",
+                    "fontFamily": "Lato-Bold",
+                    "fontSize": 19,
+                    "letterSpacing": 1,
+                    "lineHeight": 27,
+                  },
+                  null,
                 ]
               }
             >
-              100 NEW SPECIES
+              100 new species
             </Text>
           </View>
           <Image
@@ -275,44 +367,21 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         }
       >
         <View
-          accessibilityIgnoresInvertColors={true}
           style={
             [
               {
                 "alignSelf": "center",
-                "height": 48,
-                "marginBottom": 32,
-                "marginTop": 40,
-                "paddingTop": 5,
-                "width": 284,
+                "backgroundColor": "#DEF0E7",
+                "borderRadius": 999,
+                "marginBottom": 18,
+                "marginTop": 24,
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
               },
               false,
             ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/img-titlebanner.webp",
-              }
-            }
-            style={
-              [
-                {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {
-                  "height": 48,
-                  "width": 284,
-                },
-                undefined,
-              ]
-            }
-          />
           <Text
             allowFontScaling={false}
             style={
@@ -320,36 +389,30 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 {
                   "textAlign": "left",
                 },
-                [
-                  {
-                    "color": "#ffffff",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
-                    "lineHeight": 22,
-                  },
-                  {
-                    "textAlign": "center",
-                  },
-                ],
+                {
+                  "color": "#14794F",
+                  "fontFamily": "Lato-Bold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                  "textAlign": "center",
+                },
+                null,
               ]
             }
           >
-            TOP SPECIES
+            Top Species
           </Text>
         </View>
         <View>
           <View
             style={
-              [
-                {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "flexWrap": "wrap",
-                  "justifyContent": "center",
-                  "width": 377.20734908136484,
-                },
-              ]
+              {
+                "alignSelf": "center",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+                "width": 377.25,
+              }
             }
             testID="badge-container"
           >
@@ -397,12 +460,15 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     }
                   }
                   style={
-                    {
-                      "height": 113.73578302712161,
-                      "marginHorizontal": 6,
-                      "resizeMode": "contain",
-                      "width": 113.73578302712161,
-                    }
+                    [
+                      {
+                        "height": 113.75,
+                        "marginHorizontal": 6,
+                        "resizeMode": "contain",
+                        "width": 113.75,
+                      },
+                      false,
+                    ]
                   }
                 />
               </View>
@@ -451,12 +517,15 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     }
                   }
                   style={
-                    {
-                      "height": 113.73578302712161,
-                      "marginHorizontal": 6,
-                      "resizeMode": "contain",
-                      "width": 113.73578302712161,
-                    }
+                    [
+                      {
+                        "height": 113.75,
+                        "marginHorizontal": 6,
+                        "resizeMode": "contain",
+                        "width": 113.75,
+                      },
+                      false,
+                    ]
                   }
                 />
               </View>
@@ -505,12 +574,15 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     }
                   }
                   style={
-                    {
-                      "height": 113.73578302712161,
-                      "marginHorizontal": 6,
-                      "resizeMode": "contain",
-                      "width": 113.73578302712161,
-                    }
+                    [
+                      {
+                        "height": 113.75,
+                        "marginHorizontal": 6,
+                        "resizeMode": "contain",
+                        "width": 113.75,
+                      },
+                      false,
+                    ]
                   }
                 />
               </View>
@@ -526,15 +598,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         />
         <View
           style={
-            [
-              {
-                "alignSelf": "center",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "justifyContent": "center",
-                "width": 377.20734908136484,
-              },
-            ]
+            {
+              "alignSelf": "center",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "justifyContent": "center",
+              "width": 377.20734908136484,
+            }
           }
         >
           <Text
@@ -546,29 +616,25 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
-                  false,
                   {
                     "textAlign": "center",
                   },
-                  null,
                   {
                     "marginHorizontal": 6,
                     "width": 113.73578302712161,
                   },
                 ],
+                null,
               ]
             }
           >
@@ -583,29 +649,25 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
-                  false,
                   {
                     "textAlign": "center",
                   },
-                  null,
                   {
                     "marginHorizontal": 6,
                     "width": 113.73578302712161,
                   },
                 ],
+                null,
               ]
             }
           >
@@ -620,29 +682,25 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
-                  false,
                   {
                     "textAlign": "center",
                   },
-                  null,
                   {
                     "marginHorizontal": 6,
                     "width": 113.73578302712161,
                   },
                 ],
+                null,
               ]
             }
           >
@@ -651,15 +709,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         </View>
         <View
           style={
-            [
-              {
-                "alignSelf": "center",
-                "flexDirection": "row",
-                "flexWrap": "wrap",
-                "justifyContent": "center",
-                "width": 377.20734908136484,
-              },
-            ]
+            {
+              "alignSelf": "center",
+              "flexDirection": "row",
+              "flexWrap": "wrap",
+              "justifyContent": "center",
+              "width": 377.20734908136484,
+            }
           }
         >
           <Text
@@ -674,7 +730,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "width": 113.73578302712161,
                   },
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -684,6 +740,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -701,7 +758,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "width": 113.73578302712161,
                   },
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -711,6 +768,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -728,7 +786,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "width": 113.73578302712161,
                   },
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -738,6 +796,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -745,44 +804,21 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           </Text>
         </View>
         <View
-          accessibilityIgnoresInvertColors={true}
           style={
             [
               {
                 "alignSelf": "center",
-                "height": 48,
-                "marginBottom": 32,
-                "marginTop": 40,
-                "paddingTop": 5,
-                "width": 284,
+                "backgroundColor": "#DEF0E7",
+                "borderRadius": 999,
+                "marginBottom": 18,
+                "marginTop": 24,
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
               },
               false,
             ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/img-titlebanner.webp",
-              }
-            }
-            style={
-              [
-                {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {
-                  "height": 48,
-                  "width": 284,
-                },
-                undefined,
-              ]
-            }
-          />
           <Text
             allowFontScaling={false}
             style={
@@ -790,22 +826,18 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 {
                   "textAlign": "left",
                 },
-                [
-                  {
-                    "color": "#ffffff",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
-                    "lineHeight": 22,
-                  },
-                  {
-                    "textAlign": "center",
-                  },
-                ],
+                {
+                  "color": "#14794F",
+                  "fontFamily": "Lato-Bold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                  "textAlign": "center",
+                },
+                null,
               ]
             }
           >
-            OBSERVATIONS
+            Observations
           </Text>
         </View>
         <Text
@@ -817,22 +849,24 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          OBSERVATIONS BY MONTH
+          Observations by Month
         </Text>
         <View
           style={
@@ -909,22 +943,24 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          OBSERVATIONS MAP
+          Observations Map
         </Text>
         <View
           style={
@@ -933,7 +969,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
             }
           }
         />
-        <AIRMap
+        <View
           initialRegion={
             {
               "latitude": 0.21,
@@ -942,9 +978,8 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               "longitudeDelta": 84.42,
             }
           }
-          onChange={[Function]}
-          onMapReady={[Function]}
           onPress={[Function]}
+          provider="default"
           region={
             {
               "latitude": 0.21,
@@ -963,22 +998,12 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           }
           zoomEnabled={false}
         >
-          <AIRMapMarker
+          <View
             coordinate={
               {
                 "latitude": 42,
                 "longitude": -42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
             testID="some-uuid1"
           >
@@ -989,23 +1014,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-          <AIRMapMarker
+          </View>
+          <View
             coordinate={
               {
                 "latitude": -42,
                 "longitude": 42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
             testID="some-uuid2"
           >
@@ -1016,23 +1031,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-          <AIRMapMarker
+          </View>
+          <View
             coordinate={
               {
                 "latitude": 42,
                 "longitude": 42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
             testID="some-uuid3"
           >
@@ -1043,23 +1048,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-          <AIRMapMarker
+          </View>
+          <View
             coordinate={
               {
                 "latitude": 42.42,
                 "longitude": 42.42,
               }
-            }
-            onPress={[Function]}
-            style={
-              [
-                {
-                  "backgroundColor": "transparent",
-                  "position": "absolute",
-                },
-                undefined,
-              ]
             }
           >
             <Image
@@ -1069,8 +1064,8 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 }
               }
             />
-          </AIRMapMarker>
-        </AIRMap>
+          </View>
+        </View>
         <View
           accessibilityState={
             {
@@ -1102,12 +1097,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           style={
             {
               "alignSelf": "center",
-              "backgroundColor": "#38976d",
-              "borderRadius": 34,
-              "height": 79,
+              "backgroundColor": "#14794f",
+              "borderRadius": 14,
+              "elevation": 2,
+              "height": 64,
               "justifyContent": "center",
               "maxWidth": 317,
               "opacity": 1,
+              "shadowColor": "#14794f",
+              "shadowOffset": {
+                "height": 7,
+                "width": 0,
+              },
+              "shadowOpacity": 0.16,
+              "shadowRadius": 12,
               "width": 317,
             }
           }
@@ -1134,10 +1137,11 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   undefined,
                   undefined,
                 ],
+                null,
               ]
             }
           >
-            VIEW OBSERVATIONS MAP
+            View Observations Map
           </Text>
         </View>
         <View
@@ -1156,22 +1160,24 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          INATURALIST
+          iNaturalist
         </Text>
         <View
           style={
@@ -1188,7 +1194,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Medium",
                   "fontSize": 18,
                   "letterSpacing": 0,
@@ -1198,6 +1204,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1209,7 +1216,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1219,6 +1226,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1232,7 +1240,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1242,6 +1250,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1256,24 +1265,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                   false,
-                  false,
-                  null,
                   undefined,
                 ],
+                null,
               ]
             }
           >
@@ -1287,7 +1292,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1297,6 +1302,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1310,7 +1316,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1320,6 +1326,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1333,7 +1340,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1343,6 +1350,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1356,7 +1364,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1366,6 +1374,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1379,7 +1388,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1389,6 +1398,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1402,7 +1412,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1412,6 +1422,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1425,7 +1436,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1435,6 +1446,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1456,7 +1468,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Medium",
                   "fontSize": 18,
                   "letterSpacing": 0,
@@ -1466,6 +1478,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1493,44 +1506,21 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         }
       >
         <View
-          accessibilityIgnoresInvertColors={true}
           style={
             [
               {
                 "alignSelf": "center",
-                "height": 48,
-                "marginBottom": 32,
-                "marginTop": 40,
-                "paddingTop": 5,
-                "width": 284,
+                "backgroundColor": "#DEF0E7",
+                "borderRadius": 999,
+                "marginBottom": 18,
+                "marginTop": 24,
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
               },
               false,
             ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/img-titlebanner.webp",
-              }
-            }
-            style={
-              [
-                {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {
-                  "height": 48,
-                  "width": 284,
-                },
-                undefined,
-              ]
-            }
-          />
           <Text
             allowFontScaling={false}
             style={
@@ -1538,22 +1528,18 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 {
                   "textAlign": "left",
                 },
-                [
-                  {
-                    "color": "#ffffff",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
-                    "lineHeight": 22,
-                  },
-                  {
-                    "textAlign": "center",
-                  },
-                ],
+                {
+                  "color": "#14794F",
+                  "fontFamily": "Lato-Bold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                  "textAlign": "center",
+                },
+                null,
               ]
             }
           >
-            CHALLENGES
+            Challenges
           </Text>
         </View>
         <Text
@@ -1564,7 +1550,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Medium",
                   "fontSize": 18,
                   "letterSpacing": 0,
@@ -1574,6 +1560,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1585,7 +1572,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1595,6 +1582,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1608,7 +1596,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1618,6 +1606,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1632,24 +1621,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                   false,
-                  false,
-                  null,
                   undefined,
                 ],
+                null,
               ]
             }
           >
@@ -1663,7 +1648,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1673,6 +1658,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1686,7 +1672,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1696,6 +1682,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1709,7 +1696,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1719,6 +1706,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1732,7 +1720,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1742,6 +1730,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1758,15 +1747,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         <View>
           <View
             style={
-              [
-                {
-                  "alignSelf": "center",
-                  "flexDirection": "row",
-                  "flexWrap": "wrap",
-                  "justifyContent": "center",
-                  "width": 377.20734908136484,
-                },
-              ]
+              {
+                "alignSelf": "center",
+                "flexDirection": "row",
+                "flexWrap": "wrap",
+                "justifyContent": "center",
+                "width": 377.25,
+              }
             }
             testID="badge-container"
           >
@@ -1813,10 +1800,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -1865,10 +1852,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -1917,10 +1904,10 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   }
                   style={
                     {
-                      "height": 113.73578302712161,
+                      "height": 113.75,
                       "marginHorizontal": 6,
                       "resizeMode": "contain",
-                      "width": 113.73578302712161,
+                      "width": 113.75,
                     }
                   }
                 />
@@ -1943,7 +1930,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Regular",
                   "fontSize": 15,
                   "letterSpacing": 0,
@@ -1953,6 +1940,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1973,7 +1961,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Regular",
                   "fontSize": 15,
                   "letterSpacing": 0,
@@ -1983,6 +1971,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -2026,12 +2015,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           style={
             {
               "alignSelf": "center",
-              "backgroundColor": "#38976d",
-              "borderRadius": 34,
-              "height": 79,
+              "backgroundColor": "#14794f",
+              "borderRadius": 14,
+              "elevation": 2,
+              "height": 64,
               "justifyContent": "center",
               "maxWidth": 317,
               "opacity": 1,
+              "shadowColor": "#14794f",
+              "shadowOffset": {
+                "height": 7,
+                "width": 0,
+              },
+              "shadowOpacity": 0.16,
+              "shadowRadius": 12,
               "width": 317,
             }
           }
@@ -2058,25 +2055,31 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   undefined,
                   undefined,
                 ],
+                null,
               ]
             }
           >
-            DONATE
+            Donate
           </Text>
         </View>
       </View>
       <View
         style={
-          {
-            "backgroundColor": "#ffffff",
-            "paddingBottom": 60,
-          }
+          [
+            {
+              "backgroundColor": "#F3F1E8",
+              "paddingBottom": 60,
+            },
+            {
+              "backgroundColor": "#F3F1E8",
+            },
+          ]
         }
       />
       <View
         style={
           {
-            "backgroundColor": "#ffffff",
+            "backgroundColor": "#F3F1E8",
             "bottom": -1000,
             "height": 1050,
             "left": 0,
@@ -2087,222 +2090,5 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
       />
     </View>
   </RCTScrollView>
-  <RNCSafeAreaView
-    edges={
-      {
-        "bottom": "additive",
-        "left": "additive",
-        "right": "additive",
-        "top": "off",
-      }
-    }
-    style={
-      {
-        "backgroundColor": "#ffffff",
-      }
-    }
-  >
-    <View
-      accessibilityIgnoresInvertColors={true}
-      style={
-        {
-          "height": 74,
-          "justifyContent": "flex-end",
-        }
-      }
-    >
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/backgrounds/img-navbar.webp",
-          }
-        }
-        style={
-          [
-            {
-              "bottom": 0,
-              "left": 0,
-              "position": "absolute",
-              "right": 0,
-              "top": 0,
-            },
-            {
-              "height": 74,
-              "width": undefined,
-            },
-            undefined,
-          ]
-        }
-      />
-      <View
-        style={
-          [
-            {
-              "backgroundColor": "#ffffff",
-              "height": 70,
-              "justifyContent": "space-between",
-            },
-            {
-              "alignItems": "center",
-              "flexDirection": "row",
-              "flexWrap": "nowrap",
-            },
-            {
-              "shadowColor": "#000000",
-              "shadowOffset": {
-                "height": -3,
-                "width": 0,
-              },
-              "shadowOpacity": 0.2,
-              "shadowRadius": 2,
-            },
-          ]
-        }
-      >
-        <View
-          accessibilityLabel="Open menu"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "left": 10,
-              "opacity": 1,
-              "padding": 20,
-            }
-          }
-        >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/navbar/Menu.webp",
-              }
-            }
-          />
-        </View>
-        <View
-          accessibilityLabel="Open camera"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "marginBottom": 50,
-              "marginLeft": 8,
-              "opacity": 1,
-            }
-          }
-          testID="openCameraButton"
-        >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/navbar/icon-camerabutton.webp",
-              }
-            }
-            style={
-              {
-                "height": 94,
-                "width": 94,
-              }
-            }
-          />
-        </View>
-        <View
-          accessibilityLabel="View notifications"
-          accessibilityState={
-            {
-              "busy": undefined,
-              "checked": undefined,
-              "disabled": undefined,
-              "expanded": undefined,
-              "selected": undefined,
-            }
-          }
-          accessibilityValue={
-            {
-              "max": undefined,
-              "min": undefined,
-              "now": undefined,
-              "text": undefined,
-            }
-          }
-          accessible={true}
-          collapsable={false}
-          focusable={true}
-          onClick={[Function]}
-          onResponderGrant={[Function]}
-          onResponderMove={[Function]}
-          onResponderRelease={[Function]}
-          onResponderTerminate={[Function]}
-          onResponderTerminationRequest={[Function]}
-          onStartShouldSetResponder={[Function]}
-          style={
-            {
-              "opacity": 1,
-              "padding": 24,
-              "right": 10,
-            }
-          }
-        >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/navbar/Notifications-inactive.webp",
-              }
-            }
-          />
-        </View>
-      </View>
-    </View>
-  </RNCSafeAreaView>
 </RNCSafeAreaView>
 `;

@@ -7,7 +7,9 @@ const { getFontScale } = PixelRatio;
 const viewStyles = StyleSheet.create( {
   center,
   header: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
+    borderBottomColor: colors.seekBorder,
+    borderBottomWidth: 1,
     height: 55,
   },
   spaceBeforeButtons: {
@@ -21,14 +23,14 @@ const viewStyles = StyleSheet.create( {
     justifyContent: "space-around",
   },
   roundedIndicator: {
-    backgroundColor: colors.seekGreen,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    backgroundColor: colors.seekDeepGreen,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
     height: 4,
     width: 138,
   },
   hiddenIndicator: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
     height: 4,
     width: 138,
   },
@@ -77,8 +79,8 @@ const viewStyles = StyleSheet.create( {
   },
   greenButton: {
     alignSelf: "center",
-    backgroundColor: colors.seekForestGreen,
-    borderRadius: 34,
+    backgroundColor: colors.seekDeepGreen,
+    borderRadius: 14,
     height: getFontScale() > 1 ? 79 : 46,
     justifyContent: "center",
     alignItems: "center",
@@ -87,7 +89,7 @@ const viewStyles = StyleSheet.create( {
     width: dimensions.width < 500 ? 293 : 317,
   },
   whiteContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
   },
   headerText: {
     alignSelf: "center",
@@ -98,10 +100,10 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   photoSizeText: {
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
     fontSize: 14,
     lineHeight: 24,
-    letterSpacing: 0.78,
+    letterSpacing: 0,
   },
   selectedPhotoSizeText: {
     fontFamily: fonts.semibold,
@@ -116,10 +118,10 @@ const textStyles = StyleSheet.create( {
   },
   optionsText: {
     // modalBanner
-    color: colors.seekForestGreen,
+    color: colors.seekDeepGreen,
     fontFamily: fonts.semibold,
     fontSize: 19,
-    letterSpacing: 1.12,
+    letterSpacing: 0,
     marginTop: 18,
     marginLeft: 24,
   },

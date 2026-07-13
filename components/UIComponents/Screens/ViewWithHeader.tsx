@@ -1,10 +1,10 @@
 import * as React from "react";
-import { StatusBar } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import styles from "../../../styles/uiComponents/scrollWithHeader";
-import GreenHeader from "../GreenHeader";
-import Footer from "../Footer";
+import { AppHeader } from "../AppPrimitives";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props extends React.PropsWithChildren {
   testID?: string;
@@ -12,13 +12,30 @@ interface Props extends React.PropsWithChildren {
   footer?: boolean;
 }
 
-const ViewWithHeader = ( { testID, children, header, footer = true }: Props ) => (
-  <SafeAreaView testID={testID} style={styles.container} edges={["top"]}>
-    <StatusBar barStyle="light-content" />
-    <GreenHeader header={header} />
-    {children}
-    {footer && <Footer />}
-  </SafeAreaView>
-);
+const ViewWithHeader = ( { testID, children, header, footer: _footer = true }: Props ) => {
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    container: {
+      backgroundColor: theme.colors.canvas,
+    },
+    content: {
+      backgroundColor: theme.colors.canvas,
+      flex: 1,
+    },
+  } );
+
+  return (
+    <SafeAreaView
+      testID={testID}
+      style={[styles.container, themedStyles.container]}
+      edges={["top", "left", "right"]}
+    >
+      <AppHeader titleKey={header} />
+      <View style={themedStyles.content}>
+        {children}
+      </View>
+    </SafeAreaView>
+  );
+};
 
 export default ViewWithHeader;

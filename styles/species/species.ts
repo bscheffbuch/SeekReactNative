@@ -14,26 +14,26 @@ const viewStyles = StyleSheet.create( {
     zIndex: 1,
   },
   background: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     minHeight: backgroundHeight,
   },
   landscapeBackground: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     paddingBottom: bottomPadding,
   },
   bottomPadding: {
     paddingBottom: bottomPadding,
   },
   twoColumnContainer: {
+    backgroundColor: "#F3F1E8",
     flexDirection: "row",
     justifyContent: "space-between",
-    backgroundColor: colors.white,
   },
   checkmark: {
     marginRight: 10,
   },
   greenBanner: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#DEF0E7",
   },
   headerMargins: {
     marginBottom: 11,
@@ -57,8 +57,8 @@ const viewStyles = StyleSheet.create( {
     alignSelf: "flex-start",
   },
   topRibbon: {
+    backgroundColor: "#DEF0E7",
     paddingTop: 2,
-    backgroundColor: colors.speciesNearbyGreen,
   },
 } );
 
@@ -72,9 +72,10 @@ const textStyles = StyleSheet.create( {
     textAlign: "center",
   },
   iconicTaxaText: {
+    backgroundColor: "#DEF0E7",
+    color: colors.seekDeepGreen,
     paddingLeft: 28,
     paddingVertical: 12,
-    backgroundColor: colors.seekForestGreen,
   },
   largerPadding: {
     paddingLeft: 32,

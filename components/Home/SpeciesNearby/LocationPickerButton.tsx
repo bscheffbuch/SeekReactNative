@@ -1,15 +1,16 @@
 import React from "react";
 import {
+  StyleSheet,
   View,
   TouchableOpacity,
-  Image,
 } from "react-native";
 
-import { viewStyles, imageStyles } from "../../../styles/home/speciesNearby";
+import { viewStyles } from "../../../styles/home/speciesNearby";
 import { baseTextStyles } from "../../../styles/textStyles";
-import posting from "../../../assets/posting";
 import i18n from "../../../i18n";
 import StyledText from "../../UIComponents/StyledText";
+import { useTheme } from "../../Providers/ThemeProvider";
+import { MapPinIcon } from "../../UIComponents/AppIcons";
 
 interface Props {
   readonly openLocationPicker: ( ) => void;
@@ -22,6 +23,20 @@ const LocationPickerButton = ( {
   disabled,
   location,
 }: Props ) => {
+  const { theme } = useTheme( );
+  const styles = StyleSheet.create( {
+    pill: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderRadius: 999,
+      paddingBottom: 4,
+      paddingHorizontal: 9,
+      paddingTop: 4,
+    },
+    text: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.heading,
+    },
+  } );
   const locationText = location ? location : i18n.t( "species_nearby.no_location" );
   return (
     <TouchableOpacity
@@ -29,10 +44,10 @@ const LocationPickerButton = ( {
       style={[viewStyles.row, viewStyles.locationPickerButton]}
       disabled={disabled}
     >
-      <Image source={posting.location} style={imageStyles.image} />
-      <View style={viewStyles.whiteButton}>
-        <StyledText style={baseTextStyles.buttonGreen}>
-          {locationText.toLocaleUpperCase( )}
+      <MapPinIcon color={theme.colors.primary} size={20} strokeWidth={2.2} />
+      <View style={styles.pill}>
+        <StyledText style={[baseTextStyles.buttonGreen, styles.text]}>
+          {locationText}
         </StyledText>
       </View>
     </TouchableOpacity>

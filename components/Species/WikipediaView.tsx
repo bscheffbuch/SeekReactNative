@@ -27,7 +27,7 @@ const WikipediaView = ( { navigation, route }: Props ) => {
     <FullWebView
       uri={uri}
       navigation={navigation}
-      headerText={i18n.t( "species_detail.wikipedia_1" ).toLocaleUpperCase()}
+      headerText={i18n.t( "species_detail.wikipedia_1" )}
     />
   );
 };

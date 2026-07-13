@@ -11,10 +11,12 @@ import GreenButton from "../UIComponents/Buttons/GreenButton";
 import { useInternetStatus } from "../../utility/customHooks";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const PostStatus = ( ) => {
   const navigation = useNavigation( );
   const internet = useInternetStatus( );
+  const { theme } = useTheme( );
 
   const setHeaderText = ( ) => {
     if ( internet ) {
@@ -41,13 +43,11 @@ const PostStatus = ( ) => {
   };
 
   // TODO: navigation TS
-  const navToMatch = ( ) => navigation.popTo( "Drawer", {
-    screen: "Match",
-  } );
+  const navToMatch = ( ) => navigation.navigate( "Match" );
 
   return (
-    <SafeAreaView style={viewStyles.container}>
-      <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]}>
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
       <View style={viewStyles.content}>
         {!internet && <Image source={posting.internet} />}
         <StyledText style={[baseTextStyles.modalBannerGreen, textStyles.headerText]}>

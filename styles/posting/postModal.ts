@@ -3,10 +3,10 @@ import { dimensions, colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   container: {
+    backgroundColor: colors.seekCanvas,
     flex: 1,
     paddingBottom: dimensions.height > 570 ? 60 : 26,
     paddingHorizontal: 32,
-    backgroundColor: colors.white,
   },
   content: {
     flex: 1,

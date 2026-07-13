@@ -57,8 +57,8 @@ const LevelHeader = ( { level, nextLevelCount, speciesCount }: Props ) => {
           <>
             <Image source={badgeImages[level.earnedIconName]} style={imageStyles.levelImage} />
             <View style={viewStyles.textContainer}>
-              <StyledText style={[baseTextStyles.challengeMonth, textStyles.lightText]}>{i18n.t( "badges.your_level" ).toLocaleUpperCase()}</StyledText>
-              <StyledText style={baseTextStyles.challengeTitle}>{i18n.t( level.intlName ).toLocaleUpperCase()}</StyledText>
+              <StyledText style={[baseTextStyles.challengeMonth, textStyles.lightText]}>{i18n.t( "badges.your_level" )}</StyledText>
+              <StyledText style={baseTextStyles.challengeTitle}>{i18n.t( level.intlName )}</StyledText>
               <StyledText style={[baseTextStyles.bodyWhite, textStyles.text]}>
                 {level.count >= 150
                   ? i18n.t( "badges.observe_max" )

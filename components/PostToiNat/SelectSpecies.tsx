@@ -12,7 +12,6 @@ import { FlashList } from "@shopify/flash-list";
 import type { FlashListRef } from "@shopify/flash-list";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
-import { colors } from "../../styles/global";
 import { viewStyles, textStyles, imageStyles } from "../../styles/posting/selectSpecies";
 import i18n from "../../i18n";
 import posting from "../../assets/posting";
@@ -25,6 +24,7 @@ import { iconicTaxonDictSelectSpecies, iconicScientificNames } from "../../utili
 import { capitalizeNames } from "../../utility/helpers";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Taxon {
   name: string;
@@ -57,6 +57,7 @@ const SelectSpecies = ( {
   seekId,
 }: Props ) => {
   const sectionList = useRef<FlashListRef<Suggestion>>( null );
+  const { theme } = useTheme( );
 
   const seekSuggestion: Suggestion[] = [{
     image,
@@ -136,7 +137,12 @@ const SelectSpecies = ( {
     [updateTaxon, toggleSpeciesModal],
   );
 
-  const extractKey = ( item: any, index: number ) => item + index;
+  const extractKey = ( item: any ) => {
+    if ( item.type ) {
+      return `${item.type}-${item.header}`;
+    }
+    return `${item.scientificName}-${item.id}`;
+  };
 
   const renderPadding = ( ) => <Padding />;
   const dismissKeyboard = ( ) => Keyboard.dismiss( );
@@ -145,11 +151,11 @@ const SelectSpecies = ( {
     <SafeAreaProvider>
       <SafeAreaView
         testID="select-species-container"
-        style={viewStyles.container}
+        style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]}
         edges={["top"]}
       >
-        <StatusBar barStyle="light-content" />
-        <View style={viewStyles.header}>
+        <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
+        <View style={[viewStyles.header, { backgroundColor: theme.colors.canvas }]}>
           <TouchableOpacity
             accessibilityLabel={i18n.t( "accessibility.back" )}
             accessible
@@ -159,29 +165,33 @@ const SelectSpecies = ( {
             <Image source={icons.backButton} />
           </TouchableOpacity>
           <StyledText style={[baseTextStyles.button, textStyles.topHeader]}>
-            {i18n.t( "posting.what_seen" ).toLocaleUpperCase()}
+            {i18n.t( "posting.what_seen" )}
           </StyledText>
         </View>
         <View style={viewStyles.photoContainer}>
           {image && <Image source={{ uri: image }} style={imageStyles.image} />}
         </View>
-        <View style={viewStyles.row}>
+        <View style={[viewStyles.row, { backgroundColor: theme.colors.canvas }]}>
           <Image
             source={posting.searchGreen}
-            tintColor={colors.white}
-            style={imageStyles.search}
+            tintColor={theme.colors.primary}
+            style={[imageStyles.search, { tintColor: theme.colors.primary }]}
           />
           <TextInput
             onChangeText={handleTextChange}
             placeholder={i18n.t( "posting.look_up" )}
-            placeholderTextColor={colors.placeholderGray}
-            style={[baseTextStyles.inputField, textStyles.inputField]}
+            placeholderTextColor={theme.colors.muted}
+            style={[baseTextStyles.inputField, textStyles.inputField, {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              color: theme.colors.text,
+            }]}
             defaultValue={textInput}
           />
         </View>
         <FlashList
           ref={sectionList}
-          contentContainerStyle={viewStyles.whiteContainer}
+          contentContainerStyle={[viewStyles.whiteContainer, { backgroundColor: theme.colors.canvas }]}
           data={data}
           initialNumToRender={5}
           stickySectionHeadersEnabled={false}

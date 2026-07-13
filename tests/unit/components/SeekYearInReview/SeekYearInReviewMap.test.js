@@ -50,7 +50,7 @@ describe( "SeekYearInReviewMap", () => {
   test( "should render correctly", async () => {
     renderMap();
 
-    const mapScreenButton = await screen.findByText( "VIEW OBSERVATIONS MAP" );
+    const mapScreenButton = await screen.findByText( /view observations map/i );
     expect( mapScreenButton ).toBeTruthy();
 
     expect( screen ).toMatchSnapshot();
@@ -76,7 +76,7 @@ describe( "SeekYearInReviewMap", () => {
   test( "should call navigation to map screen", async () => {
     renderMap();
 
-    const mapScreenButton = await screen.findByText( "VIEW OBSERVATIONS MAP" );
+    const mapScreenButton = await screen.findByText( /view observations map/i );
     fireEvent.press( mapScreenButton );
 
     expect( mockNavigate.navigate ).toHaveBeenCalledWith(

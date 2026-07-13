@@ -15,6 +15,7 @@ import SpeciesDetailCard from "../../UIComponents/SpeciesDetailCard";
 import { localizeNumber } from "../../../utility/helpers";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   readonly id: number | null;
@@ -28,6 +29,7 @@ interface Props {
 const INatObs = ( { id, timesSeen, region }: Props ) => {
   const navigation = useNavigation();
   const [nearbySpeciesCount, setNearbySpeciesCount] = useState( null );
+  const { theme } = useTheme();
 
   useEffect( () => {
     let isFocused = true;
@@ -74,22 +76,23 @@ const INatObs = ( { id, timesSeen, region }: Props ) => {
             <View style={viewStyles.textContainer}>
               {region.latitude && (
                 <>
-                  <StyledText style={baseTextStyles.emptyState}>
+                  <StyledText style={[baseTextStyles.emptyState, { color: theme.colors.muted }]}>
                     {i18n.t( "species_detail.near" )}
                   </StyledText>
-                  <StyledText style={[baseTextStyles.number, textStyles.number]}>
+                  <StyledText style={[baseTextStyles.number, textStyles.number, { color: theme.colors.text }]}>
                     {localizeNumber( nearbySpeciesCount )}
                   </StyledText>
                 </>
               )}
               <StyledText style={[
                 baseTextStyles.emptyState,
+                { color: theme.colors.muted },
                 region.latitude && viewStyles.margin,
               ]}
               >
                 {i18n.t( "species_detail.worldwide" )}
               </StyledText>
-              <StyledText style={[baseTextStyles.number, textStyles.number]}>
+              <StyledText style={[baseTextStyles.number, textStyles.number, { color: theme.colors.text }]}>
                 {localizeNumber( timesSeen )}
               </StyledText>
             </View>

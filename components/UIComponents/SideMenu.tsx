@@ -9,8 +9,10 @@ import icons from "../../assets/icons";
 import { capitalizeNames, setRoute, StoredRoutes } from "../../utility/helpers";
 import StyledText from "./StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const SideMenu = ( { navigation } ) => {
+  const { theme } = useTheme( );
   const { navigate, popTo } = navigation;
   const menuItems = ["home", "achievements", "challenges", "observations", "inat", "about", "settings"];
 
@@ -23,7 +25,7 @@ const SideMenu = ( { navigation } ) => {
 
   const renderMenuItems = ( ) => menuItems.map( ( item, i ) => {
     const titleCase = capitalizeNames( item ) || "";
-    const name = ( item === "inat" ? "iNaturalist" : i18n.t( `menu.${item}` ) ).toLocaleUpperCase();
+    const name = ( item === "inat" ? "iNaturalist" : i18n.t( `menu.${item}` ) );
     const path = item === "inat" ? "iNatStats" : titleCase;
 
     return (
@@ -38,13 +40,13 @@ const SideMenu = ( { navigation } ) => {
           source={icons[`menu${titleCase}`]}
           style={imageStyles.icon}
         />
-        <StyledText allowFontScaling={false} style={[baseTextStyles.sideMenu, textStyles.text]}>{name}</StyledText>
+        <StyledText allowFontScaling={false} style={[baseTextStyles.sideMenu, textStyles.text, { color: theme.colors.text }]}>{name}</StyledText>
       </Pressable>
     );
   } );
 
   return (
-    <View testID="side-menu" style={viewStyles.container}>
+    <View testID="side-menu" style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]}>
       <Pressable
         accessibilityLabel={i18n.t( "menu.home" )}
         accessible

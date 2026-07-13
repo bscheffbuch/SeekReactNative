@@ -139,15 +139,18 @@ const useFetchStats = ( year: number ): StatsState => {
           }
           const highestEarned = badges
             .filtered( `iconicTaxonName != null AND iconicTaxonId == ${id}` )
-            .sorted( "index", true )
-            .sorted( "earned", true );
+            .sorted( [["earned", true], ["index", true]] );
           const highestEarnedBadge = highestEarned[0];
           if ( !highestEarnedBadge ) {
             return;
           }
-          // Add the number of observations for this year to the badge info
-          highestEarnedBadge.observationsThisYear = reduced[id];
-          _badges.push( highestEarnedBadge );
+          // Copy to a plain object so we can add the number of observations
+          // for this year without modifying the managed Realm object
+          const badgeWithCount = {
+            ...highestEarnedBadge.toJSON( ),
+            observationsThisYear: reduced[id],
+          };
+          _badges.push( badgeWithCount );
         } );
 
         const topThreeSpeciesBadges = _badges

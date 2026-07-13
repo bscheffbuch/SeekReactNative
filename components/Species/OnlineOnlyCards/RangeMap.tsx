@@ -13,11 +13,13 @@ import Modal from "../../UIComponents/Modals/Modal";
 import ViewWithHeader from "../../UIComponents/Screens/ViewWithHeader";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const latitudeDelta = 0.2;
 const longitudeDelta = 0.2;
 
 const RangeMap = () => {
+  const { theme } = useTheme( );
   const navigation = useNavigation();
   const { params } = useRoute();
   // TODO: navigation TS
@@ -119,10 +121,13 @@ const RangeMap = () => {
       </MapView>
       <TouchableOpacity
         onPress={openModal}
-        style={viewStyles.legend}
+        style={[viewStyles.legend, {
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.border,
+        }]}
       >
         <StyledText style={[baseTextStyles.modalBanner, textStyles.whiteText]}>
-          {i18n.t( "species_detail.legend" ).toLocaleUpperCase()}
+          {i18n.t( "species_detail.legend" )}
         </StyledText>
       </TouchableOpacity>
       {user.latitude && (

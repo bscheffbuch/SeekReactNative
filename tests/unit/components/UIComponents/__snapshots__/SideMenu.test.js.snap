@@ -3,12 +3,17 @@
 exports[`SideMenu should render correctly 1`] = `
 <View
   style={
-    {
-      "backgroundColor": "#38976d",
-      "flex": 1,
-      "flexGrow": 1,
-      "justifyContent": "center",
-    }
+    [
+      {
+        "backgroundColor": "#F3F1E8",
+        "flex": 1,
+        "flexGrow": 1,
+        "justifyContent": "center",
+      },
+      {
+        "backgroundColor": "#F3F1E8",
+      },
+    ]
   }
   testID="side-menu"
 >
@@ -62,7 +67,7 @@ exports[`SideMenu should render correctly 1`] = `
     />
   </View>
   <View
-    accessibilityLabel="HOME"
+    accessibilityLabel="Home"
     accessibilityState={
       {
         "busy": undefined,
@@ -102,7 +107,7 @@ exports[`SideMenu should render correctly 1`] = `
           "paddingVertical": 21,
         },
         {
-          "borderBottomColor": "#63d4ab",
+          "borderBottomColor": "#E6E9E4",
           "borderBottomWidth": 1,
         },
       ]
@@ -119,7 +124,7 @@ exports[`SideMenu should render correctly 1`] = `
           "height": 25,
           "marginHorizontal": 25,
           "resizeMode": "contain",
-          "tintColor": "#63d4ab",
+          "tintColor": "#14794f",
           "width": 27,
         }
       }
@@ -139,18 +144,23 @@ exports[`SideMenu should render correctly 1`] = `
               "letterSpacing": 1,
             },
             {
+              "color": "#111512",
               "flex": 1,
               "paddingEnd": 4,
             },
+            {
+              "color": "#111512",
+            },
           ],
+          null,
         ]
       }
     >
-      HOME
+      Home
     </Text>
   </View>
   <View
-    accessibilityLabel="ACHIEVEMENTS"
+    accessibilityLabel="Achievements"
     accessibilityState={
       {
         "busy": undefined,
@@ -190,7 +200,7 @@ exports[`SideMenu should render correctly 1`] = `
           "paddingVertical": 21,
         },
         {
-          "borderBottomColor": "#63d4ab",
+          "borderBottomColor": "#E6E9E4",
           "borderBottomWidth": 1,
         },
       ]
@@ -207,7 +217,7 @@ exports[`SideMenu should render correctly 1`] = `
           "height": 25,
           "marginHorizontal": 25,
           "resizeMode": "contain",
-          "tintColor": "#63d4ab",
+          "tintColor": "#14794f",
           "width": 27,
         }
       }
@@ -227,18 +237,23 @@ exports[`SideMenu should render correctly 1`] = `
               "letterSpacing": 1,
             },
             {
+              "color": "#111512",
               "flex": 1,
               "paddingEnd": 4,
             },
+            {
+              "color": "#111512",
+            },
           ],
+          null,
         ]
       }
     >
-      ACHIEVEMENTS
+      Achievements
     </Text>
   </View>
   <View
-    accessibilityLabel="CHALLENGES"
+    accessibilityLabel="Challenges"
     accessibilityState={
       {
         "busy": undefined,
@@ -278,7 +293,7 @@ exports[`SideMenu should render correctly 1`] = `
           "paddingVertical": 21,
         },
         {
-          "borderBottomColor": "#63d4ab",
+          "borderBottomColor": "#E6E9E4",
           "borderBottomWidth": 1,
         },
       ]
@@ -295,7 +310,7 @@ exports[`SideMenu should render correctly 1`] = `
           "height": 25,
           "marginHorizontal": 25,
           "resizeMode": "contain",
-          "tintColor": "#63d4ab",
+          "tintColor": "#14794f",
           "width": 27,
         }
       }
@@ -315,18 +330,23 @@ exports[`SideMenu should render correctly 1`] = `
               "letterSpacing": 1,
             },
             {
+              "color": "#111512",
               "flex": 1,
               "paddingEnd": 4,
             },
+            {
+              "color": "#111512",
+            },
           ],
+          null,
         ]
       }
     >
-      CHALLENGES
+      Challenges
     </Text>
   </View>
   <View
-    accessibilityLabel="MY OBSERVATIONS"
+    accessibilityLabel="My Observations"
     accessibilityState={
       {
         "busy": undefined,
@@ -366,7 +386,7 @@ exports[`SideMenu should render correctly 1`] = `
           "paddingVertical": 21,
         },
         {
-          "borderBottomColor": "#63d4ab",
+          "borderBottomColor": "#E6E9E4",
           "borderBottomWidth": 1,
         },
       ]
@@ -383,7 +403,7 @@ exports[`SideMenu should render correctly 1`] = `
           "height": 25,
           "marginHorizontal": 25,
           "resizeMode": "contain",
-          "tintColor": "#63d4ab",
+          "tintColor": "#14794f",
           "width": 27,
         }
       }
@@ -403,18 +423,23 @@ exports[`SideMenu should render correctly 1`] = `
               "letterSpacing": 1,
             },
             {
+              "color": "#111512",
               "flex": 1,
               "paddingEnd": 4,
             },
+            {
+              "color": "#111512",
+            },
           ],
+          null,
         ]
       }
     >
-      MY OBSERVATIONS
+      My Observations
     </Text>
   </View>
   <View
-    accessibilityLabel="INATURALIST"
+    accessibilityLabel="iNaturalist"
     accessibilityState={
       {
         "busy": undefined,
@@ -454,7 +479,7 @@ exports[`SideMenu should render correctly 1`] = `
           "paddingVertical": 21,
         },
         {
-          "borderBottomColor": "#63d4ab",
+          "borderBottomColor": "#E6E9E4",
           "borderBottomWidth": 1,
         },
       ]
@@ -471,7 +496,7 @@ exports[`SideMenu should render correctly 1`] = `
           "height": 25,
           "marginHorizontal": 25,
           "resizeMode": "contain",
-          "tintColor": "#63d4ab",
+          "tintColor": "#14794f",
           "width": 27,
         }
       }
@@ -491,18 +516,23 @@ exports[`SideMenu should render correctly 1`] = `
               "letterSpacing": 1,
             },
             {
+              "color": "#111512",
               "flex": 1,
               "paddingEnd": 4,
             },
+            {
+              "color": "#111512",
+            },
           ],
+          null,
         ]
       }
     >
-      INATURALIST
+      iNaturalist
     </Text>
   </View>
   <View
-    accessibilityLabel="ABOUT"
+    accessibilityLabel="About"
     accessibilityState={
       {
         "busy": undefined,
@@ -542,7 +572,7 @@ exports[`SideMenu should render correctly 1`] = `
           "paddingVertical": 21,
         },
         {
-          "borderBottomColor": "#63d4ab",
+          "borderBottomColor": "#E6E9E4",
           "borderBottomWidth": 1,
         },
       ]
@@ -559,7 +589,7 @@ exports[`SideMenu should render correctly 1`] = `
           "height": 25,
           "marginHorizontal": 25,
           "resizeMode": "contain",
-          "tintColor": "#63d4ab",
+          "tintColor": "#14794f",
           "width": 27,
         }
       }
@@ -579,18 +609,23 @@ exports[`SideMenu should render correctly 1`] = `
               "letterSpacing": 1,
             },
             {
+              "color": "#111512",
               "flex": 1,
               "paddingEnd": 4,
             },
+            {
+              "color": "#111512",
+            },
           ],
+          null,
         ]
       }
     >
-      ABOUT
+      About
     </Text>
   </View>
   <View
-    accessibilityLabel="SETTINGS"
+    accessibilityLabel="Settings"
     accessibilityState={
       {
         "busy": undefined,
@@ -644,7 +679,7 @@ exports[`SideMenu should render correctly 1`] = `
           "height": 25,
           "marginHorizontal": 25,
           "resizeMode": "contain",
-          "tintColor": "#63d4ab",
+          "tintColor": "#14794f",
           "width": 27,
         }
       }
@@ -664,14 +699,19 @@ exports[`SideMenu should render correctly 1`] = `
               "letterSpacing": 1,
             },
             {
+              "color": "#111512",
               "flex": 1,
               "paddingEnd": 4,
             },
+            {
+              "color": "#111512",
+            },
           ],
+          null,
         ]
       }
     >
-      SETTINGS
+      Settings
     </Text>
   </View>
 </View>

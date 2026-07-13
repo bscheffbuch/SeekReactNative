@@ -9,7 +9,7 @@ const SocialTabs = ( { tab, toggleTab } ) => {
   const renderTab = selectedTab => (
     <TouchableOpacity onPress={toggleTab}>
       <StyledText style={[textStyles.photoSizeText, tab === selectedTab && textStyles.selectedPhotoSizeText]}>
-        {i18n.t( `social.${selectedTab}` ).toLocaleUpperCase( )}
+        {i18n.t( `social.${selectedTab}` )}
       </StyledText>
     </TouchableOpacity>
   );

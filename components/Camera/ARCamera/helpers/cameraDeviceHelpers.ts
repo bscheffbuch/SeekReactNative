@@ -5,12 +5,6 @@ import type {
   VideoStabilizationMode,
 } from "react-native-vision-camera";
 
-interface BackCameraLensOption {
-  id: PhysicalCameraDeviceType;
-  label: string;
-  physicalDevices: [PhysicalCameraDeviceType];
-}
-
 export interface BackCameraZoomPreset {
   label: string;
   lens: BackCameraLens;
@@ -22,24 +16,6 @@ export type BackCameraLens = PhysicalCameraDeviceType;
 export const DEFAULT_BACK_CAMERA_LENS: BackCameraLens = "wide-angle-camera";
 export const DEFAULT_BACK_CAMERA_ZOOM = 1;
 const TELEPHOTO_BACK_CAMERA_ZOOM = 2;
-
-export const BACK_CAMERA_LENS_OPTIONS: BackCameraLensOption[] = [
-  {
-    id: "ultra-wide-angle-camera",
-    label: "0.5x",
-    physicalDevices: ["ultra-wide-angle-camera"],
-  },
-  {
-    id: "wide-angle-camera",
-    label: "1x",
-    physicalDevices: ["wide-angle-camera"],
-  },
-  {
-    id: "telephoto-camera",
-    label: "2x",
-    physicalDevices: ["telephoto-camera"],
-  },
-];
 
 const BACK_CAMERA_ZOOM_PRESET_VALUES = [
   0.5,
@@ -55,16 +31,10 @@ const STABILIZATION_PRIORITY: VideoStabilizationMode[] = [
   "cinematic",
   "cinematic-extended",
 ];
+// Samsung exposes an additional optimized logical back camera under id "20" on
+// many devices. Ids beyond "0"/"1" are vendor-specific (macro/depth/IR sensors
+// on other manufacturers), so this ranking must only apply on Samsung devices.
 const SAMSUNG_OPTIMIZED_BACK_CAMERA_IDS = new Set( ["20"] );
-
-const fallbackLens = BACK_CAMERA_LENS_OPTIONS.find(
-  lensOption => lensOption.id === DEFAULT_BACK_CAMERA_LENS
-) || BACK_CAMERA_LENS_OPTIONS[0];
-
-const deviceSupportsLens = (
-  cameraDevice: CameraDevice,
-  lensOption: BackCameraLensOption
-) => cameraDevice.position === "back" && cameraDevice.physicalDevices.includes( lensOption.id );
 
 const normalizeZoom = ( zoom: number ): number => Number( zoom.toFixed( 1 ) );
 
@@ -127,12 +97,15 @@ const deviceCanSelectZoomPreset = ( cameraDevice: CameraDevice, zoom: number ): 
 const compareBackCameraCandidates = (
   leftDevice: CameraDevice,
   rightDevice: CameraDevice,
-  preferredLens: BackCameraLens
+  preferredLens: BackCameraLens,
+  isSamsungDevice: boolean
 ): number => {
-  const leftOptimizedRank = SAMSUNG_OPTIMIZED_BACK_CAMERA_IDS.has( leftDevice.id ) ? 1 : 0;
-  const rightOptimizedRank = SAMSUNG_OPTIMIZED_BACK_CAMERA_IDS.has( rightDevice.id ) ? 1 : 0;
-  if ( leftOptimizedRank !== rightOptimizedRank ) {
-    return rightOptimizedRank - leftOptimizedRank;
+  if ( isSamsungDevice ) {
+    const leftOptimizedRank = SAMSUNG_OPTIMIZED_BACK_CAMERA_IDS.has( leftDevice.id ) ? 1 : 0;
+    const rightOptimizedRank = SAMSUNG_OPTIMIZED_BACK_CAMERA_IDS.has( rightDevice.id ) ? 1 : 0;
+    if ( leftOptimizedRank !== rightOptimizedRank ) {
+      return rightOptimizedRank - leftOptimizedRank;
+    }
   }
 
   const leftIncludesPreferredLens = deviceIncludesLens( leftDevice, preferredLens ) ? 1 : 0;
@@ -150,42 +123,6 @@ const compareBackCameraCandidates = (
   const leftZoomRange = leftDevice.maxZoom - leftDevice.minZoom;
   const rightZoomRange = rightDevice.maxZoom - rightDevice.minZoom;
   return rightZoomRange - leftZoomRange;
-};
-
-export const getAvailableBackCameraLenses = (
-  cameraDevices: CameraDevice[]
-): BackCameraLensOption[] => {
-  const availableLenses = BACK_CAMERA_LENS_OPTIONS.filter( lensOption => (
-    cameraDevices.some( cameraDevice => deviceSupportsLens( cameraDevice, lensOption ) )
-  ) );
-
-  return availableLenses.length > 0
-    ? availableLenses
-    : [fallbackLens];
-};
-
-export const getBackCameraLensLabel = ( lens: BackCameraLens ): string => (
-  BACK_CAMERA_LENS_OPTIONS.find( lensOption => lensOption.id === lens )?.label
-  || fallbackLens.label
-);
-
-export const getBackCameraLensZoom = (
-  cameraDevice: CameraDevice,
-  lens: BackCameraLens
-): number => {
-  if ( cameraDevice.physicalDevices.length === 1 && cameraDevice.physicalDevices[0] === lens ) {
-    return cameraDevice.neutralZoom;
-  }
-
-  if ( lens === "ultra-wide-angle-camera" ) {
-    return clampZoom( cameraDevice, cameraDevice.minZoom );
-  }
-
-  if ( lens === "telephoto-camera" ) {
-    return clampZoom( cameraDevice, cameraDevice.neutralZoom * 2 );
-  }
-
-  return clampZoom( cameraDevice, cameraDevice.neutralZoom );
 };
 
 export const getBackCameraZoomPresets = (
@@ -213,7 +150,8 @@ export const getBackCameraZoomPresets = (
 
 export const getBackCameraDeviceForZoom = (
   cameraDevices: CameraDevice[],
-  zoom: number
+  zoom: number,
+  isSamsungDevice: boolean = false
 ): CameraDevice | undefined => {
   const preferredLens = getBackCameraLensForZoom( zoom );
   const backCameraDevices = cameraDevices.filter( isBackCamera );
@@ -221,11 +159,11 @@ export const getBackCameraDeviceForZoom = (
   return backCameraDevices
     .filter( cameraDevice => deviceCanSelectZoomPreset( cameraDevice, zoom ) )
     .sort( ( leftDevice, rightDevice ) => (
-      compareBackCameraCandidates( leftDevice, rightDevice, preferredLens )
+      compareBackCameraCandidates( leftDevice, rightDevice, preferredLens, isSamsungDevice )
     ) )[0]
     || backCameraDevices
       .sort( ( leftDevice, rightDevice ) => (
-        compareBackCameraCandidates( leftDevice, rightDevice, DEFAULT_BACK_CAMERA_LENS )
+        compareBackCameraCandidates( leftDevice, rightDevice, DEFAULT_BACK_CAMERA_LENS, isSamsungDevice )
       ) )[0];
 };
 
@@ -248,21 +186,13 @@ export const getBackCameraZoomValue = (
   return clampZoom( cameraDevice, zoom );
 };
 
-export const getNextBackCameraLens = (
-  currentLens: BackCameraLens,
-  availableLenses: BackCameraLensOption[]
-): BackCameraLens => {
-  if ( availableLenses.length < 2 ) {
-    return currentLens;
-  }
-
-  const currentIndex = availableLenses.findIndex( lensOption => lensOption.id === currentLens );
-  const nextIndex = currentIndex < 0
-    ? 0
-    : ( currentIndex + 1 ) % availableLenses.length;
-
-  return availableLenses[nextIndex].id;
-};
+// On iOS multi-cam devices the zoom factor space starts at the widest lens
+// (factor 1 = ultra-wide), so presets map relative to the device's neutral
+// zoom: preset 1x -> neutralZoom, preset 2x -> neutralZoom * 2, etc.
+export const getNeutralRelativeBackCameraZoomValue = (
+  cameraDevice: CameraDevice,
+  zoom: number
+): number => clampZoom( cameraDevice, cameraDevice.neutralZoom * zoom );
 
 export const getPreferredVideoStabilizationModeForDevice = (
   cameraDevice?: CameraDevice

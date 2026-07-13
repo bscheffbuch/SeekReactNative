@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   View,
   ImageBackground,
+  StyleSheet,
 } from "react-native";
 
 import { viewStyles, textStyles } from "../../styles/uiComponents/speciesCard";
@@ -11,6 +12,7 @@ import iconicTaxa from "../../assets/iconicTaxa";
 import i18n from "../../i18n";
 import StyledText from "./StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   handlePress?: () => void;
@@ -30,12 +32,27 @@ const SpeciesCard = ( {
   taxon,
 }: Props ) => {
   const { preferredCommonName, name, iconicTaxonId } = taxon;
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    card: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+    },
+    commonName: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.heading,
+    },
+    scientificName: {
+      color: theme.colors.muted,
+    },
+  } );
 
   return (
     <TouchableOpacity
       onPress={handlePress}
       style={[
         !handlePress ? viewStyles.notTouchable : viewStyles.touchableArea,
+        handlePress && themedStyles.card,
         viewStyles.row,
       ]}
       disabled={!handlePress}
@@ -55,7 +72,7 @@ const SpeciesCard = ( {
         {!preferredCommonName && !name && (
           <StyledText
             allowFontScaling={allowFontScaling}
-            style={[baseTextStyles.regular, textStyles.commonNameText]}
+            style={[baseTextStyles.regular, textStyles.commonNameText, themedStyles.commonName]}
           >
             {i18n.t( "posting.unknown" )}
           </StyledText>
@@ -63,14 +80,18 @@ const SpeciesCard = ( {
         {preferredCommonName ? (
           <StyledText
             allowFontScaling={allowFontScaling}
-            style={[baseTextStyles.regular, textStyles.commonNameText]}
+            style={[baseTextStyles.regular, textStyles.commonNameText, themedStyles.commonName]}
           >
             {preferredCommonName}
           </StyledText>
         ) : (
           <StyledText
             allowFontScaling={allowFontScaling}
-            style={[baseTextStyles.italic, textStyles.scientificNameHeaderText]}
+            style={[
+              baseTextStyles.italic,
+              textStyles.scientificNameHeaderText,
+              themedStyles.commonName,
+            ]}
           >
             {name}
           </StyledText>
@@ -78,7 +99,7 @@ const SpeciesCard = ( {
         {name && (
           <StyledText
             allowFontScaling={allowFontScaling}
-            style={[baseTextStyles.italic, textStyles.scientificNameText]}
+            style={[baseTextStyles.italic, textStyles.scientificNameText, themedStyles.scientificName]}
           >
             {name}
           </StyledText>

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useCallback, useContext, useEffect } from "react";
 import inatjs from "inaturalistjs";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useNetInfo } from "@react-native-community/netinfo";
 import { WebView } from "react-native-webview";
 import makeWebshell, {
@@ -21,6 +21,7 @@ import { fetchAccessToken } from "../../../utility/loginHelpers";
 import { useNavigation } from "@react-navigation/native";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const Webshell = makeWebshell(
   WebView,
@@ -44,6 +45,19 @@ const AutoheightWebView = ( webshellProps: any ) => {
 
 const Announcements = ( ) => {
   const [announcements, setAnnouncements] = React.useState<any[] | undefined>( undefined );
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    container: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: 12,
+      ...theme.elevation.card,
+    },
+    title: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.heading,
+    },
+  } );
 
   const netInfo = useNetInfo();
   const { isConnected } = netInfo;
@@ -75,7 +89,7 @@ const Announcements = ( ) => {
           // Filter by placement on mobile home screen
           .filter( ( r ) => r.placement === "mobile/home" )
           // Sort by start date, oldest first
-          .sort( ( a, b ) => new Date( a.start ) - new Date( b.start ) );
+          .sort( ( a, b ) => new Date( a.start ).getTime( ) - new Date( b.start ).getTime( ) );
         setAnnouncements( homeAnnouncements );
       } )
       .catch( ( err ) => {
@@ -128,9 +142,9 @@ const Announcements = ( ) => {
   };
 
   return (
-    <View style={viewStyles.whiteContainer} testID="announcements-container">
-      <StyledText style={[baseTextStyles.header, textStyles.header]}>
-        {i18n.t( "announcements.header" ).toLocaleUpperCase()}
+    <View style={[viewStyles.whiteContainer, themedStyles.container]} testID="announcements-container">
+      <StyledText style={[baseTextStyles.header, textStyles.header, themedStyles.title]}>
+        {i18n.t( "announcements.header" )}
       </StyledText>
       <AutoheightWebView
         onDOMLinkPress={onLinkPress}

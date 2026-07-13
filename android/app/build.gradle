@@ -5,6 +5,11 @@ apply plugin: "com.facebook.react"
 
 
 def getPassword(String currentUser, String keyChain) {
+    // The security CLI only exists on macOS; debug builds elsewhere
+    // (Linux CI, containers) don't need the release keystore password
+    if (!org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        return ""
+    }
     return providers.exec {
        commandLine 'security', '-q', 'find-generic-password', '-a', currentUser, '-s', keyChain, '-w'
        ignoreExitValue true
@@ -30,6 +35,12 @@ react {
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
     //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
     // debuggableVariants = ["liteDebug", "prodDebug"]
+    //   Pass -PseekBundleDebugJs=true to embed the JS bundle (and assets) in
+    //   the debug APK, producing a standalone build that runs without a Metro
+    //   dev server. Normal local debug builds leave this unset and use Metro.
+    if (project.hasProperty("seekBundleDebugJs")) {
+        debuggableVariants = []
+    }
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
     // nodeExecutableAndArgs = ["node"]

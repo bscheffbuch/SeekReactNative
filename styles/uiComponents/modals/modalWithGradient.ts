@@ -11,17 +11,16 @@ const viewStyles = StyleSheet.create( {
   },
   container: {
     alignSelf: "center",
-    backgroundColor: colors.white,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    backgroundColor: colors.seekSurface,
+    borderColor: colors.seekBorder,
+    borderRadius: 22,
+    borderWidth: 1,
     overflow: "hidden",
     width: 337,
   },
   grayButton: {
-    backgroundColor: colors.grayGradientLight,
-    borderRadius: 6,
+    backgroundColor: colors.seekPrimaryContainer,
+    borderRadius: 14,
     paddingHorizontal: 15,
     paddingVertical: 5,
     position: "absolute",
@@ -29,8 +28,9 @@ const viewStyles = StyleSheet.create( {
     top: 55,
   },
   header: {
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    backgroundColor: colors.seekPrimaryContainer,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     height: 167,
     overflow: "visible",
   },
@@ -65,6 +65,7 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   buttonText: {
+    color: colors.seekInk,
     paddingTop: Platform.OS === "ios" ? 7 : 0,
     textAlign: "center",
   },

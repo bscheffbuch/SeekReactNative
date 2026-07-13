@@ -3,8 +3,8 @@ import type { KeyboardTypeOptions } from "react-native";
 import { TextInput, Platform } from "react-native";
 
 import styles from "../../styles/uiComponents/inputField";
-import { colors } from "../../styles/global";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 type TextContentTypes = "emailAddress" | "username" | "password";
 interface Props {
@@ -20,6 +20,7 @@ const InputField = ( {
   text,
   type,
 }: Props ) => {
+  const { theme } = useTheme( );
   let keyboardType: KeyboardTypeOptions = "default";
   if ( type === "emailAddress" ) {
     keyboardType = "email-address";
@@ -41,10 +42,14 @@ const InputField = ( {
       keyboardType={keyboardType}
       onChangeText={handleTextChange}
       placeholder={placeholder}
-      placeholderTextColor={colors.placeholderGray}
+      placeholderTextColor={theme.colors.muted}
       secureTextEntry={type === "password"}
       selectTextOnFocus={Platform.OS === "android"}
-      style={[baseTextStyles.inputField, styles.inputField]}
+      style={[baseTextStyles.inputField, styles.inputField, {
+        backgroundColor: theme.colors.surface,
+        borderColor: theme.colors.border,
+        color: theme.colors.text,
+      }]}
       textContentType={type} // iOS only
       value={text}
       testID={type}

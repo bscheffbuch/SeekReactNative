@@ -1,17 +1,16 @@
 // @ts-nocheck
 import React, { useState, useEffect } from "react";
-import { View, Switch } from "react-native";
+import { StyleSheet, Text, View, Switch } from "react-native";
 import { RadioButton, RadioButtonInput, RadioButtonLabel } from "react-native-simple-radio-button";
-import RNPickerSelect from "react-native-picker-select";
 import Realm from "realm";
 
 import i18n from "../../i18n";
 import { viewStyles, textStyles } from "../../styles/settings";
 import { updateUserSetting } from "../../utility/settingsHelpers";
-import { colors } from "../../styles/global";
 import realmConfig from "../../models";
 import StyledText from "../UIComponents/StyledText";
-import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
+import SettingsSelect from "./SettingsSelect";
 
 interface State {
   autoCapture?: boolean;
@@ -42,12 +41,45 @@ const confidenceThresholdOptions = ( () => {
   }
   return options;
 } )();
-const placeholder = {};
-const pickerStyles = { ...viewStyles };
-const showIcon = () => <></>;
 
+// Realm object properties are prototype accessors, so spreading a live Realm
+// object copies nothing; copy the fields into a plain object before using it
+// as component state
+const settingsToPlainObject = ( userSettings ): State => ( {
+  autoCapture: userSettings.autoCapture,
+  scientificNames: userSettings.scientificNames,
+  cameraViewportResolution: userSettings.cameraViewportResolution,
+  photoQualityBalance: userSettings.photoQualityBalance,
+  confidenceThreshold: userSettings.confidenceThreshold,
+} );
 const CameraSettings = ( ) => {
   const [settings, setSettings] = useState<State>( {} );
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    title: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.heading,
+      fontSize: 18,
+      lineHeight: 24,
+    },
+    groupLabel: {
+      color: theme.colors.muted,
+      fontFamily: theme.typography.heading,
+      fontSize: 13,
+      lineHeight: 18,
+      marginBottom: theme.spacing.sm,
+    },
+    rowText: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.body,
+      fontSize: 16,
+      lineHeight: 23,
+    },
+    pickerStack: {
+      gap: theme.spacing.sm,
+      paddingTop: theme.spacing.md,
+    },
+  } );
   const radioButtons = [
     { label: i18n.t( "settings.common_names" ), value: 0 },
     { label: i18n.t( "settings.scientific_names" ), value: 1 },
@@ -108,7 +140,10 @@ const CameraSettings = ( ) => {
     } );
   };
 
-  const switchTrackColor = { true: colors.seekForestGreen };
+  const switchTrackColor = {
+    false: theme.colors.border,
+    true: theme.colors.primary,
+  };
 
   const handleRadioButtonPress = ( value: number ) => updateIndex( value );
 
@@ -117,9 +152,9 @@ const CameraSettings = ( ) => {
 
     const fetchUserSettings = async ( ) => {
       const realm = await Realm.open( realmConfig );
-      const userSettings = realm.objects( "UserSettingsRealm" );
-      if ( isCurrent ) {
-        setSettings( userSettings[0] );
+      const userSettings = realm.objects( "UserSettingsRealm" )[0];
+      if ( isCurrent && userSettings ) {
+        setSettings( settingsToPlainObject( userSettings ) );
       }
     };
     fetchUserSettings( );
@@ -130,7 +165,7 @@ const CameraSettings = ( ) => {
 
   return (
     <>
-      <StyledText style={baseTextStyles.header}>{i18n.t( "settings.header" ).toLocaleUpperCase()}</StyledText>
+      <Text style={themedStyles.title}>{i18n.t( "settings.header" )}</Text>
       <View style={viewStyles.marginSmall} />
       <View style={viewStyles.radioButtonSmallMargin}>
         {radioButtons.map( ( obj, i ) => <RadioButton
@@ -145,8 +180,8 @@ const CameraSettings = ( ) => {
               }
               onPress={handleRadioButtonPress}
               borderWidth={1}
-              buttonInnerColor={colors.seekForestGreen}
-              buttonOuterColor={colors.seekForestGreen}
+              buttonInnerColor={theme.colors.primary}
+              buttonOuterColor={theme.colors.primary}
               buttonSize={12}
               buttonOuterSize={20}
               accessible
@@ -157,7 +192,7 @@ const CameraSettings = ( ) => {
               index={i}
               onPress={handleRadioButtonPress}
               labelHorizontal
-              labelStyle={baseTextStyles.body}
+              labelStyle={themedStyles.rowText}
               accessible
               accessibilityLabel={radioButtons[i].label}
             />
@@ -173,56 +208,28 @@ const CameraSettings = ( ) => {
           accessible
           accessibilityLabel={settings.autoCapture ? i18n.t( "posting.yes" ) : i18n.t( "posting.no" )}
         />
-        <StyledText style={[baseTextStyles.body, textStyles.autoCaptureText]}>
+        <StyledText style={[themedStyles.rowText, textStyles.autoCaptureText]}>
           {i18n.t( "settings.auto_capture" )}
         </StyledText>
       </View>
-      <View style={viewStyles.donateMarginBottom}>
-        <StyledText style={baseTextStyles.header}>CAMERA STREAM RESOLUTION</StyledText>
-        <RNPickerSelect
-          hideIcon
-          Icon={showIcon}
+      <View style={themedStyles.pickerStack}>
+        <SettingsSelect
           items={cameraViewportResolutionOptions}
+          label="Camera stream resolution"
           onValueChange={updateCameraViewportResolution}
-          placeholder={placeholder}
-          useNativeAndroidPickerStyle={false}
           value={settings.cameraViewportResolution || "720p"}
-          style={pickerStyles}
-          pickerProps={{
-            themeVariant: "light",
-          }}
         />
-      </View>
-      <View style={viewStyles.donateMarginBottom}>
-        <StyledText style={baseTextStyles.header}>{i18n.t( "settings.photo_quality_balance" ).toLocaleUpperCase()}</StyledText>
-        <RNPickerSelect
-          hideIcon
-          Icon={showIcon}
+        <SettingsSelect
           items={photoQualityBalanceOptions}
+          label={i18n.t( "settings.photo_quality_balance" )}
           onValueChange={updatePhotoQualityBalance}
-          placeholder={placeholder}
-          useNativeAndroidPickerStyle={false}
           value={settings.photoQualityBalance || "balanced"}
-          style={pickerStyles}
-          pickerProps={{
-            themeVariant: "light",
-          }}
         />
-      </View>
-      <View style={viewStyles.donateMarginBottom}>
-        <StyledText style={baseTextStyles.header}>{i18n.t( "settings.confidence_threshold" ).toLocaleUpperCase()}</StyledText>
-        <RNPickerSelect
-          hideIcon
-          Icon={showIcon}
+        <SettingsSelect
           items={confidenceThresholdOptions}
+          label={i18n.t( "settings.confidence_threshold" )}
           onValueChange={updateConfidenceThreshold}
-          placeholder={placeholder}
-          useNativeAndroidPickerStyle={false}
           value={settings.confidenceThreshold || 50}
-          style={pickerStyles}
-          pickerProps={{
-            themeVariant: "light",
-          }}
         />
       </View>
     </>

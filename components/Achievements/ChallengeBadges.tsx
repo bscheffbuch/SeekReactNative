@@ -1,6 +1,11 @@
 // @ts-nocheck
 import React, { useState, useCallback, useMemo } from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import ChallengeModal from "../Modals/ChallengeEarnedModal";
 import ChallengeUnearnedModal from "../Modals/ChallengeUnearnedModal";
@@ -10,6 +15,7 @@ import Modal from "../UIComponents/Modals/Modal";
 import { createBadgeSetList } from "../../utility/badgeHelpers";
 import BadgeContainer from "./BadgeContainer";
 import { useFetchChallenges } from "./hooks/achievementHooks";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface ChallengeBadge {
   index: number;
@@ -28,8 +34,14 @@ const ChallengeBadges = ( ) => {
   const challengeBadges = useFetchChallenges( );
   const [showModal, setModal] = useState( false );
   const [selectedChallenge, setChallenge] = useState<ChallengeBadge | null>( null );
+  const { theme } = useTheme( );
 
-  const sets = createBadgeSetList( challengeBadges );
+  const sets = useMemo( () => createBadgeSetList( challengeBadges ), [challengeBadges] );
+  const themedStyles = useMemo( () => StyleSheet.create( {
+    emptyBadge: {
+      tintColor: theme.colors.muted,
+    },
+  } ), [theme] );
 
   const openModal = useCallback( ( ) => setModal( true ), [] );
   const closeModal = useCallback( ( ) => setModal( false ), [] );
@@ -47,7 +59,10 @@ const ChallengeBadges = ( ) => {
         <TouchableOpacity onPress={openChallengeBadgeModal} key={item.earnedIconName}>
           <Image
             source={item.percentComplete === 100 ? badgeImages[item.earnedIconName] : badgeImages.badge_empty}
-            style={imageStyles.badgeIcon}
+            style={[
+              imageStyles.badgeIcon,
+              item.percentComplete !== 100 && themedStyles.emptyBadge,
+            ]}
           />
         </TouchableOpacity>
       );
@@ -61,7 +76,7 @@ const ChallengeBadges = ( ) => {
         />
       </View>
     );
-  } ), [challengeBadges, sets, openModal] );
+  } ), [challengeBadges, sets, openModal, themedStyles.emptyBadge] );
 
   return (
     <>

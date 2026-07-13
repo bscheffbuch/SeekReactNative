@@ -4,12 +4,12 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { textStyles, viewStyles } from "../../../styles/uiComponents/speciesNearby/speciesObservedCell";
 import i18n from "../../../i18n";
-import icons from "../../../assets/icons";
 import { setRoute, StoredRoutes } from "../../../utility/helpers";
 import iconicTaxa from "../../../assets/iconicTaxa";
 import { useCommonName } from "../../../utility/customHooks/useCommonName";
@@ -18,6 +18,8 @@ import { useUserPhoto } from "../../../utility/customHooks/useUserPhoto";
 import StyledText from "../StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { useSpeciesDetail } from "../../Providers/SpeciesDetailProvider";
+import { CheckIcon } from "../AppIcons";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   readonly item: {
@@ -33,6 +35,15 @@ const SpeciesObservedCell = ( { item }: Props ) => {
   const { setId } = useSpeciesDetail();
   const { navigate } = useNavigation();
   const { taxon } = item;
+  const { theme } = useTheme();
+  const themedStyles = StyleSheet.create( {
+    checkbox: {
+      alignItems: "center",
+      backgroundColor: theme.colors.primary,
+      borderRadius: 12,
+      justifyContent: "center",
+    },
+  } );
   const commonName = useCommonName( taxon.id );
 
   const seenTaxa = useSeenTaxa( taxon.id );
@@ -57,7 +68,14 @@ const SpeciesObservedCell = ( { item }: Props ) => {
             imageStyle={viewStyles.cellImage}
           >
             <Image source={{ uri: currentUserPhoto.uri }} style={viewStyles.cellImage} />
-            <Image source={icons.speciesObserved} style={viewStyles.checkbox} />
+            <View
+              style={[
+                viewStyles.checkbox,
+                themedStyles.checkbox,
+              ]}
+            >
+              <CheckIcon color={theme.colors.inverseText} size={15} strokeWidth={3} />
+            </View>
           </ImageBackground>
           <View style={viewStyles.cellTitle}>
             <StyledText

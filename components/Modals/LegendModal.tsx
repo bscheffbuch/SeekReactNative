@@ -10,12 +10,15 @@ import icons from "../../assets/icons";
 import WhiteModal from "../UIComponents/Modals/WhiteModal";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   readonly closeModal: () => void;
 }
 
 const Legend = ( { closeModal }: Props ) => {
+  const { theme } = useTheme( );
+
   const renderText = ( text: string ) => (
     <StyledText style={[baseTextStyles.body, textStyles.text]}>
       {text}
@@ -24,9 +27,9 @@ const Legend = ( { closeModal }: Props ) => {
 
   return (
     <WhiteModal closeModal={closeModal}>
-      <View style={viewStyles.legendHeader}>
+      <View style={[viewStyles.legendHeader, { backgroundColor: theme.colors.primaryContainer }]}>
         <StyledText style={[baseTextStyles.modalBanner, textStyles.whiteText]}>
-          {i18n.t( "species_detail.legend" ).toLocaleUpperCase()}
+          {i18n.t( "species_detail.legend" )}
         </StyledText>
       </View>
       <View>

@@ -14,8 +14,10 @@ const viewStyles = StyleSheet.create( {
   },
   container: {
     alignSelf: "center",
-    backgroundColor: colors.white,
-    borderRadius: 40,
+    backgroundColor: colors.seekSurface,
+    borderColor: colors.seekBorder,
+    borderRadius: 22,
+    borderWidth: 1,
     maxWidth: 366,
   },
   headerMargin: {

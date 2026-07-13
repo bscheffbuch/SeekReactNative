@@ -19,6 +19,7 @@ import { colors } from "../../styles/global";
 import { resetRouter } from "../../utility/navigationHelpers";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   successfulUploads: number;
@@ -35,6 +36,7 @@ const UploadStatus = ( {
 }: Props ) => {
   // progress bar adapted from: https://blog.logrocket.com/how-to-build-a-progress-bar-with-react-native/
   const navigation = useNavigation();
+  const { theme } = useTheme( );
   const progress = useSharedValue( 0 );
   const animatedStyle = useAnimatedStyle( ( ) => ( {
     width: `${progress.value}%`,
@@ -101,16 +103,18 @@ const UploadStatus = ( {
 
     const checkUploads = async ( ) => {
       const allUploads = await checkForUploads( );
+      // must match the numPendingUploads filter in HomeScreen: queued
+      // "save for later" drafts are only uploaded explicitly by the user
       const pendingUploads = allUploads.filter( observation => observation.photo.uploadSucceeded === false
-        && observation.photo.uploadFailed === false );
+        && observation.photo.uploadFailed === false
+        && observation.queued !== true );
       pendingUploads.forEach( observation => beginUpload( observation ) );
     };
 
     if ( numPendingUploads > 0 && !isUploading ) {
       // only check uploads once
       if ( isCurrent ) {
-        // TODO: don't we need to reset here?
-        // progress.set( 0 );
+        progress.set( 0 );
         setIsUploading( true );
         checkUploads( );
       }
@@ -124,7 +128,7 @@ const UploadStatus = ( {
   const retryUploads = ( ) => resetRouter( navigation );
 
   return (
-    <View style={viewStyles.container}>
+    <View style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]}>
       {successfulUploads > 0 && (
         <Pressable
           onPress={closeCard}
@@ -158,10 +162,10 @@ const UploadStatus = ( {
           </View>
         )}
         {( internet === true && !error ) && (
-          <View style={viewStyles.progressBar}>
+          <View style={[viewStyles.progressBar, { backgroundColor: theme.colors.surface }]}>
             {successfulUploads > 0
-              ? <View style={[viewStyles.absoluteFill, viewStyles.fullWidth]} />
-              : <Animated.View style={[viewStyles.absoluteFill, animatedStyle]} />}
+              ? <View style={[viewStyles.absoluteFill, viewStyles.fullWidth, { backgroundColor: theme.colors.primaryContainer }]} />
+              : <Animated.View style={[viewStyles.absoluteFill, animatedStyle, { backgroundColor: theme.colors.primaryContainer }]} />}
           </View>
         )}
       </View>

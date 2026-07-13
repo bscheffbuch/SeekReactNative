@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useCallback } from "react";
-import { View, BackHandler } from "react-native";
+import { StyleSheet, View, BackHandler } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import Realm from "realm";
 import Modal from "react-native-modal";
@@ -12,10 +12,10 @@ import styles from "../../styles/observations/observations";
 import { createSectionList, removeFromCollection } from "../../utility/observationHelpers";
 import DeleteModal from "../Modals/DeleteModal";
 import LoadingWheel from "../UIComponents/LoadingWheel";
-import { colors } from "../../styles/global";
 import ObsList from "./ObsList";
 import ViewWithHeader from "../UIComponents/Screens/ViewWithHeader";
 import { resetRouter } from "../../utility/navigationHelpers";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Observation {
   id: number;
@@ -44,6 +44,7 @@ interface ItemToDelete extends Taxon {
 
 const Observations = ( ) => {
   const navigation = useNavigation( );
+  const { theme } = useTheme( );
   const [observations, setObservations] = useState<Observation[]>( [] );
   const [showModal, setModal] = useState<boolean>( false );
   const [itemToDelete, setItemToDelete] = useState<ItemToDelete | null>( null );
@@ -135,7 +136,9 @@ const Observations = ( ) => {
     // otherwise hard to use search in languages with characters
     if ( text.length >= 1 ) {
       Realm.open( realmConfig ).then( ( realm ) => {
-        const species = realm.objects( "ObservationRealm" ).filtered( `taxon.name CONTAINS[c] '${text}' OR taxon.preferredCommonName CONTAINS[c] '${text}'` );
+        // parameterized query: user input must not be interpolated into the
+        // query string, or names containing quotes crash the search
+        const species = realm.objects( "ObservationRealm" ).filtered( "taxon.name CONTAINS[c] $0 OR taxon.preferredCommonName CONTAINS[c] $0", text );
         setupObsList( species, true );
       } ).catch( ( ) => {
         // console.log( "Err: ", err )
@@ -175,6 +178,11 @@ const Observations = ( ) => {
   }, [resetObservations] );
 
   const updateObs = useCallback( ( obs: Observation[] ) => setObservations( obs ), [] );
+  const themedStyles = StyleSheet.create( {
+    content: {
+      backgroundColor: theme.colors.canvas,
+    },
+  } );
 
   return (
     <ViewWithHeader header="observations.header">
@@ -193,9 +201,9 @@ const Observations = ( ) => {
           closeModal={closeModal}
         />
       </Modal>
-      <View style={styles.whiteContainer}>
+      <View style={[styles.whiteContainer, themedStyles.content]}>
         {loading
-          ? <LoadingWheel color={colors.seekForestGreen} />
+          ? <LoadingWheel color={theme.colors.primary} />
           : (
             <ObsList
               fetchFilteredObservations={fetchFilteredObservations}

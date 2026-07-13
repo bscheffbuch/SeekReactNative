@@ -7,6 +7,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { viewStyles } from "../../styles/onboarding";
 import Dots from "./Dots";
 import Button from "./Button";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const gradientColors = {
   "0": ["#50c49c", "#1b6537"],
@@ -15,6 +16,7 @@ const gradientColors = {
 };
 
 const Swiper = ( { children }: PropsWithChildren ) => {
+  const { theme } = useTheme( );
   const flatList = useRef( null );
   const viewConfigRef = useRef( {
     waitForInteraction: true,
@@ -52,7 +54,7 @@ const Swiper = ( { children }: PropsWithChildren ) => {
   return (
     <LinearGradient
       colors={[gradientColors[scrollIndex][0], gradientColors[scrollIndex][1]]}
-      style={viewStyles.container}
+      style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]}
     >
       {renderScrollView( children )}
       <Dots index={scrollIndex} />

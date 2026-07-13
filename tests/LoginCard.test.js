@@ -15,7 +15,7 @@ function renderLoginCard() {
 describe( "LoginCard", () => {
   test( "that login card renders button based on user status", () => {
     renderLoginCard();
-    const signInButton = screen.getByText( "LOG IN WITH INATURALIST" );
+    const signInButton = screen.getByText( /log in with inaturalist/i );
     expect( signInButton ).toBeTruthy();
     fireEvent.press( signInButton );
     // const signOutButton = screen.getByText( "SIGN OUT OF INATURALIST" );

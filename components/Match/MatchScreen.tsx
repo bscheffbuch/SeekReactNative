@@ -17,9 +17,11 @@ import { useFetchUserSettings } from "../../utility/customHooks/useFetchUserSett
 import { setGradients, setScreenType } from "../../utility/matchHelpers";
 import MatchModals from "./MatchModals";
 import { useObservation } from "../Providers/ObservationProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const MatchScreen = ( ) => {
   const { observation } = useObservation();
+  const { theme } = useTheme( );
   const scrollView = useRef<any>( null );
   const navigation = useNavigation( );
   const settings = useFetchUserSettings( );
@@ -94,7 +96,7 @@ const MatchScreen = ( ) => {
         setNavigationPath={setNavigationPath}
         scientificNames={scientificNames}
       />
-      <ScrollView ref={scrollView} contentContainerStyle={styles.whiteContainer}>
+      <ScrollView ref={scrollView} contentContainerStyle={[styles.whiteContainer, { backgroundColor: theme.colors.canvas }]}>
         <TopSpacer backgroundColor={gradientDark} />
         <MatchHeader
           observation={observation}

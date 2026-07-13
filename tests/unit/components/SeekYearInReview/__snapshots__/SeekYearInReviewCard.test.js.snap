@@ -1,5 +1,375 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SeekYearInReviewCard should render in December with observations 1`] = `null`;
+exports[`SeekYearInReviewCard should render in December with observations 1`] = `
+<View
+  style={
+    [
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 18,
+        "borderWidth": 1,
+        "marginHorizontal": 16,
+        "marginTop": 16,
+        "padding": 16,
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 12,
+        "elevation": 2,
+        "shadowColor": "#142018",
+        "shadowOffset": {
+          "height": 6,
+          "width": 0,
+        },
+        "shadowOpacity": 0.07,
+        "shadowRadius": 14,
+      },
+    ]
+  }
+  testID="yir-card"
+>
+  <Text
+    style={
+      [
+        {
+          "textAlign": "left",
+        },
+        [
+          {
+            "color": "#111512",
+            "fontFamily": "Lato-Bold",
+            "fontSize": 18,
+            "letterSpacing": 0,
+            "lineHeight": 22,
+          },
+          {
+            "paddingLeft": 0,
+          },
+          {
+            "color": "#111512",
+            "fontFamily": "Lato-Bold",
+          },
+        ],
+        null,
+      ]
+    }
+  >
+    Seek Year in Review
+  </Text>
+  <View
+    style={
+      {
+        "paddingTop": 21,
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "textAlign": "left",
+          },
+          [
+            {
+              "color": "#111512",
+              "fontFamily": "Lato-Regular",
+              "fontSize": 15,
+              "letterSpacing": 0,
+              "lineHeight": 21,
+            },
+            false,
+            {
+              "color": "#707A72",
+              "fontFamily": "Lato-Regular",
+            },
+          ],
+          null,
+        ]
+      }
+    >
+      Thanks for using Seek this year! Check out your personalized Year in Review here:
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "marginTop": 33,
+      }
+    }
+  />
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignSelf": "center",
+        "backgroundColor": "#14794f",
+        "borderRadius": 14,
+        "elevation": 2,
+        "height": 64,
+        "justifyContent": "center",
+        "maxWidth": 317,
+        "opacity": 1,
+        "shadowColor": "#14794f",
+        "shadowOffset": {
+          "height": 7,
+          "width": 0,
+        },
+        "shadowOpacity": 0.16,
+        "shadowRadius": 12,
+        "width": 317,
+      }
+    }
+    testID="greenButton"
+  >
+    <Text
+      allowFontScaling={true}
+      style={
+        [
+          {
+            "textAlign": "left",
+          },
+          [
+            {
+              "color": "#ffffff",
+              "fontFamily": "Lato-Bold",
+              "fontSize": 15,
+              "letterSpacing": 1,
+              "lineHeight": 21,
+            },
+            {
+              "textAlign": "center",
+            },
+            undefined,
+            undefined,
+          ],
+          null,
+        ]
+      }
+    >
+      View my Seek Review
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "marginTop": 48,
+      }
+    }
+  />
+</View>
+`;
 
-exports[`SeekYearInReviewCard should render in January with observations 1`] = `null`;
+exports[`SeekYearInReviewCard should render in January with observations 1`] = `
+<View
+  style={
+    [
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 18,
+        "borderWidth": 1,
+        "marginHorizontal": 16,
+        "marginTop": 16,
+        "padding": 16,
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 12,
+        "elevation": 2,
+        "shadowColor": "#142018",
+        "shadowOffset": {
+          "height": 6,
+          "width": 0,
+        },
+        "shadowOpacity": 0.07,
+        "shadowRadius": 14,
+      },
+    ]
+  }
+  testID="yir-card"
+>
+  <Text
+    style={
+      [
+        {
+          "textAlign": "left",
+        },
+        [
+          {
+            "color": "#111512",
+            "fontFamily": "Lato-Bold",
+            "fontSize": 18,
+            "letterSpacing": 0,
+            "lineHeight": 22,
+          },
+          {
+            "paddingLeft": 0,
+          },
+          {
+            "color": "#111512",
+            "fontFamily": "Lato-Bold",
+          },
+        ],
+        null,
+      ]
+    }
+  >
+    Seek Year in Review
+  </Text>
+  <View
+    style={
+      {
+        "paddingTop": 21,
+      }
+    }
+  >
+    <Text
+      style={
+        [
+          {
+            "textAlign": "left",
+          },
+          [
+            {
+              "color": "#111512",
+              "fontFamily": "Lato-Regular",
+              "fontSize": 15,
+              "letterSpacing": 0,
+              "lineHeight": 21,
+            },
+            false,
+            {
+              "color": "#707A72",
+              "fontFamily": "Lato-Regular",
+            },
+          ],
+          null,
+        ]
+      }
+    >
+      Thanks for using Seek this year! Check out your personalized Year in Review here:
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "marginTop": 33,
+      }
+    }
+  />
+  <View
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": undefined,
+        "expanded": undefined,
+        "selected": undefined,
+      }
+    }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    style={
+      {
+        "alignSelf": "center",
+        "backgroundColor": "#14794f",
+        "borderRadius": 14,
+        "elevation": 2,
+        "height": 64,
+        "justifyContent": "center",
+        "maxWidth": 317,
+        "opacity": 1,
+        "shadowColor": "#14794f",
+        "shadowOffset": {
+          "height": 7,
+          "width": 0,
+        },
+        "shadowOpacity": 0.16,
+        "shadowRadius": 12,
+        "width": 317,
+      }
+    }
+    testID="greenButton"
+  >
+    <Text
+      allowFontScaling={true}
+      style={
+        [
+          {
+            "textAlign": "left",
+          },
+          [
+            {
+              "color": "#ffffff",
+              "fontFamily": "Lato-Bold",
+              "fontSize": 15,
+              "letterSpacing": 1,
+              "lineHeight": 21,
+            },
+            {
+              "textAlign": "center",
+            },
+            undefined,
+            undefined,
+          ],
+          null,
+        ]
+      }
+    >
+      View my Seek Review
+    </Text>
+  </View>
+  <View
+    style={
+      {
+        "marginTop": 48,
+      }
+    }
+  />
+</View>
+`;

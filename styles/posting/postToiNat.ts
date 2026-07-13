@@ -23,11 +23,11 @@ export default StyleSheet.create( {
     marginLeft: height < 570 ? 14 : 27,
   },
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   divider: {
-    backgroundColor: colors.dividerGray,
+    backgroundColor: "#E6E9E4",
     height: 1,
   },
   extraMargin: {
@@ -41,7 +41,7 @@ export default StyleSheet.create( {
     width: width - 54,
   },
   rotate: {
-    tintColor: colors.seekForestGreen,
+    tintColor: colors.seekDeepGreen,
     transform: [{ rotate: I18nManager.isRTL ? "0deg" : "180deg" }],
   },
   row: {

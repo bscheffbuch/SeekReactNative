@@ -6,6 +6,8 @@ import {
   getLanguage,
   getAutoCapture,
   getSeasonality,
+  fetchUserSetting,
+  updateUserSetting,
 } from "../../../utility/settingsHelpers";
 
 describe( "getScientificNames", () => {
@@ -87,5 +89,15 @@ describe( "getSeasonality", () => {
     jest.spyOn( AsyncStorage, "getItem" ).mockResolvedValueOnce( "true" );
     const result = await getSeasonality();
     expect( result ).toBe( true );
+  } );
+} );
+
+describe( "hideCameraReminder user setting", () => {
+  it( "should persist the reminder opt-out setting", async () => {
+    const updatedSetting = await updateUserSetting( "hideCameraReminder", true );
+    const fetchedSetting = await fetchUserSetting( "hideCameraReminder" );
+
+    expect( updatedSetting ).toBe( true );
+    expect( fetchedSetting ).toBe( true );
   } );
 } );

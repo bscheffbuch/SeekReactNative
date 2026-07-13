@@ -41,7 +41,7 @@ const GeoprivacyPicker = ( { updateObservation, geoprivacy }: Props ) => {
         <Image source={posting.geoprivacy} />
         <View style={styles.row}>
           <StyledText style={baseTextStyles.postSectionHeader}>
-            {i18n.t( "posting.geoprivacy" ).toLocaleUpperCase()}
+            {i18n.t( "posting.geoprivacy" )}
           </StyledText>
           <StyledText style={[baseTextStyles.body, styles.text]}>
             {geoprivacyText}

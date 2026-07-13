@@ -1,10 +1,14 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   whiteContainer: {
-    paddingTop: 35,
-    backgroundColor: colors.white,
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E6E9E4",
+    borderRadius: 18,
+    borderWidth: 1,
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
   },
   marginGreenButtonLarge: {
     marginTop: 33,
@@ -16,8 +20,8 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   header: {
-    paddingLeft: 22,
-    paddingBottom: 21,
+    paddingBottom: 12,
+    paddingLeft: 0,
   },
 } );
 

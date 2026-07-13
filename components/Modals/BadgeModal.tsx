@@ -150,13 +150,13 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
     </View>
   );
 
-  const extractKey = useCallback( ( item: Badge, index: number ) => `${item}${index}`, [] );
+  const extractKey = useCallback( ( item: Badge ) => `badge-${item.earnedIconName}`, [] );
 
   return (
     <WhiteModal closeModal={closeModal}>
       <BannerHeader
         modal
-        text={i18n.t( badges[0].iconicTaxonName ).toLocaleUpperCase()}
+        text={i18n.t( badges[0].iconicTaxonName )}
       />
       <FlatList
         ref={flatList}

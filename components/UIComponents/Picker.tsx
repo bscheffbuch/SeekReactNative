@@ -3,6 +3,8 @@ import type { PropsWithChildren} from "react";
 import React, { useCallback } from "react";
 import RNPickerSelect from "react-native-picker-select";
 
+import { useTheme } from "../Providers/ThemeProvider";
+
 const placeholder = {};
 
 interface Props extends PropsWithChildren {
@@ -21,9 +23,11 @@ const Picker = ( {
   disabled,
 }: Props ) => {
   const showIcon = useCallback( () => <></>, [] );
+  const { theme } = useTheme();
 
   return (
     <RNPickerSelect
+      darkTheme={theme.isDark}
       hideIcon
       Icon={showIcon}
       items={itemList}
@@ -32,7 +36,7 @@ const Picker = ( {
       useNativeAndroidPickerStyle={false}
       disabled={disabled}
       pickerProps={{
-        themeVariant: "light",
+        themeVariant: theme.isDark ? "dark" : "light",
       }}
     >
       {children}

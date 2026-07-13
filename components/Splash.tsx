@@ -19,7 +19,8 @@ const SplashScreen = ( ) => {
   const navToCamera = useCallback( ( ) => navigation.navigate( "Camera" ), [navigation] );
 
   const resetRouter = useCallback( ( name ) => {
-    setTimeout( ( ) => navigation.reset( { routes: [{ name }] } ), 2000 );
+    const params = name === "MainTabs" ? { screen: "Home" } : undefined;
+    setTimeout( ( ) => navigation.reset( { routes: [{ name, params }] } ), 2000 );
   }, [navigation] );
 
   const checkForQuickAction = useCallback( ( ) => {
@@ -31,7 +32,7 @@ const SplashScreen = ( ) => {
     const checkForNewUser = async ( ) => {
       setCameraLaunched( false );
       await deleteFromAsyncStorage( "speciesNearbyLocation" );
-      setupUserSettings( );
+      await setupUserSettings( );
 
       // originally, I thought we could move AR camera files into the main bundle on first launch only,
       // but this breaks the camera for offloaded apps on iOS

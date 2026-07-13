@@ -49,17 +49,17 @@ const ChallengeEarnedModal = ( { closeModal, challenge }: Props ) => {
           style={imageStyles.seekBanner}
         >
           <StyledText style={[is2020OrAfterChallenge ? baseTextStyles.banner : baseTextStyles.bannerSmall, textStyles.bannerText]}>
-            {i18n.t( challenge.badgeName ).toLocaleUpperCase( )}
+            {i18n.t( challenge.badgeName )}
           </StyledText>
         </ImageBackground>
       </ImageBackground>
       <View style={viewStyles.marginTop} />
       <StyledText style={[baseTextStyles.highlight, textStyles.headerText]}>
         {i18n.t( "challenges_all.you_completed_sponsor_challenge", {
-          sponsorName: challenge.sponsorName.toLocaleUpperCase( ),
+          sponsorName: challenge.sponsorName,
           date: challenge.sponsorName === "Our Planet"
-            ? formatMonth( challenge.availableDate ).toLocaleUpperCase( )
-            : formatMonthYear( challenge.availableDate ).toLocaleUpperCase( ),
+            ? formatMonth( challenge.availableDate )
+            : formatMonthYear( challenge.availableDate ),
         } )}
       </StyledText>
       <StyledText style={[baseTextStyles.body, textStyles.text]}>

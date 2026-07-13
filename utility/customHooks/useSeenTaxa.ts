@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
+import Realm from "realm";
 
 import realmConfig from "../../models";
 

@@ -9,7 +9,7 @@ const viewStyles = StyleSheet.create( {
     top: 0,
     bottom: 0,
     borderRadius: 40,
-    backgroundColor: colors.seekiNatGreen,
+    backgroundColor: colors.seekPrimaryContainer,
   },
   center: {
     alignItems: "center",
@@ -29,7 +29,7 @@ const viewStyles = StyleSheet.create( {
   container: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: colors.speciesNearbyGreen,
+    backgroundColor: colors.seekCanvas,
   },
   containerPadding: {
     paddingHorizontal: 20,
@@ -47,7 +47,7 @@ const viewStyles = StyleSheet.create( {
     marginTop: 21,
     height: 6,
     marginHorizontal: 7,
-    backgroundColor: "white",
+    backgroundColor: colors.seekSurface,
     borderRadius: 40,
   },
   row,

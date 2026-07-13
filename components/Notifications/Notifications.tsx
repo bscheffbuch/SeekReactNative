@@ -1,6 +1,11 @@
 // @ts-nocheck
-import React, { useEffect, useRef } from "react";
-import { View } from "react-native";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
+import { StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import type { FlashListRef } from "@shopify/flash-list";
 import { useNavigation, useScrollToTop } from "@react-navigation/native";
@@ -14,11 +19,22 @@ import { markNotificationsAsViewed } from "../../utility/notificationHelpers";
 import ViewWithHeader from "../UIComponents/Screens/ViewWithHeader";
 import type { Notification } from "./hooks/notificationHooks";
 import useFetchNotifications from "./hooks/notificationHooks";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const NotificationsScreen = ( ) => {
   const navigation = useNavigation( );
   const scrollView = useRef<FlashListRef<Notification>>( null );
   const notifications = useFetchNotifications( );
+  const { theme } = useTheme( );
+
+  const themedStyles = useMemo( () => StyleSheet.create( {
+    content: {
+      backgroundColor: theme.colors.canvas,
+    },
+    divider: {
+      backgroundColor: theme.colors.border,
+    },
+  } ), [theme] );
 
   useScrollToTop( scrollView );
 
@@ -30,22 +46,31 @@ const NotificationsScreen = ( ) => {
     return unsubscribe;
   }, [navigation] );
 
-  const renderItem = ( { item }: { item: Notification } ) => <NotificationCard item={item} />;
-  const showEmptyList = ( ) => <EmptyState />;
-  const renderItemSeparator = ( ) => <View style={viewStyles.divider} />;
-  const renderFooter = ( ) => (
+  const renderItem = useCallback(
+    ( { item }: { item: Notification } ) => <NotificationCard item={item} />,
+    [],
+  );
+  const showEmptyList = useCallback( ( ) => <EmptyState />, [] );
+  const renderItemSeparator = useCallback(
+    ( ) => <View style={[viewStyles.divider, themedStyles.divider]} />,
+    [themedStyles],
+  );
+  const renderFooter = useCallback( ( ) => (
     <>
       <Padding />
       <BottomSpacer />
     </>
+  ), [] );
+  const extractKey = useCallback(
+    ( item: Notification, index: number ) => `${item.index ?? item.title ?? "notification"}-${index}`,
+    [],
   );
-  const extractKey = ( item: Notification, index: number ) => item + index;
 
   return (
     <ViewWithHeader testID="notifications-screen-container" header="notifications.header">
       <FlashList
         ref={scrollView}
-        contentContainerStyle={viewStyles.containerWhite}
+        contentContainerStyle={[viewStyles.containerWhite, themedStyles.content]}
         data={notifications}
         keyExtractor={extractKey}
         ListFooterComponent={renderFooter}

@@ -11,9 +11,11 @@ import ViewWithHeader from "./Screens/ViewWithHeader";
 import CopyButton from "./Buttons/CopyButton";
 import StyledText from "./StyledText";
 import i18n from "../../i18n";
+import { useTheme } from "../Providers/ThemeProvider";
 // import LogFileText from "./LogFileText";
 
 const DebugEmailScreen = ( ) => {
+  const { theme } = useTheme( );
   // Log file content state
   const [logContents, setLogContents] = useState( "" );
   const [failed, setFailed] = useState( false );
@@ -60,7 +62,7 @@ const DebugEmailScreen = ( ) => {
 
   return (
     <ViewWithHeader header="inat_signup.email">
-      <View style={styles.background}>
+      <View style={[styles.background, { backgroundColor: theme.colors.canvas }]}>
         <View style={styles.center}>
           <GreenButton handlePress={sendEmailAttachment} text="debug.logs" />
           { failed &&

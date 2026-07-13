@@ -27,13 +27,13 @@ const GreenHeader = ( { header = null, route = null, plainText }: Props ) => {
     <View style={[viewHeaderStyles.container, viewHeaderStyles.center]}>
       {name !== "LoginSuccess" && <BackArrow route={route} />}
       {header && (
-        <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.text]}>
-          {i18n.t( header ).toLocaleUpperCase()}
+        <StyledText allowFontScaling={false} style={[baseTextStyles.header, textStyles.text]}>
+          {i18n.t( header )}
         </StyledText>
       )}
       {plainText && (
-        <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.text]}>
-          {plainText.toLocaleUpperCase( )}
+        <StyledText allowFontScaling={false} style={[baseTextStyles.header, textStyles.text]}>
+          {plainText}
         </StyledText>
       )}
       {name === "Post" && (

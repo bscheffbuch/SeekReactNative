@@ -11,6 +11,7 @@ import SpeciesObserved from "./SpeciesObserved";
 import SpeciesNearbyChallenge from "./SpeciesNearbyChallenge";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   challenge: {
@@ -27,14 +28,15 @@ interface Props {
 
 const ChallengeDetailsContainer = ( { challenge }: Props ) => {
   const { navigate } = useNavigation( );
+  const { theme } = useTheme( );
 
-  const navToChallenges = ( ) => navigate( "Challenges" );
+  const navToChallenges = ( ) => navigate( "MainTabs", { screen: "Challenges" } );
 
   // only show for WWFOP, not NatGeo or future sponsors
   const photographerLogo = challenge.logo === "op" ? logos[challenge.secondLogo] : null;
 
   return (
-    <View style={viewStyles.whiteContainer}>
+    <View style={[viewStyles.whiteContainer, { backgroundColor: theme.colors.canvas }]}>
       <View style={viewStyles.textContainer}>
         {challenge.startedDate && <ChallengeMissionCard challenge={challenge} />}
         <View style={viewStyles.marginSmall} />

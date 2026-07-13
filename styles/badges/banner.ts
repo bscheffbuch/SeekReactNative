@@ -2,12 +2,13 @@ import { StyleSheet } from "react-native";
 
 const viewStyles = StyleSheet.create( {
   banner: {
-    height: 48,
-    marginBottom: 32,
-    marginTop: 40,
-    paddingTop: 5,
-    width: 284,
     alignSelf: "center",
+    backgroundColor: "#DEF0E7",
+    borderRadius: 999,
+    marginBottom: 18,
+    marginTop: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   modal: {
     marginBottom: 26,
@@ -17,6 +18,10 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   bannerText: {
+    color: "#14794F",
+    fontFamily: "Lato-Bold",
+    fontSize: 13,
+    lineHeight: 17,
     textAlign: "center",
   },
 } );

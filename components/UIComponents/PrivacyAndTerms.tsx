@@ -6,6 +6,7 @@ import i18n from "../../i18n";
 import { viewStyles, textStyles } from "../../styles/uiComponents/privacyAndTerms";
 import StyledText from "./StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   login?: boolean;
@@ -14,11 +15,14 @@ interface Props {
 const PrivacyAndTerms = ( { login }: Props ) => {
   const { navigate } = useNavigation();
   const { name } = useRoute();
+  const { theme } = useTheme( );
 
   const screens = ["Age", "LicensePhotos", "About"];
   const greenText = screens.includes( name );
 
-  const linkStyles = greenText ? [baseTextStyles.bodyGreen, textStyles.signupTextLink] : [baseTextStyles.regular, textStyles.textLink];
+  const linkStyles = greenText
+    ? [baseTextStyles.bodyGreen, textStyles.signupTextLink, { color: theme.colors.primary }]
+    : [baseTextStyles.regular, textStyles.textLink, { color: theme.colors.primary }];
 
   // TODO: navigation TS
   const navToPrivacy = ( ) => navigate( "Privacy" );

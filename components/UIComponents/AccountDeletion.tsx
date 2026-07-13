@@ -26,7 +26,7 @@ const AccountDeletion = ( ) => {
   return (
     <View style={viewStyles.whiteContainer}>
       <StyledText style={baseTextStyles.header}>
-        {i18n.t( "settings.danger_zone" ).toLocaleUpperCase( )}
+        {i18n.t( "settings.danger_zone" )}
       </StyledText>
       <View style={viewStyles.paddingAboveText}>
         <StyledText style={[

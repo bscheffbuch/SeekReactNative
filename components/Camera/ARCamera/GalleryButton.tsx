@@ -4,7 +4,6 @@ import * as ImagePicker from "react-native-image-picker";
 import {
   TouchableOpacity,
   View,
-  Image,
   Platform,
 } from "react-native";
 
@@ -15,13 +14,14 @@ import { UserContext } from "../../UserContext";
 import { useObservation } from "../../Providers/ObservationProvider";
 import type { ObservationImage } from "../../Providers/ObservationProvider";
 import { viewStyles } from "../../../styles/camera/arCameraOverlay";
-import icons from "../../../assets/icons";
 import readExifFromMultiplePhotos from "../../../utility/parseExif";
 import { getUnixTime } from "date-fns";
 import LoadingWheel from "../../UIComponents/LoadingWheel";
 import InatVision from "./helpers/visionPluginWrapper";
 import { log } from "../../../react-native-logs.config";
 import { LogLevels, logToApi } from "../../../utility/apiCalls";
+import { ImageIcon } from "../../UIComponents/AppIcons";
+import { colors } from "../../../styles/global";
 
 const logger = log.extend( "GalleryButton.tsx" );
 
@@ -96,9 +96,7 @@ const GalleryButton = ( { setIsActive }: Props ) => {
         context: "getPredictionsForImage rankLevel",
       } ).catch( ( logError ) => logger.error( "logToApi failed:", logError ) );
       startObservationWithImage( image, () => {
-        navigation.navigate( "Drawer", {
-          screen: "Match",
-        } );
+        navigation.navigate( "Match", { origin: "camera" } );
       } );
     } else {
       logToApi( {
@@ -193,7 +191,7 @@ const GalleryButton = ( { setIsActive }: Props ) => {
         onPress={showPhotoGallery}
         style={viewStyles.galleryButton}
       >
-      <Image source={icons.gallery} />
+      <ImageIcon color={colors.white} size={27} strokeWidth={2.35} />
     </TouchableOpacity>
   );
 };

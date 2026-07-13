@@ -1,22 +1,21 @@
-import { StyleSheet, Platform } from "react-native";
-import { colors } from "../global";
+import { StyleSheet } from "react-native";
 
 const viewStyles = StyleSheet.create( {
   container: {
-    backgroundColor: Platform.OS === "android" ? colors.white : colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   containerWhite: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
   },
   darkGreen: {
-    backgroundColor: colors.speciesNearbyGreen,
+    backgroundColor: "#DEF0E7",
   },
   green: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
   },
   black: {
-    backgroundColor: colors.black,
+    backgroundColor: "#F3F1E8",
   },
   loadingWheel: {
     alignItems: "center",

@@ -3,7 +3,7 @@ import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   background: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
     flex: 1,
     paddingHorizontal: 23,
   },

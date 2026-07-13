@@ -5,739 +5,478 @@ exports[`NotificationsScreen should render correctly 1`] = `
   edges={
     {
       "bottom": "off",
-      "left": "off",
-      "right": "off",
+      "left": "additive",
+      "right": "additive",
       "top": "additive",
     }
   }
   style={
-    {
-      "backgroundColor": "#38976d",
-      "flex": 1,
-    }
+    [
+      {
+        "backgroundColor": "#F3F1E8",
+        "flex": 1,
+      },
+      {
+        "backgroundColor": "#F3F1E8",
+      },
+    ]
   }
   testID="notifications-screen-container"
 >
   <View
     style={
-      [
-        {
-          "backgroundColor": "#38976d",
-          "flexDirection": "row",
-          "paddingBottom": 18,
-          "paddingTop": 20.5,
-        },
-        {
-          "alignItems": "center",
-          "justifyContent": "center",
-        },
-      ]
+      {
+        "alignItems": "center",
+        "backgroundColor": "#F3F1E8",
+        "flexDirection": "row",
+        "minHeight": 64,
+        "paddingHorizontal": 16,
+        "paddingVertical": 8,
+      }
     }
   >
     <View
-      accessibilityLabel="Go back to previous screen"
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
         {
-          "left": 0,
-          "opacity": 1,
-          "paddingHorizontal": 23,
-          "paddingVertical": 18,
-          "position": "absolute",
-          "transform": [
-            {
-              "scaleX": 1,
-            },
-          ],
+          "height": 48,
+          "width": 48,
+        }
+      }
+    />
+    <Text
+      accessibilityRole="header"
+      numberOfLines={2}
+      style={
+        {
+          "color": "#111512",
+          "flex": 1,
+          "fontFamily": "Lato-Bold",
+          "fontSize": 22,
+          "lineHeight": 28,
+          "marginHorizontal": 8,
         }
       }
     >
-      <Image
-        source={
+      Notifications
+    </Text>
+    <View>
+      <View
+        accessibilityLabel="View notifications"
+        accessibilityRole="button"
+        accessibilityState={
           {
-            "testUri": "../../../assets/icons/back.webp",
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": false,
+            "expanded": undefined,
+            "selected": undefined,
           }
         }
-        style={false}
-      />
-    </View>
-    <Text
-      allowFontScaling={false}
-      style={
-        [
+        accessibilityValue={
           {
-            "textAlign": "left",
-          },
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        hitSlop={8}
+        onBlur={[Function]}
+        onClick={[Function]}
+        onFocus={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
           [
             {
-              "color": "#ffffff",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 15,
-              "letterSpacing": 1,
-              "lineHeight": 21,
+              "alignItems": "center",
+              "borderRadius": 24,
+              "height": 48,
+              "justifyContent": "center",
+              "minHeight": 48,
+              "minWidth": 48,
+              "width": 48,
             },
-            {
-              "maxWidth": 650,
-            },
-          ],
-        ]
-      }
-    >
-      NOTIFICATIONS
-    </Text>
+            false,
+            false,
+          ]
+        }
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={24}
+          bbWidth={24}
+          fill="none"
+          focusable={false}
+          height={24}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#111512"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 24,
+                "width": 24,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={24}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4279309586,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2}
+          >
+            <RNSVGPath
+              d="M10.268 21a2 2 0 0 0 3.464 0"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+            <RNSVGPath
+              d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
+      <View
+        style={
+          {
+            "backgroundColor": "#E0A82E",
+            "borderColor": "#FFFFFF",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "height": 10,
+            "position": "absolute",
+            "right": 11,
+            "top": 11,
+            "width": 10,
+          }
+        }
+        testID="unreadNotificationsIndicator"
+      />
+    </View>
   </View>
   <View
     style={
       {
+        "backgroundColor": "#F3F1E8",
         "flex": 1,
-        "overflow": "hidden",
       }
     }
   >
-    <RCTScrollView
-      ItemSeparatorComponent={[Function]}
-      ListEmptyComponent={[Function]}
-      ListFooterComponent={[Function]}
-      applyWindowCorrection={[Function]}
-      canChangeSize={true}
-      contentContainerStyle={
-        {
-          "backgroundColor": "#ffffff",
-          "minHeight": 1,
-          "minWidth": 1,
-          "paddingLeft": 0,
-          "paddingRight": 0,
-        }
-      }
-      contentHeight={212}
-      contentWidth={400}
-      data={
-        [
-          {
-            "challengeIndex": 37,
-            "iconName": "badge_empty",
-            "index": 0,
-            "message": "notifications.view_challenges",
-            "nextScreen": "ChallengeDetails",
-            "seen": false,
-            "title": "notifications.new_challenge",
-            "viewed": false,
-          },
-          {
-            "challengeIndex": 36,
-            "iconName": "badge_empty",
-            "index": 0,
-            "message": "notifications.view_challenges",
-            "nextScreen": "ChallengeDetails",
-            "seen": true,
-            "title": "notifications.new_challenge",
-            "viewed": true,
-          },
-        ]
-      }
-      dataProvider={
-        DataProvider {
-          "_data": [
-            {
-              "challengeIndex": 37,
-              "iconName": "badge_empty",
-              "index": 0,
-              "message": "notifications.view_challenges",
-              "nextScreen": "ChallengeDetails",
-              "seen": false,
-              "title": "notifications.new_challenge",
-              "viewed": false,
-            },
-            {
-              "challengeIndex": 36,
-              "iconName": "badge_empty",
-              "index": 0,
-              "message": "notifications.view_challenges",
-              "nextScreen": "ChallengeDetails",
-              "seen": true,
-              "title": "notifications.new_challenge",
-              "viewed": true,
-            },
-          ],
-          "_firstIndexToProcess": 0,
-          "_hasStableIds": true,
-          "_requiresDataChangeHandling": false,
-          "_size": 2,
-          "getStableId": [Function],
-          "rowHasChanged": [Function],
-        }
-      }
-      disableRecycling={false}
-      estimatedItemSize={106}
-      extendedState={{}}
-      externalScrollView={[Function]}
-      finalRenderAheadOffset={250}
-      forceNonDeterministicRendering={true}
-      horizontal={false}
-      initialOffset={0}
-      initialRenderIndex={0}
-      isHorizontal={false}
-      keyExtractor={[Function]}
-      layoutProvider={
-        GridLayoutProviderWithProps {
-          "_acceptableRelayoutDelta": 1,
-          "_getHeightOrWidth": [Function],
-          "_getLayoutTypeForIndex": [Function],
-          "_getSpan": [Function],
-          "_hasExpired": false,
-          "_isHorizontal": false,
-          "_lastLayoutManager": GridLayoutManager {
-            "_acceptableRelayoutDelta": 1,
-            "_getSpan": [Function],
-            "_isGridHorizontal": false,
-            "_isHorizontal": false,
-            "_layoutProvider": [Circular],
-            "_layouts": [
-              {
-                "height": 106,
-                "type": 0,
-                "width": 400,
-                "x": 0,
-                "y": 0,
-              },
-              {
-                "height": 106,
-                "type": 0,
-                "width": 400,
-                "x": 0,
-                "y": 106,
-              },
-            ],
-            "_maxSpan": 1,
-            "_renderWindowSize": {
-              "height": 900,
-              "width": 400,
-            },
-            "_totalHeight": 212,
-            "_totalWidth": 400,
-            "_window": {
-              "height": 900,
-              "width": 400,
-            },
-          },
-          "_maxSpan": 1,
-          "_renderWindowSize": {
-            "height": 900,
-            "width": 400,
-          },
-          "_setLayoutForType": [Function],
-          "_tempDim": {
-            "height": 0,
-            "width": 0,
-          },
-          "averageWindow": AverageWindow {
-            "currentAverage": 106,
-            "currentCount": 1,
-            "inputValues": [
-              106,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-              ,
-            ],
-            "nextIndex": 1,
-          },
-          "defaultEstimatedItemSize": 100,
-          "layoutObject": {
-            "size": undefined,
-            "span": undefined,
-          },
-          "props": {
-            "ItemSeparatorComponent": [Function],
-            "ListEmptyComponent": [Function],
-            "ListFooterComponent": [Function],
-            "contentContainerStyle": {
-              "backgroundColor": "#ffffff",
-            },
-            "data": [
-              {
-                "challengeIndex": 37,
-                "iconName": "badge_empty",
-                "index": 0,
-                "message": "notifications.view_challenges",
-                "nextScreen": "ChallengeDetails",
-                "seen": false,
-                "title": "notifications.new_challenge",
-                "viewed": false,
-              },
-              {
-                "challengeIndex": 36,
-                "iconName": "badge_empty",
-                "index": 0,
-                "message": "notifications.view_challenges",
-                "nextScreen": "ChallengeDetails",
-                "seen": true,
-                "title": "notifications.new_challenge",
-                "viewed": true,
-              },
-            ],
-            "estimatedItemSize": 106,
-            "keyExtractor": [Function],
-            "numColumns": 1,
-            "renderItem": [Function],
-          },
-          "renderWindowInsets": {
-            "height": 0,
-            "width": 0,
-          },
-          "shouldRefreshWithAnchoring": true,
-        }
-      }
-      maxRenderAhead={750}
-      numColumns={1}
-      onEndReached={[Function]}
-      onEndReachedThreshold={0}
-      onEndReachedThresholdRelative={0}
-      onItemLayout={[Function]}
-      onLayout={[Function]}
+    <View
       onScroll={[Function]}
-      onScrollBeginDrag={[Function]}
-      onSizeChanged={[Function]}
-      onVisibleIndicesChanged={[Function]}
-      removeClippedSubviews={false}
-      renderAheadOffset={0}
-      renderAheadStep={250}
-      renderContentContainer={[Function]}
-      renderItem={[Function]}
-      renderItemContainer={[Function]}
-      rowRenderer={[Function]}
-      scrollEventThrottle={16}
-      scrollThrottle={16}
-      scrollViewProps={
-        {
-          "contentContainerStyle": {
-            "backgroundColor": "#ffffff",
-            "minHeight": 1,
-            "minWidth": 1,
-            "paddingLeft": 0,
-            "paddingRight": 0,
-          },
-          "onLayout": [Function],
-          "onScrollBeginDrag": [Function],
-          "refreshControl": undefined,
-          "style": {
-            "minHeight": 1,
-            "minWidth": 1,
-          },
-        }
-      }
-      style={
-        {
-          "minHeight": 1,
-          "minWidth": 1,
-        }
-      }
-      suppressBoundedSizeException={true}
-      windowCorrectionConfig={
-        {
-          "applyToInitialOffset": true,
-          "applyToItemScroll": true,
-          "value": {
-            "endCorrection": 0,
-            "startCorrection": 0,
-            "windowShift": -0,
-          },
-        }
-      }
     >
-      <View>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": 112,
+            "justifyContent": "flex-start",
+            "marginHorizontal": 22,
+            "opacity": 1,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/badges/Badge_Empty.webp",
+            }
+          }
+          style={
+            {
+              "height": 72,
+              "marginRight": 24,
+              "resizeMode": "contain",
+              "width": 72,
+            }
+          }
+        />
         <View
           style={
             {
-              "flexDirection": "column",
+              "width": 589,
             }
           }
         >
-          <View
-            style={
-              {
-                "paddingLeft": 0,
-                "paddingTop": 0,
-              }
-            }
-          />
-          <View
+          <Text
             style={
               [
-                undefined,
-                undefined,
-              ]
-            }
-          />
-          <AutoLayoutView
-            enableInstrumentation={false}
-            horizontal={false}
-            onBlankAreaEvent={[Function]}
-            onLayout={[Function]}
-            renderAheadOffset={0}
-            scrollOffset={0}
-            style={
-              {
-                "height": 212,
-                "width": 400,
-              }
-            }
-            windowSize={900}
-          >
-            <CellContainer
-              index={0}
-              onLayout={[Function]}
-              style={
                 {
-                  "alignItems": "stretch",
-                  "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "top": 0,
-                  "width": 400,
-                }
-              }
-            >
-              <View
-                style={
+                  "textAlign": "left",
+                },
+                [
                   {
-                    "flexDirection": "column",
-                  }
-                }
-              >
-                <View
-                  accessibilityState={
-                    {
-                      "busy": undefined,
-                      "checked": undefined,
-                      "disabled": undefined,
-                      "expanded": undefined,
-                      "selected": undefined,
-                    }
-                  }
-                  accessibilityValue={
-                    {
-                      "max": undefined,
-                      "min": undefined,
-                      "now": undefined,
-                      "text": undefined,
-                    }
-                  }
-                  accessible={true}
-                  collapsable={false}
-                  focusable={true}
-                  onClick={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderMove={[Function]}
-                  onResponderRelease={[Function]}
-                  onResponderTerminate={[Function]}
-                  onResponderTerminationRequest={[Function]}
-                  onStartShouldSetResponder={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                      "flexWrap": "nowrap",
-                      "height": 112,
-                      "justifyContent": "flex-start",
-                      "marginHorizontal": 22,
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  <Image
-                    source={
-                      {
-                        "testUri": "../../../assets/badges/Badge_Empty.webp",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 72,
-                        "marginRight": 24,
-                        "resizeMode": "contain",
-                        "width": 72,
-                      }
-                    }
-                  />
-                  <View
-                    style={
-                      {
-                        "width": 589,
-                      }
-                    }
-                  >
-                    <Text
-                      style={
-                        [
-                          {
-                            "textAlign": "left",
-                          },
-                          [
-                            {
-                              "color": "#000000",
-                              "fontFamily": "Lato-Medium",
-                              "fontSize": 15,
-                              "letterSpacing": 0,
-                              "lineHeight": 21,
-                            },
-                            {
-                              "marginBottom": 6,
-                            },
-                          ],
-                        ]
-                      }
-                    >
-                      There's a new challenge available!
-                    </Text>
-                    <Text
-                      style={
-                        [
-                          {
-                            "textAlign": "left",
-                          },
-                          {
-                            "color": "#000000",
-                            "fontFamily": "Lato-Regular",
-                            "fontSize": 13,
-                            "letterSpacing": 0,
-                            "lineHeight": 21,
-                          },
-                        ]
-                      }
-                    >
-                      View challenge
-                    </Text>
-                  </View>
-                  <View
-                    style={
-                      {
-                        "backgroundColor": "#77b300",
-                        "borderRadius": 5.5,
-                        "height": 11,
-                        "width": 11,
-                      }
-                    }
-                  />
-                </View>
-              </View>
-              <View
-                style={
+                    "color": "#000000",
+                    "fontFamily": "Lato-Medium",
+                    "fontSize": 15,
+                    "letterSpacing": 0,
+                    "lineHeight": 21,
+                  },
                   {
-                    "backgroundColor": "#d8d8d8",
-                    "height": 1,
-                    "marginHorizontal": 23,
-                  }
-                }
-              />
-            </CellContainer>
-            <CellContainer
-              index={1}
-              onLayout={[Function]}
-              style={
-                {
-                  "alignItems": "stretch",
-                  "flexDirection": "column",
-                  "left": 0,
-                  "position": "absolute",
-                  "top": 106,
-                  "width": 400,
-                }
-              }
-            >
-              <View
-                style={
+                    "marginBottom": 6,
+                  },
                   {
-                    "flexDirection": "column",
-                  }
-                }
-              >
-                <View
-                  accessibilityState={
-                    {
-                      "busy": undefined,
-                      "checked": undefined,
-                      "disabled": undefined,
-                      "expanded": undefined,
-                      "selected": undefined,
-                    }
-                  }
-                  accessibilityValue={
-                    {
-                      "max": undefined,
-                      "min": undefined,
-                      "now": undefined,
-                      "text": undefined,
-                    }
-                  }
-                  accessible={true}
-                  collapsable={false}
-                  focusable={true}
-                  onClick={[Function]}
-                  onResponderGrant={[Function]}
-                  onResponderMove={[Function]}
-                  onResponderRelease={[Function]}
-                  onResponderTerminate={[Function]}
-                  onResponderTerminationRequest={[Function]}
-                  onStartShouldSetResponder={[Function]}
-                  style={
-                    {
-                      "alignItems": "center",
-                      "flexDirection": "row",
-                      "flexWrap": "nowrap",
-                      "height": 112,
-                      "justifyContent": "flex-start",
-                      "marginHorizontal": 22,
-                      "opacity": 1,
-                    }
-                  }
-                >
-                  <Image
-                    source={
-                      {
-                        "testUri": "../../../assets/badges/Badge_Empty.webp",
-                      }
-                    }
-                    style={
-                      {
-                        "height": 72,
-                        "marginRight": 24,
-                        "resizeMode": "contain",
-                        "width": 72,
-                      }
-                    }
-                  />
-                  <View
-                    style={
-                      {
-                        "width": 589,
-                      }
-                    }
-                  >
-                    <Text
-                      style={
-                        [
-                          {
-                            "textAlign": "left",
-                          },
-                          [
-                            {
-                              "color": "#000000",
-                              "fontFamily": "Lato-Medium",
-                              "fontSize": 15,
-                              "letterSpacing": 0,
-                              "lineHeight": 21,
-                            },
-                            {
-                              "marginBottom": 6,
-                            },
-                          ],
-                        ]
-                      }
-                    >
-                      There's a new challenge available!
-                    </Text>
-                    <Text
-                      style={
-                        [
-                          {
-                            "textAlign": "left",
-                          },
-                          {
-                            "color": "#000000",
-                            "fontFamily": "Lato-Regular",
-                            "fontSize": 13,
-                            "letterSpacing": 0,
-                            "lineHeight": 21,
-                          },
-                        ]
-                      }
-                    >
-                      View challenge
-                    </Text>
-                  </View>
-                </View>
-              </View>
-            </CellContainer>
-          </AutoLayoutView>
-          <CellContainer
-            index={-1}
-            style={
-              [
-                undefined,
-                undefined,
+                    "color": "#111512",
+                  },
+                ],
+                null,
               ]
             }
           >
-            <View
-              style={
-                {
-                  "backgroundColor": "#ffffff",
-                  "paddingBottom": 60,
-                }
-              }
-            />
-            <View
-              style={
-                {
-                  "backgroundColor": "#ffffff",
-                  "bottom": -1000,
-                  "height": 1050,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                }
-              }
-            />
-          </CellContainer>
-          <View
+            There's a new challenge available!
+          </Text>
+          <Text
             style={
-              {
-                "paddingBottom": 0,
-                "paddingRight": 0,
-              }
+              [
+                {
+                  "textAlign": "left",
+                },
+                [
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Regular",
+                    "fontSize": 13,
+                    "letterSpacing": 0,
+                    "lineHeight": 21,
+                  },
+                  {
+                    "color": "#707A72",
+                  },
+                ],
+                null,
+              ]
             }
-          />
+          >
+            View challenge
+          </Text>
+        </View>
+        <View
+          style={
+            {
+              "backgroundColor": "#77b300",
+              "borderRadius": 5.5,
+              "height": 11,
+              "width": 11,
+            }
+          }
+        />
+      </View>
+      <View
+        accessibilityState={
+          {
+            "busy": undefined,
+            "checked": undefined,
+            "disabled": undefined,
+            "expanded": undefined,
+            "selected": undefined,
+          }
+        }
+        accessibilityValue={
+          {
+            "max": undefined,
+            "min": undefined,
+            "now": undefined,
+            "text": undefined,
+          }
+        }
+        accessible={true}
+        collapsable={false}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          {
+            "alignItems": "center",
+            "flexDirection": "row",
+            "flexWrap": "nowrap",
+            "height": 112,
+            "justifyContent": "flex-start",
+            "marginHorizontal": 22,
+            "opacity": 1,
+          }
+        }
+      >
+        <Image
+          source={
+            {
+              "testUri": "../../../assets/badges/Badge_Empty.webp",
+            }
+          }
+          style={
+            {
+              "height": 72,
+              "marginRight": 24,
+              "resizeMode": "contain",
+              "width": 72,
+            }
+          }
+        />
+        <View
+          style={
+            {
+              "width": 589,
+            }
+          }
+        >
+          <Text
+            style={
+              [
+                {
+                  "textAlign": "left",
+                },
+                [
+                  {
+                    "color": "#000000",
+                    "fontFamily": "Lato-Medium",
+                    "fontSize": 15,
+                    "letterSpacing": 0,
+                    "lineHeight": 21,
+                  },
+                  {
+                    "marginBottom": 6,
+                  },
+                  {
+                    "color": "#111512",
+                  },
+                ],
+                null,
+              ]
+            }
+          >
+            There's a new challenge available!
+          </Text>
+          <Text
+            style={
+              [
+                {
+                  "textAlign": "left",
+                },
+                [
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Regular",
+                    "fontSize": 13,
+                    "letterSpacing": 0,
+                    "lineHeight": 21,
+                  },
+                  {
+                    "color": "#707A72",
+                  },
+                ],
+                null,
+              ]
+            }
+          >
+            View challenge
+          </Text>
         </View>
       </View>
-    </RCTScrollView>
+      <View
+        style={
+          [
+            {
+              "backgroundColor": "#F3F1E8",
+              "paddingBottom": 60,
+            },
+            {
+              "backgroundColor": "#F3F1E8",
+            },
+          ]
+        }
+      />
+      <View
+        style={
+          {
+            "backgroundColor": "#F3F1E8",
+            "bottom": -1000,
+            "height": 1050,
+            "left": 0,
+            "position": "absolute",
+            "right": 0,
+          }
+        }
+      />
+    </View>
   </View>
 </RNCSafeAreaView>
 `;

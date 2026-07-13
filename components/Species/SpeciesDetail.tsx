@@ -5,7 +5,7 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import { ScrollView, Platform, View, StatusBar } from "react-native";
+import { ScrollView, Platform, StyleSheet, View, StatusBar } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -25,6 +25,7 @@ import ScrollNoHeader from "../UIComponents/Screens/ScrollNoHeader";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
 import styles from "../../styles/uiComponents/scrollWithHeader";
 import { useSpeciesDetail } from "../Providers/SpeciesDetailProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface State {
   error: string | null;
@@ -69,6 +70,7 @@ const SpeciesDetail = ( ) => {
   const internet = useInternetStatus( );
   const { id } = useSpeciesDetail( );
   const { isLandscape, width } = useAppOrientation( );
+  const { theme } = useTheme( );
   const columnWidth = width / 3;
   const scrollView = useRef<ScrollView>( null );
   const navigation = useNavigation( );
@@ -137,6 +139,23 @@ const SpeciesDetail = ( ) => {
   }, [navigation, resetScreen] );
 
   const predictions = params ? params.image : null;
+  const themedStyles = StyleSheet.create( {
+    background: {
+      backgroundColor: theme.colors.canvas,
+      paddingBottom: theme.spacing.lg,
+    },
+    landscapeBackground: {
+      backgroundColor: theme.colors.canvas,
+      paddingBottom: 100,
+      paddingTop: theme.spacing.md,
+    },
+    landscapeShell: {
+      backgroundColor: theme.colors.canvas,
+    },
+    twoColumn: {
+      backgroundColor: theme.colors.canvas,
+    },
+  } );
 
   const renderOnlineOrOfflineContent = ( ) => {
     if ( error ) {
@@ -165,7 +184,7 @@ const SpeciesDetail = ( ) => {
   const renderPortraitMode = ( ) => (
     <ScrollView
       ref={scrollView}
-      contentContainerStyle={[viewStyles.background, error && viewStyles.bottomPadding]}
+      contentContainerStyle={[viewStyles.background, themedStyles.background, error && viewStyles.bottomPadding]}
       onScrollBeginDrag={clearSelectedText}
     >
       <SpeciesHeader
@@ -181,16 +200,16 @@ const SpeciesDetail = ( ) => {
   );
 
   const renderLandscapeMode = () => (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <StatusBar barStyle="light-content" />
+    <SafeAreaView style={[styles.container, themedStyles.landscapeShell]} edges={["top"]}>
+      <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
       <GreenHeader plainText={commonName || scientificName} />
-      <View style={viewStyles.twoColumnContainer}>
+      <View style={[viewStyles.twoColumnContainer, themedStyles.twoColumn]}>
         <View style={{ width: columnWidth }}>
           <SpeciesPhotosLandscape loading={loading} photos={photos} id={id} />
         </View>
         <ScrollView
           ref={scrollView}
-          contentContainerStyle={viewStyles.landscapeBackground}
+          contentContainerStyle={[viewStyles.landscapeBackground, themedStyles.landscapeBackground]}
           onScrollBeginDrag={clearSelectedText}
           bounces={false}
         >

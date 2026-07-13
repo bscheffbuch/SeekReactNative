@@ -1,4 +1,5 @@
 import React from "react";
+import { advanceAnimationByTime, withReanimatedTimer } from "react-native-reanimated";
 import { render, screen } from "tests/jest-utils";
 
 import ObsList from "../../../../components/Observations/ObsList";
@@ -81,19 +82,22 @@ jest.mock( "../../../../utility/customHooks/useUserPhoto", () => {
 const containerID = "observations-list";
 
 describe( "ObsList", () => {
-  test( "should render correctly", async () => {
-    render(
-      <ObsList
-        fetchFilteredObservations={() => jest.fn()}
-        observations={mockObservations}
-        searchText={""}
-        openModal={() => jest.fn()}
-        updateObs={() => jest.fn()}
-        clearText={() => jest.fn()}
-      />
-    );
-    const container = await screen.findByTestId( containerID );
-    expect( container ).toBeTruthy();
-    expect( screen ).toMatchSnapshot();
+  test( "should render correctly", () => {
+    withReanimatedTimer( () => {
+      render(
+        <ObsList
+          fetchFilteredObservations={() => jest.fn()}
+          observations={mockObservations}
+          searchText={""}
+          openModal={() => jest.fn()}
+          updateObs={() => jest.fn()}
+          clearText={() => jest.fn()}
+        />
+      );
+      advanceAnimationByTime( 2600 );
+      const container = screen.getByTestId( containerID );
+      expect( container ).toBeTruthy();
+      expect( screen ).toMatchSnapshot();
+    } );
   } );
 } );

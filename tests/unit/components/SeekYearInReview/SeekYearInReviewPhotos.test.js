@@ -130,7 +130,9 @@ describe( "SeekYearInReviewPhotos", () => {
     // Right arrow should be visible
     const rightArrow = await screen.findByTestId( "right-arrow" );
     expect( rightArrow ).toBeTruthy();
-    // Second obs photo should not be visible
+    // the FlashList test mock only renders the visible row of a horizontal
+    // carousel, so the later photo must NOT be in the tree before scrolling;
+    // scrolling behavior is covered in the test below
     const description2 = screen.queryByText( /some_name_3/ );
     expect( description2 ).toBeNull();
 

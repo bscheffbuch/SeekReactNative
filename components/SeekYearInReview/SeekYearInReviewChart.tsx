@@ -37,7 +37,7 @@ const Decorator = ( { data, x, y }: DecoratorProps ) => data.map( ( value ) => (
 const SeekYearInReviewChart = ( { data }: Props ) => {
   const xAccessor = ( { item }: { item: Datum } ) => item.month;
   const yAccessor = ( { item }: { item: Datum } ) => item.count;
-  const lineChartSvg = { stroke: colors.seekForestGreen };
+  const lineChartSvg = { stroke: colors.seekDeepGreen };
 
   const xAxis = useMemo( ( ) => {
     const allMonths = createShortMonthsList();

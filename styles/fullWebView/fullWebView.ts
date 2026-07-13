@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   back: {
@@ -9,15 +8,17 @@ const viewStyles = StyleSheet.create( {
     top: 0,
   },
   bottom: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     height: 60,
   },
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   header: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
+    borderBottomColor: "#E6E9E4",
+    borderBottomWidth: 1,
     height: 55,
   },
 } );

@@ -1,0 +1,87 @@
+##
+# Build a standalone arm64 debug APK and publish it as a GitHub Release asset.
+# Runs on demand (workflow_dispatch). The APK embeds the JS bundle and the
+# example ML model, so it installs and runs on a physical Android phone without
+# a Metro dev server. Google Maps is disabled (placeholder key).
+##
+name: Build Debug APK
+
+on:
+  workflow_dispatch:
+  # Temporary: auto-build on pushes to the review branch so the APK can be
+  # produced without manual dispatch. Remove once testing is done.
+  push:
+    branches:
+      - claude/repo-redesign-review-cq6a33
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install NDK and CMake
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;27.1.12297006" "cmake;3.22.1"
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Generate local config
+        run: cp config.example.js config.js
+
+      - name: Add placeholder Google Maps key
+        run: |
+          cat > android/app/src/main/res/values/config.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <string name="gmaps_api_key">PLACEHOLDER_NO_MAPS_IN_TEST_BUILD</string>
+          </resources>
+          EOF
+
+      - name: Download example ML model and common names
+        run: node scripts/add-example-model.js
+
+      - name: Build debug APK (arm64, bundled JS)
+        working-directory: android
+        run: ./gradlew assembleDebug -x lint -PreactNativeArchitectures=arm64-v8a -PseekBundleDebugJs=true
+
+      - name: Publish APK to a GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APK=$(find android/app/build/outputs/apk/debug -name "*.apk" | head -1)
+          echo "Publishing $APK"
+          TAG="debug-apk-${{ github.run_number }}"
+          gh release create "$TAG" "$APK" \
+            --title "Seek debug APK (build ${{ github.run_number }})" \
+            --notes "Standalone arm64 debug build with the redesign fixes. Install on a physical Android phone (Settings may prompt to allow installs from your browser). Installs as a separate app (org.inaturalist.seek.debug) alongside any existing Seek. Google Maps views are blank (placeholder key); the ML model is the public example model, so IDs are approximate." \
+            --prerelease \
+            --target "${{ github.sha }}"
+
+      - name: Also upload as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: seek-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

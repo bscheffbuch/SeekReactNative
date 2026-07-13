@@ -12,13 +12,13 @@ const viewStyles = StyleSheet.create( {
     width: Platform.OS === "android" ? 84 : 94,
   },
   shadow: {
-    shadowColor: colors.black,
+    shadowColor: colors.seekShadow,
     shadowOffset: {
       width: 0,
       height: -3,
     },
-    shadowOpacity: 0.20,
-    shadowRadius: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
   },
   container: {
     height: 74,
@@ -33,7 +33,9 @@ const viewStyles = StyleSheet.create( {
     padding: 20,
   },
   navbar: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekSurface,
+    borderTopColor: colors.seekBorder,
+    borderTopWidth: 1,
     height: 70,
     justifyContent: "space-between",
   },
@@ -48,7 +50,7 @@ const viewStyles = StyleSheet.create( {
   row,
   safeArea: {
     // need this for MatchFooter
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekSurface,
   },
 } );
 
@@ -57,7 +59,7 @@ const imageStyles = StyleSheet.create( {
   bird: {
     height: 33,
     resizeMode: "contain",
-    tintColor: colors.seekForestGreen,
+    tintColor: colors.seekDeepGreen,
     width: 37,
   },
 } );

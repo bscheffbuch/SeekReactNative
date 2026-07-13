@@ -56,9 +56,10 @@ const LoginScreen = ( ) => {
             setError( true );
             setErrorMessage( errorDescription );
             return;
-          } else if ( responseJson.error === 400 ) {
+          } else if ( responseJson.error ) {
             setError( true );
             setErrorMessage( i18n.t( "inat_login.authentication_failed" ) );
+            return;
           }
           const accessToken = responseJson.access_token;
           if ( !accessToken ) {

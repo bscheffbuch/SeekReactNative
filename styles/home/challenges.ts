@@ -3,15 +3,18 @@ import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   challengeContainer: {
-    backgroundColor: colors.darkGray,
+    backgroundColor: colors.seekInk,
+    borderRadius: 18,
+    marginHorizontal: 16,
+    overflow: "hidden",
   },
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
   },
   header: {
-    paddingBottom: 21,
+    paddingBottom: 12,
     paddingHorizontal: 22,
-    paddingTop: 25,
+    paddingTop: 18,
   },
   marginMedium: {
     marginTop: 28,
@@ -27,9 +30,8 @@ const viewStyles = StyleSheet.create( {
 const textStyles = StyleSheet.create( {
   viewText: {
     alignSelf: "center",
-    paddingBottom: 31,
+    paddingBottom: 22,
     paddingTop: 15,
-    textDecorationLine: "underline",
   },
 } );
 

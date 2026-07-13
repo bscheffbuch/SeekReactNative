@@ -75,11 +75,16 @@ const FullWebView = ( { navigation, headerText, uri, loggedIn }: Props ) => {
 
   React.useEffect( ( ) => {
     const unsubscribe = navigation.addListener( "blur", async ( ) => {
-      // Log out user if they navigate away from the webview and checking
-      // if server does no longer send back a token
+      // Log out user if they navigate away from the webview and the server
+      // definitively no longer sends back a token. Transient failures
+      // (downtime, timeout, network errors) return an error object and
+      // should not log the user out.
       const login = await fetchAccessToken();
+      if ( !login ) {
+        return;
+      }
       const jwt = await fetchJSONWebToken( login );
-      if ( jwt && typeof jwt !== "string" ) {
+      if ( jwt === undefined ) {
         const loggedOut = await removeAccessToken( );
         if ( loggedOut !== false ) {
           updateLogin( );

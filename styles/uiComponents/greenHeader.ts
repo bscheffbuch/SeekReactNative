@@ -15,7 +15,9 @@ const viewHeaderStyles = StyleSheet.create( {
   },
   center,
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
+    borderBottomColor: "#E6E9E4",
+    borderBottomWidth: 1,
     flexDirection: "row",
     paddingBottom: 18,
     paddingTop: 20.5,
@@ -31,6 +33,7 @@ const viewHeaderStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   text: {
+    color: colors.seekInk,
     maxWidth: dimensions.width - 100,
   },
 } );

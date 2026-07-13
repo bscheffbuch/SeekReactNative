@@ -2,69 +2,83 @@ import { StyleSheet } from "react-native";
 import {
   colors,
   dimensions,
-  row,
-  center,
 } from "../global";
 
 const { height } = dimensions;
 
-
-
 const viewStyles = StyleSheet.create( {
-  portraitDotsRow: {
-    width: 262,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  greenButton: {
-    alignItems: "center",
-  },
   header: {
-    position: "absolute",
-    top: height > 700 ? 89 : 58,
-  },
-  landscapeHeader: {
-    borderRadius: 20,
-    backgroundColor: colors.seekForestGreen,
-    paddingVertical: 15,
+    alignItems: "center",
+    left: 0,
     paddingHorizontal: 20,
+    position: "absolute",
+    right: 0,
+    top: height > 700 ? 88 : 58,
+    zIndex: 4,
   },
-  landscapeHeaderSpecies: {
-    backgroundColor: colors.seekGreen,
+  predictionCopy: {
+    flexShrink: 1,
+    minWidth: 0,
   },
-  landscapeDots: {
-    backgroundColor: colors.white,
-    borderRadius: 10 / 2,
-    height: 10,
-    marginHorizontal: 16,
-    width: 10,
+  predictionPill: {
+    alignItems: "center",
+    backgroundColor: "rgba(10, 14, 11, 0.62)",
+    borderColor: "rgba(255, 255, 255, 0.14)",
+    borderRadius: 999,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 11,
+    maxWidth: "100%",
+    paddingBottom: 9,
+    paddingLeft: 17,
+    paddingRight: 10,
+    paddingTop: 9,
   },
-  landscapeDotsGreen: {
-    backgroundColor: colors.speciesNearbyGreen,
-    borderRadius: 6 / 2,
-    height: 6,
-    marginBottom: 3,
-    marginHorizontal: 16,
-    marginTop: 3,
-    width: 6,
+  predictionPillSpecies: {
+    borderColor: "rgba(68, 171, 85, 0.72)",
   },
-  row,
-  center,
-  noLeftMargin: {
-    marginLeft: 0,
+  progressBubble: {
+    alignItems: "center",
+    borderColor: "rgba(255, 255, 255, 0.22)",
+    borderRadius: 19,
+    borderWidth: 3,
+    height: 38,
+    justifyContent: "center",
+    width: 38,
   },
-  noRightMargin: {
-    marginRight: 0,
+  progressBubbleSpecies: {
+    borderColor: colors.seekGreen,
   },
 } );
 
 const textStyles = StyleSheet.create( {
-  predictions: {
-    margin: 22,
+  predictionName: {
+    color: colors.white,
+    fontSize: 17,
+    fontWeight: "800",
+    lineHeight: 20,
+  },
+  progressText: {
+    color: colors.white,
+    fontSize: 10,
+    fontWeight: "800",
     textAlign: "center",
-    textShadowColor: colors.textShadow,
-    textShadowOffset: { width: -1, height: 1 },
-    textShadowRadius: 3,
+  },
+  progressTextSpecies: {
+    color: colors.seekGreen,
+  },
+  rankLabel: {
+    color: colors.seekGold,
+    fontSize: 9.5,
+    fontWeight: "800",
+    letterSpacing: 0,
+    lineHeight: 12,
+  },
+  scientificName: {
+    color: "rgba(255, 255, 255, 0.78)",
+    fontSize: 12,
+    fontStyle: "italic",
+    lineHeight: 15,
   },
 } );
 

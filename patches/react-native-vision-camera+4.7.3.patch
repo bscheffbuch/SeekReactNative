@@ -116,7 +116,7 @@ index f91ce83..3f48cc0 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraConfiguration.kt
 @@ -2,6 +2,7 @@ package com.mrousavy.camera.core
-
+ 
  import android.util.Range
  import androidx.camera.core.Preview.SurfaceProvider
 +import androidx.camera.core.ViewPort
@@ -131,7 +131,7 @@ index f91ce83..3f48cc0 100644
 +  var focusPeakingActive: Boolean = false,
 +  var focusPeakingSensitivity: Float = 0.35f,
    var exposure: Double? = null,
-
+ 
    // Zoom
 @@ -51,7 +55,35 @@ data class CameraConfiguration(
    data class Video(val isMirrored: Boolean, val enableHdr: Boolean, val bitRateOverride: Double?, val bitRateMultiplier: Double?)
@@ -167,7 +167,7 @@ index f91ce83..3f48cc0 100644
 +    val scaleType: Int,
 +    val layoutDirection: Int
 +  )
-
+ 
    val targetFpsRange: Range<Int>?
      get() {
 @@ -125,10 +157,10 @@ data class CameraConfiguration(
@@ -183,7 +183,7 @@ index f91ce83..3f48cc0 100644
          left.minFps != right.minFps ||
          left.maxFps != right.maxFps
 @@ -138,6 +170,9 @@ data class CameraConfiguration(
-
+ 
        // repeating request
        val sidePropsChanged = deviceChanged ||
 +        left?.videoStabilizationMode != right.videoStabilizationMode ||
@@ -193,12 +193,12 @@ index f91ce83..3f48cc0 100644
          left.zoom != right.zoom ||
          left.exposure != right.exposure
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
-index 1e9c0de..0970d3b 100644
+index 1e9c0de..9ab9765 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 @@ -1,8 +1,19 @@
  package com.mrousavy.camera.core
-
+ 
  import android.annotation.SuppressLint
 +import android.content.Context
 +import android.hardware.camera2.CameraCharacteristics
@@ -236,7 +236,7 @@ index 1e9c0de..0970d3b 100644
 +import java.lang.Integer as JavaInteger
  import com.mrousavy.camera.core.utils.CamcorderProfileUtils
  import kotlin.math.roundToInt
-
+ 
 +private const val QCOM_EIS_MODE_KEY_NAME = "org.codeaurora.qcamera3.sessionParameters.EISMode"
 +private const val SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME = "samsung.android.control.swVideoStabilization"
 +private const val SAMSUNG_OIS_OPERATION_MODE_KEY_NAME = "samsung.android.lens.opticalStabilizationOperationMode"
@@ -262,7 +262,20 @@ index 1e9c0de..0970d3b 100644
        // Configure Preview Output
        if (configuration.videoStabilizationMode.isAtLeast(VideoStabilizationMode.CINEMATIC)) {
          assertFormatRequirement("videoStabilizationMode", format, InvalidVideoStabilizationMode(configuration.videoStabilizationMode)) {
-@@ -95,6 +125,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -75,8 +105,10 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+       }
+ 
+       if (format != null) {
+-        // Preview will follow video size as it's size & aspect ratio, or photo- if video is disabled.
+-        val targetSize = if (videoConfig != null) format.videoSize else format.photoSize
++        // Preview always follows the video size. Falling back to photoSize when video is disabled
++        // asks the HAL for a preview-rate PRIV stream at full photo resolution, which is outside
++        // the guaranteed stream combinations on many devices and corrupts preview colors.
++        val targetSize = format.videoSize
+ 
+         val previewResolutionSelector = ResolutionSelector.Builder()
+           .forSize(targetSize)
+@@ -95,6 +127,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
    if (photoConfig != null) {
      Log.i(CameraSession.TAG, "Creating Photo output...")
      val photo = ImageCapture.Builder().also { photo ->
@@ -270,15 +283,15 @@ index 1e9c0de..0970d3b 100644
        // Configure Photo Output
        photo.setCaptureMode(photoConfig.config.photoQualityBalance.toCaptureMode())
        if (format != null) {
-@@ -146,6 +177,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -146,6 +179,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
      }
-
+ 
      val video = VideoCapture.Builder(recorder).also { video ->
 +      configureStabilizationCaptureRequestOptions(Camera2Interop.Extender(video), configuration)
        // Configure Video Output
        if (videoConfig.config.isMirrored) {
          video.setMirrorMode(MirrorMode.MIRROR_MODE_ON)
-@@ -191,7 +223,8 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -191,7 +225,8 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
      val pixelFormat = frameProcessorConfig.config.pixelFormat
      Log.i(CameraSession.TAG, "Creating $pixelFormat Frame Processor output...")
      val analyzer = ImageAnalysis.Builder().also { analysis ->
@@ -288,7 +301,7 @@ index 1e9c0de..0970d3b 100644
        analysis.setOutputImageFormat(pixelFormat.toImageAnalysisFormat())
        if (fpsRange != null) {
          assertFormatRequirement("fps", format, InvalidFpsError(fpsRange.upper)) {
-@@ -220,7 +253,9 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -220,7 +255,9 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
    val codeScannerConfig = configuration.codeScanner as? CameraConfiguration.Output.Enabled<CameraConfiguration.CodeScanner>
    if (codeScannerConfig != null) {
      Log.i(CameraSession.TAG, "Creating CodeScanner output...")
@@ -299,7 +312,7 @@ index 1e9c0de..0970d3b 100644
      val pipeline = CodeScannerPipeline(codeScannerConfig.config, callback)
      analyzer.setAnalyzer(CameraQueues.analyzerExecutor, pipeline)
      codeScannerOutput = analyzer
-@@ -248,6 +283,7 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
+@@ -248,6 +285,7 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
    // Wrap input with a vendor extension if needed (see https://developer.android.com/media/camera/camera-extensions)
    val isStreamingHDR = useCases.any { !it.currentConfig.dynamicRange.isSDR }
    val needsImageAnalysis = codeScannerOutput != null || frameProcessorOutput != null
@@ -307,13 +320,13 @@ index 1e9c0de..0970d3b 100644
    val photoOptions = configuration.photo as? CameraConfiguration.Output.Enabled<CameraConfiguration.Photo>
    val enableHdrExtension = photoOptions != null && photoOptions.config.enableHdr
    if (enableHdrExtension) {
-@@ -276,10 +312,28 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
+@@ -276,10 +314,28 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
      Log.i(CameraSession.TAG, "Unbinding ${currentUseCases.size} use-cases for Camera #${camera?.cameraInfo?.id}...")
      provider.unbind(*currentUseCases.toTypedArray())
    }
 +  focusPeakingEffect?.release()
 +  focusPeakingEffect = null
-
+ 
    // Bind it all together (must be on UI Thread)
    Log.i(CameraSession.TAG, "Binding ${useCases.size} use-cases...")
 -  camera = provider.bindToLifecycle(this, cameraSelector, *useCases.toTypedArray())
@@ -336,18 +349,18 @@ index 1e9c0de..0970d3b 100644
 +  isManualFocusActive = false
    // Notify callback
    callback.onInitialized()
-
-@@ -336,6 +390,201 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
+ 
+@@ -336,6 +392,217 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
    if (currentExposureCompensation != exposureCompensation) {
      camera.cameraControl.setExposureCompensationIndex(exposureCompensation)
    }
 +
-+  configureStabilizationCaptureRequestOptions(config)
++  applyStabilizationCaptureRequestOptions(config)
 +  focusPeakingEffect?.update(config.focusPeakingActive, config.focusPeakingSensitivity)
 +}
 +
 +@OptIn(ExperimentalCamera2Interop::class)
-+private fun CameraSession.configureStabilizationCaptureRequestOptions(config: CameraConfiguration) {
++internal fun CameraSession.applyStabilizationCaptureRequestOptions(config: CameraConfiguration) {
 +  val camera = camera ?: return
 +  val camera2Info = try {
 +    Camera2CameraInfo.from(camera.cameraInfo)
@@ -379,15 +392,20 @@ index 1e9c0de..0970d3b 100644
 +    hasOptions = true
 +  }
 +
-+  val opticalStabilizationModes = camera2Info.getCameraCharacteristic(
-+    CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION
-+  )
-+  if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
-+    builder.setCaptureRequestOption(
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++  // Only touch OIS when stabilization is requested — forcing it in the
++  // non-stabilized configuration deviates from stock behavior and can upset
++  // vendor ISP pipelines.
++  if (config.videoStabilizationMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++    val opticalStabilizationModes = camera2Info.getCameraCharacteristic(
++      CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION
 +    )
-+    hasOptions = true
++    if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
++      builder.setCaptureRequestOption(
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++      )
++      hasOptions = true
++    }
 +  }
 +  if (characteristics != null && configureVendorStabilizationCaptureRequestOptions(
 +      builder,
@@ -399,6 +417,11 @@ index 1e9c0de..0970d3b 100644
 +  }
 +
 +  if (hasOptions) {
++    if (!config.videoStabilizationMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++      // Stabilization is off: drop any vendor/OIS keys left over from a
++      // previous stabilized configuration instead of overwriting them with 0.
++      camera2Control.clearCaptureRequestOptions()
++    }
 +    camera2Control.addCaptureRequestOptions(builder.build())
 +  }
 +}
@@ -418,12 +441,14 @@ index 1e9c0de..0970d3b 100644
 +  }
 +  configureStreamUseCase(extender, characteristics, config.videoStabilizationMode)
 +
-+  val opticalStabilizationModes = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)
-+  if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
-+    extender.setCaptureRequestOption(
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
-+    )
++  if (config.videoStabilizationMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++    val opticalStabilizationModes = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)
++    if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
++      extender.setCaptureRequestOption(
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++      )
++    }
 +  }
 +  configureVendorStabilizationCaptureRequestOptions(extender, characteristics, config.videoStabilizationMode)
 +}
@@ -453,19 +478,23 @@ index 1e9c0de..0970d3b 100644
 +  characteristics: CameraCharacteristics,
 +  requestedMode: VideoStabilizationMode
 +): Boolean {
-+  val enableStabilization = requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)
++  // Vendor keys are only written when enabling stabilization. Writing 0 into
++  // vendor session parameters is not what stock camera apps do and has been
++  // observed to leave some vendor ISP pipelines in a bad state (e.g. inverted
++  // preview colors); leaving the keys untouched keeps the HAL defaults.
++  if (!requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)) return false
 +  var hasOptions = false
 +
 +  if (characteristics.supportsCaptureRequestKey(QCOM_EIS_MODE_KEY_NAME)) {
-+    builder.setCaptureRequestOption(qcomEisModeKey, if (enableStabilization) 1 else 0)
++    builder.setCaptureRequestOption(qcomEisModeKey, 1)
 +    hasOptions = true
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME)) {
-+    builder.setCaptureRequestOption(samsungSwVideoStabilizationKey, if (enableStabilization) 1.toByte() else 0.toByte())
++    builder.setCaptureRequestOption(samsungSwVideoStabilizationKey, 1.toByte())
 +    hasOptions = true
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_OIS_OPERATION_MODE_KEY_NAME)) {
-+    builder.setCaptureRequestOption(samsungOisOperationModeKey, if (enableStabilization) 1 else 0)
++    builder.setCaptureRequestOption(samsungOisOperationModeKey, 1)
 +    hasOptions = true
 +  }
 +
@@ -478,15 +507,15 @@ index 1e9c0de..0970d3b 100644
 +  characteristics: CameraCharacteristics,
 +  requestedMode: VideoStabilizationMode
 +) {
-+  val enableStabilization = requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)
++  if (!requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)) return
 +  if (characteristics.supportsCaptureRequestKey(QCOM_EIS_MODE_KEY_NAME)) {
-+    extender.setCaptureRequestOption(qcomEisModeKey, if (enableStabilization) 1 else 0)
++    extender.setCaptureRequestOption(qcomEisModeKey, 1)
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME)) {
-+    extender.setCaptureRequestOption(samsungSwVideoStabilizationKey, if (enableStabilization) 1.toByte() else 0.toByte())
++    extender.setCaptureRequestOption(samsungSwVideoStabilizationKey, 1.toByte())
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_OIS_OPERATION_MODE_KEY_NAME)) {
-+    extender.setCaptureRequestOption(samsungOisOperationModeKey, if (enableStabilization) 1 else 0)
++    extender.setCaptureRequestOption(samsungOisOperationModeKey, 1)
 +  }
 +}
 +
@@ -537,15 +566,15 @@ index 1e9c0de..0970d3b 100644
 +    null
 +  }
  }
-
+ 
  internal fun CameraSession.configureIsActive(config: CameraConfiguration) {
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
-index a295fdc..1c2187a 100644
+index a295fdc..6a1f1da 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Focus.kt
 @@ -1,11 +1,20 @@
  package com.mrousavy.camera.core
-
+ 
  import android.annotation.SuppressLint
 +import android.hardware.camera2.CameraCharacteristics
 +import android.hardware.camera2.CaptureRequest
@@ -561,10 +590,10 @@ index a295fdc..1c2187a 100644
  import com.mrousavy.camera.core.extensions.await
 +import kotlin.math.max
 +import kotlin.math.min
-
+ 
  @SuppressLint("RestrictedApi")
  suspend fun CameraSession.focus(meteringPoint: MeteringPoint) {
-@@ -29,3 +38,64 @@ suspend fun CameraSession.focus(meteringPoint: MeteringPoint) {
+@@ -29,3 +38,68 @@ suspend fun CameraSession.focus(meteringPoint: MeteringPoint) {
      throw FocusCanceledError()
    }
  }
@@ -613,14 +642,18 @@ index a295fdc..1c2187a 100644
 +  } catch (_: RuntimeException) {
 +    throw FocusNotSupportedError()
 +  }
-+  val options = CaptureRequestOptions.Builder()
-+    .setCaptureRequestOption(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE)
-+    .build()
 +
 +  isManualFocusActive = false
++  // Clear all interop capture request options instead of pinning CONTROL_AF_MODE to
++  // CONTINUOUS_PICTURE: the stale LENS_FOCUS_DISTANCE/CONTROL_AF_MODE overrides from
++  // setManualFocus would otherwise stay in the option bundle forever and prevent
++  // CameraX tap-to-focus (which drives CONTROL_AF_MODE itself) from working again.
 +  camera2Control
-+    .addCaptureRequestOptions(options)
++    .clearCaptureRequestOptions()
 +    .await(CameraQueues.cameraExecutor)
++  // Re-apply the non-focus side-prop options (video/optical/vendor stabilization)
++  // that were cleared together with the focus overrides.
++  configuration?.let { config -> applyStabilizationCaptureRequestOptions(config) }
 +  try {
 +    camera.cameraControl
 +      .cancelFocusAndMetering()
@@ -647,7 +680,7 @@ index 13f6a76..b5b006c 100644
    internal var codeScannerOutput: ImageAnalysis? = null
 +  internal var focusPeakingEffect: FocusPeakingPreviewEffect? = null
    internal var currentUseCases: List<UseCase> = emptyList()
-
+ 
    // Camera Outputs State
 @@ -63,6 +65,7 @@ class CameraSession(internal val context: Context, internal val callback: Callba
    internal val lifecycleRegistry = LifecycleRegistry(this)
@@ -655,7 +688,7 @@ index 13f6a76..b5b006c 100644
    internal var isRecordingCanceled = false
 +  internal var isManualFocusActive = false
    internal val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
+ 
    // Threading
 @@ -84,6 +87,8 @@ class CameraSession(internal val context: Context, internal val callback: Callba
    override fun close() {
@@ -963,7 +996,7 @@ index a9d5683..c854855 100644
 +import com.mrousavy.camera.core.resetFocus
 +import com.mrousavy.camera.core.setManualFocus
  import com.mrousavy.camera.core.utils.runOnUiThreadAndWait
-
+ 
  suspend fun CameraView.focus(pointMap: ReadableMap) {
 @@ -17,3 +19,11 @@ suspend fun CameraView.focus(pointMap: ReadableMap) {
    }
@@ -1009,7 +1042,7 @@ index 64a751e..36df5d5 100644
 +        config.focusPeakingActive = focusPeakingActive
 +        config.focusPeakingSensitivity = focusPeakingSensitivity
          config.exposure = exposure
-
+ 
          // Zoom
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/react/CameraViewManager.kt
 index cc20b40..af72fc0 100644
@@ -1018,7 +1051,7 @@ index cc20b40..af72fc0 100644
 @@ -239,6 +239,21 @@ class CameraViewManager : ViewGroupManager<CameraView>() {
      view.exposure = exposure
    }
-
+ 
 +  @ReactProp(name = "focusPeakingEnabled")
 +  fun setFocusPeakingEnabled(view: CameraView, focusPeakingEnabled: Boolean) {
 +    view.focusPeakingEnabled = focusPeakingEnabled
@@ -1044,7 +1077,7 @@ index 059f677..5210260 100644
 @@ -188,6 +188,28 @@ class CameraViewModule(reactContext: ReactApplicationContext) : ReactContextBase
      }
    }
-
+ 
 +  @ReactMethod
 +  fun setManualFocus(viewTag: Int, focusValue: Double, promise: Promise) {
 +    backgroundCoroutineScope.launch {
@@ -1102,7 +1135,7 @@ index afe056a..708d737 100644
 +    }
 +  }
    //#endregion
-
+ 
    //#region Static Functions (NativeModule)
 diff --git a/node_modules/react-native-vision-camera/src/types/CameraProps.ts b/node_modules/react-native-vision-camera/src/types/CameraProps.ts
 index 18bfc9b..606fb7b 100644
@@ -1136,5 +1169,5 @@ index 18bfc9b..606fb7b 100644
 +   */
 +  focusPeakingSensitivity?: number
    //#endregion
-
+ 
    /**

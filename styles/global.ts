@@ -13,6 +13,17 @@ export const colors: Colors = {
   seekTeal: "#297f87",
   seekGreen: "#44ab55",
   seekForestGreen: "#38976d",
+  seekDeepGreen: "#14794f",
+  seekInk: "#111512",
+  seekCanvas: "#F3F1E8",
+  seekSurface: "#FFFFFF",
+  seekElevatedSurface: "#FAF8F1",
+  seekPrimaryContainer: "#DEF0E7",
+  seekBorder: "#E6E9E4",
+  seekMuted: "#707A72",
+  seekShadow: "#10251D",
+  seekGold: "#e0a82e",
+  focusPeakingYellow: "#dfff38",
   seekTransparent: "#38976d33",
   speciesNearbyGreen: "#2a7353",
   dividerGray: "#d8d8d8",
@@ -75,4 +86,3 @@ export const row = {
   flexDirection: "row" as const,
   flexWrap: "nowrap" as const,
 };
-

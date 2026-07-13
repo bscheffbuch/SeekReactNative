@@ -1,8 +1,10 @@
 import React from "react";
+import { TouchableOpacity } from "react-native";
 
-import icons from "../../../assets/icons";
 import i18n from "../../../i18n";
-import TransparentCircleButton from "../../UIComponents/Buttons/TransparentCircleButton";
+import { viewStyles } from "../../../styles/camera/arCameraOverlay";
+import { colors } from "../../../styles/global";
+import { RotateCameraIcon } from "../../UIComponents/AppIcons";
 
 interface Props {
   flipCamera: ( ) => void;
@@ -12,12 +14,16 @@ const CameraFlip = ( {
   flipCamera,
 }: Props ) => {
   return (
-    <TransparentCircleButton
+    <TouchableOpacity
       onPress={flipCamera}
       accessibilityLabel={i18n.t( "accessibility.flip_camera" )}
       accessibilityHint={i18n.t( "accessibility.use_other_camera" )}
-      source={icons.cameraflip}
-    />
+      accessibilityRole="button"
+      activeOpacity={0.65}
+      style={viewStyles.galleryButton}
+    >
+      <RotateCameraIcon color={colors.white} size={27} strokeWidth={2.2} />
+    </TouchableOpacity>
   );
 };
 

@@ -49,7 +49,7 @@ const SpeciesPhotos = ( { loading, photos, id }: Props ) => {
           style={viewStyles.ccButton}
         >
           <StyledText style={baseTextStyles.button}>
-            {i18n.t( "species_detail.cc" ).toLocaleUpperCase()}
+            {i18n.t( "species_detail.cc" )}
           </StyledText>
         </TouchableOpacity>
       </View>

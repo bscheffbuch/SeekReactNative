@@ -11,6 +11,7 @@ import { viewStyles, imageStyles, textStyles } from "../../styles/toasts/badgeTo
 import badges from "../../assets/badges";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   readonly badge: {
@@ -22,15 +23,16 @@ interface Props {
 
 const BadgeToast = ( { badge }: Props ) => {
   const navigation = useNavigation();
+  const { theme } = useTheme( );
 
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate( "Achievements" )}
-      style={viewStyles.row}
+      style={[viewStyles.row, { backgroundColor: theme.colors.surface }]}
     >
       <View>
         <StyledText allowFontScaling={false} style={[baseTextStyles.header, textStyles.headerText]}>
-          {i18n.t( badge.intlName ).toLocaleUpperCase()}
+          {i18n.t( badge.intlName )}
         </StyledText>
         <StyledText allowFontScaling={false} style={[baseTextStyles.body, textStyles.description]}>
           {i18n.t( "badges.you_found" )}

@@ -23,6 +23,9 @@ class UploadObservationRealm extends Realm.Object {
       // JSON-encoded array of photo paths, used for multi-photo observations
       // created by combining queued drafts. Falls back to `photo.uri` when null.
       photoUris: "string?",
+      // JSON-encoded array of AR-camera predictions captured at save time, used
+      // to reopen the identification (Match) screen for a queued draft.
+      predictions: "string?",
     },
   };
 }

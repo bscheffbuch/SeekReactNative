@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import {
-  colors,
   center,
   row,
 } from "../global";
@@ -21,18 +20,23 @@ const viewStyles = StyleSheet.create( {
   },
   row,
   container: {
-    backgroundColor: colors.white,
-    paddingTop: 45,
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E6E9E4",
+    borderRadius: 18,
+    borderWidth: 1,
+    marginHorizontal: 16,
+    marginTop: 16,
+    paddingTop: 18,
   },
   topMarginWithChallenge: {
-    backgroundColor: colors.white,
-    paddingTop: 31,
+    backgroundColor: "#FFFFFF",
+    paddingTop: 18,
   },
   textContainer: {
     paddingHorizontal: 33,
   },
   headerPadding: {
-    paddingLeft: 22,
+    paddingLeft: 16,
   },
   landscapeContainerRestrictedWidth: {
     width: maxColumnWidth,

@@ -2,7 +2,7 @@
 import StyledText from "../../UIComponents/StyledText";
 
 import React from "react";
-import { View, TouchableOpacity, ImageBackground } from "react-native";
+import { StyleSheet, View, TouchableOpacity, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import GreenText from "../../UIComponents/GreenText";
@@ -17,11 +17,21 @@ import ChallengeTitle from "../../UIComponents/Challenges/ChallengeTitle";
 import ChallengeBadgeRow from "../../UIComponents/Challenges/ChallengeBadgeRow";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { useChallenge } from "../../Providers/ChallengeProvider";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const ChallengeCard = ( ) => {
   const { setIndex } = useChallenge( );
   const { navigate } = useNavigation( );
   const challenge = useLatestChallenge( );
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    challengeContainer: {
+      borderRadius: 12,
+    },
+    container: {
+      backgroundColor: theme.colors.canvas,
+    },
+  } );
 
   const navToChallenges = ( ) => navigate( "Challenges" );
 
@@ -38,7 +48,7 @@ const ChallengeCard = ( ) => {
     return (
       <ImageBackground
         source={backgrounds[challenge.backgroundName]}
-        style={viewStyles.challengeContainer}
+        style={[viewStyles.challengeContainer, themedStyles.challengeContainer]}
       >
         <View style={viewStyles.marginTop} />
         <ChallengeTitle challenge={challenge} />
@@ -61,7 +71,7 @@ const ChallengeCard = ( ) => {
   };
 
   return (
-    <View style={viewStyles.container}>
+    <View style={[viewStyles.container, themedStyles.container]}>
       <TouchableOpacity onPress={navToChallenges} style={viewStyles.header}>
         <GreenText text="challenges_card.header" />
       </TouchableOpacity>

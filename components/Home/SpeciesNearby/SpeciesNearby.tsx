@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useCallback, useReducer, useEffect } from "react";
-import { View, Platform, Modal } from "react-native";
+import { StyleSheet, View, Platform, Modal } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import type { PositionError} from "react-native-geolocation-service";
 
@@ -8,18 +8,19 @@ import { viewStyles } from "../../../styles/home/speciesNearby";
 import { baseTextStyles } from "../../../styles/textStyles";
 import i18n from "../../../i18n";
 import { fetchTruncatedUserLocation } from "../../../utility/locationHelpers";
+import { formatYearMonthDay } from "../../../utility/dateHelpers";
 import TaxonPicker from "./TaxonPicker";
 import LocationPickerButton from "./LocationPickerButton";
 import { useLocationPermission } from "../../../utility/customHooks";
 import SpeciesNearbyError from "./SpeciesNearbyError";
 import LocationPicker from "./LocationPicker";
 import LoadingWheel from "../../UIComponents/LoadingWheel";
-import { colors } from "../../../styles/global";
 import SpeciesNearbyList from "../../UIComponents/SpeciesNearby/SpeciesNearbyList";
 import { taxonIds } from "../../../utility/dictionaries/taxonomyDicts";
 import createUserAgent from "../../../utility/userAgent";
 import StyledText from "../../UIComponents/StyledText";
 import { useSpeciesNearby } from "../../Providers/SpeciesNearbyProvider";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface State {
   error: string | null;
@@ -47,7 +48,7 @@ interface ApiParams {
   per_page: number;
   lat: number;
   lng: number | null;
-  observed_on: Date;
+  observed_on: string;
   seek_exceptions: boolean;
   locale: string;
   all_photos: boolean;
@@ -74,6 +75,23 @@ function reducer( state: State, action: Action ) {
 const SpeciesNearby = ( ) => {
   const { speciesNearby, setSpeciesNearby } = useSpeciesNearby( );
   const granted = useLocationPermission( );
+  const { theme } = useTheme( );
+  const themedStyles = StyleSheet.create( {
+    container: {
+      backgroundColor: theme.colors.canvas,
+    },
+    header: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.heading,
+    },
+    speciesNearbyContainer: {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+    },
+    speciesNearbyPadding: {
+      backgroundColor: theme.colors.canvas,
+    },
+  } );
 
   const [state, dispatch] = useReducer( reducer, {
     error: speciesNearby.isConnected === false ? "internet_error" : null,
@@ -172,7 +190,7 @@ const SpeciesNearby = ( ) => {
         per_page: 20,
         lat: latitude,
         lng: longitude,
-        observed_on: new Date(),
+        observed_on: formatYearMonthDay( new Date() ),
         seek_exceptions: true,
         locale: i18n.locale,
         all_photos: true, // this allows for ARR license filtering
@@ -183,7 +201,7 @@ const SpeciesNearby = ( ) => {
       }
 
       const site = "https://api.inaturalist.org/v1/taxa/nearby";
-      const queryString = Object.keys( params ).map( key => `${key}=${params[key as keyof ApiParams]}` ).join( "&" );
+      const queryString = Object.keys( params ).map( key => `${key}=${encodeURIComponent( String( params[key as keyof ApiParams] ) )}` ).join( "&" );
       const options = { headers: { "User-Agent": createUserAgent() } };
 
       dispatch( { type: ACTION_TYPE.SET_FETCHING } );
@@ -230,20 +248,20 @@ const SpeciesNearby = ( ) => {
 
   const renderSpeciesNearbyList = ( ) => (
     <>
-      <View style={viewStyles.speciesNearbyContainer}>
+      <View style={[viewStyles.speciesNearbyContainer, themedStyles.speciesNearbyContainer]}>
         {loading
-          ? <LoadingWheel color={colors.white} />
+          ? <LoadingWheel color={theme.colors.primary} />
           : <SpeciesNearbyList taxa={speciesNearby.taxa} />}
       </View>
-      <View style={viewStyles.speciesNearbyPadding} />
+      <View style={[viewStyles.speciesNearbyPadding, themedStyles.speciesNearbyPadding]} />
     </>
   );
 
   return (
-    <View style={viewStyles.container}>
+    <View style={[viewStyles.container, themedStyles.container]}>
       {renderModal( )}
-      <StyledText style={[baseTextStyles.headerWhite, viewStyles.header]}>
-        {i18n.t( "species_nearby.header" ).toLocaleUpperCase( )}
+      <StyledText style={[baseTextStyles.header, viewStyles.header, themedStyles.header]}>
+        {i18n.t( "species_nearby.header" )}
       </StyledText>
       <LocationPickerButton
         disabled={disabled}

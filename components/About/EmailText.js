@@ -13,14 +13,17 @@ import ToastAnimation from "../UIComponents/ToastAnimation";
 import { colors } from "../../styles/global";
 import { UserContext } from "../UserContext";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const EmailText = () => {
   const { login } = useContext( UserContext );
   const [copied, setCopied] = useState( false );
+  const { theme } = useTheme( );
+  const themedText = { color: theme.colors.text };
 
   if ( !login ) {
     return (
-      <StyledText style={[baseTextStyles.body, textStyles.text]}>{i18n.t( "about.help" )}</StyledText>
+      <StyledText style={[baseTextStyles.body, textStyles.text, themedText]}>{i18n.t( "about.help" )}</StyledText>
     );
   }
 
@@ -66,7 +69,7 @@ const EmailText = () => {
             rectangleColor={colors.seekGreen}
           />
         )}
-        <StyledText style={[baseTextStyles.body, textStyles.text]}>{i18n.t( "about.help" )}</StyledText>
+        <StyledText style={[baseTextStyles.body, textStyles.text, themedText]}>{i18n.t( "about.help" )}</StyledText>
       </View>
     </TouchableOpacity>
   );

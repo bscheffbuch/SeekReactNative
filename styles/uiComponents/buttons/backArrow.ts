@@ -19,7 +19,7 @@ const viewStyles = StyleSheet.create( {
 
 const imageStyles = StyleSheet.create( {
   green: {
-    tintColor: colors.seekForestGreen,
+    tintColor: colors.seekDeepGreen,
   },
 } );
 

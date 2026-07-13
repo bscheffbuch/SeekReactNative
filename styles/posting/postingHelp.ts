@@ -3,7 +3,7 @@ import { colors, row } from "../global";
 
 const viewStyles = StyleSheet.create( {
   container: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
     flex: 1,
   },
   margin: {
@@ -17,7 +17,7 @@ const viewStyles = StyleSheet.create( {
   },
   row,
   textContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
     marginHorizontal: 27,
     marginTop: 30,
   },

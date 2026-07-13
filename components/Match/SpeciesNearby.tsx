@@ -65,7 +65,7 @@ const SpeciesNearbyMatch = ( { ancestorId, image }: Props ) => {
   return (
     <>
       <StyledText style={[baseTextStyles.highlightTeal, textStyles.headerText]}>
-        {i18n.t( "results.nearby" ).toLocaleUpperCase( )}
+        {i18n.t( "results.nearby" )}
       </StyledText>
       {renderSpecies( )}
     </>

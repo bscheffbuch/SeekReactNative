@@ -19,7 +19,7 @@ const viewStyles = StyleSheet.create( {
     alignItems: "center",
     flexDirection: "row",
     paddingLeft: 21,
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekSurface,
   },
   topContainer: {
     zIndex: 1,

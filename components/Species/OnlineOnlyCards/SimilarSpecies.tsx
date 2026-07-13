@@ -5,10 +5,10 @@ import inatjs from "inaturalistjs";
 
 import i18n from "../../../i18n";
 import LoadingWheel from "../../UIComponents/LoadingWheel";
-import { colors } from "../../../styles/global";
 import styles from "../../../styles/species/similarSpecies";
 import SpeciesNearbyList from "../../UIComponents/SpeciesNearby/SpeciesNearbyList";
 import GreenText from "../../UIComponents/GreenText";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Taxon {
   taxon: {
@@ -76,13 +76,12 @@ const initialState = {
 
 const SimilarSpecies = ( { id }: Props ) => {
   const [state, dispatch] = useReducer( reducer, initialState );
+  const { theme } = useTheme( );
 
   const {
     similarSpecies,
     loading,
   } = state;
-
-  const { length } = similarSpecies;
 
   useEffect( ( ) => {
     let isActive = true;
@@ -118,14 +117,17 @@ const SimilarSpecies = ( { id }: Props ) => {
       <View style={styles.similarSpeciesHeader}>
         <GreenText text="species_detail.similar" />
       </View>
-      <View style={styles.similarSpeciesContainer}>
+      <View style={[styles.similarSpeciesContainer, { backgroundColor: theme.colors.canvas }]}>
        {loading
-          ? <LoadingWheel color={colors.white} />
+          ? <LoadingWheel color={theme.colors.primary} />
           : <SpeciesNearbyList taxa={similarSpecies}  />}
       </View>
-      <View style={[styles.bottomPadding, length === 0 && styles.empty]} />
+      <View style={[
+        styles.bottomPadding,
+        { backgroundColor: theme.colors.canvas },
+      ]} />
     </>
-  ), [length, similarSpecies, loading] );
+  ), [similarSpecies, loading, theme.colors.canvas, theme.colors.primary] );
 };
 
 export default SimilarSpecies;

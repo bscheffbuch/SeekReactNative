@@ -1,16 +1,17 @@
 import React, { useMemo, useCallback } from "react";
 import {
-  Image,
+  StyleSheet,
   View,
 } from "react-native";
 
 import i18n from "../../../i18n";
-import icons from "../../../assets/icons";
-import { viewStyles, imageStyles } from "../../../styles/home/speciesNearby";
+import { viewStyles } from "../../../styles/home/speciesNearby";
 import { baseTextStyles } from "../../../styles/textStyles";
 import Picker from "../../../components/UIComponents/Picker";
 import StyledText from "../../UIComponents/StyledText";
 import { useSpeciesNearby } from "../../Providers/SpeciesNearbyProvider";
+import { useTheme } from "../../Providers/ThemeProvider";
+import { SlidersIcon } from "../../UIComponents/AppIcons";
 
 interface Props {
   readonly updateTaxaType: ( value: string ) => void;
@@ -19,13 +20,27 @@ interface Props {
 
 const TaxonPicker = ( { updateTaxaType, error }: Props ) => {
   const { speciesNearby } = useSpeciesNearby( );
+  const { theme } = useTheme( );
   const { taxaType } = speciesNearby;
+  const styles = StyleSheet.create( {
+    pill: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderRadius: 999,
+      paddingBottom: 4,
+      paddingHorizontal: 9,
+      paddingTop: 4,
+    },
+    text: {
+      color: theme.colors.primary,
+      fontFamily: theme.typography.heading,
+    },
+  } );
 
   const types = useMemo( () => {
     const list = ["all", "plants", "amphibians", "fungi", "fish", "reptiles", "arachnids", "birds", "insects", "mollusks", "mammals"];
 
     return list.map( ( item ) => ( {
-      label: i18n.t( `taxon_picker.${item}` ).toLocaleUpperCase(),
+      label: i18n.t( `taxon_picker.${item}` ),
       value: item,
     } ) );
   }, [] );
@@ -34,14 +49,14 @@ const TaxonPicker = ( { updateTaxaType, error }: Props ) => {
 
   const renderTaxonPicker = useMemo( () => (
     <View style={[viewStyles.row, viewStyles.marginLeft]}>
-      <Image source={icons.filter} style={imageStyles.image} />
-      <View style={viewStyles.whiteButton}>
-        <StyledText style={baseTextStyles.buttonGreen}>
-          {i18n.t( `taxon_picker.${taxaType}` ).toLocaleUpperCase()}
+      <SlidersIcon color={theme.colors.primary} size={20} strokeWidth={2.2} />
+      <View style={styles.pill}>
+        <StyledText style={[baseTextStyles.buttonGreen, styles.text]}>
+          {i18n.t( `taxon_picker.${taxaType}` )}
         </StyledText>
       </View>
     </View>
-  ), [taxaType] );
+  ), [styles.pill, styles.text, taxaType, theme.colors.primary] );
 
   return (
     <Picker

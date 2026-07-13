@@ -24,7 +24,7 @@ const GreenRectangle = ( { text, color, letterSpacing, textColor }: Props ) => (
       letterSpacing && { letterSpacing },
       textColor && { color: textColor },
     ]}>
-      {text.toLocaleUpperCase()}
+      {text}
     </StyledText>
   </View>
 );

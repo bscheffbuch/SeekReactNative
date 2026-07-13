@@ -1,16 +1,14 @@
 import { StyleSheet } from "react-native";
 
-import { colors } from "../../styles/global";
-
 const viewStyles = StyleSheet.create( {
   challengeList: {
-    backgroundColor: colors.white,
-    paddingBottom: 23,
+    backgroundColor: "#F3F1E8",
+    paddingBottom: 112,
+    paddingHorizontal: 18,
   },
   header: {
-    marginBottom: 10,
-    marginLeft: 22,
-    marginTop: 26,
+    marginBottom: 12,
+    marginTop: 18,
   },
   separator: {
     marginTop: 23,

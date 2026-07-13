@@ -7,11 +7,11 @@ import {
 const viewStyles = StyleSheet.create( {
   center,
   speciesNearbyContainer: {
-    backgroundColor: colors.seekTeal,
+    backgroundColor: colors.seekPrimaryContainer,
     paddingVertical: 15,
   },
   challengeContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekCanvas,
   },
 } );
 

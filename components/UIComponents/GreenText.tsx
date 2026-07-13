@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useMemo } from "react";
 import type { TextStyle } from "react-native";
 
 import styles from "../../styles/uiComponents/greenText";
 import i18n from "../../i18n";
 import StyledText from "./StyledText";
-import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   readonly style?: TextStyle;
@@ -26,20 +26,27 @@ const GreenText = ( {
   color = null,
   allowFontScaling = true,
   noTranslation,
-}: Props ) => (
-  <StyledText
-    style={[
-      baseTextStyles.header,
-      small && baseTextStyles.emptyStateGreen,
-      smaller && baseTextStyles.highlight,
-      center && styles.center,
-      color && { color },
-      style,
-    ]}
-    allowFontScaling={allowFontScaling}
-  >
-    {noTranslation ? text : i18n.t( text ).toLocaleUpperCase()}
-  </StyledText>
-);
+}: Props ) => {
+  const { theme } = useTheme( );
+  const themedTextStyle = useMemo<TextStyle>( () => ( {
+    color: color || theme.colors.text,
+    fontFamily: theme.typography.heading,
+  } ), [color, theme.colors.text, theme.typography.heading] );
+
+  return (
+    <StyledText
+      style={[
+        styles.base,
+        smaller ? styles.smaller : small ? styles.small : styles.defaultSize,
+        themedTextStyle,
+        center && styles.center,
+        style,
+      ]}
+      allowFontScaling={allowFontScaling}
+    >
+      {noTranslation ? text : i18n.t( text )}
+    </StyledText>
+  );
+};
 
 export default GreenText;

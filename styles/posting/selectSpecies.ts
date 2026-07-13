@@ -16,14 +16,14 @@ const viewStyles = StyleSheet.create( {
     marginLeft: 24,
   },
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     flex: 1,
   },
   whiteContainer: {
-    backgroundColor: colors.white,
+    backgroundColor: "#F3F1E8",
   },
   header: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     height: 55,
   },
   headerMargins: {
@@ -38,7 +38,7 @@ const viewStyles = StyleSheet.create( {
   },
   row: {
     alignItems: "center",
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: "#F3F1E8",
     flexDirection: "row",
     flexWrap: "nowrap",
     height: 63,
@@ -56,8 +56,10 @@ const textStyles = StyleSheet.create( {
     position: "absolute",
   },
   inputField: {
-    backgroundColor: colors.white,
-    borderRadius: 40,
+    backgroundColor: colors.seekSurface,
+    borderColor: colors.seekBorder,
+    borderRadius: 14,
+    borderWidth: 1,
     height: 37,
     marginLeft: 11,
     paddingBottom: 0,
@@ -76,7 +78,7 @@ const imageStyles = StyleSheet.create( {
   search: {
     height: 20,
     resizeMode: "contain",
-    tintColor: colors.white,
+    tintColor: colors.seekDeepGreen,
     width: 20,
   },
 } );

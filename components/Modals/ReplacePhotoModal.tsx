@@ -72,7 +72,7 @@ const ReplacePhotoModal = ( {
         testID="replacePhoto"
         handlePress={setNewPhoto}
         text="replace_photo.new"
-        color={colors.seekForestGreen}
+        color={colors.seekDeepGreen}
       />
       <View style={viewStyles.marginSmall} />
       <Button

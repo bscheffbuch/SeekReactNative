@@ -5,8 +5,10 @@ const { width, height } = Dimensions.get( "screen" );
 
 const viewStyles = StyleSheet.create( {
   legend: {
-    backgroundColor: colors.seekForestGreen,
-    borderTopRightRadius: 40,
+    backgroundColor: colors.seekSurface,
+    borderColor: colors.seekBorder,
+    borderTopRightRadius: 22,
+    borderWidth: 1,
     paddingBottom: ( Platform.OS === "ios" && height > 670 ) ? 23 : 13,
     paddingLeft: 22,
     paddingRight: 28,
@@ -15,9 +17,9 @@ const viewStyles = StyleSheet.create( {
     position: "absolute",
   },
   legendHeader: {
-    backgroundColor: colors.seekForestGreen,
-    borderTopLeftRadius: 40,
-    borderTopRightRadius: 40,
+    backgroundColor: colors.seekPrimaryContainer,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
     height: 56,
     width: "100%",
   },
@@ -54,6 +56,7 @@ const textStyles = StyleSheet.create( {
     marginTop: 3,
   },
   whiteText: {
+    color: colors.seekInk,
     marginTop: 18,
     textAlign: "center",
   },

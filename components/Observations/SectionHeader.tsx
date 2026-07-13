@@ -53,7 +53,7 @@ const SectionHeader = ( { id, dataLength, open, toggleSection }: Props ) => {
       style={[styles.header, styles.row]}
     >
       <StyledText allowFontScaling={false} style={[baseTextStyles.header, styles.headerText]}>
-        {i18n.t( iconicTaxaNamesById[id] ).toLocaleUpperCase()}
+        {i18n.t( iconicTaxaNamesById[id] )}
       </StyledText>
       <View style={styles.row}>
         <StyledText style={[baseTextStyles.sectionNumber]} allowFontScaling={false}>{dataLength}</StyledText>

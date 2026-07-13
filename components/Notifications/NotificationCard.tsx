@@ -4,6 +4,7 @@ import type {
   ImageSourcePropType} from "react-native";
 import {
   Image,
+  StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -19,6 +20,7 @@ import StyledText from "../UIComponents/StyledText";
 import { useChallenge } from "../Providers/ChallengeProvider";
 import { baseTextStyles } from "../../styles/textStyles";
 import type { Notification } from "./hooks/notificationHooks";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   readonly item: Notification;
@@ -27,6 +29,16 @@ interface Props {
 const NotificationCard = ( { item }: Props ) => {
   const { setIndex } = useChallenge( );
   const navigation = useNavigation();
+  const { theme } = useTheme( );
+
+  const themedStyles = React.useMemo( () => StyleSheet.create( {
+    title: {
+      color: theme.colors.text,
+    },
+    message: {
+      color: theme.colors.muted,
+    },
+  } ), [theme] );
 
   let image: ImageSourcePropType = notifications[item.iconName];
 
@@ -54,10 +66,10 @@ const NotificationCard = ( { item }: Props ) => {
     >
       <Image source={image} style={imageStyles.image} />
       <View style={viewStyles.textContainer}>
-        <StyledText style={[baseTextStyles.bodyMedium, textStyles.titleText]}>
+        <StyledText style={[baseTextStyles.bodyMedium, textStyles.titleText, themedStyles.title]}>
           {i18n.t( item.title )}
         </StyledText>
-        <StyledText style={baseTextStyles.bodySmall}>
+        <StyledText style={[baseTextStyles.bodySmall, themedStyles.message]}>
           {i18n.t( item.message )}
         </StyledText>
       </View>

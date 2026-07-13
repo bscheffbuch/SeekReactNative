@@ -10,20 +10,16 @@ exports[`LanguagePicker should render correctly 1`] = `
 >
   <Text
     style={
-      [
-        {
-          "textAlign": "left",
-        },
-        {
-          "color": "#38976d",
-          "fontFamily": "Whitney-Semibold",
-          "fontSize": 19,
-          "letterSpacing": 1.12,
-        },
-      ]
+      {
+        "color": "#111512",
+        "fontFamily": "Lato-Bold",
+        "fontSize": 18,
+        "lineHeight": 24,
+        "marginBottom": 8,
+      }
     }
   >
-    IN-APP LANGUAGE
+    In-app language
   </Text>
   <View
     style={
@@ -54,7 +50,7 @@ exports[`LanguagePicker should render correctly 1`] = `
         }
       }
       accessible={true}
-      focusable={true}
+      focusable={false}
       onClick={[Function]}
       onResponderGrant={[Function]}
       onResponderMove={[Function]}
@@ -84,29 +80,26 @@ exports[`LanguagePicker should render correctly 1`] = `
           }
           style={
             {
-              "tintColor": "#979797",
+              "tintColor": "#14794F",
             }
           }
         />
       </View>
     </View>
     <Text
+      onPress={[Function]}
       style={
         [
           {
             "textAlign": "left",
           },
-          [
-            {
-              "color": "#000000",
-              "fontFamily": "Whitney-Book",
-              "fontSize": 16,
-              "lineHeight": 21,
-            },
-            {
-              "paddingTop": 5,
-            },
-          ],
+          {
+            "color": "#111512",
+            "fontFamily": "Lato-Regular",
+            "fontSize": 16,
+            "lineHeight": 23,
+          },
+          null,
         ]
       }
     >
@@ -114,108 +107,155 @@ exports[`LanguagePicker should render correctly 1`] = `
     </Text>
   </View>
   <View
-    style={
-      [
-        {
-          "alignSelf": "stretch",
-        },
-        undefined,
-      ]
+    accessibilityRole="button"
+    accessibilityState={
+      {
+        "busy": undefined,
+        "checked": undefined,
+        "disabled": false,
+        "expanded": false,
+        "selected": undefined,
+      }
     }
+    accessibilityValue={
+      {
+        "max": undefined,
+        "min": undefined,
+        "now": undefined,
+        "text": undefined,
+      }
+    }
+    accessible={true}
+    collapsable={false}
+    focusable={true}
+    onBlur={[Function]}
+    onClick={[Function]}
+    onFocus={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+    testID="picker"
   >
     <View
-      accessibilityState={
-        {
-          "busy": undefined,
-          "checked": undefined,
-          "disabled": undefined,
-          "expanded": undefined,
-          "selected": undefined,
-        }
-      }
-      accessibilityValue={
-        {
-          "max": undefined,
-          "min": undefined,
-          "now": undefined,
-          "text": undefined,
-        }
-      }
-      accessible={true}
-      collapsable={false}
-      focusable={true}
-      onClick={[Function]}
-      onResponderGrant={[Function]}
-      onResponderMove={[Function]}
-      onResponderRelease={[Function]}
-      onResponderTerminate={[Function]}
-      onResponderTerminationRequest={[Function]}
-      onStartShouldSetResponder={[Function]}
       style={
-        {
-          "opacity": 1,
-        }
-      }
-      testID="picker"
-    >
-      <View
-        pointerEvents="box-only"
-        style={
+        [
           {
             "alignItems": "center",
-            "paddingVertical": 19,
+            "backgroundColor": "#FAF8F1",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 10,
+            "borderWidth": 1,
+            "flexDirection": "row",
+            "minHeight": 58,
+            "paddingHorizontal": 16,
+            "paddingVertical": 8,
+          },
+          false,
+        ]
+      }
+    >
+      <View
+        style={
+          {
+            "flex": 1,
+            "minWidth": 0,
           }
         }
       >
-        <TextInput
-          editable={false}
+        <Text
           style={
-            [
-              {
-                "backgroundColor": "#38976d",
-                "borderRadius": 6,
-                "color": "#ffffff",
-                "fontFamily": "Whitney-Semibold",
-                "fontSize": 20,
-                "letterSpacing": 1.11,
-                "paddingBottom": 11,
-                "paddingHorizontal": 18,
-                "paddingTop": 12,
-                "textAlign": "center",
-              },
-              {},
-            ]
+            {
+              "color": "#707A72",
+              "fontFamily": "Lato-Regular",
+              "fontSize": 12,
+              "lineHeight": 16,
+            }
           }
-          testID="text_input"
-          value="ENGLISH"
-        />
-        <View
+        >
+          In-app language
+        </Text>
+        <Text
+          numberOfLines={1}
           style={
-            [
-              {
-                "position": "absolute",
-                "right": 0,
-              },
-              undefined,
-            ]
+            {
+              "color": "#111512",
+              "fontFamily": "Lato-Bold",
+              "fontSize": 16,
+              "lineHeight": 22,
+              "marginTop": 2,
+            }
           }
-          testID="icon_container"
-        />
+        >
+          English
+        </Text>
       </View>
+      <RNSVGSvgView
+        align="xMidYMid"
+        bbHeight={22}
+        bbWidth={22}
+        fill="none"
+        focusable={false}
+        height={22}
+        meetOrSlice={0}
+        minX={0}
+        minY={0}
+        stroke="#14794F"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2.2}
+        style={
+          [
+            {
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+            },
+            {
+              "flex": 0,
+              "height": 22,
+              "width": 22,
+            },
+          ]
+        }
+        vbHeight={24}
+        vbWidth={24}
+        width={22}
+      >
+        <RNSVGGroup
+          fill={null}
+          propList={
+            [
+              "fill",
+              "stroke",
+              "strokeWidth",
+              "strokeLinecap",
+              "strokeLinejoin",
+            ]
+          }
+          stroke={
+            {
+              "payload": 4279531855,
+              "type": 0,
+            }
+          }
+          strokeLinecap={1}
+          strokeLinejoin={1}
+          strokeWidth={2.2}
+        >
+          <RNSVGPath
+            d="m6 9 6 6 6-6"
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+          />
+        </RNSVGGroup>
+      </RNSVGSvgView>
     </View>
-    <Modal
-      hardwareAccelerated={false}
-      onOrientationChange={[Function]}
-      supportedOrientations={
-        [
-          "portrait",
-          "landscape",
-        ]
-      }
-      testID="ios_modal"
-      transparent={true}
-      visible={false}
-    />
   </View>
 </View>
 `;

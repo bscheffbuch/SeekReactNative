@@ -169,7 +169,7 @@ exports[`SpeciesNearbyList should render correctly 1`] = `
           }
           style={
             {
-              "borderRadius": 54,
+              "borderRadius": 14,
               "height": 108,
               "width": 108,
             }
@@ -194,15 +194,13 @@ exports[`SpeciesNearbyList should render correctly 1`] = `
                   "paddingTop": 13,
                   "textAlign": "center",
                 },
-                {
-                  "color": "#ffffff",
-                  "fontFamily": "Lato-Italic",
-                },
+                false,
               ],
+              null,
             ]
           }
         >
-          Buteo jamaicensis
+          Red-tailed Hawk
         </Text>
       </View>
     </View>

@@ -17,9 +17,11 @@ import Species from "../Species/SpeciesDetail";
 import SeekYearInReview from "../SeekYearInReview/SeekYearInReviewScreen";
 import SeekYearInReviewMapScreen from "../SeekYearInReview/SeekYearInReviewMapScreen";
 import Notifications from "../Notifications/Notifications";
-import type { DrawerParamList } from "./types";
+type LegacyDrawerParamList = {
+  [key: string]: object | undefined;
+};
 
-const Drawer = createDrawerNavigator<DrawerParamList>( );
+const Drawer = createDrawerNavigator<LegacyDrawerParamList>( );
 const drawerContent = ( props: any ) => <SideMenu {...props} />;
 
 const screenOptions = {

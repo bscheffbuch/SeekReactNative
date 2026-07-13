@@ -40,27 +40,32 @@ const checkForColdStarts = async ( navToCamera: ( ) => void, resetRouter: ( stri
     if ( title === seekCameraTitle ) {
       navToCamera( );
     } else {
-      resetRouter( "Drawer" );
+      resetRouter( "MainTabs" );
     }
-  } catch ( e ) {
-    resetRouter( "Drawer" );
+  } catch {
+    resetRouter( "MainTabs" );
   }
 };
 
-interface Navigation {
-  dispatch: Object;
-}
-
-const resetRouter = ( navigation: Navigation ): any => navigation.dispatch(
+const createHomeResetAction = ( ) => (
   CommonActions.reset( {
-    index: 1,
-    routes: [{ name: "Drawer" }],
+    index: 0,
+    routes: [{ name: "MainTabs", params: { screen: "Home" } }],
   } )
 );
+
+type HomeResetAction = ReturnType<typeof createHomeResetAction>;
+
+interface Navigation {
+  dispatch: ( action: HomeResetAction ) => void;
+}
+
+const resetRouter = ( navigation: Navigation ): void => navigation.dispatch( createHomeResetAction( ) );
 
 export {
   setQuickActions,
   checkForHotStarts,
   checkForColdStarts,
+  createHomeResetAction,
   resetRouter,
 };

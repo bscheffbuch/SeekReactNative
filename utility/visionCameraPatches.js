@@ -1,6 +1,7 @@
 /*
     This file contains patches for handling the react-native-vision-camera library.
 */
+import { useEffect, useMemo } from "react";
 import {
   useSharedValue as useWorkletSharedValue,
   Worklets,
@@ -13,52 +14,86 @@ import {
 // version 4 of vision-camera.
 // Originally, posted on this currently open issue: https://github.com/mrousavy/react-native-vision-camera/issues/2589
 const usePatchedRunAsync = () => {
-  /**
-   * Print worklets logs/errors on js thread
-   */
-  const logOnJs = Worklets.createRunOnJS( ( log, error ) => {
-    console.log( "logOnJs - ", log, " - error?:", error?.message ?? "no error" );
-  } );
   const isAsyncContextBusy = useWorkletSharedValue( false );
   const queuedFrame = useWorkletSharedValue( null );
-  const customRunOnAsyncContext = Worklets.defaultContext.createRunAsync(
-    ( frame, func ) => {
+
+  // All of the run-on-other-context wrappers are created once (the shared values
+  // are stable), so the returned function identity is stable and does not force
+  // useFrameProcessor to rebuild the frame processor on every render.
+  const { customRunAsync, drainQueuedFrame } = useMemo( () => {
+    /**
+     * Print worklets logs/errors on js thread
+     */
+    const logOnJs = Worklets.createRunOnJS( ( log, error ) => {
+      console.log( "logOnJs - ", log, " - error?:", error?.message ?? "no error" );
+    } );
+
+    // Note: this worklet must not call itself by name. A worklet's closure is
+    // captured when the worklet is created, and at that point the (var-hoisted)
+    // binding for the const holding this function is still undefined, so a
+    // recursive call would invoke undefined. Queued frames are therefore drained
+    // with a loop instead of recursion.
+    const customRunOnAsyncContext = Worklets.defaultContext.createRunAsync(
+      ( frame, func ) => {
+        "worklet";
+
+        let currentFrame = frame;
+        while ( currentFrame != null ) {
+          try {
+            func( currentFrame );
+          } catch ( e ) {
+            logOnJs( "customRunOnAsyncContext error", e );
+          } finally {
+            currentFrame.decrementRefCount();
+          }
+          currentFrame = queuedFrame.value;
+          queuedFrame.value = null;
+        }
+        isAsyncContextBusy.value = false;
+      }
+    );
+
+    // Releases a frame that is still queued when the camera tears down, so its
+    // native buffer is not leaked. This runs on the same async context as the
+    // processing worklet above, so the two cannot race on queuedFrame.
+    const drainQueuedFrameOnAsyncContext = Worklets.defaultContext.createRunAsync( () => {
       "worklet";
 
-      try {
-        func( frame );
-      } catch ( e ) {
-        logOnJs( "customRunOnAsyncContext error", e );
-      } finally {
+      const frame = queuedFrame.value;
+      queuedFrame.value = null;
+      if ( frame != null ) {
         frame.decrementRefCount();
-        const nextFrame = queuedFrame.value;
-        queuedFrame.value = null;
+      }
+    } );
 
-        if ( nextFrame != null ) {
-          customRunOnAsyncContext( nextFrame, func );
-        } else {
-          isAsyncContextBusy.value = false;
+    function runAsync( frame, func ) {
+      "worklet";
+
+      const internal = frame;
+      internal.incrementRefCount();
+      if ( isAsyncContextBusy.value ) {
+        const previousQueuedFrame = queuedFrame.value;
+        if ( previousQueuedFrame != null ) {
+          previousQueuedFrame.decrementRefCount();
         }
+        queuedFrame.value = internal;
+        return;
       }
+      isAsyncContextBusy.value = true;
+      customRunOnAsyncContext( internal, func );
     }
-  );
 
-  function customRunAsync( frame, func ) {
-    "worklet";
+    return {
+      customRunAsync: runAsync,
+      drainQueuedFrame: drainQueuedFrameOnAsyncContext,
+    };
+  }, [isAsyncContextBusy, queuedFrame] );
 
-    const internal = frame;
-    internal.incrementRefCount();
-    if ( isAsyncContextBusy.value ) {
-      const previousQueuedFrame = queuedFrame.value;
-      if ( previousQueuedFrame != null ) {
-        previousQueuedFrame.decrementRefCount();
-      }
-      queuedFrame.value = internal;
-      return;
-    }
-    isAsyncContextBusy.value = true;
-    customRunOnAsyncContext( internal, func );
-  }
+  useEffect( () => () => {
+    drainQueuedFrame().catch( ( e ) => {
+      console.log( "drainQueuedFrame error", e?.message ?? e );
+    } );
+  }, [drainQueuedFrame] );
 
   return customRunAsync;
 };

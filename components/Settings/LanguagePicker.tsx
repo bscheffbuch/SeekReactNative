@@ -1,37 +1,46 @@
 // @ts-nocheck
-import React, { useCallback, useMemo, useState } from "react";
-import { View, Alert, Platform } from "react-native";
+import React, { useCallback, useMemo } from "react";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import Checkbox from "react-native-check-box";
 import * as RNLocalize from "react-native-localize";
-import RNPickerSelect from "react-native-picker-select";
 
 import i18n from "../../i18n";
 import { viewStyles } from "../../styles/settings";
-import { colors } from "../../styles/global";
 import languages from "../../utility/dictionaries/languageDict";
 import { useLanguage } from "../Providers/LanguageProvider";
 import { toggleLanguage } from "../../utility/settingsHelpers";
 import { deviceLanguageSupported, setDisplayLanguage } from "../../utility/languageHelpers";
 import StyledText from "../UIComponents/StyledText";
-import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
+import SettingsSelect from "./SettingsSelect";
 
 const localeList = Object.keys( languages ).map( ( locale ) => (
-  { value: locale, label: languages[locale].toLocaleUpperCase() }
+  { value: locale, label: languages[locale] }
 ) );
-
-const placeholder = {};
-const pickerStyles = { ...viewStyles };
-const showIcon = () => <></>;
 
 const { languageCode } = RNLocalize.getLocales()[0];
 
 const LanguagePicker = () => {
   const { toggleLanguagePreference, preferredLanguage } = useLanguage( );
+  const { theme } = useTheme( );
+  const styles = StyleSheet.create( {
+    title: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.heading,
+      fontSize: 18,
+      lineHeight: 24,
+      marginBottom: theme.spacing.sm,
+    },
+    rowText: {
+      color: theme.colors.text,
+      fontFamily: theme.typography.body,
+      fontSize: 16,
+      lineHeight: 23,
+    },
+  } );
 
   const displayLanguage = setDisplayLanguage( preferredLanguage );
   const isChecked = preferredLanguage === "device" || displayLanguage === languageCode;
-
-  const [pickerValue, setPickerValue] = useState( displayLanguage );
 
   const showAlert = useCallback( ( value: string ) => {
     const valueLabel = languages[value];
@@ -74,12 +83,10 @@ const LanguagePicker = () => {
       toggleLanguagePreference();
       return;
     }
-    Platform.OS === "ios" ? setPickerValue( value ) : showAlert( value );
+    // SettingsSelect commits the choice as soon as an option is tapped on
+    // both platforms, so confirm immediately with the tapped value
+    showAlert( value );
   }, [displayLanguage, preferredLanguage, toggleLanguagePreference, showAlert] );
-
-  const onDonePress = useCallback( ( ) => {
-    showAlert( pickerValue );
-  }, [showAlert, pickerValue] );
 
   const setDeviceLanguage = useCallback( () => handleValueChange( "device" ), [handleValueChange] );
 
@@ -89,35 +96,27 @@ const LanguagePicker = () => {
       implemented on iOS for the official react-native-checkbox library
       https://github.com/crazycodeboy/react-native-check-box/issues/94 */}
       <Checkbox
-        checkBoxColor={colors.checkboxColor}
+        checkBoxColor={theme.colors.primary}
         isChecked={isChecked}
         disabled={isChecked}
         onClick={setDeviceLanguage}
         style={viewStyles.checkBox}
       />
-      <StyledText onPress={setDeviceLanguage} style={baseTextStyles.body}>{i18n.t( "settings.device_settings" )}</StyledText>
+      <StyledText onPress={setDeviceLanguage} style={styles.rowText}>{i18n.t( "settings.device_settings" )}</StyledText>
     </View>
-  ), [isChecked, setDeviceLanguage] );
+  ), [isChecked, setDeviceLanguage, styles.rowText, theme.colors.primary] );
 
   return (
     <View style={viewStyles.donateMarginBottom}>
-      <StyledText style={baseTextStyles.header}>{i18n.t( "settings.language" ).toLocaleUpperCase()}</StyledText>
+      <Text style={styles.title}>{i18n.t( "settings.language" )}</Text>
       {deviceLanguageSupported( ) && renderDeviceCheckbox}
-      <RNPickerSelect
-        hideIcon
-        Icon={showIcon}
-        items={localeList}
-        onValueChange={handleValueChange}
-        onDonePress={onDonePress}
-        placeholder={placeholder}
-        useNativeAndroidPickerStyle={false}
-        value={Platform.OS === "ios" ? pickerValue : displayLanguage}
-        touchableWrapperProps={{ testID: "picker" }}
+      <SettingsSelect
         disabled={!displayLanguage}
-        style={pickerStyles}
-        pickerProps={{
-          themeVariant: "light",
-        }}
+        items={localeList}
+        label={i18n.t( "settings.language" )}
+        onValueChange={handleValueChange}
+        value={displayLanguage}
+        testID="picker"
       />
     </View>
   );

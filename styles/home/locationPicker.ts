@@ -7,23 +7,25 @@ import {
 
 const viewStyles = StyleSheet.create( {
   container: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
     flex: 1,
   },
   footer: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.seekSurface,
+    borderTopColor: colors.seekBorder,
+    borderTopWidth: 1,
     paddingBottom: dimensions.height > 670 ? 35 : 15,
     paddingTop: 15,
   },
   greenCircle: {
-    backgroundColor: colors.seekGreen,
+    backgroundColor: colors.seekPrimaryContainer,
     borderRadius: 281 / 2,
     height: 281,
     opacity: 0.33,
     width: 281,
   },
   header: {
-    backgroundColor: colors.seekForestGreen,
+    backgroundColor: colors.seekCanvas,
   },
   image: {
     padding: 5,
@@ -40,8 +42,8 @@ const viewStyles = StyleSheet.create( {
     right: 19,
   },
   map: {
-    backgroundColor: colors.white,
-    borderBottomColor: colors.lightGray,
+    backgroundColor: colors.seekSurface,
+    borderBottomColor: colors.seekBorder,
     borderBottomWidth: 1,
     bottom: 0,
     left: 0,
@@ -62,8 +64,8 @@ const viewStyles = StyleSheet.create( {
   },
   row,
   textContainer: {
-    backgroundColor: colors.white,
-    borderBottomColor: colors.lightGray,
+    backgroundColor: colors.seekSurface,
+    borderBottomColor: colors.seekBorder,
     borderBottomWidth: 1,
     justifyContent: "center",
     bottom: 0,
@@ -91,8 +93,10 @@ const textStyles = StyleSheet.create( {
     marginHorizontal: 20,
   },
   inputField: {
-    backgroundColor: colors.white,
-    borderRadius: 40,
+    backgroundColor: colors.seekSurface,
+    borderColor: colors.seekBorder,
+    borderRadius: 14,
+    borderWidth: 1,
     height: 37,
     paddingBottom: 0,
     paddingLeft: 20,
@@ -105,7 +109,7 @@ const imageStyles = StyleSheet.create( {
   white: {
     height: 19,
     resizeMode: "contain",
-    tintColor: colors.white,
+    tintColor: colors.seekDeepGreen,
     width: 14,
   },
   markerPin: {

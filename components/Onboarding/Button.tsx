@@ -16,7 +16,7 @@ const Button = ( { index }: Props ) => {
   const navigation = useNavigation( );
 
   // TODO: navigation TS
-  const navToHome = ( ) => navigation.navigate( "Drawer" );
+  const navToHome = ( ) => navigation.navigate( "MainTabs", { screen: "Home" } );
 
   return (
     <TouchableOpacity
@@ -27,7 +27,7 @@ const Button = ( { index }: Props ) => {
         ? (
           <View style={viewStyles.button}>
             <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.continue]}>
-              {i18n.t( "onboarding.continue" ).toLocaleUpperCase( )}
+              {i18n.t( "onboarding.continue" )}
             </StyledText>
           </View>
         ) : (

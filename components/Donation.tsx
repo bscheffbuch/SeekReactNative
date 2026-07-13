@@ -16,8 +16,10 @@ import urls from "../constants/urls";
 import CopyButton from "./UIComponents/Buttons/CopyButton";
 import StyledText from "./UIComponents/StyledText";
 import { baseTextStyles } from "../styles/textStyles";
+import { useTheme } from "./Providers/ThemeProvider";
 
 const Donation = ( { navigation, route } ) => {
+  const { theme } = useTheme( );
   const goBack = ( ) => navigation.goBack( );
 
   const [selectedText, setSelectedText] = React.useState( false );
@@ -32,10 +34,13 @@ const Donation = ( { navigation, route } ) => {
   const highlightSelectedText = ( ) => setSelectedText( true );
 
   return (
-    <SafeAreaView style={viewStyles.container} edges={["top"]}>
-      <View style={viewStyles.header}>
-        <StyledText style={[baseTextStyles.button, textStyles.text]}>
-          {i18n.t( "settings.donate" ).toLocaleUpperCase( )}
+    <SafeAreaView style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
+      <View style={[viewStyles.header, {
+        backgroundColor: theme.colors.canvas,
+        borderBottomColor: theme.colors.border,
+      }]}>
+        <StyledText style={[baseTextStyles.button, textStyles.text, { color: theme.colors.text }]}>
+          {i18n.t( "settings.donate" )}
         </StyledText>
         <TouchableOpacity
           onPress={goBack}
@@ -50,7 +55,7 @@ const Donation = ( { navigation, route } ) => {
           source={{ uri: donationPage }}
         />
       ) : (
-        <View style={viewStyles.whiteContainer}>
+        <View style={[viewStyles.whiteContainer, { backgroundColor: theme.colors.canvas }]}>
           <StyledText style={[baseTextStyles.body, textStyles.blackText]}>
            {i18n.t( "settings.donate_ios" )}
           </StyledText>
@@ -65,7 +70,7 @@ const Donation = ( { navigation, route } ) => {
           </CopyButton>
         </View>
       )}
-      <View style={viewStyles.bottom} />
+      <View style={[viewStyles.bottom, { backgroundColor: theme.colors.canvas }]} />
     </SafeAreaView>
   );
 };
