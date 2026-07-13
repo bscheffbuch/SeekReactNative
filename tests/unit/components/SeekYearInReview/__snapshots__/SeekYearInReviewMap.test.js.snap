@@ -130,12 +130,20 @@ exports[`SeekYearInReviewMap should render correctly 1`] = `
     style={
       {
         "alignSelf": "center",
-        "backgroundColor": "#38976d",
-        "borderRadius": 34,
-        "height": 79,
+        "backgroundColor": "#14794f",
+        "borderRadius": 14,
+        "elevation": 2,
+        "height": 64,
         "justifyContent": "center",
         "maxWidth": 317,
         "opacity": 1,
+        "shadowColor": "#14794f",
+        "shadowOffset": {
+          "height": 7,
+          "width": 0,
+        },
+        "shadowOpacity": 0.16,
+        "shadowRadius": 12,
         "width": 317,
       }
     }
@@ -162,10 +170,11 @@ exports[`SeekYearInReviewMap should render correctly 1`] = `
             undefined,
             undefined,
           ],
+          null,
         ]
       }
     >
-      VIEW OBSERVATIONS MAP
+      View Observations Map
     </Text>
   </View>,
 ]

@@ -5,8 +5,14 @@ import { Alert } from "react-native";
 import LanguagePicker from "../../../../components/Settings/LanguagePicker";
 import { toggleLanguage } from "../../../../utility/settingsHelpers";
 
-// Mock the hooks
-jest.mock( "../../../../utility/settingsHelpers" );
+// Mock the hooks; getLanguage must resolve a real language, because
+// LanguageProvider ignores the jest-utils value override and loads its
+// preference through this helper — with the automock the picker would
+// stay disabled forever
+jest.mock( "../../../../utility/settingsHelpers", () => ( {
+  getLanguage: jest.fn( async () => "en" ),
+  toggleLanguage: jest.fn(),
+} ) );
 
 const renderPicker = () => {
   render( <LanguagePicker /> );
@@ -24,32 +30,32 @@ describe( "LanguagePicker", () => {
     expect( screen ).toMatchSnapshot();
   } );
 
-  test( "should on iOS open alert on Done pressed but not before", async () => {
+  test( "should open confirmation alert when a language is selected", async () => {
     const alertSpy = jest.spyOn( Alert, "alert" );
+    alertSpy.mockClear();
     renderPicker();
-    await screen.findByTestId( pickerID );
-    const picker = screen.getByTestId( pickerID );
+    const picker = await screen.findByTestId( pickerID );
 
-    // Change language to "es" no alert should be shown
-    fireEvent( picker, "onValueChange", newLanguage );
+    // wait for the language preference to load and enable the picker
+    await screen.findByText( "English" );
+    // Opening the picker sheet shows no alert yet
+    fireEvent.press( picker );
     expect( alertSpy ).not.toHaveBeenCalled();
-    // Press done, show confirmation alert
-    fireEvent( picker, "onDonePress" );
+    // Tapping an option commits the choice and asks for confirmation
+    fireEvent.press( await screen.findByText( "Español" ) );
     expect( alertSpy ).toHaveBeenCalledTimes( 1 );
-    // TODO: this works with the iOS picker, but not with the Android one
-    // because Platform.OS always returns "ios" in the test environment
   } );
 
   test( "should call the language change hook with the new language", async () => {
-    renderPicker();
-    await screen.findByTestId( pickerID );
-    const picker = screen.getByTestId( pickerID );
-
-    // Change language to "es" no alert should be shown
-    fireEvent( picker, "onValueChange", newLanguage );
-    fireEvent( picker, "onDonePress" );
-
     const alertSpy = jest.spyOn( Alert, "alert" );
+    alertSpy.mockClear();
+    renderPicker();
+    const picker = await screen.findByTestId( pickerID );
+
+    await screen.findByText( "English" );
+    fireEvent.press( picker );
+    fireEvent.press( await screen.findByText( "Español" ) );
+
     // This is a press of the Confirm button on the Alert
     alertSpy.mock.calls[0][2][1].onPress();
 

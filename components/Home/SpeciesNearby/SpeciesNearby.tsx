@@ -8,6 +8,7 @@ import { viewStyles } from "../../../styles/home/speciesNearby";
 import { baseTextStyles } from "../../../styles/textStyles";
 import i18n from "../../../i18n";
 import { fetchTruncatedUserLocation } from "../../../utility/locationHelpers";
+import { formatYearMonthDay } from "../../../utility/dateHelpers";
 import TaxonPicker from "./TaxonPicker";
 import LocationPickerButton from "./LocationPickerButton";
 import { useLocationPermission } from "../../../utility/customHooks";
@@ -47,7 +48,7 @@ interface ApiParams {
   per_page: number;
   lat: number;
   lng: number | null;
-  observed_on: Date;
+  observed_on: string;
   seek_exceptions: boolean;
   locale: string;
   all_photos: boolean;
@@ -189,7 +190,7 @@ const SpeciesNearby = ( ) => {
         per_page: 20,
         lat: latitude,
         lng: longitude,
-        observed_on: new Date(),
+        observed_on: formatYearMonthDay( new Date() ),
         seek_exceptions: true,
         locale: i18n.locale,
         all_photos: true, // this allows for ARR license filtering
@@ -200,7 +201,7 @@ const SpeciesNearby = ( ) => {
       }
 
       const site = "https://api.inaturalist.org/v1/taxa/nearby";
-      const queryString = Object.keys( params ).map( key => `${key}=${params[key as keyof ApiParams]}` ).join( "&" );
+      const queryString = Object.keys( params ).map( key => `${key}=${encodeURIComponent( String( params[key as keyof ApiParams] ) )}` ).join( "&" );
       const options = { headers: { "User-Agent": createUserAgent() } };
 
       dispatch( { type: ACTION_TYPE.SET_FETCHING } );

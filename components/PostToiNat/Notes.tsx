@@ -8,13 +8,15 @@ import { baseTextStyles } from "../../styles/textStyles";
 
 type description = "description";
 interface Props {
+  description?: string | null;
   updateObservation: ( description: description, text: string ) => void;
 }
 
-const Notes = ( { updateObservation }: Props ) => (
+const Notes = ( { description, updateObservation }: Props ) => (
   <TextInput
     keyboardType="default"
     multiline
+    defaultValue={description ?? undefined}
     onChangeText={text => updateObservation( "description", text )}
     placeholder={i18n.t( "posting.notes" )}
     placeholderTextColor={colors.placeholderGray}

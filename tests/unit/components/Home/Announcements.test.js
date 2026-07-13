@@ -91,7 +91,7 @@ describe( "Announcements", () => {
 
         await waitFor( () => expect( inaturalistjs.announcements.search ).toHaveBeenCalled() );
 
-        const text = screen.queryByText( "DISMISS" );
+        const text = screen.queryByText( /dismiss/i );
         expect( text ).toBeNull();
     } );
   } );
@@ -109,7 +109,7 @@ describe( "Announcements", () => {
 
       await waitFor( () => expect( inaturalistjs.announcements.search ).toHaveBeenCalled() );
 
-      const button = await screen.findByText( "DISMISS" );
+      const button = await screen.findByText( /dismiss/i );
       expect( button ).toBeTruthy();
     } );
   } );

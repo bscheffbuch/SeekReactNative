@@ -13,11 +13,11 @@ exports[`ChallengeScreen should render correctly 1`] = `
   style={
     [
       {
-        "backgroundColor": "#38976d",
+        "backgroundColor": "#F3F1E8",
         "flex": 1,
       },
       {
-        "backgroundColor": "#F7F6F0",
+        "backgroundColor": "#F3F1E8",
       },
     ]
   }
@@ -27,9 +27,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "borderBottomColor": "#D8E1DA",
-        "borderBottomWidth": 0.5,
+        "backgroundColor": "#F3F1E8",
         "flexDirection": "row",
         "minHeight": 64,
         "paddingHorizontal": 16,
@@ -50,11 +48,11 @@ exports[`ChallengeScreen should render correctly 1`] = `
       numberOfLines={2}
       style={
         {
-          "color": "#17251F",
+          "color": "#111512",
           "flex": 1,
           "fontFamily": "Lato-Bold",
-          "fontSize": 20,
-          "lineHeight": 26,
+          "fontSize": 22,
+          "lineHeight": 28,
           "marginHorizontal": 8,
         }
       }
@@ -111,30 +109,83 @@ exports[`ChallengeScreen should render correctly 1`] = `
           ]
         }
       >
-        <Image
-          accessibilityIgnoresInvertColors={true}
-          resizeMode="contain"
-          source={
-            {
-              "testUri": "../../../assets/navbar/Notifications-inactive.webp",
-            }
-          }
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={24}
+          bbWidth={24}
+          fill="none"
+          focusable={false}
+          height={24}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#111512"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
           style={
             [
               {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
                 "height": 24,
                 "width": 24,
               },
-              null,
-              undefined,
             ]
           }
-        />
+          vbHeight={24}
+          vbWidth={24}
+          width={24}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4279309586,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2}
+          >
+            <RNSVGPath
+              d="M18 8.8c0-3.1-2.2-5.3-6-5.3s-6 2.2-6 5.3c0 5.7-2 6.4-2 7.7h16c0-1.3-2-2-2-7.7Z"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+            <RNSVGPath
+              d="M9.8 19a2.3 2.3 0 0 0 4.4 0"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
       </View>
       <View
         style={
           {
-            "backgroundColor": "#E5B84B",
+            "backgroundColor": "#E0A82E",
             "borderColor": "#FFFFFF",
             "borderRadius": 5,
             "borderWidth": 1,
@@ -152,7 +203,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
   <View
     style={
       {
-        "backgroundColor": "#F7F6F0",
+        "backgroundColor": "#F3F1E8",
         "flex": 1,
       }
     }
@@ -163,9 +214,8 @@ exports[`ChallengeScreen should render correctly 1`] = `
       <View
         style={
           {
-            "marginBottom": 10,
-            "marginLeft": 22,
-            "marginTop": 26,
+            "marginBottom": 12,
+            "marginTop": 18,
           }
         }
       >
@@ -178,22 +228,24 @@ exports[`ChallengeScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          IN PROGRESS
+          In progress
         </Text>
       </View>
       <View
@@ -227,10 +279,25 @@ exports[`ChallengeScreen should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "elevation": 2,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "marginBottom": 12,
+            "minHeight": 112,
             "opacity": 1,
+            "paddingHorizontal": 12,
             "paddingVertical": 12,
+            "shadowColor": "#142018",
+            "shadowOffset": {
+              "height": 6,
+              "width": 0,
+            },
+            "shadowOpacity": 0.07,
+            "shadowRadius": 14,
           }
         }
       >
@@ -242,16 +309,18 @@ exports[`ChallengeScreen should render correctly 1`] = `
           }
           style={
             {
-              "height": 60,
-              "marginHorizontal": 25,
+              "height": 64,
+              "marginRight": 12,
               "resizeMode": "contain",
-              "width": 60,
+              "width": 64,
             }
           }
         />
         <View
           style={
             {
+              "flex": 1,
+              "minWidth": 0,
               "width": 530,
             }
           }
@@ -264,20 +333,28 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#111512",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 16,
-                    "letterSpacing": 0.89,
+                    "letterSpacing": 0,
                     "lineHeight": 20,
                   },
                   {
+                    "color": "#111512",
+                    "fontSize": 16,
+                    "lineHeight": 20,
                     "marginBottom": 1,
                   },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            MIGRATION CHALLENGE
+            Migration Challenge
           </Text>
           <Text
             style={
@@ -287,14 +364,20 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
-                    "fontSize": 13,
-                    "lineHeight": 21,
+                    "color": "#707A72",
+                    "fontSize": 12.5,
+                    "lineHeight": 18,
+                  },
+                  {
+                    "color": "#707A72",
+                    "fontFamily": "Lato-Regular",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -305,8 +388,9 @@ exports[`ChallengeScreen should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "marginHorizontal": 25,
-              "width": 59,
+              "justifyContent": "center",
+              "marginLeft": 12,
+              "width": 64,
             }
           }
         >
@@ -446,13 +530,14 @@ exports[`ChallengeScreen should render correctly 1`] = `
                     },
                     [
                       {
-                        "color": "#000000",
+                        "color": "#111512",
                         "fontFamily": "Lato-Regular",
                       },
                       {
                         "fontSize": 19,
                       },
                     ],
+                    null,
                   ]
                 }
               >
@@ -493,10 +578,25 @@ exports[`ChallengeScreen should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "elevation": 2,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "marginBottom": 12,
+            "minHeight": 112,
             "opacity": 1,
+            "paddingHorizontal": 12,
             "paddingVertical": 12,
+            "shadowColor": "#142018",
+            "shadowOffset": {
+              "height": 6,
+              "width": 0,
+            },
+            "shadowOpacity": 0.07,
+            "shadowRadius": 14,
           }
         }
       >
@@ -508,16 +608,18 @@ exports[`ChallengeScreen should render correctly 1`] = `
           }
           style={
             {
-              "height": 60,
-              "marginHorizontal": 25,
+              "height": 64,
+              "marginRight": 12,
               "resizeMode": "contain",
-              "width": 60,
+              "width": 64,
             }
           }
         />
         <View
           style={
             {
+              "flex": 1,
+              "minWidth": 0,
               "width": 530,
             }
           }
@@ -530,20 +632,28 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#111512",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 16,
-                    "letterSpacing": 0.89,
+                    "letterSpacing": 0,
                     "lineHeight": 20,
                   },
                   {
+                    "color": "#111512",
+                    "fontSize": 16,
+                    "lineHeight": 20,
                     "marginBottom": 1,
                   },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            EQUINOX CHALLENGE
+            Equinox Challenge
           </Text>
           <Text
             style={
@@ -553,14 +663,20 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
-                    "fontSize": 13,
-                    "lineHeight": 21,
+                    "color": "#707A72",
+                    "fontSize": 12.5,
+                    "lineHeight": 18,
+                  },
+                  {
+                    "color": "#707A72",
+                    "fontFamily": "Lato-Regular",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -571,8 +687,9 @@ exports[`ChallengeScreen should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "marginHorizontal": 25,
-              "width": 59,
+              "justifyContent": "center",
+              "marginLeft": 12,
+              "width": 64,
             }
           }
         >
@@ -712,13 +829,14 @@ exports[`ChallengeScreen should render correctly 1`] = `
                     },
                     [
                       {
-                        "color": "#000000",
+                        "color": "#111512",
                         "fontFamily": "Lato-Regular",
                       },
                       {
                         "fontSize": 19,
                       },
                     ],
+                    null,
                   ]
                 }
               >
@@ -731,9 +849,8 @@ exports[`ChallengeScreen should render correctly 1`] = `
       <View
         style={
           {
-            "marginBottom": 10,
-            "marginLeft": 22,
-            "marginTop": 26,
+            "marginBottom": 12,
+            "marginTop": 18,
           }
         }
       >
@@ -746,22 +863,24 @@ exports[`ChallengeScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          NOT STARTED
+          Not started
         </Text>
       </View>
       <View
@@ -795,10 +914,25 @@ exports[`ChallengeScreen should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "elevation": 2,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "marginBottom": 12,
+            "minHeight": 112,
             "opacity": 1,
+            "paddingHorizontal": 12,
             "paddingVertical": 12,
+            "shadowColor": "#142018",
+            "shadowOffset": {
+              "height": 6,
+              "width": 0,
+            },
+            "shadowOpacity": 0.07,
+            "shadowRadius": 14,
           }
         }
       >
@@ -810,16 +944,18 @@ exports[`ChallengeScreen should render correctly 1`] = `
           }
           style={
             {
-              "height": 60,
-              "marginHorizontal": 25,
+              "height": 64,
+              "marginRight": 12,
               "resizeMode": "contain",
-              "width": 60,
+              "width": 64,
             }
           }
         />
         <View
           style={
             {
+              "flex": 1,
+              "minWidth": 0,
               "width": 530,
             }
           }
@@ -832,20 +968,28 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#111512",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 16,
-                    "letterSpacing": 0.89,
+                    "letterSpacing": 0,
                     "lineHeight": 20,
                   },
                   {
+                    "color": "#111512",
+                    "fontSize": 16,
+                    "lineHeight": 20,
                     "marginBottom": 1,
                   },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            ECOLOGY CHALLENGE
+            Ecology Challenge
           </Text>
           <Text
             style={
@@ -855,14 +999,20 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
-                    "fontSize": 13,
-                    "lineHeight": 21,
+                    "color": "#707A72",
+                    "fontSize": 12.5,
+                    "lineHeight": 18,
+                  },
+                  {
+                    "color": "#707A72",
+                    "fontFamily": "Lato-Regular",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -873,8 +1023,9 @@ exports[`ChallengeScreen should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "marginHorizontal": 25,
-              "width": 59,
+              "justifyContent": "center",
+              "marginLeft": 12,
+              "width": 64,
             }
           }
         >
@@ -890,19 +1041,26 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#14794f",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 13,
                     "lineHeight": 17,
                   },
                   {
+                    "color": "#14794F",
+                    "fontSize": 12,
                     "textAlign": "center",
                   },
+                  {
+                    "color": "#14794F",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            START NOW
+            Start now
           </Text>
         </View>
       </View>
@@ -937,10 +1095,25 @@ exports[`ChallengeScreen should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "elevation": 2,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "marginBottom": 12,
+            "minHeight": 112,
             "opacity": 1,
+            "paddingHorizontal": 12,
             "paddingVertical": 12,
+            "shadowColor": "#142018",
+            "shadowOffset": {
+              "height": 6,
+              "width": 0,
+            },
+            "shadowOpacity": 0.07,
+            "shadowRadius": 14,
           }
         }
       >
@@ -952,16 +1125,18 @@ exports[`ChallengeScreen should render correctly 1`] = `
           }
           style={
             {
-              "height": 60,
-              "marginHorizontal": 25,
+              "height": 64,
+              "marginRight": 12,
               "resizeMode": "contain",
-              "width": 60,
+              "width": 64,
             }
           }
         />
         <View
           style={
             {
+              "flex": 1,
+              "minWidth": 0,
               "width": 530,
             }
           }
@@ -974,20 +1149,28 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#111512",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 16,
-                    "letterSpacing": 0.89,
+                    "letterSpacing": 0,
                     "lineHeight": 20,
                   },
                   {
+                    "color": "#111512",
+                    "fontSize": 16,
+                    "lineHeight": 20,
                     "marginBottom": 1,
                   },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            INSECT CHALLENGE
+            Insect Challenge
           </Text>
           <Text
             style={
@@ -997,14 +1180,20 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
-                    "fontSize": 13,
-                    "lineHeight": 21,
+                    "color": "#707A72",
+                    "fontSize": 12.5,
+                    "lineHeight": 18,
+                  },
+                  {
+                    "color": "#707A72",
+                    "fontFamily": "Lato-Regular",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1015,8 +1204,9 @@ exports[`ChallengeScreen should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "marginHorizontal": 25,
-              "width": 59,
+              "justifyContent": "center",
+              "marginLeft": 12,
+              "width": 64,
             }
           }
         >
@@ -1032,28 +1222,34 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#14794f",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 13,
                     "lineHeight": 17,
                   },
                   {
+                    "color": "#14794F",
+                    "fontSize": 12,
                     "textAlign": "center",
                   },
+                  {
+                    "color": "#14794F",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            START NOW
+            Start now
           </Text>
         </View>
       </View>
       <View
         style={
           {
-            "marginBottom": 10,
-            "marginLeft": 22,
-            "marginTop": 26,
+            "marginBottom": 12,
+            "marginTop": 18,
           }
         }
       >
@@ -1066,22 +1262,24 @@ exports[`ChallengeScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          COMPLETED
+          Completed
         </Text>
       </View>
       <View
@@ -1115,10 +1313,25 @@ exports[`ChallengeScreen should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "elevation": 2,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "marginBottom": 12,
+            "minHeight": 112,
             "opacity": 1,
+            "paddingHorizontal": 12,
             "paddingVertical": 12,
+            "shadowColor": "#142018",
+            "shadowOffset": {
+              "height": 6,
+              "width": 0,
+            },
+            "shadowOpacity": 0.07,
+            "shadowRadius": 14,
           }
         }
       >
@@ -1130,16 +1343,18 @@ exports[`ChallengeScreen should render correctly 1`] = `
           }
           style={
             {
-              "height": 60,
-              "marginHorizontal": 25,
+              "height": 64,
+              "marginRight": 12,
               "resizeMode": "contain",
-              "width": 60,
+              "width": 64,
             }
           }
         />
         <View
           style={
             {
+              "flex": 1,
+              "minWidth": 0,
               "width": 530,
             }
           }
@@ -1152,20 +1367,28 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#111512",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 16,
-                    "letterSpacing": 0.89,
+                    "letterSpacing": 0,
                     "lineHeight": 20,
                   },
                   {
+                    "color": "#111512",
+                    "fontSize": 16,
+                    "lineHeight": 20,
                     "marginBottom": 1,
                   },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            HIGH SEAS CHALLENGE
+            High Seas Challenge
           </Text>
           <Text
             style={
@@ -1175,14 +1398,20 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
-                    "fontSize": 13,
-                    "lineHeight": 21,
+                    "color": "#707A72",
+                    "fontSize": 12.5,
+                    "lineHeight": 18,
+                  },
+                  {
+                    "color": "#707A72",
+                    "fontFamily": "Lato-Regular",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1193,8 +1422,9 @@ exports[`ChallengeScreen should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "marginHorizontal": 25,
-              "width": 59,
+              "justifyContent": "center",
+              "marginLeft": 12,
+              "width": 64,
             }
           }
         >
@@ -1238,10 +1468,25 @@ exports[`ChallengeScreen should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
+            "elevation": 2,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "marginBottom": 12,
+            "minHeight": 112,
             "opacity": 1,
+            "paddingHorizontal": 12,
             "paddingVertical": 12,
+            "shadowColor": "#142018",
+            "shadowOffset": {
+              "height": 6,
+              "width": 0,
+            },
+            "shadowOpacity": 0.07,
+            "shadowRadius": 14,
           }
         }
       >
@@ -1253,16 +1498,18 @@ exports[`ChallengeScreen should render correctly 1`] = `
           }
           style={
             {
-              "height": 60,
-              "marginHorizontal": 25,
+              "height": 64,
+              "marginRight": 12,
               "resizeMode": "contain",
-              "width": 60,
+              "width": 64,
             }
           }
         />
         <View
           style={
             {
+              "flex": 1,
+              "minWidth": 0,
               "width": 530,
             }
           }
@@ -1275,20 +1522,28 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
+                    "color": "#111512",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 16,
-                    "letterSpacing": 0.89,
+                    "letterSpacing": 0,
                     "lineHeight": 20,
                   },
                   {
+                    "color": "#111512",
+                    "fontSize": 16,
+                    "lineHeight": 20,
                     "marginBottom": 1,
                   },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
+                  },
                 ],
+                null,
               ]
             }
           >
-            FRESHWATER CHALLENGE
+            Freshwater Challenge
           </Text>
           <Text
             style={
@@ -1298,14 +1553,20 @@ exports[`ChallengeScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
-                    "fontSize": 13,
-                    "lineHeight": 21,
+                    "color": "#707A72",
+                    "fontSize": 12.5,
+                    "lineHeight": 18,
+                  },
+                  {
+                    "color": "#707A72",
+                    "fontFamily": "Lato-Regular",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1316,8 +1577,9 @@ exports[`ChallengeScreen should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "marginHorizontal": 25,
-              "width": 59,
+              "justifyContent": "center",
+              "marginLeft": 12,
+              "width": 64,
             }
           }
         >

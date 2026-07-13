@@ -150,7 +150,7 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
     </View>
   );
 
-  const extractKey = useCallback( ( item: Badge, index: number ) => `${item}${index}`, [] );
+  const extractKey = useCallback( ( item: Badge ) => `badge-${item.earnedIconName}`, [] );
 
   return (
     <WhiteModal closeModal={closeModal}>

@@ -12,7 +12,7 @@ exports[`SelectSpecies should render correctly 1`] = `
   }
   style={
     {
-      "backgroundColor": "#38976d",
+      "backgroundColor": "#F3F1E8",
       "flex": 1,
     }
   }
@@ -21,7 +21,7 @@ exports[`SelectSpecies should render correctly 1`] = `
   <View
     style={
       {
-        "backgroundColor": "#38976d",
+        "backgroundColor": "#F3F1E8",
         "height": 55,
       }
     }
@@ -92,10 +92,11 @@ exports[`SelectSpecies should render correctly 1`] = `
               "position": "absolute",
             },
           ],
+          null,
         ]
       }
     >
-      WHAT DID YOU SEE?
+      What did you see?
     </Text>
   </View>
   <View
@@ -126,7 +127,7 @@ exports[`SelectSpecies should render correctly 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#38976d",
+        "backgroundColor": "#F3F1E8",
         "flexDirection": "row",
         "flexWrap": "nowrap",
         "height": 63,
@@ -144,11 +145,11 @@ exports[`SelectSpecies should render correctly 1`] = `
         {
           "height": 20,
           "resizeMode": "contain",
-          "tintColor": "#ffffff",
+          "tintColor": "#14794f",
           "width": 20,
         }
       }
-      tintColor="#ffffff"
+      tintColor="#14794f"
     />
     <TextInput
       defaultValue={null}
@@ -163,8 +164,10 @@ exports[`SelectSpecies should render correctly 1`] = `
             "fontSize": 15,
           },
           {
-            "backgroundColor": "#ffffff",
-            "borderRadius": 40,
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 14,
+            "borderWidth": 1,
             "height": 37,
             "marginLeft": 11,
             "paddingBottom": 0,
@@ -197,22 +200,24 @@ exports[`SelectSpecies should render correctly 1`] = `
             },
             [
               {
-                "color": "#38976d",
-                "fontFamily": "Lato-Bold",
+                "letterSpacing": 0,
+              },
+              {
                 "fontSize": 18,
-                "letterSpacing": 1,
-                "lineHeight": 22,
+                "lineHeight": 24,
+              },
+              {
+                "color": "#111512",
+                "fontFamily": "Lato-Bold",
               },
               false,
-              false,
-              false,
-              null,
               undefined,
             ],
+            null,
           ]
         }
       >
-        SEEK'S IDENTIFICATION
+        Seek's identification
       </Text>
     </View>
     <View
@@ -254,10 +259,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -269,17 +281,19 @@ exports[`SelectSpecies should render correctly 1`] = `
           }
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         />
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -292,15 +306,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -315,16 +335,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -351,18 +376,20 @@ exports[`SelectSpecies should render correctly 1`] = `
             },
             [
               {
-                "color": "#38976d",
-                "fontFamily": "Lato-Bold",
+                "letterSpacing": 0,
+              },
+              {
                 "fontSize": 18,
-                "letterSpacing": 1,
-                "lineHeight": 22,
+                "lineHeight": 24,
+              },
+              {
+                "color": "#111512",
+                "fontFamily": "Lato-Bold",
               },
               false,
-              false,
-              false,
-              null,
               undefined,
             ],
+            null,
           ]
         }
       >
@@ -408,10 +435,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -419,10 +453,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -442,14 +476,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -457,10 +491,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -468,7 +502,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -481,15 +517,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -504,16 +546,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -561,10 +608,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -572,10 +626,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -595,14 +649,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -610,10 +664,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -621,7 +675,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -634,15 +690,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -657,16 +719,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -714,10 +781,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -725,10 +799,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -748,14 +822,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -763,10 +837,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -774,7 +848,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -787,15 +863,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -810,16 +892,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -867,10 +954,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -878,10 +972,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -901,14 +995,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -916,10 +1010,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -927,7 +1021,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -940,15 +1036,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -963,16 +1065,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1020,10 +1127,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -1031,10 +1145,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -1054,14 +1168,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -1069,10 +1183,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -1080,7 +1194,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -1093,15 +1209,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1116,16 +1238,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1173,10 +1300,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -1184,10 +1318,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -1207,14 +1341,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -1222,10 +1356,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -1233,7 +1367,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -1246,15 +1382,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1269,16 +1411,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1326,10 +1473,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -1337,10 +1491,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -1360,14 +1514,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -1375,10 +1529,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -1386,7 +1540,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -1399,15 +1555,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1422,16 +1584,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1479,10 +1646,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -1490,10 +1664,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -1513,14 +1687,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -1528,10 +1702,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -1539,7 +1713,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -1552,15 +1728,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1575,16 +1757,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1632,10 +1819,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -1643,10 +1837,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -1666,14 +1860,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -1681,10 +1875,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -1692,7 +1886,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -1705,15 +1901,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1728,16 +1930,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1785,10 +1992,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -1796,10 +2010,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -1819,14 +2033,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -1834,10 +2048,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -1845,7 +2059,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -1858,15 +2074,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1881,16 +2103,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1938,10 +2165,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -1949,10 +2183,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -1972,14 +2206,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -1987,10 +2221,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -1998,7 +2232,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -2011,15 +2247,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -2034,16 +2276,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -2091,10 +2338,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -2102,10 +2356,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -2125,14 +2379,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -2140,10 +2394,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -2151,7 +2405,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -2164,15 +2420,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -2187,16 +2449,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -2244,10 +2511,17 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "borderRadius": 12,
+            "borderWidth": 1,
             "flexDirection": "row",
             "flexWrap": "nowrap",
+            "minHeight": 96,
             "opacity": 1,
-            "width": 750,
+            "paddingHorizontal": 10,
+            "paddingVertical": 10,
+            "width": 714,
           }
         }
       >
@@ -2255,10 +2529,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           accessibilityIgnoresInvertColors={true}
           style={
             {
-              "borderRadius": 40,
-              "height": 80,
-              "marginRight": 24,
-              "width": 80,
+              "borderRadius": 8,
+              "height": 76,
+              "marginRight": 14,
+              "width": 76,
             }
           }
         >
@@ -2278,14 +2552,14 @@ exports[`SelectSpecies should render correctly 1`] = `
                   "top": 0,
                 },
                 {
-                  "height": 80,
-                  "width": 80,
+                  "height": 76,
+                  "width": 76,
                 },
                 {
-                  "borderRadius": 40,
-                  "height": 80,
-                  "marginRight": 24,
-                  "width": 80,
+                  "borderRadius": 8,
+                  "height": 76,
+                  "marginRight": 14,
+                  "width": 76,
                 },
               ]
             }
@@ -2293,10 +2567,10 @@ exports[`SelectSpecies should render correctly 1`] = `
           <Image
             style={
               {
-                "borderRadius": 40,
-                "height": 80,
-                "marginRight": 24,
-                "width": 80,
+                "borderRadius": 8,
+                "height": 76,
+                "marginRight": 14,
+                "width": 76,
               }
             }
           />
@@ -2304,7 +2578,9 @@ exports[`SelectSpecies should render correctly 1`] = `
         <View
           style={
             {
+              "flex": 1,
               "maxWidth": 220,
+              "minWidth": 0,
             }
           }
         >
@@ -2317,15 +2593,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Regular",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 20,
+                    "fontSize": 17,
+                    "lineHeight": 22,
+                  },
+                  {
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -2340,16 +2622,21 @@ exports[`SelectSpecies should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Italic",
                   },
                   {
                     "flexDirection": "row",
                     "flexWrap": "wrap",
-                    "fontSize": 15,
-                    "marginTop": 12,
+                    "fontSize": 13,
+                    "lineHeight": 18,
+                    "marginTop": 3,
+                  },
+                  {
+                    "color": "#707A72",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -2360,10 +2647,15 @@ exports[`SelectSpecies should render correctly 1`] = `
     </View>
     <View
       style={
-        {
-          "backgroundColor": "#ffffff",
-          "paddingBottom": 60,
-        }
+        [
+          {
+            "backgroundColor": "#F3F1E8",
+            "paddingBottom": 60,
+          },
+          {
+            "backgroundColor": "#F3F1E8",
+          },
+        ]
       }
     />
   </View>

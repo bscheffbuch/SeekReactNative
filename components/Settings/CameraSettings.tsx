@@ -41,6 +41,17 @@ const confidenceThresholdOptions = ( () => {
   }
   return options;
 } )();
+
+// Realm object properties are prototype accessors, so spreading a live Realm
+// object copies nothing; copy the fields into a plain object before using it
+// as component state
+const settingsToPlainObject = ( userSettings ): State => ( {
+  autoCapture: userSettings.autoCapture,
+  scientificNames: userSettings.scientificNames,
+  cameraViewportResolution: userSettings.cameraViewportResolution,
+  photoQualityBalance: userSettings.photoQualityBalance,
+  confidenceThreshold: userSettings.confidenceThreshold,
+} );
 const CameraSettings = ( ) => {
   const [settings, setSettings] = useState<State>( {} );
   const { theme } = useTheme( );
@@ -141,9 +152,9 @@ const CameraSettings = ( ) => {
 
     const fetchUserSettings = async ( ) => {
       const realm = await Realm.open( realmConfig );
-      const userSettings = realm.objects( "UserSettingsRealm" );
-      if ( isCurrent ) {
-        setSettings( userSettings[0] );
+      const userSettings = realm.objects( "UserSettingsRealm" )[0];
+      if ( isCurrent && userSettings ) {
+        setSettings( settingsToPlainObject( userSettings ) );
       }
     };
     fetchUserSettings( );

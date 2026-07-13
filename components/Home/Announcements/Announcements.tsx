@@ -89,7 +89,7 @@ const Announcements = ( ) => {
           // Filter by placement on mobile home screen
           .filter( ( r ) => r.placement === "mobile/home" )
           // Sort by start date, oldest first
-          .sort( ( a, b ) => new Date( a.start ) - new Date( b.start ) );
+          .sort( ( a, b ) => new Date( a.start ).getTime( ) - new Date( b.start ).getTime( ) );
         setAnnouncements( homeAnnouncements );
       } )
       .catch( ( err ) => {

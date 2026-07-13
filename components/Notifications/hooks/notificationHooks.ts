@@ -22,7 +22,8 @@ const useFetchNotifications = ( ) => {
       try {
         const realm = await Realm.open( realmConfig );
         const notificationList = realm.objects( "NotificationRealm" ).sorted( "index", true );
-        setNotifications( notificationList );
+        // copy to a plain array so state doesn't hold live Realm results
+        setNotifications( notificationList.map( ( notification ) => notification.toJSON( ) ) );
       } catch ( e ) {
         console.log( e, "couldn't open realm: notifications" );
       }

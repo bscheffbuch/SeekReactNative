@@ -27,6 +27,7 @@ jest.mock( "@react-navigation/native", () => {
         if ( event === "focus" ) {
           callback();
         }
+        return jest.fn();
       },
     } ),
     useRoute: () => ( {} ),
@@ -235,15 +236,15 @@ describe( "SeekYearInReviewScreen", () => {
 
     const container = await screen.findByTestId( containerID );
     expect( container ).toBeTruthy();
-    // Should show observations section
-    const observationsBanner = await screen.findByText( "OBSERVATIONS" );
-    expect( observationsBanner ).toBeTruthy();
-    // Should show observations map section
-    const observationsText = await screen.findByText( "OBSERVATIONS MAP" );
-    expect( observationsText ).toBeTruthy();
+    // Should show observations section (several headers may match)
+    const observationsBanners = await screen.findAllByText( /^observations$/i );
+    expect( observationsBanners.length ).toBeGreaterThan( 0 );
+    // Should show observations map section (button label + section header)
+    const observationsTexts = await screen.findAllByText( /observations map/i );
+    expect( observationsTexts.length ).toBeGreaterThan( 0 );
     // Should show iNaturalist section
-    const iNatText = await screen.findByText( "INATURALIST" );
-    expect( iNatText ).toBeTruthy();
+    const iNatTexts = await screen.findAllByText( /^inaturalist$/i );
+    expect( iNatTexts.length ).toBeGreaterThan( 0 );
     const iNatText2 = await screen.findByText( "Thank you for contributing to our community!" );
     expect( iNatText2 ).toBeTruthy();
     // Should show the donate section
@@ -251,7 +252,7 @@ describe( "SeekYearInReviewScreen", () => {
     expect( donateText1 ).toBeTruthy();
     const donateText2 = await screen.findByText( /As a small team, we greatly appreciate/ );
     expect( donateText2 ).toBeTruthy();
-    const donateButton = await screen.findByText( "DONATE" );
+    const donateButton = await screen.findByText( /donate/i );
     expect( donateButton ).toBeTruthy();
     // Create snapshot
     expect( screen ).toMatchSnapshot();
@@ -338,7 +339,7 @@ describe( "SeekYearInReviewScreen", () => {
     renderScreen();
     await screen.findByTestId( containerID );
 
-    const text = screen.queryByText( "OBSERVATIONS MAP" );
+    const text = screen.queryByText( /observations map/i );
     expect( text ).toBeNull();
 
     screen.unmount();
@@ -349,7 +350,7 @@ describe( "SeekYearInReviewScreen", () => {
     renderScreen( { login: null } );
     await screen.findByTestId( containerID );
 
-    const text = screen.queryByText( "INATURALIST" );
+    const text = screen.queryAllByText( /^inaturalist$/i )[0] || null;
     expect( text ).toBeNull();
 
     screen.unmount();
@@ -395,7 +396,7 @@ describe( "SeekYearInReviewScreen", () => {
     renderScreen();
     await screen.findByTestId( containerID );
 
-    const challengesBanner = screen.queryByText( "CHALLENGES" );
+    const challengesBanner = screen.queryByText( /^challenges$/i );
     expect( challengesBanner ).toBeNull();
 
     screen.unmount();
@@ -406,7 +407,7 @@ describe( "SeekYearInReviewScreen", () => {
     renderScreen();
     await screen.findByTestId( containerID );
 
-    const donateButton = await screen.findByText( "DONATE" );
+    const donateButton = await screen.findByText( /donate/i );
     fireEvent.press( donateButton );
 
     const navigateSpy = jest.spyOn( mockNavigate, "navigate" );

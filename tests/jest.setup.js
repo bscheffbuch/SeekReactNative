@@ -165,6 +165,8 @@ jest.mock( "@react-navigation/native", () => {
         if ( event === "focus" ) {
           callback();
         }
+        // Real navigators return an unsubscribe function
+        return jest.fn();
       },
     } ),
     useRoute: () => ( {} ),

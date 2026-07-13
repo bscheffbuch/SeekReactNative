@@ -54,7 +54,7 @@ const checkIfFirstLaunch = async ( ): Promise<boolean> => {
       return true;
     }
     return false;
-  } catch ( error ) {
+  } catch {
     return false;
   }
 };
@@ -73,7 +73,7 @@ const checkIfCameraLaunched = async ( ): Promise<boolean> => {
       return true;
     }
     return false;
-  } catch ( error ) {
+  } catch {
     return false;
   }
 };
@@ -92,7 +92,7 @@ const checkIfCardShown = async ( ): Promise<boolean> => {
       return true;
     }
     return false;
-  } catch ( error ) {
+  } catch {
     return false;
   }
 };

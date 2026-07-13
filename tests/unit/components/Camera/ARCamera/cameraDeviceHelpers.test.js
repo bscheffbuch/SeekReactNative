@@ -46,7 +46,7 @@ describe( "cameraDeviceHelpers", () => {
     expect( getBackCameraZoomValue( telephotoCamera, 2 ) ).toBe( telephotoCamera.neutralZoom );
   } );
 
-  it( "prefers Samsung's optimized logical back camera when it is exposed", () => {
+  it( "prefers Samsung's optimized logical back camera on Samsung devices", () => {
     const defaultLogicalCamera = buildBackCamera( { id: "0", maxZoom: 10 } );
     const samsungOptimizedCamera = buildBackCamera( {
       id: "20",
@@ -54,9 +54,26 @@ describe( "cameraDeviceHelpers", () => {
       physicalDevices: ["wide-angle-camera", "telephoto-camera"],
     } );
 
-    expect( getBackCameraDeviceForZoom( [defaultLogicalCamera, samsungOptimizedCamera], 1 ) ).toBe(
-      samsungOptimizedCamera
-    );
+    expect(
+      getBackCameraDeviceForZoom( [defaultLogicalCamera, samsungOptimizedCamera], 1, true )
+    ).toBe( samsungOptimizedCamera );
+  } );
+
+  it( "does not rank camera id 20 first on non-Samsung devices", () => {
+    // on other manufacturers ids beyond 0/1 are vendor-specific (macro/depth/IR)
+    const defaultLogicalCamera = buildBackCamera( {
+      id: "0",
+      maxZoom: 10,
+      physicalDevices: ["wide-angle-camera", "telephoto-camera"],
+    } );
+    const vendorSpecificCamera = buildBackCamera( { id: "20", maxZoom: 10 } );
+
+    expect(
+      getBackCameraDeviceForZoom( [vendorSpecificCamera, defaultLogicalCamera], 1, false )
+    ).toBe( defaultLogicalCamera );
+    expect(
+      getBackCameraDeviceForZoom( [vendorSpecificCamera, defaultLogicalCamera], 1 )
+    ).toBe( defaultLogicalCamera );
   } );
 
   it( "prefers standard digital stabilization over preview-only cinematic modes", () => {

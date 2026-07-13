@@ -13,11 +13,11 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
   style={
     [
       {
-        "backgroundColor": "#38976d",
+        "backgroundColor": "#F3F1E8",
         "flex": 1,
       },
       {
-        "backgroundColor": "#F7F6F0",
+        "backgroundColor": "#F3F1E8",
       },
     ]
   }
@@ -27,9 +27,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
     style={
       {
         "alignItems": "center",
-        "backgroundColor": "#FFFFFF",
-        "borderBottomColor": "#D8E1DA",
-        "borderBottomWidth": 0.5,
+        "backgroundColor": "#F3F1E8",
         "flexDirection": "row",
         "minHeight": 64,
         "paddingHorizontal": 16,
@@ -50,11 +48,11 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
       numberOfLines={2}
       style={
         {
-          "color": "#17251F",
+          "color": "#111512",
           "flex": 1,
           "fontFamily": "Lato-Bold",
-          "fontSize": 20,
-          "lineHeight": 26,
+          "fontSize": 22,
+          "lineHeight": 28,
           "marginHorizontal": 8,
         }
       }
@@ -111,30 +109,83 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           ]
         }
       >
-        <Image
-          accessibilityIgnoresInvertColors={true}
-          resizeMode="contain"
-          source={
-            {
-              "testUri": "../../../assets/navbar/Notifications-inactive.webp",
-            }
-          }
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={24}
+          bbWidth={24}
+          fill="none"
+          focusable={false}
+          height={24}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#111512"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
           style={
             [
               {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
                 "height": 24,
                 "width": 24,
               },
-              null,
-              undefined,
             ]
           }
-        />
+          vbHeight={24}
+          vbWidth={24}
+          width={24}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4279309586,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2}
+          >
+            <RNSVGPath
+              d="M18 8.8c0-3.1-2.2-5.3-6-5.3s-6 2.2-6 5.3c0 5.7-2 6.4-2 7.7h16c0-1.3-2-2-2-7.7Z"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+            <RNSVGPath
+              d="M9.8 19a2.3 2.3 0 0 0 4.4 0"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
       </View>
       <View
         style={
           {
-            "backgroundColor": "#E5B84B",
+            "backgroundColor": "#E0A82E",
             "borderColor": "#FFFFFF",
             "borderRadius": 5,
             "borderWidth": 1,
@@ -153,16 +204,15 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
     contentContainerStyle={
       [
         {
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#F3F1E8",
         },
         {
-          "backgroundColor": "#F7F6F0",
+          "backgroundColor": "#F3F1E8",
         },
       ]
     }
     keyboardDismissMode="none"
-    onScroll={[Function]}
-    scrollEventThrottle={0}
+    onScrollBeginDrag={[Function]}
   >
     <View>
       <View
@@ -264,10 +314,11 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                       "marginBottom": 10,
                     },
                   ],
+                  null,
                 ]
               }
             >
-              IN 2022, YOU OBSERVED
+              In 2022, you observed
             </Text>
             <Text
               style={
@@ -282,10 +333,11 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "letterSpacing": 1,
                     "lineHeight": 27,
                   },
+                  null,
                 ]
               }
             >
-              100 NEW SPECIES
+              100 new species
             </Text>
           </View>
           <Image
@@ -315,44 +367,21 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         }
       >
         <View
-          accessibilityIgnoresInvertColors={true}
           style={
             [
               {
                 "alignSelf": "center",
-                "height": 48,
-                "marginBottom": 32,
-                "marginTop": 40,
-                "paddingTop": 5,
-                "width": 284,
+                "backgroundColor": "#DEF0E7",
+                "borderRadius": 999,
+                "marginBottom": 18,
+                "marginTop": 24,
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
               },
               false,
             ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/img-titlebanner.webp",
-              }
-            }
-            style={
-              [
-                {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {
-                  "height": 48,
-                  "width": 284,
-                },
-                undefined,
-              ]
-            }
-          />
           <Text
             allowFontScaling={false}
             style={
@@ -360,22 +389,18 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 {
                   "textAlign": "left",
                 },
-                [
-                  {
-                    "color": "#ffffff",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
-                    "lineHeight": 22,
-                  },
-                  {
-                    "textAlign": "center",
-                  },
-                ],
+                {
+                  "color": "#14794F",
+                  "fontFamily": "Lato-Bold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                  "textAlign": "center",
+                },
+                null,
               ]
             }
           >
-            TOP SPECIES
+            Top Species
           </Text>
         </View>
         <View>
@@ -435,12 +460,15 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     }
                   }
                   style={
-                    {
-                      "height": 113.75,
-                      "marginHorizontal": 6,
-                      "resizeMode": "contain",
-                      "width": 113.75,
-                    }
+                    [
+                      {
+                        "height": 113.75,
+                        "marginHorizontal": 6,
+                        "resizeMode": "contain",
+                        "width": 113.75,
+                      },
+                      false,
+                    ]
                   }
                 />
               </View>
@@ -489,12 +517,15 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     }
                   }
                   style={
-                    {
-                      "height": 113.75,
-                      "marginHorizontal": 6,
-                      "resizeMode": "contain",
-                      "width": 113.75,
-                    }
+                    [
+                      {
+                        "height": 113.75,
+                        "marginHorizontal": 6,
+                        "resizeMode": "contain",
+                        "width": 113.75,
+                      },
+                      false,
+                    ]
                   }
                 />
               </View>
@@ -543,12 +574,15 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     }
                   }
                   style={
-                    {
-                      "height": 113.75,
-                      "marginHorizontal": 6,
-                      "resizeMode": "contain",
-                      "width": 113.75,
-                    }
+                    [
+                      {
+                        "height": 113.75,
+                        "marginHorizontal": 6,
+                        "resizeMode": "contain",
+                        "width": 113.75,
+                      },
+                      false,
+                    ]
                   }
                 />
               </View>
@@ -582,29 +616,25 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
-                  false,
                   {
                     "textAlign": "center",
                   },
-                  null,
                   {
                     "marginHorizontal": 6,
                     "width": 113.73578302712161,
                   },
                 ],
+                null,
               ]
             }
           >
@@ -619,29 +649,25 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
-                  false,
                   {
                     "textAlign": "center",
                   },
-                  null,
                   {
                     "marginHorizontal": 6,
                     "width": 113.73578302712161,
                   },
                 ],
+                null,
               ]
             }
           >
@@ -656,29 +682,25 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
-                  false,
                   {
                     "textAlign": "center",
                   },
-                  null,
                   {
                     "marginHorizontal": 6,
                     "width": 113.73578302712161,
                   },
                 ],
+                null,
               ]
             }
           >
@@ -708,7 +730,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "width": 113.73578302712161,
                   },
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -718,6 +740,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -735,7 +758,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "width": 113.73578302712161,
                   },
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -745,6 +768,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -762,7 +786,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "width": 113.73578302712161,
                   },
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -772,6 +796,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -779,44 +804,21 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           </Text>
         </View>
         <View
-          accessibilityIgnoresInvertColors={true}
           style={
             [
               {
                 "alignSelf": "center",
-                "height": 48,
-                "marginBottom": 32,
-                "marginTop": 40,
-                "paddingTop": 5,
-                "width": 284,
+                "backgroundColor": "#DEF0E7",
+                "borderRadius": 999,
+                "marginBottom": 18,
+                "marginTop": 24,
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
               },
               false,
             ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/img-titlebanner.webp",
-              }
-            }
-            style={
-              [
-                {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {
-                  "height": 48,
-                  "width": 284,
-                },
-                undefined,
-              ]
-            }
-          />
           <Text
             allowFontScaling={false}
             style={
@@ -824,22 +826,18 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 {
                   "textAlign": "left",
                 },
-                [
-                  {
-                    "color": "#ffffff",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
-                    "lineHeight": 22,
-                  },
-                  {
-                    "textAlign": "center",
-                  },
-                ],
+                {
+                  "color": "#14794F",
+                  "fontFamily": "Lato-Bold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                  "textAlign": "center",
+                },
+                null,
               ]
             }
           >
-            OBSERVATIONS
+            Observations
           </Text>
         </View>
         <Text
@@ -851,22 +849,24 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          OBSERVATIONS BY MONTH
+          Observations by Month
         </Text>
         <View
           style={
@@ -943,22 +943,24 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          OBSERVATIONS MAP
+          Observations Map
         </Text>
         <View
           style={
@@ -1095,12 +1097,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           style={
             {
               "alignSelf": "center",
-              "backgroundColor": "#38976d",
-              "borderRadius": 34,
-              "height": 79,
+              "backgroundColor": "#14794f",
+              "borderRadius": 14,
+              "elevation": 2,
+              "height": 64,
               "justifyContent": "center",
               "maxWidth": 317,
               "opacity": 1,
+              "shadowColor": "#14794f",
+              "shadowOffset": {
+                "height": 7,
+                "width": 0,
+              },
+              "shadowOpacity": 0.16,
+              "shadowRadius": 12,
               "width": 317,
             }
           }
@@ -1127,10 +1137,11 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   undefined,
                   undefined,
                 ],
+                null,
               ]
             }
           >
-            VIEW OBSERVATIONS MAP
+            View Observations Map
           </Text>
         </View>
         <View
@@ -1149,22 +1160,24 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#38976d",
-                  "fontFamily": "Lato-Bold",
+                  "letterSpacing": 0,
+                },
+                {
                   "fontSize": 18,
-                  "letterSpacing": 1,
-                  "lineHeight": 22,
+                  "lineHeight": 24,
+                },
+                {
+                  "color": "#111512",
+                  "fontFamily": "Lato-Bold",
                 },
                 false,
-                false,
-                false,
-                null,
                 undefined,
               ],
+              null,
             ]
           }
         >
-          INATURALIST
+          iNaturalist
         </Text>
         <View
           style={
@@ -1181,7 +1194,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Medium",
                   "fontSize": 18,
                   "letterSpacing": 0,
@@ -1191,6 +1204,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1202,7 +1216,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1212,6 +1226,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1225,7 +1240,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1235,6 +1250,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1249,24 +1265,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                   false,
-                  false,
-                  null,
                   undefined,
                 ],
+                null,
               ]
             }
           >
@@ -1280,7 +1292,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1290,6 +1302,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1303,7 +1316,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1313,6 +1326,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1326,7 +1340,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1336,6 +1350,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1349,7 +1364,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1359,6 +1374,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1372,7 +1388,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1382,6 +1398,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1395,7 +1412,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1405,6 +1422,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1418,7 +1436,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1428,6 +1446,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1449,7 +1468,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Medium",
                   "fontSize": 18,
                   "letterSpacing": 0,
@@ -1459,6 +1478,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1486,44 +1506,21 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         }
       >
         <View
-          accessibilityIgnoresInvertColors={true}
           style={
             [
               {
                 "alignSelf": "center",
-                "height": 48,
-                "marginBottom": 32,
-                "marginTop": 40,
-                "paddingTop": 5,
-                "width": 284,
+                "backgroundColor": "#DEF0E7",
+                "borderRadius": 999,
+                "marginBottom": 18,
+                "marginTop": 24,
+                "paddingHorizontal": 16,
+                "paddingVertical": 8,
               },
               false,
             ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/img-titlebanner.webp",
-              }
-            }
-            style={
-              [
-                {
-                  "bottom": 0,
-                  "left": 0,
-                  "position": "absolute",
-                  "right": 0,
-                  "top": 0,
-                },
-                {
-                  "height": 48,
-                  "width": 284,
-                },
-                undefined,
-              ]
-            }
-          />
           <Text
             allowFontScaling={false}
             style={
@@ -1531,22 +1528,18 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 {
                   "textAlign": "left",
                 },
-                [
-                  {
-                    "color": "#ffffff",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
-                    "lineHeight": 22,
-                  },
-                  {
-                    "textAlign": "center",
-                  },
-                ],
+                {
+                  "color": "#14794F",
+                  "fontFamily": "Lato-Bold",
+                  "fontSize": 13,
+                  "lineHeight": 17,
+                  "textAlign": "center",
+                },
+                null,
               ]
             }
           >
-            CHALLENGES
+            Challenges
           </Text>
         </View>
         <Text
@@ -1557,7 +1550,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Medium",
                   "fontSize": 18,
                   "letterSpacing": 0,
@@ -1567,6 +1560,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1578,7 +1572,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1588,6 +1582,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1601,7 +1596,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1611,6 +1606,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1625,24 +1621,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Bold",
-                    "fontSize": 18,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0,
+                  },
+                  {
+                    "fontSize": 16,
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#38976d",
-                    "fontFamily": "Lato-Medium",
-                    "fontSize": 18,
-                    "letterSpacing": 0,
-                    "lineHeight": 24,
+                    "color": "#111512",
+                    "fontFamily": "Lato-Bold",
                   },
                   false,
-                  false,
-                  null,
                   undefined,
                 ],
+                null,
               ]
             }
           >
@@ -1656,7 +1648,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1666,6 +1658,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1679,7 +1672,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1689,6 +1682,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1702,7 +1696,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1712,6 +1706,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1725,7 +1720,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 },
                 [
                   {
-                    "color": "#000000",
+                    "color": "#111512",
                     "fontFamily": "Lato-Medium",
                     "fontSize": 18,
                     "letterSpacing": 0,
@@ -1735,6 +1730,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
+                null,
               ]
             }
           >
@@ -1934,7 +1930,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Regular",
                   "fontSize": 15,
                   "letterSpacing": 0,
@@ -1944,6 +1940,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -1964,7 +1961,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#000000",
+                  "color": "#111512",
                   "fontFamily": "Lato-Regular",
                   "fontSize": 15,
                   "letterSpacing": 0,
@@ -1974,6 +1971,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
+              null,
             ]
           }
         >
@@ -2017,12 +2015,20 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           style={
             {
               "alignSelf": "center",
-              "backgroundColor": "#38976d",
-              "borderRadius": 34,
-              "height": 79,
+              "backgroundColor": "#14794f",
+              "borderRadius": 14,
+              "elevation": 2,
+              "height": 64,
               "justifyContent": "center",
               "maxWidth": 317,
               "opacity": 1,
+              "shadowColor": "#14794f",
+              "shadowOffset": {
+                "height": 7,
+                "width": 0,
+              },
+              "shadowOpacity": 0.16,
+              "shadowRadius": 12,
               "width": 317,
             }
           }
@@ -2049,25 +2055,31 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   undefined,
                   undefined,
                 ],
+                null,
               ]
             }
           >
-            DONATE
+            Donate
           </Text>
         </View>
       </View>
       <View
         style={
-          {
-            "backgroundColor": "#ffffff",
-            "paddingBottom": 60,
-          }
+          [
+            {
+              "backgroundColor": "#F3F1E8",
+              "paddingBottom": 60,
+            },
+            {
+              "backgroundColor": "#F3F1E8",
+            },
+          ]
         }
       />
       <View
         style={
           {
-            "backgroundColor": "#ffffff",
+            "backgroundColor": "#F3F1E8",
             "bottom": -1000,
             "height": 1050,
             "left": 0,

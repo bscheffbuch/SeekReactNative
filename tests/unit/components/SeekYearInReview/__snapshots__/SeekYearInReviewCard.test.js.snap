@@ -3,10 +3,30 @@
 exports[`SeekYearInReviewCard should render in December with observations 1`] = `
 <View
   style={
-    {
-      "backgroundColor": "#ffffff",
-      "paddingTop": 35,
-    }
+    [
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 18,
+        "borderWidth": 1,
+        "marginHorizontal": 16,
+        "marginTop": 16,
+        "padding": 16,
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 12,
+        "elevation": 2,
+        "shadowColor": "#142018",
+        "shadowOffset": {
+          "height": 6,
+          "width": 0,
+        },
+        "shadowOpacity": 0.07,
+        "shadowRadius": 14,
+      },
+    ]
   }
   testID="yir-card"
 >
@@ -18,25 +38,29 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
         },
         [
           {
-            "color": "#38976d",
+            "color": "#111512",
             "fontFamily": "Lato-Bold",
             "fontSize": 18,
-            "letterSpacing": 1,
+            "letterSpacing": 0,
             "lineHeight": 22,
           },
           {
-            "paddingLeft": 22,
+            "paddingLeft": 0,
+          },
+          {
+            "color": "#111512",
+            "fontFamily": "Lato-Bold",
           },
         ],
+        null,
       ]
     }
   >
-    SEEK YEAR IN REVIEW
+    Seek Year in Review
   </Text>
   <View
     style={
       {
-        "paddingHorizontal": 33,
         "paddingTop": 21,
       }
     }
@@ -49,14 +73,19 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
           },
           [
             {
-              "color": "#000000",
+              "color": "#111512",
               "fontFamily": "Lato-Regular",
               "fontSize": 15,
               "letterSpacing": 0,
               "lineHeight": 21,
             },
             false,
+            {
+              "color": "#707A72",
+              "fontFamily": "Lato-Regular",
+            },
           ],
+          null,
         ]
       }
     >
@@ -101,12 +130,20 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
     style={
       {
         "alignSelf": "center",
-        "backgroundColor": "#38976d",
-        "borderRadius": 34,
-        "height": 79,
+        "backgroundColor": "#14794f",
+        "borderRadius": 14,
+        "elevation": 2,
+        "height": 64,
         "justifyContent": "center",
         "maxWidth": 317,
         "opacity": 1,
+        "shadowColor": "#14794f",
+        "shadowOffset": {
+          "height": 7,
+          "width": 0,
+        },
+        "shadowOpacity": 0.16,
+        "shadowRadius": 12,
         "width": 317,
       }
     }
@@ -133,10 +170,11 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
             undefined,
             undefined,
           ],
+          null,
         ]
       }
     >
-      VIEW MY SEEK REVIEW
+      View my Seek Review
     </Text>
   </View>
   <View
@@ -152,10 +190,30 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
 exports[`SeekYearInReviewCard should render in January with observations 1`] = `
 <View
   style={
-    {
-      "backgroundColor": "#ffffff",
-      "paddingTop": 35,
-    }
+    [
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 18,
+        "borderWidth": 1,
+        "marginHorizontal": 16,
+        "marginTop": 16,
+        "padding": 16,
+      },
+      {
+        "backgroundColor": "#FFFFFF",
+        "borderColor": "#E6E9E4",
+        "borderRadius": 12,
+        "elevation": 2,
+        "shadowColor": "#142018",
+        "shadowOffset": {
+          "height": 6,
+          "width": 0,
+        },
+        "shadowOpacity": 0.07,
+        "shadowRadius": 14,
+      },
+    ]
   }
   testID="yir-card"
 >
@@ -167,25 +225,29 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
         },
         [
           {
-            "color": "#38976d",
+            "color": "#111512",
             "fontFamily": "Lato-Bold",
             "fontSize": 18,
-            "letterSpacing": 1,
+            "letterSpacing": 0,
             "lineHeight": 22,
           },
           {
-            "paddingLeft": 22,
+            "paddingLeft": 0,
+          },
+          {
+            "color": "#111512",
+            "fontFamily": "Lato-Bold",
           },
         ],
+        null,
       ]
     }
   >
-    SEEK YEAR IN REVIEW
+    Seek Year in Review
   </Text>
   <View
     style={
       {
-        "paddingHorizontal": 33,
         "paddingTop": 21,
       }
     }
@@ -198,14 +260,19 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
           },
           [
             {
-              "color": "#000000",
+              "color": "#111512",
               "fontFamily": "Lato-Regular",
               "fontSize": 15,
               "letterSpacing": 0,
               "lineHeight": 21,
             },
             false,
+            {
+              "color": "#707A72",
+              "fontFamily": "Lato-Regular",
+            },
           ],
+          null,
         ]
       }
     >
@@ -250,12 +317,20 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
     style={
       {
         "alignSelf": "center",
-        "backgroundColor": "#38976d",
-        "borderRadius": 34,
-        "height": 79,
+        "backgroundColor": "#14794f",
+        "borderRadius": 14,
+        "elevation": 2,
+        "height": 64,
         "justifyContent": "center",
         "maxWidth": 317,
         "opacity": 1,
+        "shadowColor": "#14794f",
+        "shadowOffset": {
+          "height": 7,
+          "width": 0,
+        },
+        "shadowOpacity": 0.16,
+        "shadowRadius": 12,
         "width": 317,
       }
     }
@@ -282,10 +357,11 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
             undefined,
             undefined,
           ],
+          null,
         ]
       }
     >
-      VIEW MY SEEK REVIEW
+      View my Seek Review
     </Text>
   </View>
   <View

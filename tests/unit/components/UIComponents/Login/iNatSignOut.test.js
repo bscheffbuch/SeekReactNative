@@ -15,7 +15,7 @@ function renderWithoutUser() {
 describe( "iNatSignOut", () => {
   test( "should render correctly", async () => {
     renderWithoutUser();
-    await screen.findByText( "SIGN OUT OF INATURALIST" );
+    await screen.findByText( /sign out of inaturalist/i );
     expect( screen ).toMatchSnapshot();
   } );
 } );

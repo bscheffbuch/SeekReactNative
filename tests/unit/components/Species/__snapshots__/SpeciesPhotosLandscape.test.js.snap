@@ -46,7 +46,7 @@ exports[`SpeciesPhotosLandscape should render correctly 1`] = `
             },
             {
               "backgroundColor": "#000000",
-              "borderRadius": 40,
+              "borderRadius": 8,
               "paddingBottom": 3,
               "paddingHorizontal": 5,
               "paddingTop": 8,
@@ -56,6 +56,7 @@ exports[`SpeciesPhotosLandscape should render correctly 1`] = `
               "maxWidth": 250,
             },
           ],
+          null,
         ]
       }
     >

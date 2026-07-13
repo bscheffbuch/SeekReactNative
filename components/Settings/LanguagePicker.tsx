@@ -1,6 +1,6 @@
 // @ts-nocheck
-import React, { useCallback, useMemo, useState } from "react";
-import { StyleSheet, Text, View, Alert, Platform } from "react-native";
+import React, { useCallback, useMemo } from "react";
+import { StyleSheet, Text, View, Alert } from "react-native";
 import Checkbox from "react-native-check-box";
 import * as RNLocalize from "react-native-localize";
 
@@ -41,8 +41,6 @@ const LanguagePicker = () => {
 
   const displayLanguage = setDisplayLanguage( preferredLanguage );
   const isChecked = preferredLanguage === "device" || displayLanguage === languageCode;
-
-  const [pickerValue, setPickerValue] = useState( displayLanguage );
 
   const showAlert = useCallback( ( value: string ) => {
     const valueLabel = languages[value];
@@ -85,12 +83,10 @@ const LanguagePicker = () => {
       toggleLanguagePreference();
       return;
     }
-    Platform.OS === "ios" ? setPickerValue( value ) : showAlert( value );
+    // SettingsSelect commits the choice as soon as an option is tapped on
+    // both platforms, so confirm immediately with the tapped value
+    showAlert( value );
   }, [displayLanguage, preferredLanguage, toggleLanguagePreference, showAlert] );
-
-  const onDonePress = useCallback( ( ) => {
-    showAlert( pickerValue );
-  }, [showAlert, pickerValue] );
 
   const setDeviceLanguage = useCallback( () => handleValueChange( "device" ), [handleValueChange] );
 
@@ -119,8 +115,7 @@ const LanguagePicker = () => {
         items={localeList}
         label={i18n.t( "settings.language" )}
         onValueChange={handleValueChange}
-        onDonePress={onDonePress}
-        value={Platform.OS === "ios" ? pickerValue : displayLanguage}
+        value={displayLanguage}
         testID="picker"
       />
     </View>

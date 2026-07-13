@@ -10,7 +10,7 @@ exports[`iNatSignOut should render correctly 1`] = `
         },
         [
           {
-            "color": "#000000",
+            "color": "#111512",
             "fontFamily": "Lato-Regular",
             "fontSize": 15,
             "letterSpacing": 0,
@@ -20,7 +20,11 @@ exports[`iNatSignOut should render correctly 1`] = `
             "marginBottom": 33,
             "marginTop": 19,
           },
+          {
+            "color": "#111512",
+          },
         ],
+        null,
       ]
     }
   >
@@ -59,12 +63,20 @@ Thanks for being part of this community!
     style={
       {
         "alignSelf": "center",
-        "backgroundColor": "#38976d",
-        "borderRadius": 34,
-        "height": 79,
+        "backgroundColor": "#14794f",
+        "borderRadius": 14,
+        "elevation": 2,
+        "height": 64,
         "justifyContent": "center",
         "maxWidth": 317,
         "opacity": 1,
+        "shadowColor": "#14794f",
+        "shadowOffset": {
+          "height": 7,
+          "width": 0,
+        },
+        "shadowOpacity": 0.16,
+        "shadowRadius": 12,
         "width": 317,
       }
     }
@@ -91,10 +103,11 @@ Thanks for being part of this community!
             undefined,
             undefined,
           ],
+          null,
         ]
       }
     >
-      SIGN OUT OF INATURALIST
+      Sign out of iNaturalist
     </Text>
   </View>,
 ]

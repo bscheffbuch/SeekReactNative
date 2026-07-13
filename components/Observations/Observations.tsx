@@ -136,7 +136,9 @@ const Observations = ( ) => {
     // otherwise hard to use search in languages with characters
     if ( text.length >= 1 ) {
       Realm.open( realmConfig ).then( ( realm ) => {
-        const species = realm.objects( "ObservationRealm" ).filtered( `taxon.name CONTAINS[c] '${text}' OR taxon.preferredCommonName CONTAINS[c] '${text}'` );
+        // parameterized query: user input must not be interpolated into the
+        // query string, or names containing quotes crash the search
+        const species = realm.objects( "ObservationRealm" ).filtered( "taxon.name CONTAINS[c] $0 OR taxon.preferredCommonName CONTAINS[c] $0", text );
         setupObsList( species, true );
       } ).catch( ( ) => {
         // console.log( "Err: ", err )

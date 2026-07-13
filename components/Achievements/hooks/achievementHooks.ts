@@ -35,8 +35,7 @@ const useFetchAchievements = ( ): AchievementState => {
           if ( id === null ) { return; }
           const highestEarned = badges
             .filtered( `iconicTaxonName != null AND iconicTaxonId == ${id}` )
-            .sorted( "index", true )
-            .sorted( "earned", true );
+            .sorted( [["earned", true], ["index", true]] );
           speciesBadges.push( highestEarned[0] );
         } );
 

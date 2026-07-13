@@ -18,7 +18,7 @@ import { baseTextStyles } from "../../../styles/textStyles";
 const ForgotPasswordScreen = ( ) => {
   const { navigate } = useNavigation( );
   const [email, setEmail] = useState( "" );
-  const [error, setError] = useState( false );
+  const [error, setError] = useState( "" );
   const token = createJwtToken( );
 
   const emailForgotPassword = ( ) => {
@@ -37,20 +37,25 @@ const ForgotPasswordScreen = ( ) => {
       method: "POST",
       body: JSON.stringify( params ),
       headers,
-    } ).then( ( responseJson ) => {
-      const { status } = responseJson;
+    } ).then( ( response ) => {
+      const { status } = response;
       if ( status === 200 ) {
         navigate( "PasswordEmail" );
+      } else {
+        setError( i18n.t( "login.error_request_could_not_be_completed" ) );
       }
-    } ).catch( ( err ) => console.log( err, "error" ) );
+    } ).catch( ( err ) => {
+      console.log( err, "error" );
+      setError( i18n.t( "login.error_request_could_not_be_completed" ) );
+    } );
   };
 
   const checkEmail = ( ) => {
     if ( checkIsEmailValid( email ) ) {
-      setError( false );
+      setError( "" );
       emailForgotPassword( );
     } else {
-      setError( true );
+      setError( "email" );
     }
   };
 
@@ -70,7 +75,7 @@ const ForgotPasswordScreen = ( ) => {
         type="emailAddress"
       />
       {error
-        ? <ErrorMessage error="email" />
+        ? <ErrorMessage error={error} />
         : <View style={styles.marginLarge} />}
       <GreenButton
         handlePress={( ) => checkEmail( )}

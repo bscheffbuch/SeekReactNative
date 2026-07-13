@@ -97,24 +97,28 @@ class SignUpScreen extends Component<Props, State> {
       .then( response => response.json( ) )
       .then( ( responseJson: {
         error_description?: string;
-        error?: number;
-        access_token: string;
+        error?: string;
+        access_token?: string;
       } ) => {
         const errorDescription = responseJson.error_description;
+        const accessToken = responseJson.access_token;
+
         if ( errorDescription ) {
           this.setErrorOrMessage( errorDescription );
-        } else if ( responseJson.error === 400 ) {
+          return;
+        }
+        if ( responseJson.error || !accessToken ) {
           this.setErrorOrMessage( i18n.t( "inat_login.authentication_failed" ) );
+          return;
         }
 
-        const accessToken = responseJson.access_token;
         saveAccessToken( accessToken );
         newUser.updateLogin( );
         this.resetForm( );
         this.submitSuccess( );
       } ).catch( ( e ) => {
         console.log( e, "couldn't get /oauth/token" );
-        this.setErrorOrMessage( null );
+        this.setErrorOrMessage( i18n.t( "inat_login.authentication_failed" ) );
       } );
   }
 

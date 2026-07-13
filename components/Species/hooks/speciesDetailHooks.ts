@@ -1,31 +1,8 @@
 // @ts-nocheck
 import { useState, useEffect } from "react";
-import Realm from "realm";
 import inatjs from "inaturalistjs";
 
 import i18n from "../../../i18n";
-import realmConfig from "../../../models";
-
-const useSpeciesSeen = ( id: number ) => {
-  const [seenTaxa, setSeenTaxa] = useState<any>( );
-
-  useEffect( ( ) => {
-    const fetchSpeciesSeen = async ( ) => {
-      if ( id === null ) { return; }
-      const realm = await Realm.open( realmConfig );
-      const observations = realm.objects( "ObservationRealm" );
-      const seen = observations.filtered( `taxon.id == ${id}` )[0];
-
-      if ( seen ) {
-        setSeenTaxa( seen );
-      }
-    };
-
-    fetchSpeciesSeen( );
-  }, [id] );
-
-  return seenTaxa;
-};
 
 interface Taxon {
   rank: string;
@@ -110,6 +87,5 @@ const useTaxonDetails = ( id: number ) => {
 };
 
 export {
-  useSpeciesSeen,
   useTaxonDetails,
 };

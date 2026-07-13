@@ -15,6 +15,8 @@ const useCommonName = ( id?: number ): string | undefined => {
       if ( isCurrent ) {
         setCommonName( name );
       }
+    } ).catch( () => {
+      // keep showing the scientific name when the lookup fails
     } );
 
     return () => {
