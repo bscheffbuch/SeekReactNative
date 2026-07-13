@@ -1,8 +1,10 @@
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import type { StackCardInterpolationProps } from "@react-navigation/stack";
 import { createStackNavigator, CardStyleInterpolators } from "@react-navigation/stack";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme, DarkTheme } from "@react-navigation/native";
 import { useReactNavigationDevTools } from "@rozenite/react-navigation-plugin";
+
+import { useTheme } from "../Providers/ThemeProvider";
 
 import BottomTabs from "./BottomTabs";
 import Splash from "../Splash";
@@ -66,8 +68,26 @@ const App = ( ) => {
   // Enable React Navigation DevTools in development
   useReactNavigationDevTools( { ref: navigationRef } );
 
+  const { theme } = useTheme( );
+  // Without this, react-navigation's light default paints scene backgrounds
+  // during transitions, flashing white between screens in dark mode.
+  const navigationTheme = useMemo( () => {
+    const base = theme.isDark ? DarkTheme : DefaultTheme;
+    return {
+      ...base,
+      colors: {
+        ...base.colors,
+        primary: theme.colors.primary,
+        background: theme.colors.canvas,
+        card: theme.colors.surface,
+        text: theme.colors.text,
+        border: theme.colors.border,
+      },
+    };
+  }, [theme] );
+
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
       <Stack.Navigator id={undefined}>
         <Stack.Group screenOptions={screenOptions}>
           <Stack.Screen name="Splash" component={Splash} options={defaultConfig} />

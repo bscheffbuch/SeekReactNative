@@ -98,9 +98,24 @@ What is known so far:
 
 ## Open issue 2 — inverted camera preview colors ("non-stabilized camera")
 
-Two candidate causes identified; both are now eliminated in the branch.
-Verify on-device with `debug-apk-5` (or newer) once the render crash above
-is fixed:
+**Root cause found (third pass, fixed in the branch — verify with
+`debug-apk-7` or newer):** the redesign made the vision-camera `video`
+output conditional on the stabilization toggle
+(`video={digitalStabilizationEnabled && ...}` in `FrameProcessorCamera.tsx`;
+on `main` it was always on). In stock vision-camera, when the video output
+is disabled the Preview use case is sized to `format.photoSize` — the
+**maximum photo resolution** (the app requests `photoResolution: "max"`) —
+instead of the screen-matched `format.videoSize`. A preview-rate PRIV
+stream at full photo resolution is outside the guaranteed CameraX/HAL
+stream combinations on many devices and corrupts preview colors. That is
+why the corruption appears exactly and only with stabilization off, and
+why the emulator (software HAL, any size fine) never reproduced it. The
+patch (`CameraSession+Configuration.kt`, `configureOutputs`) now sizes the
+preview to `format.videoSize` regardless of whether video is enabled, so
+both toggle states use the same preview stream configuration.
+
+Two earlier candidate causes were also eliminated (kept below for
+history; both are real non-stock behaviors worth keeping fixed):
 
 - Candidate A (fixed earlier): the **first** test build (`debug-apk-1`,
   pre-rebase) had `USE_NATIVE_FOCUS_PEAKING = Platform.OS === "android"`,
