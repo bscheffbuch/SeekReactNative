@@ -162,7 +162,7 @@ exports[`RangeMap should change map region to user's location when button is pre
             strokeWidth={2}
           >
             <RNSVGPath
-              d="M18 8.8c0-3.1-2.2-5.3-6-5.3s-6 2.2-6 5.3c0 5.7-2 6.4-2 7.7h16c0-1.3-2-2-2-7.7Z"
+              d="M10.268 21a2 2 0 0 0 3.464 0"
               fill={
                 {
                   "payload": 4278190080,
@@ -171,7 +171,7 @@ exports[`RangeMap should change map region to user's location when button is pre
               }
             />
             <RNSVGPath
-              d="M9.8 19a2.3 2.3 0 0 0 4.4 0"
+              d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
               fill={
                 {
                   "payload": 4278190080,
@@ -548,7 +548,7 @@ exports[`RangeMap should render correctly 1`] = `
             strokeWidth={2}
           >
             <RNSVGPath
-              d="M18 8.8c0-3.1-2.2-5.3-6-5.3s-6 2.2-6 5.3c0 5.7-2 6.4-2 7.7h16c0-1.3-2-2-2-7.7Z"
+              d="M10.268 21a2 2 0 0 0 3.464 0"
               fill={
                 {
                   "payload": 4278190080,
@@ -557,7 +557,7 @@ exports[`RangeMap should render correctly 1`] = `
               }
             />
             <RNSVGPath
-              d="M9.8 19a2.3 2.3 0 0 0 4.4 0"
+              d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
               fill={
                 {
                   "payload": 4278190080,

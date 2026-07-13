@@ -193,7 +193,7 @@ index f91ce83..3f48cc0 100644
          left.zoom != right.zoom ||
          left.exposure != right.exposure
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
-index 1e9c0de..ffe3ad6 100644
+index 1e9c0de..ae96b45 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 @@ -1,8 +1,19 @@
@@ -337,7 +337,7 @@ index 1e9c0de..ffe3ad6 100644
    // Notify callback
    callback.onInitialized()
  
-@@ -336,6 +390,201 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
+@@ -336,6 +390,217 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
    if (currentExposureCompensation != exposureCompensation) {
      camera.cameraControl.setExposureCompensationIndex(exposureCompensation)
    }
@@ -379,15 +379,20 @@ index 1e9c0de..ffe3ad6 100644
 +    hasOptions = true
 +  }
 +
-+  val opticalStabilizationModes = camera2Info.getCameraCharacteristic(
-+    CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION
-+  )
-+  if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
-+    builder.setCaptureRequestOption(
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++  // Only touch OIS when stabilization is requested — forcing it in the
++  // non-stabilized configuration deviates from stock behavior and can upset
++  // vendor ISP pipelines.
++  if (config.videoStabilizationMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++    val opticalStabilizationModes = camera2Info.getCameraCharacteristic(
++      CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION
 +    )
-+    hasOptions = true
++    if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
++      builder.setCaptureRequestOption(
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++      )
++      hasOptions = true
++    }
 +  }
 +  if (characteristics != null && configureVendorStabilizationCaptureRequestOptions(
 +      builder,
@@ -399,6 +404,11 @@ index 1e9c0de..ffe3ad6 100644
 +  }
 +
 +  if (hasOptions) {
++    if (!config.videoStabilizationMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++      // Stabilization is off: drop any vendor/OIS keys left over from a
++      // previous stabilized configuration instead of overwriting them with 0.
++      camera2Control.clearCaptureRequestOptions()
++    }
 +    camera2Control.addCaptureRequestOptions(builder.build())
 +  }
 +}
@@ -418,12 +428,14 @@ index 1e9c0de..ffe3ad6 100644
 +  }
 +  configureStreamUseCase(extender, characteristics, config.videoStabilizationMode)
 +
-+  val opticalStabilizationModes = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)
-+  if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
-+    extender.setCaptureRequestOption(
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
-+      CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
-+    )
++  if (config.videoStabilizationMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++    val opticalStabilizationModes = characteristics.get(CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION)
++    if (opticalStabilizationModes?.contains(CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON) == true) {
++      extender.setCaptureRequestOption(
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE,
++        CaptureRequest.LENS_OPTICAL_STABILIZATION_MODE_ON
++      )
++    }
 +  }
 +  configureVendorStabilizationCaptureRequestOptions(extender, characteristics, config.videoStabilizationMode)
 +}
@@ -453,19 +465,23 @@ index 1e9c0de..ffe3ad6 100644
 +  characteristics: CameraCharacteristics,
 +  requestedMode: VideoStabilizationMode
 +): Boolean {
-+  val enableStabilization = requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)
++  // Vendor keys are only written when enabling stabilization. Writing 0 into
++  // vendor session parameters is not what stock camera apps do and has been
++  // observed to leave some vendor ISP pipelines in a bad state (e.g. inverted
++  // preview colors); leaving the keys untouched keeps the HAL defaults.
++  if (!requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)) return false
 +  var hasOptions = false
 +
 +  if (characteristics.supportsCaptureRequestKey(QCOM_EIS_MODE_KEY_NAME)) {
-+    builder.setCaptureRequestOption(qcomEisModeKey, if (enableStabilization) 1 else 0)
++    builder.setCaptureRequestOption(qcomEisModeKey, 1)
 +    hasOptions = true
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME)) {
-+    builder.setCaptureRequestOption(samsungSwVideoStabilizationKey, if (enableStabilization) 1.toByte() else 0.toByte())
++    builder.setCaptureRequestOption(samsungSwVideoStabilizationKey, 1.toByte())
 +    hasOptions = true
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_OIS_OPERATION_MODE_KEY_NAME)) {
-+    builder.setCaptureRequestOption(samsungOisOperationModeKey, if (enableStabilization) 1 else 0)
++    builder.setCaptureRequestOption(samsungOisOperationModeKey, 1)
 +    hasOptions = true
 +  }
 +
@@ -478,15 +494,15 @@ index 1e9c0de..ffe3ad6 100644
 +  characteristics: CameraCharacteristics,
 +  requestedMode: VideoStabilizationMode
 +) {
-+  val enableStabilization = requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)
++  if (!requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)) return
 +  if (characteristics.supportsCaptureRequestKey(QCOM_EIS_MODE_KEY_NAME)) {
-+    extender.setCaptureRequestOption(qcomEisModeKey, if (enableStabilization) 1 else 0)
++    extender.setCaptureRequestOption(qcomEisModeKey, 1)
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_SW_VIDEO_STABILIZATION_KEY_NAME)) {
-+    extender.setCaptureRequestOption(samsungSwVideoStabilizationKey, if (enableStabilization) 1.toByte() else 0.toByte())
++    extender.setCaptureRequestOption(samsungSwVideoStabilizationKey, 1.toByte())
 +  }
 +  if (characteristics.supportsCaptureRequestKey(SAMSUNG_OIS_OPERATION_MODE_KEY_NAME)) {
-+    extender.setCaptureRequestOption(samsungOisOperationModeKey, if (enableStabilization) 1 else 0)
++    extender.setCaptureRequestOption(samsungOisOperationModeKey, 1)
 +  }
 +}
 +

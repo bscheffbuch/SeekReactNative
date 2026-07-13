@@ -245,7 +245,7 @@ exports[`LanguagePicker should render correctly 1`] = `
           strokeWidth={2.2}
         >
           <RNSVGPath
-            d="M6 9 12 15 18 9"
+            d="m6 9 6 6 6-6"
             fill={
               {
                 "payload": 4278190080,
