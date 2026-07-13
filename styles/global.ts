@@ -23,6 +23,7 @@ export const colors: Colors = {
   seekMuted: "#707A72",
   seekShadow: "#10251D",
   seekGold: "#e0a82e",
+  focusPeakingYellow: "#dfff38",
   seekTransparent: "#38976d33",
   speciesNearbyGreen: "#2a7353",
   dividerGray: "#d8d8d8",

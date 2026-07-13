@@ -209,6 +209,7 @@ const ARCamera = ( ) => {
   const [takePhotoOptions, setTakePhotoOptions] = useState<TakePhotoOptions>( initialPhotoOptions );
   const [visibleToast, setVisibleToast] = useState( TOAST.NONE );
   const userSettings = useFetchUserSettings( );
+  const { refetch: refetchUserSettings } = userSettings;
   const viewportResolution = CAMERA_VIEWPORT_RESOLUTIONS.find(
     resolution => resolution.label === userSettings.cameraViewportResolution
   ) || CAMERA_VIEWPORT_RESOLUTIONS[1];
@@ -808,21 +809,28 @@ const ARCamera = ( ) => {
   // timestamp to the local observation queue, then stay on the camera. The
   // stored predictions let the queue list reopen the identification screen.
   const saveForLaterToQueue = useCallback( async ( uri: string, predictions: Prediction[] ) => {
-    const time = createTimestamp( );
-    const userImage = { time, uri, predictions };
-    const { image } = await fetchImageLocationOrErrorCode( userImage, login );
-    const coords = image.preciseCoords || {
-      latitude: image.latitude ?? null,
-      longitude: image.longitude ?? null,
-      accuracy: null,
-    };
+    try {
+      const time = createTimestamp( );
+      const userImage = { time, uri, predictions };
+      const { image } = await fetchImageLocationOrErrorCode( userImage, login );
+      const coords = image.preciseCoords || {
+        latitude: image.latitude ?? null,
+        longitude: image.longitude ?? null,
+        accuracy: null,
+      };
 
-    await saveQueuedObservation( coords, time, uri, predictions );
+      await saveQueuedObservation( coords, time, uri, predictions );
 
-    const count = await getQueuedCount( );
-    setQueueCount( count );
-    setVisibleToast( TOAST.SAVED_FOR_LATER );
-    queueSaveInProgress.current = false;
+      const count = await getQueuedCount( );
+      setQueueCount( count );
+      setVisibleToast( TOAST.SAVED_FOR_LATER );
+    } catch ( e ) {
+      logger.warn( e );
+    } finally {
+      // always release the guard, or a single failed save would leave the
+      // queue shutter permanently unresponsive until the camera remounts
+      queueSaveInProgress.current = false;
+    }
   }, [login] );
 
   const saveForLaterPhoto = useCallback( ( photo: HandledPhoto ) => {
@@ -894,10 +902,13 @@ const ARCamera = ( ) => {
       checkForFirstCameraLaunch( );
       requestAndroidPermissions( );
       getQueuedCount( ).then( setQueueCount ).catch( ( e ) => logger.warn( e ) );
+      // reload settings changed on the Settings screen (e.g. confidence
+      // threshold), which would otherwise only apply after a camera remount
+      refetchUserSettings?.( )?.catch?.( ( e ) => logger.warn( e ) );
     } );
 
     return unsubscribe;
-  }, [navigation, requestAndroidPermissions, setObservation] );
+  }, [navigation, requestAndroidPermissions, setObservation, refetchUserSettings] );
 
   useFocusEffect(
     useCallback( ( ) => {
