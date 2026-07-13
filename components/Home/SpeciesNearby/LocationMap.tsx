@@ -12,6 +12,7 @@ import i18n from "../../../i18n";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { checkLocationPermissionGranted } from "../../../utility/locationHelpers";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   region: {
@@ -31,6 +32,7 @@ const LocationMap = ( {
   returnToUserLocation,
   posting = false,
 }: Props ) => {
+  const { theme } = useTheme( );
   const onUserLocationPressed = async ( ) => {
     const granted = await checkLocationPermissionGranted();
     if ( !granted ) {
@@ -53,16 +55,21 @@ const LocationMap = ( {
     returnToUserLocation( );
   };
   return (
-    <View style={viewStyles.container}>
+    <View style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]}>
       {region.latitude ? (
         <MapView
           onRegionChangeComplete={onRegionChange}
           provider={PROVIDER_DEFAULT}
           region={region} // need region instead of initial region for return to user location
-          style={viewStyles.map}
+          style={[viewStyles.map, { backgroundColor: theme.colors.surface, borderBottomColor: theme.colors.border }]}
         />
       ) : (
-        <View style={viewStyles.textContainer}>
+        <View
+          style={[viewStyles.textContainer, {
+            backgroundColor: theme.colors.surface,
+            borderBottomColor: theme.colors.border,
+          }]}
+        >
           <StyledText style={[baseTextStyles.body, textStyles.text]}>
             {i18n.t( "species_nearby.input_location_above_map" )}
           </StyledText>

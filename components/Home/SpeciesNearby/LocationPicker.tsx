@@ -12,13 +12,13 @@ import i18n from "../../../i18n";
 import LocationMap from "./LocationMap";
 import { truncateCoordinates, fetchTruncatedUserLocation, fetchLocationName, createAlertUserLocationOnMaps, fetchCoordsByLocationName } from "../../../utility/locationHelpers";
 import posting from "../../../assets/posting";
-import { colors } from "../../../styles/global";
 import { textStyles, viewStyles, imageStyles } from "../../../styles/home/locationPicker";
 import GreenButton from "../../UIComponents/Buttons/GreenButton";
 import BackArrow from "../../UIComponents/Buttons/BackArrowModal";
 import StyledText from "../../UIComponents/StyledText";
 import { useSpeciesNearby } from "../../Providers/SpeciesNearbyProvider";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const latitudeDelta = 0.2;
 const longitudeDelta = 0.2;
@@ -32,6 +32,7 @@ const LocationPicker = ( {
   updateLatLng,
   closeLocationPicker,
 }: Props ) => {
+  const { theme } = useTheme( );
   const { speciesNearby } = useSpeciesNearby( );
   const { latitude, longitude, location } = speciesNearby;
 
@@ -113,23 +114,27 @@ const LocationPicker = ( {
   const changeText = ( text: string ) => setCoordsByLocationName( text );
 
   return (
-    <SafeAreaView style={viewStyles.container} edges={["top"]}>
-      <View style={viewStyles.header}>
+    <SafeAreaView style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
+      <View style={[viewStyles.header, { backgroundColor: theme.colors.canvas }]}>
         <BackArrow handlePress={closeLocationPicker} />
         <View style={viewStyles.marginLarge} />
         <StyledText style={[baseTextStyles.button, textStyles.headerText]}>
           {i18n.t( "location_picker.species_nearby" )}
         </StyledText>
         <View style={[viewStyles.row, viewStyles.inputRow]}>
-          <Image source={posting.location} tintColor={colors.seekDeepGreen} style={imageStyles.white} />
+          <Image source={posting.location} tintColor={theme.colors.primary} style={[imageStyles.white, { tintColor: theme.colors.primary }]} />
           <TextInput
             accessibilityLabel={inputLocation}
             accessible
             autoCapitalize="words"
             onChangeText={changeText}
             placeholder={inputLocation || i18n.t( "species_nearby.no_location" )}
-            placeholderTextColor={colors.placeholderGray}
-            style={[baseTextStyles.inputField, textStyles.inputField]}
+            placeholderTextColor={theme.colors.muted}
+            style={[baseTextStyles.inputField, textStyles.inputField, {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              color: theme.colors.text,
+            }]}
             textContentType="addressCity"
           />
         </View>
@@ -139,7 +144,7 @@ const LocationPicker = ( {
         region={region}
         returnToUserLocation={returnToUserLocation}
       />
-      <View style={viewStyles.footer}>
+      <View style={[viewStyles.footer, { backgroundColor: theme.colors.surface, borderTopColor: theme.colors.border }]}>
         <GreenButton
           handlePress={searchNearLocation}
           text="location_picker.button"

@@ -19,6 +19,7 @@ import type { Region } from "react-native-maps";
 import type { Coords } from "../../../utility/locationHelpers";
 import posting from "../../../assets/posting";
 import BackArrow from "../../UIComponents/Buttons/BackArrowModal";
+import { useTheme } from "../../Providers/ThemeProvider";
 import {
   fetchCoordsByLocationName,
 } from "../../../utility/locationHelpers";
@@ -42,6 +43,7 @@ const LocationPicker = ( {
   closeLocationPicker,
   location,
 }: Props ) => {
+  const { theme } = useTheme( );
   const initialAccuracy = 90;
   const [accuracy, setAccuracy] = useState( initialAccuracy );
   const [region, setRegion] = useState<Region | {
@@ -155,8 +157,8 @@ const LocationPicker = ( {
   );
 
   return (
-    <SafeAreaView style={viewStyles.container} edges={["top"]}>
-      <View style={viewStyles.header}>
+    <SafeAreaView style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
+      <View style={[viewStyles.header, { backgroundColor: theme.colors.canvas }]}>
         <BackArrow handlePress={closeLocationPicker} />
         <View style={viewStyles.marginLarge} />
         <StyledText style={[baseTextStyles.button, textStyles.headerText]}>
@@ -165,8 +167,8 @@ const LocationPicker = ( {
         <View style={[viewStyles.row, viewStyles.inputRow]}>
           <Image
             source={posting.location}
-            tintColor={colors.seekDeepGreen}
-            style={imageStyles.white}
+            tintColor={theme.colors.primary}
+            style={[imageStyles.white, { tintColor: theme.colors.primary }]}
           />
           <TextInput
             accessibilityLabel={inputLocation}
@@ -174,14 +176,21 @@ const LocationPicker = ( {
             autoCapitalize="words"
             onChangeText={changeText}
             placeholder={inputLocation || location || i18n.t( "species_nearby.no_location" )}
-            placeholderTextColor={colors.placeholderGray}
-            style={[baseTextStyles.inputField, textStyles.inputField]}
+            placeholderTextColor={theme.colors.muted}
+            style={[baseTextStyles.inputField, textStyles.inputField, {
+              backgroundColor: theme.colors.surface,
+              borderColor: theme.colors.border,
+              color: theme.colors.text,
+            }]}
             textContentType="addressCity"
           />
         </View>
       </View>
       {region.latitude && displayMap( )}
-      <View style={viewStyles.footer}>
+      <View style={[viewStyles.footer, {
+        backgroundColor: theme.colors.surface,
+        borderTopColor: theme.colors.border,
+      }]}>
         <GreenButton
           color={!hasUserChangedLocation ? colors.seekTransparent : null}
           handlePress={handleLocationChange}

@@ -11,19 +11,29 @@ exports[`SelectSpecies should render correctly 1`] = `
     }
   }
   style={
-    {
-      "backgroundColor": "#F3F1E8",
-      "flex": 1,
-    }
+    [
+      {
+        "backgroundColor": "#F3F1E8",
+        "flex": 1,
+      },
+      {
+        "backgroundColor": "#F3F1E8",
+      },
+    ]
   }
   testID="select-species-container"
 >
   <View
     style={
-      {
-        "backgroundColor": "#F3F1E8",
-        "height": 55,
-      }
+      [
+        {
+          "backgroundColor": "#F3F1E8",
+          "height": 55,
+        },
+        {
+          "backgroundColor": "#F3F1E8",
+        },
+      ]
     }
   >
     <View
@@ -125,14 +135,19 @@ exports[`SelectSpecies should render correctly 1`] = `
   </View>
   <View
     style={
-      {
-        "alignItems": "center",
-        "backgroundColor": "#F3F1E8",
-        "flexDirection": "row",
-        "flexWrap": "nowrap",
-        "height": 63,
-        "justifyContent": "center",
-      }
+      [
+        {
+          "alignItems": "center",
+          "backgroundColor": "#F3F1E8",
+          "flexDirection": "row",
+          "flexWrap": "nowrap",
+          "height": 63,
+          "justifyContent": "center",
+        },
+        {
+          "backgroundColor": "#F3F1E8",
+        },
+      ]
     }
   >
     <Image
@@ -142,20 +157,25 @@ exports[`SelectSpecies should render correctly 1`] = `
         }
       }
       style={
-        {
-          "height": 20,
-          "resizeMode": "contain",
-          "tintColor": "#14794f",
-          "width": 20,
-        }
+        [
+          {
+            "height": 20,
+            "resizeMode": "contain",
+            "tintColor": "#14794f",
+            "width": 20,
+          },
+          {
+            "tintColor": "#14794F",
+          },
+        ]
       }
-      tintColor="#14794f"
+      tintColor="#14794F"
     />
     <TextInput
       defaultValue={null}
       onChangeText={[Function]}
       placeholder="Look up a species by name"
-      placeholderTextColor="#828282"
+      placeholderTextColor="#707A72"
       style={
         [
           {
@@ -174,6 +194,11 @@ exports[`SelectSpecies should render correctly 1`] = `
             "paddingLeft": 16,
             "paddingTop": 0,
             "width": 679,
+          },
+          {
+            "backgroundColor": "#FFFFFF",
+            "borderColor": "#E6E9E4",
+            "color": "#111512",
           },
         ]
       }

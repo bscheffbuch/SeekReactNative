@@ -13,15 +13,16 @@ import LoadingWheel from "../../UIComponents/LoadingWheel";
 import i18n from "../../../i18n";
 import SpeciesNearbyChallengeError from "./SpeciesNearbyChallengeError";
 import { useInternetStatus } from "../../../utility/customHooks";
-import { colors } from "../../../styles/global";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   challenge: any;
 }
 
 const SpeciesNearbyChallenge = ( { challenge }: Props ) => {
+  const { theme } = useTheme( );
   const [taxa, setTaxa] = useState( [] );
   const [loading, setLoading] = useState( false );
   const [loaded, setLoaded] = useState( false );
@@ -110,7 +111,7 @@ const SpeciesNearbyChallenge = ( { challenge }: Props ) => {
     } else if ( loading ) {
       return (
         <View style={viewStyles.loadingWheelContainer}>
-          <LoadingWheel color={colors.seekDeepGreen} />
+          <LoadingWheel color={theme.colors.primary} />
         </View>
       );
     } else {
