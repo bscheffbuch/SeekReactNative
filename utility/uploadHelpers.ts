@@ -4,7 +4,7 @@ import inatjs, { FileUpload } from "inaturalistjs";
 import * as createUUID from "uuid";
 
 import realmConfig from "../models/index";
-import { resizeImage } from "./photoHelpers";
+import { resizeImage, deleteBackupFile } from "./photoHelpers";
 import { fetchAccessToken } from "./loginHelpers";
 import { fetchJSONWebToken } from "./tokenHelpers";
 import i18n from "../i18n";
@@ -262,23 +262,51 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
   }
   const options = { api_token: token };
 
+  const genericPhotoError: ErrorType = {
+    error: {
+      type: "photo",
+      errorText: i18n.t( "post_to_inat_card.error_photo" ),
+    },
+  };
+
+  // mark the draft as permanently failed (analogous to uploadFailed on the
+  // normal upload path) so Seek doesn't retry an upload that can never succeed
+  const markQueuedUploadFailed = async ( ) => {
+    if ( !observation.photo ) {
+      return;
+    }
+    try {
+      const realm = await Realm.open( realmConfig );
+      realm.write( ( ) => {
+        observation.photo.uploadFailed = true;
+      } );
+    } catch ( e ) {
+      console.log( "couldn't set failed status on queued observation: ", e );
+    }
+  };
+
   let photoUris: string[] = [];
+  let hasStoredPhotoUris = false;
   try {
-    photoUris = observation.photoUris ? JSON.parse( observation.photoUris ) : [];
+    if ( observation.photoUris ) {
+      const parsed = JSON.parse( observation.photoUris );
+      if ( Array.isArray( parsed ) ) {
+        photoUris = parsed;
+        hasStoredPhotoUris = true;
+      }
+    }
   } catch {
     photoUris = [];
   }
-  if ( photoUris.length === 0 && observation.photo?.uri ) {
+  // fall back to the representative photo only for legacy records that never
+  // stored a photoUris array; an empty stored array means nothing is left
+  if ( !hasStoredPhotoUris && photoUris.length === 0 && observation.photo?.uri ) {
     photoUris = [observation.photo.uri];
   }
 
   if ( photoUris.length === 0 ) {
-    return {
-      error: {
-        type: "photo",
-        errorText: i18n.t( "post_to_inat_card.error_photo" ),
-      },
-    };
+    await markQueuedUploadFailed( );
+    return genericPhotoError;
   }
 
   const params = {
@@ -302,19 +330,35 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
     if ( !id ) {
       const response = await inatjs.observations.create( params, options );
       id = response[0].id;
-      logger.debug( `queued observation created with id: ${id}` );
+      // persist the observation id immediately so a crash after this point
+      // doesn't re-create the observation on the next attempt
       if ( observation.photo ) {
         await saveObservationId( id, observation.photo );
       }
+      logger.debug( `queued observation created with id: ${id}` );
     }
 
     let uploadedPhotoCount = 0;
-    const remainingPhotoUris: string[] = [];
+    let remainingPhotoUris: string[] = [...photoUris];
     let firstPhotoError: ErrorType | undefined;
+
+    // persist the remaining list after every removal so a crash mid-loop
+    // doesn't re-upload photos that already made it to iNat
+    const persistRemainingPhotoUris = async ( ) => {
+      const realm = await Realm.open( realmConfig );
+      realm.write( ( ) => {
+        observation.photoUris = JSON.stringify( remainingPhotoUris );
+      } );
+    };
+
     for ( const uri of photoUris ) {
       const resizedPhoto = await resizeImageForUpload( uri );
       if ( !resizedPhoto ) {
-        remainingPhotoUris.push( uri );
+        // photo is missing/unreadable and can never upload; drop it for good
+        remainingPhotoUris = remainingPhotoUris.filter( u => u !== uri );
+        await persistRemainingPhotoUris( );
+        deleteBackupFile( uri );
+        firstPhotoError = firstPhotoError || genericPhotoError;
         continue;
       }
       const photoUpload = await appendPhotoToObservation(
@@ -324,36 +368,28 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
       );
       if ( photoUpload === true ) {
         uploadedPhotoCount += 1;
-      } else if ( photoUpload ) {
-        firstPhotoError = firstPhotoError || photoUpload;
-        remainingPhotoUris.push( uri );
+        remainingPhotoUris = remainingPhotoUris.filter( u => u !== uri );
+        await persistRemainingPhotoUris( );
+        // uploaded, so the local backup copy is no longer needed
+        deleteBackupFile( uri );
       } else {
-        remainingPhotoUris.push( uri );
+        // transient failure: keep the uri around so it retries next time
+        firstPhotoError = firstPhotoError || photoUpload || genericPhotoError;
       }
     }
 
-    if ( uploadedPhotoCount > 0 && remainingPhotoUris.length > 0 ) {
-      const realm = await Realm.open( realmConfig );
-      realm.write( ( ) => {
-        observation.photoUris = JSON.stringify( remainingPhotoUris );
-      } );
-      return firstPhotoError || {
-        error: {
-          type: "photo",
-          errorText: i18n.t( "post_to_inat_card.error_photo" ),
-        },
-      };
+    if ( remainingPhotoUris.length === 0 ) {
+      if ( uploadedPhotoCount > 0 ) {
+        // everything that could upload has uploaded; any unreadable photos
+        // were dropped permanently above
+        return true;
+      }
+      // nothing uploaded and nothing left to retry
+      await markQueuedUploadFailed( );
+      return firstPhotoError || genericPhotoError;
     }
 
-    if ( uploadedPhotoCount === 0 ) {
-      return firstPhotoError || {
-        error: {
-          type: "photo",
-          errorText: i18n.t( "post_to_inat_card.error_photo" ),
-        },
-      };
-    }
-    return true;
+    return firstPhotoError || genericPhotoError;
   } catch ( e ) {
     logger.debug( `uploadQueuedObservation error: ${e}` );
     if ( e.message === "timeout" ) {
@@ -397,31 +433,6 @@ const saveObservationToRealm = async ( observation: Observation, uri: string ): 
   } catch ( e ) {
     console.log( "couldn't save observation to UploadObservationRealm", e );
     logger.debug( `saveObservationToRealm error: ${e}` );
-  }
-};
-
-const saveObservationLocally = async ( observation: Observation, uri: string ): Promise<void> => {
-  const realm = await Realm.open( realmConfig );
-  const obsUUID = createUUID.v4();
-  const photoUUID = createUUID.v4();
-
-  try {
-    realm.write( ( ) => {
-      const photo = realm.create( "UploadPhotoRealm", {
-        uri,
-        uploadSucceeded: false,
-        uuid: photoUUID,
-        notificationShown: false,
-      } );
-      realm.create( "UploadObservationRealm", {
-        ...observation,
-        uuid: obsUUID,
-        photo,
-      }, true );
-    } );
-  } catch ( e ) {
-    console.log( "couldn't save observation locally", e );
-    logger.debug( `saveObservationLocally error: ${e}` );
   }
 };
 
@@ -475,7 +486,6 @@ const checkForUploads = async ( ) => {
 export {
   resizeImageForUpload,
   saveObservationToRealm,
-  saveObservationLocally,
   checkForNumSuccessfulUploads,
   markUploadsAsSeen,
   checkForUploads,

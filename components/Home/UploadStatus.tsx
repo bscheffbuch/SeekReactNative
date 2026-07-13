@@ -101,16 +101,18 @@ const UploadStatus = ( {
 
     const checkUploads = async ( ) => {
       const allUploads = await checkForUploads( );
+      // must match the numPendingUploads filter in HomeScreen: queued
+      // "save for later" drafts are only uploaded explicitly by the user
       const pendingUploads = allUploads.filter( observation => observation.photo.uploadSucceeded === false
-        && observation.photo.uploadFailed === false );
+        && observation.photo.uploadFailed === false
+        && observation.queued !== true );
       pendingUploads.forEach( observation => beginUpload( observation ) );
     };
 
     if ( numPendingUploads > 0 && !isUploading ) {
       // only check uploads once
       if ( isCurrent ) {
-        // TODO: don't we need to reset here?
-        // progress.set( 0 );
+        progress.set( 0 );
         setIsUploading( true );
         checkUploads( );
       }

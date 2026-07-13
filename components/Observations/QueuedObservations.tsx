@@ -26,6 +26,7 @@ import {
   getQueuedObservations,
   parsePhotoUris,
   parsePredictions,
+  parseObservedOnString,
   representativePrediction,
   deleteQueuedObservation,
   combineQueuedObservations,
@@ -105,6 +106,10 @@ const QueuedThumbnail = ( { uri }: { uri: string | null } ) => {
   return <Image style={styles.thumbnail} source={{ uri: source }} />;
 };
 
+// module-scope so the in-flight guard survives component remounts; a second
+// concurrent "upload all" run would duplicate photos server-side
+let uploadAllInProgress = false;
+
 const QueuedObservations = ( ) => {
   const { login } = useContext( UserContext );
   const { theme } = useTheme( );
@@ -113,7 +118,7 @@ const QueuedObservations = ( ) => {
   const [drafts, setDrafts] = useState<QueuedDraft[]>( [] );
   const [selected, setSelected] = useState<string[]>( [] );
   const [selectMode, setSelectMode] = useState( false );
-  const [uploading, setUploading] = useState( false );
+  const [uploading, setUploading] = useState( uploadAllInProgress );
 
   const loadDrafts = useCallback( async ( ) => {
     const queued = await getQueuedObservations( );
@@ -123,7 +128,9 @@ const QueuedObservations = ( ) => {
       const top = representativePrediction( predictions );
       return {
         uuid: obs.uuid,
-        thumbnailUri: uris[0] || obs.photo?.uri || null,
+        // photo.uri holds the small display copy; photoUris holds the
+        // high-resolution copies reserved for upload
+        thumbnailUri: obs.photo?.uri || uris[0] || null,
         photoCount: uris.length || 1,
         observedOn: obs.observed_on_string || null,
         latitude: obs.latitude ?? null,
@@ -193,11 +200,16 @@ const QueuedObservations = ( ) => {
   };
 
   const handleDelete = ( uuid: string ) => {
+    if ( uploading || uploadAllInProgress ) {
+      // deleting a draft mid-upload would pull realm objects out from under
+      // the in-flight upload
+      return;
+    }
     Alert.alert(
       i18n.t( "queue.delete_title" ),
       i18n.t( "queue.delete_message" ),
       [
-        { text: i18n.t( "results.no" ), style: "cancel" },
+        { text: i18n.t( "delete.no" ), style: "cancel" },
         {
           text: i18n.t( "queue.delete_confirm" ),
           style: "destructive",
@@ -211,7 +223,7 @@ const QueuedObservations = ( ) => {
   };
 
   const handleCombine = async ( ) => {
-    if ( selected.length < 2 ) {
+    if ( selected.length < 2 || uploading || uploadAllInProgress ) {
       return;
     }
     await combineQueuedObservations( selected );
@@ -228,14 +240,22 @@ const QueuedObservations = ( ) => {
       );
       return;
     }
+    if ( uploadAllInProgress ) {
+      return;
+    }
+    uploadAllInProgress = true;
     setUploading( true );
-    const { success, failed } = await uploadAllQueuedObservations( );
-    setUploading( false );
-    Alert.alert(
-      i18n.t( "queue.upload_complete_title" ),
-      i18n.t( "queue.upload_complete_message", { success, failed } )
-    );
-    loadDrafts( );
+    try {
+      const { success, failed } = await uploadAllQueuedObservations( );
+      Alert.alert(
+        i18n.t( "queue.upload_complete_title" ),
+        i18n.t( "queue.upload_complete_message", { success, failed } )
+      );
+    } finally {
+      uploadAllInProgress = false;
+      setUploading( false );
+      loadDrafts( );
+    }
   };
 
   const formatLocation = ( draft: QueuedDraft ): string => {
@@ -249,8 +269,10 @@ const QueuedObservations = ( ) => {
     if ( !observedOn ) {
       return "";
     }
-    const date = new Date( observedOn );
-    if ( Number.isNaN( date.getTime( ) ) ) {
+    // Hermes can't reliably parse the GMT-weekday format stored in
+    // observed_on_string; parseObservedOnString knows the exact pattern
+    const date = parseObservedOnString( observedOn );
+    if ( !date ) {
       return observedOn;
     }
     return formatDateToDisplayShort( date );

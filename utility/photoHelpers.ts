@@ -91,7 +91,7 @@ const resizeImage = async ( path: string, width: number, height?: number, output
     );
 
     return uri;
-  } catch ( e ) {
+  } catch {
     return "";
   }
 };
@@ -136,7 +136,11 @@ const localizeAttributionsLandscape = ( attribution: string, licenseCode: string
   return `\u00A9${userName} (${licenseCode.toUpperCase()})`;
 };
 
-const createBackupUri = async ( uri: string, uuid?: string | null ): Promise<string | null> => {
+const backupImageToAppStorage = async (
+  uri: string,
+  maxDimension: number,
+  uuid?: string | null
+): Promise<string | null> => {
   let newImageName: string;
 
   const timestamp = namePhotoByTime();
@@ -147,12 +151,8 @@ const createBackupUri = async ( uri: string, uuid?: string | null ): Promise<str
     newImageName = `${timestamp}.jpg`;
   }
 
-  // const historicalSeekSize = 250;
-
-  const thumbnailWidth = dimensions.width;
-
   try {
-    const resizedImage = await resizeImage( uri, thumbnailWidth, thumbnailWidth ); // stored in cache
+    const resizedImage = await resizeImage( uri, maxDimension, maxDimension ); // stored in cache
 
     if ( resizedImage ) {
       const backupFilepath = `${dirPictures}/${newImageName}`; // stored in document directory
@@ -166,6 +166,28 @@ const createBackupUri = async ( uri: string, uuid?: string | null ): Promise<str
   } catch ( e ) {
     console.log( e, "couldn't resize image" );
     return null;
+  }
+};
+
+// small, screen-width-sized backup used for display (thumbnails)
+// const historicalSeekSize = 250;
+const createBackupUri = async ( uri: string, uuid?: string | null ): Promise<string | null> => (
+  backupImageToAppStorage( uri, dimensions.width, uuid )
+);
+
+// high-resolution persistent backup used when a photo must be uploaded to
+// iNaturalist later (e.g. queued "save for later" drafts); matches the 2048px
+// max dimension used by resizeImageForUpload for the standard upload path
+const uploadBackupMaxDimension = 2048;
+const createUploadBackupUri = async ( uri: string, uuid?: string | null ): Promise<string | null> => (
+  backupImageToAppStorage( uri, uploadBackupMaxDimension, uuid )
+);
+
+// deletes a file only if it lives in Seek's own backup pictures directory,
+// so camera-roll/user files are never touched
+const deleteBackupFile = ( uri?: string | null ): void => {
+  if ( uri && uri.startsWith( `${dirPictures}/` ) ) {
+    deleteFile( uri );
   }
 };
 
@@ -314,8 +336,10 @@ export {
   localizeAttributions,
   localizeAttributionsLandscape,
   createBackupUri,
+  createUploadBackupUri,
   moveAndroidFilesToInternalStorage,
   deleteFile,
+  deleteBackupFile,
   checkForDirectory,
   writeToDebugLog,
   deleteDebugLogAfter7Days,

@@ -2,8 +2,11 @@
 import Realm from "realm";
 import * as createUUID from "uuid";
 
+import { parse } from "date-fns";
+import { enUS } from "date-fns/locale";
+
 import realmConfig from "../models/index";
-import { createBackupUri } from "./photoHelpers";
+import { createBackupUri, createUploadBackupUri, deleteBackupFile } from "./photoHelpers";
 import { setISOTime, formatGMTTimeWithTimeZone } from "./dateHelpers";
 import { uploadQueuedObservation } from "./uploadHelpers";
 import { log } from "../react-native-logs.config";
@@ -24,6 +27,34 @@ interface QueuePrediction {
   combined_score?: number;
   ancestor_ids?: number[];
 }
+
+// observed_on_string is stored in the iNat-iOS-style format produced by
+// formatGMTTimeWithTimeZone, e.g. "Sun Mar 18 2012 17:07:20 GMT -0700 (PDT)".
+// That string starts with a weekday name, so it can't be compared lexically;
+// parse it back to a real Date. Hermes' native Date parsing is unreliable, so
+// use date-fns with the exact known pattern (minus the trailing zone name).
+const parseObservedOnString = ( observedOn?: string | null ): Date | null => {
+  if ( !observedOn ) {
+    return null;
+  }
+  const withoutTimeZoneName = observedOn.replace( / *\([^)]*\) *$/, "" ).trim( );
+  const parsed = parse(
+    withoutTimeZoneName,
+    "EEE MMM dd yyyy HH:mm:ss 'GMT' xxxx",
+    new Date( ),
+    { locale: enUS }
+  );
+  if ( !Number.isNaN( parsed.getTime( ) ) ) {
+    return parsed;
+  }
+  const fallback = new Date( observedOn );
+  return Number.isNaN( fallback.getTime( ) ) ? null : fallback;
+};
+
+const observedOnTime = ( obs ): number => {
+  const date = parseObservedOnString( obs?.observed_on_string );
+  return date ? date.getTime( ) : 0;
+};
 
 // Returns the AR-camera predictions stored with a queued draft, or [] when the
 // draft was saved without an identification (older drafts / unidentified).
@@ -79,9 +110,11 @@ const saveQueuedObservation = async (
   const obsUUID = createUUID.v4( );
   const photoUUID = createUUID.v4( );
 
-  // back the photo up to persistent app storage so the thumbnail survives the
-  // OS clearing the camera cache, and so it remains available for later upload
-  const displayUri = ( await createBackupUri( uri ) ) || uri;
+  // back the photo up to persistent app storage so it survives the OS clearing
+  // the camera cache: a small screen-width copy for list thumbnails, plus a
+  // high-resolution (2048px max) copy that is the one actually uploaded later
+  const displayUri = ( await createBackupUri( uri, photoUUID ) ) || uri;
+  const uploadUri = ( await createUploadBackupUri( uri, `${photoUUID}-upload` ) ) || uri;
   const date = formatGMTTimeWithTimeZone( setISOTime( time ) );
   const topPrediction = representativePrediction( predictions );
 
@@ -107,7 +140,7 @@ const saveQueuedObservation = async (
         photo,
         vision: predictions.length > 0,
         queued: true,
-        photoUris: JSON.stringify( [displayUri] ),
+        photoUris: JSON.stringify( [uploadUri] ),
         predictions: predictions.length > 0 ? JSON.stringify( predictions ) : null,
       }, true );
     } );
@@ -119,9 +152,9 @@ const saveQueuedObservation = async (
 
 const getQueuedObservations = async ( ) => {
   const realm = await Realm.open( realmConfig );
-  return realm.objects( "UploadObservationRealm" )
-    .filtered( "queued == true" )
-    .sorted( "observed_on_string", true );
+  const queued = realm.objects( "UploadObservationRealm" ).filtered( "queued == true" );
+  // newest first; observed_on_string can't be sorted lexically (see parseObservedOnString)
+  return Array.from( queued ).sort( ( a, b ) => observedOnTime( b ) - observedOnTime( a ) );
 };
 
 const getQueuedCount = async ( ): Promise<number> => {
@@ -132,16 +165,24 @@ const getQueuedCount = async ( ): Promise<number> => {
 const deleteQueuedObservation = async ( uuid: string ): Promise<void> => {
   const realm = await Realm.open( realmConfig );
   try {
+    const backupFilesToDelete: string[] = [];
     realm.write( ( ) => {
       const obs = realm.objects( "UploadObservationRealm" ).filtered( `uuid == '${uuid}'` )[0];
       if ( !obs ) {
         return;
+      }
+      // clean up this draft's backup files (thumbnail + upload copies);
+      // deleteBackupFile only removes files inside Seek's own backup directory
+      parsePhotoUris( obs ).forEach( u => backupFilesToDelete.push( u ) );
+      if ( obs.photo?.uri ) {
+        backupFilesToDelete.push( obs.photo.uri );
       }
       if ( obs.photo ) {
         realm.delete( obs.photo );
       }
       realm.delete( obs );
     } );
+    backupFilesToDelete.forEach( deleteBackupFile );
   } catch ( e ) {
     logger.debug( `deleteQueuedObservation error: ${e}` );
     console.log( "couldn't delete queued observation", e );
@@ -157,6 +198,7 @@ const combineQueuedObservations = async ( uuids: string[] ): Promise<void> => {
   }
   const realm = await Realm.open( realmConfig );
   try {
+    const backupFilesToDelete: string[] = [];
     realm.write( ( ) => {
       const observations = uuids
         .map( uuid => realm.objects( "UploadObservationRealm" ).filtered( `uuid == '${uuid}'` )[0] )
@@ -164,20 +206,30 @@ const combineQueuedObservations = async ( uuids: string[] ): Promise<void> => {
       if ( observations.length < 2 ) {
         return;
       }
-      observations.sort( ( a, b ) => (
-        ( a.observed_on_string || "" ).localeCompare( b.observed_on_string || "" )
-      ) );
+      // chronological order, so the earliest draft keeps its metadata
+      observations.sort( ( a, b ) => observedOnTime( a ) - observedOnTime( b ) );
       const [primary, ...rest] = observations;
       let allUris = parsePhotoUris( primary );
+      const mergedThumbUris: ( string | null )[] = [];
       rest.forEach( ( obs ) => {
         allUris = allUris.concat( parsePhotoUris( obs ) );
+        mergedThumbUris.push( obs.photo?.uri || null );
         if ( obs.photo ) {
           realm.delete( obs.photo );
         }
         realm.delete( obs );
       } );
       primary.photoUris = JSON.stringify( allUris );
+      // merged-away drafts' upload copies moved into the primary draft; only
+      // their display thumbnails become unreferenced (unless a legacy record
+      // reused the thumbnail as its upload uri)
+      mergedThumbUris.forEach( ( thumbUri ) => {
+        if ( thumbUri && !allUris.includes( thumbUri ) ) {
+          backupFilesToDelete.push( thumbUri );
+        }
+      } );
     } );
+    backupFilesToDelete.forEach( deleteBackupFile );
   } catch ( e ) {
     logger.debug( `combineQueuedObservations error: ${e}` );
     console.log( "couldn't combine queued observations", e );
@@ -188,8 +240,10 @@ const combineQueuedObservations = async ( uuids: string[] ): Promise<void> => {
 // the user is logged in. Returns counts of successes and failures.
 const uploadAllQueuedObservations = async ( ): Promise<{ success: number; failed: number }> => {
   const realm = await Realm.open( realmConfig );
+  // skip drafts already marked as permanently failed (e.g. unreadable photos)
+  // so they don't retry forever
   const uuids = realm.objects( "UploadObservationRealm" )
-    .filtered( "queued == true" )
+    .filtered( "queued == true AND photo.uploadFailed == false" )
     .map( o => o.uuid );
 
   let success = 0;
@@ -222,6 +276,7 @@ const uploadAllQueuedObservations = async ( ): Promise<{ success: number; failed
 export {
   parsePhotoUris,
   parsePredictions,
+  parseObservedOnString,
   representativePrediction,
   saveQueuedObservation,
   getQueuedObservations,
