@@ -237,7 +237,7 @@ index 0000000..d93241f
 +
 +}
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-index dd91fb5..6b59797 100644
+index dd91fb5..ab6ff77 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 @@ -2,9 +2,11 @@ package com.visioncameraplugininatvision;
@@ -252,12 +252,23 @@ index dd91fb5..6b59797 100644
  
  import java.io.FileInputStream;
  import java.io.IOException;
-@@ -49,9 +51,22 @@ public class ImageClassifier {
+@@ -49,9 +51,33 @@ public class ImageClassifier {
      /** An instance of the driver class to run model inference with Tensorflow Lite. */
      private Interpreter mTFlite;
  
 +    /** Optional GPU delegate kept alive for the lifetime of the interpreter. */
 +    private GpuDelegate mGpuDelegate;
++
++    /** Delegate tiers the interpreter can run on, ordered from most to least preferred. */
++    private static final int DELEGATE_TIER_GPU = 0;
++    private static final int DELEGATE_TIER_NNAPI = 1;
++    private static final int DELEGATE_TIER_CPU = 2;
++
++    /** The delegate tier the current interpreter was created with. */
++    private int mDelegateTier = DELEGATE_TIER_CPU;
++
++    /** The mapped model, kept so the interpreter can be recreated if a delegate fails at inference time. */
++    private MappedByteBuffer mModelBuffer;
 +
      /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
      private ByteBuffer imgData;
@@ -275,16 +286,17 @@ index dd91fb5..6b59797 100644
      private float[][] mGeomodelScores;
  
      public void setFilterByTaxonId(Integer taxonId) {
-@@ -79,7 +94,7 @@ public class ImageClassifier {
+@@ -79,7 +105,8 @@ public class ImageClassifier {
          mModelFilename = modelPath;
          mTaxonomyFilename = taxonomyPath;
          mModelVersion = version;
 -        mTFlite = new Interpreter(loadModelFile());
-+        mTFlite = createInterpreter(loadModelFile());
++        mModelBuffer = loadModelFile();
++        mTFlite = createInterpreter(mModelBuffer);
          imgData =
                  ByteBuffer.allocateDirect(
                          4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
-@@ -88,6 +103,10 @@ public class ImageClassifier {
+@@ -88,6 +115,10 @@ public class ImageClassifier {
  
          mTaxonomy = new Taxonomy(new FileInputStream(mTaxonomyFilename), mModelVersion);
          mModelSize = mTaxonomy.getModelSize();
@@ -295,7 +307,7 @@ index dd91fb5..6b59797 100644
      }
  
      /** Classifies a frame from the preview stream. */
-@@ -102,31 +121,45 @@ public class ImageClassifier {
+@@ -102,31 +133,59 @@ public class ImageClassifier {
          }
          convertBitmapToByteBuffer(bitmap);
  
@@ -315,11 +327,11 @@ index dd91fb5..6b59797 100644
 +        if (image == null) {
 +            Timber.tag(TAG).e("Null input image");
 +            return new ArrayList<Prediction>();
-         }
++        }
 +        if (image.getPlanes().length < 3) {
 +            Timber.tag(TAG).e("Expected YUV image with three planes");
 +            return new ArrayList<Prediction>();
-+        }
+         }
 +        convertImageToByteBuffer(image, cropRatio);
 +
 +        return runInference(taxonomyRollupCutoff, commonAncestorMode);
@@ -330,7 +342,21 @@ index dd91fb5..6b59797 100644
          List<Prediction> predictions = null;
          try {
 -            mTFlite.runForMultipleInputsOutputs(input, expectedOutputs);
-+            mTFlite.runForMultipleInputsOutputs(inputArray, expectedOutputs);
++            // GPU/NNAPI delegates can be constructed successfully but still fail on the
++            // first run(); fall back to the next tier (ultimately CPU) and retry so such
++            // devices don't silently get zero predictions forever.
++            boolean ranInference = false;
++            while (!ranInference) {
++                try {
++                    mTFlite.runForMultipleInputsOutputs(inputArray, expectedOutputs);
++                    ranInference = true;
++                } catch (Exception inferenceExc) {
++                    if (!fallbackToNextDelegateTier(inferenceExc)) {
++                        throw inferenceExc;
++                    }
++                    imgData.rewind();
++                }
++            }
              // Get raw vision scores
 -            float[] visionScores = ((float[][]) expectedOutputs.get(0))[0];
 -            float[] combinedScores = new float[visionScores.length];
@@ -356,7 +382,7 @@ index dd91fb5..6b59797 100644
          } catch (Exception exc) {
              exc.printStackTrace();
              return new ArrayList<Prediction>();
-@@ -140,8 +173,39 @@ public class ImageClassifier {
+@@ -140,8 +199,87 @@ public class ImageClassifier {
  
      /** Closes tflite to release resources. */
      public void close() {
@@ -369,6 +395,7 @@ index dd91fb5..6b59797 100644
 +            mGpuDelegate.close();
 +        }
 +        mGpuDelegate = null;
++        mModelBuffer = null;
 +    }
 +
 +    private Interpreter createInterpreter(MappedByteBuffer modelBuffer) {
@@ -376,7 +403,9 @@ index dd91fb5..6b59797 100644
 +            Interpreter.Options gpuOptions = new Interpreter.Options();
 +            mGpuDelegate = new GpuDelegate();
 +            gpuOptions.addDelegate(mGpuDelegate);
-+            return new Interpreter(modelBuffer, gpuOptions);
++            Interpreter gpuInterpreter = new Interpreter(modelBuffer, gpuOptions);
++            mDelegateTier = DELEGATE_TIER_GPU;
++            return gpuInterpreter;
 +        } catch (Exception exc) {
 +            Timber.tag(TAG).w("Failed to initialize GPU delegate, falling back: " + exc);
 +            if (mGpuDelegate != null) {
@@ -388,16 +417,61 @@ index dd91fb5..6b59797 100644
 +        try {
 +            Interpreter.Options nnapiOptions = new Interpreter.Options();
 +            nnapiOptions.setUseNNAPI(true);
-+            return new Interpreter(modelBuffer, nnapiOptions);
++            Interpreter nnapiInterpreter = new Interpreter(modelBuffer, nnapiOptions);
++            mDelegateTier = DELEGATE_TIER_NNAPI;
++            return nnapiInterpreter;
 +        } catch (Exception exc) {
 +            Timber.tag(TAG).w("Failed to initialize NNAPI delegate, falling back to CPU: " + exc);
 +        }
 +
++        mDelegateTier = DELEGATE_TIER_CPU;
 +        return new Interpreter(modelBuffer, new Interpreter.Options());
++    }
++
++    /**
++     * Recreates the interpreter with the next delegate tier (GPU -> NNAPI -> CPU) after an
++     * inference-time failure. Returns true if a new interpreter is ready and the inference
++     * can be retried, false if the classifier was already on CPU (or cannot be recreated).
++     */
++    private boolean fallbackToNextDelegateTier(Exception inferenceExc) {
++        if (mDelegateTier >= DELEGATE_TIER_CPU || mModelBuffer == null) {
++            return false;
++        }
++
++        Timber.tag(TAG).w("Inference failed on delegate tier " + mDelegateTier + ", falling back: " + inferenceExc);
++        if (mTFlite != null) {
++            mTFlite.close();
++            mTFlite = null;
++        }
++        if (mGpuDelegate != null) {
++            mGpuDelegate.close();
++            mGpuDelegate = null;
++        }
++
++        if (mDelegateTier < DELEGATE_TIER_NNAPI) {
++            try {
++                Interpreter.Options nnapiOptions = new Interpreter.Options();
++                nnapiOptions.setUseNNAPI(true);
++                mTFlite = new Interpreter(mModelBuffer, nnapiOptions);
++                mDelegateTier = DELEGATE_TIER_NNAPI;
++                return true;
++            } catch (Exception exc) {
++                Timber.tag(TAG).w("Failed to initialize NNAPI delegate during fallback: " + exc);
++            }
++        }
++
++        try {
++            mTFlite = new Interpreter(mModelBuffer, new Interpreter.Options());
++            mDelegateTier = DELEGATE_TIER_CPU;
++            return true;
++        } catch (Exception exc) {
++            Timber.tag(TAG).e("Failed to recreate interpreter on CPU during fallback: " + exc);
++            return false;
++        }
      }
  
      /** Memory-map the model file in Assets. */
-@@ -158,46 +222,139 @@ public class ImageClassifier {
+@@ -158,46 +296,139 @@ public class ImageClassifier {
          }
          imgData.rewind();
  
@@ -565,7 +639,7 @@ index dd91fb5..6b59797 100644
          float sum = 0.0f;
  
          // First multiply the scores
-@@ -214,8 +371,6 @@ public class ImageClassifier {
+@@ -214,8 +445,6 @@ public class ImageClassifier {
                  combinedScores[i] = combinedScores[i] / sum;
              }
          }
@@ -665,7 +739,7 @@ diff --git a/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPlugin
 index 76960db..5d12b3d 100644
 --- a/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m
 +++ b/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m
-@@ -63,7 +63,9 @@ - (id)callback:(Frame*)frame withArguments:(NSDictionary*)arguments {
+@@ -63,7 +63,9 @@
      NSDate *startDate = [NSDate date];
  
      // Log arguments
