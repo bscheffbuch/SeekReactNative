@@ -3,17 +3,51 @@
 Everything below is aimed at running/debugging this branch quickly on a Mac
 (hardware-accelerated emulator or a USB-connected phone). The cloud session this
 was written from has no KVM, so the Android emulator there runs at ~1/50 speed —
-the two open issues below are much faster to close on real hardware.
+the open issue below is much faster to close on real hardware.
 
-## State of the branch
+## State of the branch (tip: `b1bf283`)
 
 - Base: `origin/full-redesign` (bottom tabs, dark mode, camera settings sheet,
   observation queue) with all still-relevant fixes re-applied on top.
-- Toolchain green: `npm ci`, `npx tsc` (0 errors), `npx eslint .` (0 errors),
-  `npx jest` (31/31 suites, 85/85 tests).
+- Toolchain green: `npm ci`, `npx tsc --noEmit` (0 errors), `npx eslint .`
+  (0 errors), `npx jest tests/unit` (29/29 suites, 83/83 tests).
 - CI: every push to this branch builds a standalone arm64 debug APK and
   publishes it as a GitHub Release (`debug-apk-N`), via
-  `.github/workflows/build-debug-apk.yml`.
+  `.github/workflows/build-debug-apk.yml`. Latest: **`debug-apk-9`**
+  (camera preview fix + full dark-mode pass).
+- Recent commits on top of the build-6 state:
+  - `82d1a50` — camera preview sizing fix (the real inversion root cause,
+    see open issue 2).
+  - `539d405` — dark mode, central fixes: NavigationContainer gets the app
+    theme (kills white flashes between screens); `StyledText` remaps legacy
+    baked colors in dark mode (ink/black → text, legacy grays → muted,
+    legacy greens → primary).
+  - `cb3e804` — dark mode, per-screen pass 1: PostToiNat flow, Home upload
+    banner + species-nearby location picker/map, challenge details, match.
+  - `b1bf283` — dark mode, per-screen pass 2: SideMenu, InputField, modals,
+    toasts, species error cards, donation, range-map legend, onboarding
+    swiper, gallery error, debug email, signup spinner.
+
+## Dark-mode pass — what was done, what to eyeball
+
+The pattern everywhere: append a theme-token override *after* the static
+legacy style, e.g. `style={[viewStyles.container, { backgroundColor:
+theme.colors.canvas }]}` with `const { theme } = useTheme( )` from
+`components/Providers/ThemeProvider`. Tokens live in `styles/theme.ts`.
+
+Deliberately untouched: the camera overlay (intentionally dark in both
+themes), white spinners/text on fixed brand-green or photo-black surfaces,
+the always-green onboarding gradient, and `components/Social/` (legacy,
+deletion candidate per the TODO in `RootStack.tsx`).
+
+Known cosmetic quirks that predate this pass (fine in dark, odd in light):
+`TapToLoad`'s white body text and `ModalWithGradient`'s white date text sit
+on light `primaryContainer` in light mode.
+
+To verify on device: Settings → appearance → dark, then walk Post-to-iNat
+(form, species/location pickers, notes), Home, a challenge detail, a match
+screen, side menu, and the modals — everything should sit on the dark
+canvas with readable text and no white flashes during navigation.
 
 ## Open issue 1 — crash on opening the camera (`debug-apk-2`)
 
@@ -98,8 +132,8 @@ What is known so far:
 
 ## Open issue 2 — inverted camera preview colors ("non-stabilized camera")
 
-**Root cause found (third pass, fixed in the branch — verify with
-`debug-apk-7` or newer):** the redesign made the vision-camera `video`
+**Root cause found (third pass, fixed in `82d1a50` — verify with
+`debug-apk-9`, stabilization OFF):** the redesign made the vision-camera `video`
 output conditional on the stabilization toggle
 (`video={digitalStabilizationEnabled && ...}` in `FrameProcessorCamera.tsx`;
 on `main` it was always on). In stock vision-camera, when the video output
@@ -155,6 +189,12 @@ for Home (tabs), Observations, Settings (incl. dark mode), and the camera.
 
 ## Misc
 
+- The camera fixes live in `patches/react-native-vision-camera+4.7.3.patch`
+  (applied by patch-package on `npm ci`). If you edit files under
+  `node_modules/react-native-vision-camera` and regenerate the patch, first
+  `rm -rf node_modules/react-native-vision-camera/android/build
+  node_modules/react-native-vision-camera/android/.cxx` or the build
+  artifacts get baked into the patch.
 - ML model files are gitignored; `node scripts/add-example-model.js` fetches
   the public example model into `android/app/src/main/assets/camera/`.
 - Google Maps views are blank in debug builds (placeholder API key).
