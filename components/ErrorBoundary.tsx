@@ -28,18 +28,21 @@ class ErrorBoundary extends React.Component {
 
   componentDidCatch( error, info ) {
     this.setState( { info } );
-    if ( info?.componentStack ) {
-      // componentStack is a little more informative than what's generally in
-      // stack, so put that in there before logging
-      error.stack = info.componentStack;
-    }
-    logger.error( error );
+    // Keep the throwing frames AND the component stack: the JS stack names the
+    // function that actually threw (which the component stack cannot), while
+    // the component stack locates it in the tree. Overwriting error.stack with
+    // the component stack here used to destroy the only record of the real
+    // throw site before it was logged or displayed.
+    const backtrace = [error.stack, info?.componentStack]
+      .filter( Boolean )
+      .join( "\n--- component stack ---\n" );
+    logger.error( `${error.message}\n${backtrace}` );
     logToApi( {
       level: LogLevels.ERROR,
       context: "ErrorBoundary",
       message: error.message,
       errorType: error.constructor?.name,
-      backtrace: error.stack,
+      backtrace,
     } );
   }
 
@@ -65,6 +68,11 @@ class ErrorBoundary extends React.Component {
             </StyledText>
             <StyledText style={[baseTextStyles.body, textStyles.text]}>
               {this.state.error.toString()}
+            </StyledText>
+            {/* The JS stack first: its top frames name the function that threw,
+                which is what a bug report screenshot needs most. */}
+            <StyledText style={[baseTextStyles.body, textStyles.text]}>
+              {this.state.error.stack?.split( "\n" ).slice( 0, 12 ).join( "\n" )}
             </StyledText>
             <StyledText style={[baseTextStyles.body, textStyles.text]}>
               {this.state.info?.componentStack}
