@@ -98,20 +98,34 @@ What is known so far:
 
 ## Open issue 2 — inverted camera preview colors ("non-stabilized camera")
 
-Root cause found, no action needed beyond verifying on-device:
+Two candidate causes identified; both are now eliminated in the branch.
+Verify on-device with `debug-apk-5` (or newer) once the render crash above
+is fixed:
 
-- The **previous** test build (`debug-apk-1`, built from the pre-rebase branch)
-  had `USE_NATIVE_FOCUS_PEAKING = Platform.OS === "android"`, which attached a
-  custom OpenGL preview shader (`FocusPeakingPreviewEffect`) to the CameraX
-  preview whenever the camera ran — even with peaking inactive. On some devices
-  that shader's YUV→RGB pass renders wrong/inverted colors. Toggling
-  stabilization adds/removes the video use case, which changes how CameraX
-  routes the preview stream — that's why the corruption correlated with the
-  stabilization setting.
-- The current branch hardcodes `USE_NATIVE_FOCUS_PEAKING = false` in
-  `components/Camera/ARCamera/FrameProcessorCamera.tsx` (focus peaking now
-  draws as a JS overlay), so the shader never attaches. Once the render crash
-  above is fixed, preview colors should be correct in both stabilization modes.
+- Candidate A (fixed earlier): the **first** test build (`debug-apk-1`,
+  pre-rebase) had `USE_NATIVE_FOCUS_PEAKING = Platform.OS === "android"`,
+  which attached a custom OpenGL preview shader (`FocusPeakingPreviewEffect`)
+  to the CameraX preview whenever the camera ran — even with peaking
+  inactive. On some devices that shader's YUV→RGB pass renders wrong colors.
+  The branch hardcodes `USE_NATIVE_FOCUS_PEAKING = false` in
+  `components/Camera/ARCamera/FrameProcessorCamera.tsx` (peaking draws as a
+  JS overlay), so the shader never attaches in apk-2 and later.
+- Candidate B (fixed in this commit): the vision-camera patch wrote vendor
+  stabilization keys (`org.codeaurora.qcamera3.sessionParameters.EISMode`,
+  `samsung.android.control.swVideoStabilization`,
+  `samsung.android.lens.opticalStabilizationOperationMode`) as **0** into
+  session parameters and runtime capture-request options whenever
+  stabilization was off, and forced `LENS_OPTICAL_STABILIZATION_MODE_ON`
+  unconditionally. Stock camera apps leave these untouched; writing disable
+  values into vendor session parameters can put the vendor ISP pipeline into
+  a bad state (wrong/inverted preview colors) — and it happens exactly and
+  only in the stabilization-off configuration, matching the symptom. The
+  patch (`patches/react-native-vision-camera+4.7.3.patch`,
+  `CameraSession+Configuration.kt`) now writes only the documented
+  `CONTROL_VIDEO_STABILIZATION_MODE_OFF` when stabilization is off: vendor
+  keys are written only when enabling, OIS is only forced when stabilization
+  is requested, and the runtime path clears leftover vendor/OIS options on
+  disable instead of overwriting them with 0.
 
 ## Screenshots of the redesign (nice-to-have)
 
