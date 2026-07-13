@@ -8,6 +8,7 @@ import GreenHeader from "../../UIComponents/GreenHeader";
 import { viewStyles, textStyles } from "../../../styles/camera/error";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 enum Error {
   image = "image",
@@ -21,6 +22,7 @@ interface Props {
 }
 
 const ErrorScreen = ( { error, number }: Props ) => {
+  const { theme } = useTheme( );
   let errorText;
 
   // TODO: Audit which ones are actually still used, since error has been deleted from ObsProvider
@@ -37,7 +39,7 @@ const ErrorScreen = ( { error, number }: Props ) => {
   }
 
   return (
-    <SafeAreaView style={viewStyles.container} edges={["top"]}>
+    <SafeAreaView style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
       <GreenHeader />
       <View style={viewStyles.textContainer}>
         <StyledText style={[baseTextStyles.emptyStateWhite, textStyles.errorText]}>{errorText}</StyledText>

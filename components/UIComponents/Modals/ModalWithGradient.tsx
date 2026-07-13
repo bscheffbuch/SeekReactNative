@@ -10,10 +10,10 @@ import LinearGradient from "react-native-linear-gradient";
 import i18n from "../../../i18n";
 import icons from "../../../assets/icons";
 import { viewStyles, textStyles } from "../../../styles/uiComponents/modals/modalWithGradient";
-import { colors } from "../../../styles/global";
 import iconicTaxa from "../../../assets/iconicTaxa";
 import StyledText from "../StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props extends React.PropsWithChildren {
   readonly closeModal: () => void;
@@ -30,63 +30,70 @@ const ModalWithGradient = ( {
   userImage,
   originalImage,
   displayDate = null,
-}: Props ) => (
-  <View style={viewStyles.container}>
-    <LinearGradient
-      colors={[colors.seekPrimaryContainer, colors.seekPrimaryContainer]}
-      style={viewStyles.header}
-    >
-      <View style={[viewStyles.headerTextContainer, viewStyles.row]}>
-        <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText]}>
-          {color === "green"
-            ? i18n.t( "replace_photo.header" )
-            : i18n.t( "results.flag" )}
-        </StyledText>
-        <TouchableOpacity
-          onPress={closeModal}
-          style={viewStyles.backButton}
-        >
-          <Image source={icons.closeModal} />
-        </TouchableOpacity>
-      </View>
-      <View style={[viewStyles.images, viewStyles.row]}>
-        {userImage && <Image
-            source={{ uri: userImage }}
-            style={viewStyles.imageCell}
-          />}
-        {color === "green" && (
-          <ImageBackground
-            source={iconicTaxa[1]} // for cases where uri exists but photo is blank
-            style={[viewStyles.imageCell, viewStyles.marginLeft]}
-            imageStyle={viewStyles.imageCell}
+}: Props ) => {
+  const { theme } = useTheme( );
+
+  return (
+    <View style={[viewStyles.container, {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+    }]}>
+      <LinearGradient
+        colors={[theme.colors.primaryContainer, theme.colors.primaryContainer]}
+        style={viewStyles.header}
+      >
+        <View style={[viewStyles.headerTextContainer, viewStyles.row]}>
+          <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText]}>
+            {color === "green"
+              ? i18n.t( "replace_photo.header" )
+              : i18n.t( "results.flag" )}
+          </StyledText>
+          <TouchableOpacity
+            onPress={closeModal}
+            style={viewStyles.backButton}
           >
-            {originalImage && <Image
-              source={{ uri: originalImage }}
+            <Image source={icons.closeModal} />
+          </TouchableOpacity>
+        </View>
+        <View style={[viewStyles.images, viewStyles.row]}>
+          {userImage && <Image
+              source={{ uri: userImage }}
               style={viewStyles.imageCell}
             />}
-          </ImageBackground>
-        )}
-        <View>
-          {( color === "gray" && originalImage ) && (
-            <Image
-              source={{ uri: originalImage }}
+          {color === "green" && (
+            <ImageBackground
+              source={iconicTaxa[1]} // for cases where uri exists but photo is blank
               style={[viewStyles.imageCell, viewStyles.marginLeft]}
-            />
+              imageStyle={viewStyles.imageCell}
+            >
+              {originalImage && <Image
+                source={{ uri: originalImage }}
+                style={viewStyles.imageCell}
+              />}
+            </ImageBackground>
           )}
-          {displayDate && (
-            <View style={viewStyles.grayButton}>
-              <StyledText style={[baseTextStyles.mediumWhite, textStyles.grayButtonText]}>{displayDate}</StyledText>
-            </View>
-          )}
+          <View>
+            {( color === "gray" && originalImage ) && (
+              <Image
+                source={{ uri: originalImage }}
+                style={[viewStyles.imageCell, viewStyles.marginLeft]}
+              />
+            )}
+            {displayDate && (
+              <View style={[viewStyles.grayButton, { backgroundColor: theme.colors.primaryContainer }]}>
+                <StyledText style={[baseTextStyles.mediumWhite, textStyles.grayButtonText]}>{displayDate}</StyledText>
+              </View>
+            )}
+          </View>
         </View>
+      </LinearGradient>
+      <View style={viewStyles.innerContainer}>
+        <View style={viewStyles.marginLarge} />
+        {children}
+        <View style={viewStyles.marginMedium} />
       </View>
-    </LinearGradient>
-    <View style={viewStyles.innerContainer}>
-      <View style={viewStyles.marginLarge} />
-      {children}
-      <View style={viewStyles.marginMedium} />
     </View>
-  </View>
-);
+  );
+};
 
 export default ModalWithGradient;

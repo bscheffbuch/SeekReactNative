@@ -13,11 +13,12 @@ import { checkIsEmailValid } from "../../../utility/loginHelpers";
 import { createJwtToken } from "../../../utility/helpers";
 import ScrollWithHeader from "../../UIComponents/Screens/ScrollWithHeader";
 import createUserAgent from "../../../utility/userAgent";
-import { colors } from "../../../styles/global";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const ParentalConsentScreen = ( { navigation } ) => {
+  const { theme } = useTheme( );
   const [email, setEmail] = useState( "" );
   const [error, setError] = useState<Error | string | null>( null );
   const [loading, setLoading] = useState( false );
@@ -86,7 +87,7 @@ const ParentalConsentScreen = ( { navigation } ) => {
       />
       <View style={styles.center}>
         {error ? <ErrorMessage error={error} /> : <View style={styles.greenButtonMargin} />}
-        {loading ? <LoadingWheel color={colors.seekDeepGreen} /> : null}
+        {loading ? <LoadingWheel color={theme.colors.primary} /> : null}
       </View>
       <GreenButton
         handlePress={() => {

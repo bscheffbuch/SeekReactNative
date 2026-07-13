@@ -11,6 +11,7 @@ import PercentCircle from "../UIComponents/PercentCircle";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useChallenge } from "../Providers/ChallengeProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   readonly challenge: {
@@ -23,6 +24,7 @@ interface Props {
 const ChallengeToast = ( { challenge }: Props ) => {
   const { setIndex } = useChallenge( );
   const navigation = useNavigation( );
+  const { theme } = useTheme( );
 
   const navToChallenge = ( ) => {
     setIndex( challenge.index );
@@ -32,7 +34,7 @@ const ChallengeToast = ( { challenge }: Props ) => {
   return (
     <TouchableOpacity
       onPress={navToChallenge}
-      style={viewStyles.row}
+      style={[viewStyles.row, { backgroundColor: theme.colors.surface }]}
     >
       <View>
         <StyledText allowFontScaling={false} style={[baseTextStyles.header, textStyles.headerText]}>
