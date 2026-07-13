@@ -193,7 +193,7 @@ index f91ce83..3f48cc0 100644
          left.zoom != right.zoom ||
          left.exposure != right.exposure
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
-index 1e9c0de..ae96b45 100644
+index 1e9c0de..9ab9765 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 @@ -1,8 +1,19 @@
@@ -262,7 +262,20 @@ index 1e9c0de..ae96b45 100644
        // Configure Preview Output
        if (configuration.videoStabilizationMode.isAtLeast(VideoStabilizationMode.CINEMATIC)) {
          assertFormatRequirement("videoStabilizationMode", format, InvalidVideoStabilizationMode(configuration.videoStabilizationMode)) {
-@@ -95,6 +125,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -75,8 +105,10 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+       }
+ 
+       if (format != null) {
+-        // Preview will follow video size as it's size & aspect ratio, or photo- if video is disabled.
+-        val targetSize = if (videoConfig != null) format.videoSize else format.photoSize
++        // Preview always follows the video size. Falling back to photoSize when video is disabled
++        // asks the HAL for a preview-rate PRIV stream at full photo resolution, which is outside
++        // the guaranteed stream combinations on many devices and corrupts preview colors.
++        val targetSize = format.videoSize
+ 
+         val previewResolutionSelector = ResolutionSelector.Builder()
+           .forSize(targetSize)
+@@ -95,6 +127,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
    if (photoConfig != null) {
      Log.i(CameraSession.TAG, "Creating Photo output...")
      val photo = ImageCapture.Builder().also { photo ->
@@ -270,7 +283,7 @@ index 1e9c0de..ae96b45 100644
        // Configure Photo Output
        photo.setCaptureMode(photoConfig.config.photoQualityBalance.toCaptureMode())
        if (format != null) {
-@@ -146,6 +177,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -146,6 +179,7 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
      }
  
      val video = VideoCapture.Builder(recorder).also { video ->
@@ -278,7 +291,7 @@ index 1e9c0de..ae96b45 100644
        // Configure Video Output
        if (videoConfig.config.isMirrored) {
          video.setMirrorMode(MirrorMode.MIRROR_MODE_ON)
-@@ -191,7 +223,8 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -191,7 +225,8 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
      val pixelFormat = frameProcessorConfig.config.pixelFormat
      Log.i(CameraSession.TAG, "Creating $pixelFormat Frame Processor output...")
      val analyzer = ImageAnalysis.Builder().also { analysis ->
@@ -288,7 +301,7 @@ index 1e9c0de..ae96b45 100644
        analysis.setOutputImageFormat(pixelFormat.toImageAnalysisFormat())
        if (fpsRange != null) {
          assertFormatRequirement("fps", format, InvalidFpsError(fpsRange.upper)) {
-@@ -220,7 +253,9 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
+@@ -220,7 +255,9 @@ internal fun CameraSession.configureOutputs(configuration: CameraConfiguration)
    val codeScannerConfig = configuration.codeScanner as? CameraConfiguration.Output.Enabled<CameraConfiguration.CodeScanner>
    if (codeScannerConfig != null) {
      Log.i(CameraSession.TAG, "Creating CodeScanner output...")
@@ -299,7 +312,7 @@ index 1e9c0de..ae96b45 100644
      val pipeline = CodeScannerPipeline(codeScannerConfig.config, callback)
      analyzer.setAnalyzer(CameraQueues.analyzerExecutor, pipeline)
      codeScannerOutput = analyzer
-@@ -248,6 +283,7 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
+@@ -248,6 +285,7 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
    // Wrap input with a vendor extension if needed (see https://developer.android.com/media/camera/camera-extensions)
    val isStreamingHDR = useCases.any { !it.currentConfig.dynamicRange.isSDR }
    val needsImageAnalysis = codeScannerOutput != null || frameProcessorOutput != null
@@ -307,7 +320,7 @@ index 1e9c0de..ae96b45 100644
    val photoOptions = configuration.photo as? CameraConfiguration.Output.Enabled<CameraConfiguration.Photo>
    val enableHdrExtension = photoOptions != null && photoOptions.config.enableHdr
    if (enableHdrExtension) {
-@@ -276,10 +312,28 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
+@@ -276,10 +314,28 @@ internal suspend fun CameraSession.configureCamera(provider: ProcessCameraProvid
      Log.i(CameraSession.TAG, "Unbinding ${currentUseCases.size} use-cases for Camera #${camera?.cameraInfo?.id}...")
      provider.unbind(*currentUseCases.toTypedArray())
    }
@@ -337,7 +350,7 @@ index 1e9c0de..ae96b45 100644
    // Notify callback
    callback.onInitialized()
  
-@@ -336,6 +390,217 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
+@@ -336,6 +392,217 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
    if (currentExposureCompensation != exposureCompensation) {
      camera.cameraControl.setExposureCompensationIndex(exposureCompensation)
    }
