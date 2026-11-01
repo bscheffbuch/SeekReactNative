@@ -10,7 +10,8 @@ the open issue below is much faster to close on real hardware.
 - Base: `origin/full-redesign` (bottom tabs, dark mode, camera settings sheet,
   observation queue) with all still-relevant fixes re-applied on top.
 - Toolchain green: `npm ci`, `npx tsc --noEmit` (0 errors), `npx eslint .`
-  (0 errors), `npx jest tests/unit` (29/29 suites, 83/83 tests).
+  (0 errors), `npx jest tests/unit` (30/30 suites, 85/85 tests).
+  `tsc` needs a `config.js` (gitignored): `cp config.example.js config.js`.
 - CI: every push to this branch builds a standalone arm64 debug APK and
   publishes it as a GitHub Release (`debug-apk-N`), via
   `.github/workflows/build-debug-apk.yml`. Latest: **`debug-apk-9`**
@@ -40,14 +41,46 @@ themes), white spinners/text on fixed brand-green or photo-black surfaces,
 the always-green onboarding gradient, and `components/Social/` (legacy,
 deletion candidate per the TODO in `RootStack.tsx`).
 
-Known cosmetic quirks that predate this pass (fine in dark, odd in light):
-`TapToLoad`'s white body text and `ModalWithGradient`'s white date text sit
-on light `primaryContainer` in light mode.
+The light-mode quirks noted here earlier (`TapToLoad` / `ModalWithGradient`
+white text on the light `primaryContainer`) are fixed — see the polish pass
+below.
 
 To verify on device: Settings → appearance → dark, then walk Post-to-iNat
 (form, species/location pickers, notes), Home, a challenge detail, a match
 screen, side menu, and the modals — everything should sit on the dark
 canvas with readable text and no white flashes during navigation.
+
+## Polish pass (branch `ccr-2f8f05b6-osmvws`)
+
+- **Home** no longer shows placeholder content. The hero is the user's real
+  level (badge, name, progress bar, "observe N more" caption) and taps
+  through to Achievements; the "Your collection" cards show live species /
+  in-progress challenge / badge counts. Data comes from
+  `components/Achievements/hooks/useProgressSummary.ts`, which re-reads
+  realm on every focus (so counts update after returning from the camera).
+- **More**: level card replaces the hardcoded "Field Notebook" card;
+  Notifications moved into the main list (it was alone under "Help" with a
+  help icon); Help now holds Camera help + About. Camera help uses
+  `goBack` so it works from either entry point.
+- **i18n**: ~40 hardcoded English strings in the camera overlay/settings
+  sheet and camera settings moved to `camera.*` / `settings.*` keys in
+  `translations/en.json` (other locales fall back to English until Crowdin
+  picks them up). The "Animals" camera filter is now "Non-plants" — it is
+  the non-plant filter and includes fungi.
+- **Invisible controls in light mode** fixed: white bitmap close/back icons
+  on the light canvas (Donation, Wikipedia/announcement web views, location
+  pickers, Post species search, Home upload card) replaced with themed
+  stroke icons + a11y labels. `FullWebView` is now themed for dark mode.
+  Camera help had a hardcoded light text panel in dark mode — removed.
+- `GreenHeader` is gone; the last two users (Species landscape, gallery
+  error) use `AppHeader`.
+- `components/Social/` is **unreachable**: `MatchModals` handles
+  `navPath === "Social"`, but nothing ever sets that path. Safe to delete
+  (screen, styles, route, `socialHelpers`) once product confirms.
+
+To eyeball on device: Home (light + dark, fresh install vs. a few
+observations), More, the camera settings sheet, Wikipedia from a species
+page, Donate from Settings, and Home → Species nearby → location picker.
 
 ## Open issue 1 — crash on opening the camera (`debug-apk-2`)
 
