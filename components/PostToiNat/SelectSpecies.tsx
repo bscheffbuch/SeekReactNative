@@ -17,7 +17,6 @@ import i18n from "../../i18n";
 import posting from "../../assets/posting";
 import SpeciesCard from "../UIComponents/SpeciesCard";
 import GreenText from "../UIComponents/GreenText";
-import icons from "../../assets/icons";
 import Padding from "../UIComponents/Padding";
 import { useSearchSpecies } from "./hooks/postingHooks";
 import { iconicTaxonDictSelectSpecies, iconicScientificNames } from "../../utility/dictionaries/taxonomyDicts";
@@ -25,6 +24,7 @@ import { capitalizeNames } from "../../utility/helpers";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useTheme } from "../Providers/ThemeProvider";
+import { ChevronLeftIcon } from "../UIComponents/AppIcons";
 
 interface Taxon {
   name: string;
@@ -162,7 +162,7 @@ const SelectSpecies = ( {
             onPress={toggleSpeciesModal}
             style={viewStyles.backButton}
           >
-            <Image source={icons.backButton} />
+            <ChevronLeftIcon color={theme.colors.text} size={26} />
           </TouchableOpacity>
           <StyledText style={[baseTextStyles.button, textStyles.topHeader]}>
             {i18n.t( "posting.what_seen" )}

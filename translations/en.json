@@ -773,7 +773,8 @@
     "disable_hdr": "Disable HDR photos",
     "location": "Location",
     "disable_location": "Disable location",
-    "enable_location": "Enable location"
+    "enable_location": "Enable location",
+    "close": "Close"
   },
   "review": {
     "title": "Rate this app",

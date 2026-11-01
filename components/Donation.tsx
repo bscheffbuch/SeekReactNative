@@ -3,7 +3,6 @@ import * as React from "react";
 import {
   View,
   TouchableOpacity,
-  Image,
   Platform,
 } from "react-native";
 import { WebView } from "react-native-webview";
@@ -11,12 +10,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import i18n from "../i18n";
 import { viewStyles, textStyles } from "../styles/species/donation";
-import icons from "../assets/icons";
 import urls from "../constants/urls";
 import CopyButton from "./UIComponents/Buttons/CopyButton";
 import StyledText from "./UIComponents/StyledText";
 import { baseTextStyles } from "../styles/textStyles";
 import { useTheme } from "./Providers/ThemeProvider";
+import { XIcon } from "./UIComponents/AppIcons";
 
 const Donation = ( { navigation, route } ) => {
   const { theme } = useTheme( );
@@ -43,10 +42,12 @@ const Donation = ( { navigation, route } ) => {
           {i18n.t( "settings.donate" )}
         </StyledText>
         <TouchableOpacity
+          accessibilityLabel={i18n.t( "accessibility.close" )}
+          accessibilityRole="button"
           onPress={goBack}
           style={viewStyles.back}
         >
-          <Image source={icons.closeWhite} />
+          <XIcon color={theme.colors.text} size={22} />
         </TouchableOpacity>
       </View>
       {Platform.OS === "android" ? (

@@ -28,6 +28,10 @@ const textStyles = StyleSheet.create( {
     alignSelf: "center",
     top: 19,
   },
+  // keep long titles clear of the close button
+  title: {
+    maxWidth: "70%",
+  },
 } );
 
 export {

@@ -20,6 +20,7 @@ import { resetRouter } from "../../utility/navigationHelpers";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useTheme } from "../Providers/ThemeProvider";
+import { XIcon } from "../UIComponents/AppIcons";
 
 interface Props {
   successfulUploads: number;
@@ -131,13 +132,12 @@ const UploadStatus = ( {
     <View style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]}>
       {successfulUploads > 0 && (
         <Pressable
+          accessibilityLabel={i18n.t( "accessibility.close" )}
+          accessibilityRole="button"
           onPress={closeCard}
           style={viewStyles.closeButton}
         >
-          <Image
-            style={imageStyles.closeIcon}
-            source={icons.closeWhite}
-          />
+          <XIcon color={theme.colors.muted} size={18} />
         </Pressable>
       )}
       <View style={viewStyles.containerPadding}>

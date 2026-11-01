@@ -4,13 +4,14 @@ import * as React from "react";
 import {
   View,
   TouchableOpacity,
-  Image,
 } from "react-native";
 import { WebView } from "react-native-webview";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { viewStyles, textStyles } from "../../styles/fullWebView/fullWebView";
-import icons from "../../assets/icons";
+import i18n from "../../i18n";
+import { XIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import createUserAgent from "../../utility/userAgent";
@@ -29,6 +30,7 @@ interface Props {
 
 const FullWebView = ( { navigation, headerText, uri, loggedIn }: Props ) => {
   const navBack = () => navigation.goBack();
+  const { theme } = useTheme( );
   const { updateLogin } = React.useContext( UserContext );
 
   const [token, setToken] = React.useState<
@@ -112,15 +114,28 @@ const FullWebView = ( { navigation, headerText, uri, loggedIn }: Props ) => {
   };
 
   return (
-    <SafeAreaView style={viewStyles.container} edges={["top"]}>
-      <View style={viewStyles.header}>
-        <StyledText style={[baseTextStyles.button, textStyles.text]}>{headerText}</StyledText>
-        <TouchableOpacity onPress={navBack} style={viewStyles.back}>
-          <Image source={icons.closeWhite} />
+    <SafeAreaView style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
+      <View style={[viewStyles.header, {
+        backgroundColor: theme.colors.canvas,
+        borderBottomColor: theme.colors.border,
+      }]}>
+        <StyledText
+          numberOfLines={1}
+          style={[baseTextStyles.button, textStyles.text, { color: theme.colors.text }, textStyles.title]}
+        >
+          {headerText}
+        </StyledText>
+        <TouchableOpacity
+          accessibilityLabel={i18n.t( "accessibility.close" )}
+          accessibilityRole="button"
+          onPress={navBack}
+          style={viewStyles.back}
+        >
+          <XIcon color={theme.colors.text} size={22} />
         </TouchableOpacity>
       </View>
       {renderWebview()}
-      <View style={viewStyles.bottom} />
+      <View style={[viewStyles.bottom, { backgroundColor: theme.colors.canvas }]} />
     </SafeAreaView>
   );
 };
