@@ -1,5 +1,5 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { colors, row } from "../global";
+import { row } from "../global";
 
 const { width, height } = Dimensions.get( "window" );
 
@@ -10,7 +10,6 @@ const viewStyles = StyleSheet.create( {
   },
   row,
   textContainer: {
-    backgroundColor: colors.seekCanvas,
     marginHorizontal: 30,
     marginTop: 20,
   },

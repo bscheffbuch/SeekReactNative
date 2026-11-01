@@ -81,7 +81,7 @@ const ModalWithGradient = ( {
             )}
             {displayDate && (
               <View style={[viewStyles.grayButton, { backgroundColor: theme.colors.primaryContainer }]}>
-                <StyledText style={[baseTextStyles.mediumWhite, textStyles.grayButtonText]}>{displayDate}</StyledText>
+                <StyledText style={[baseTextStyles.medium, textStyles.grayButtonText, { color: theme.colors.primary }]}>{displayDate}</StyledText>
               </View>
             )}
           </View>

@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import {
   BackHandler,
+  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -20,7 +21,10 @@ import Announcements from "./Announcements/Announcements";
 import GetStarted from "../Modals/GetStarted";
 import ChallengeCard from "./Challenges/ChallengeCard";
 import Updates from "./Updates/Updates";
-import { checkIfCardShown } from "../../utility/helpers";
+import { checkIfCardShown, localizeNumber } from "../../utility/helpers";
+import i18n from "../../i18n";
+import badgeImages from "../../assets/badges";
+import useProgressSummary from "../Achievements/hooks/useProgressSummary";
 import RNModal from "../UIComponents/Modals/Modal";
 import ScrollNoHeader from "../UIComponents/Screens/ScrollNoHeader";
 import UploadStatus from "./UploadStatus";
@@ -35,19 +39,41 @@ import {
 } from "../UIComponents/AppIcons";
 import { useTheme } from "../Providers/ThemeProvider";
 
-const HomeHero = ( ) => {
+const HomeHero = ( { summary, navigation } ) => {
   const { theme } = useTheme( );
+  const { level, nextLevelCount, speciesCount } = summary;
   const styles = StyleSheet.create( {
     container: {
       paddingHorizontal: theme.spacing.lg,
       paddingTop: theme.spacing.md,
-      paddingBottom: theme.spacing.md,
+      paddingBottom: theme.spacing.sm,
     },
-    topRow: {
-      alignItems: "flex-start",
+    card: {
+      alignItems: "center",
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.border,
+      borderRadius: theme.radii.lg,
+      borderWidth: 1,
       flexDirection: "row",
-      justifyContent: "space-between",
       gap: theme.spacing.md,
+      padding: theme.spacing.md,
+      ...theme.elevation.card,
+    },
+    cardPressed: {
+      backgroundColor: theme.colors.primaryContainer,
+    },
+    badge: {
+      height: 64,
+      width: 64,
+    },
+    badgePlaceholder: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderRadius: 32,
+      height: 64,
+      width: 64,
+    },
+    textColumn: {
+      flex: 1,
     },
     kicker: {
       color: theme.colors.muted,
@@ -59,126 +85,71 @@ const HomeHero = ( ) => {
     title: {
       color: theme.colors.text,
       fontFamily: theme.typography.heading,
-      fontSize: 28,
+      fontSize: 24,
       letterSpacing: 0,
-      lineHeight: 32,
-      marginTop: theme.spacing.xs,
+      lineHeight: 30,
+      marginTop: theme.spacing.xxs,
     },
-    levelRing: {
-      alignItems: "center",
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.accent,
-      borderRadius: 24,
-      borderWidth: 3,
-      height: 48,
-      justifyContent: "center",
-      minHeight: 48,
-      minWidth: 48,
-      width: 48,
+    track: {
+      backgroundColor: theme.colors.primaryContainer,
+      borderRadius: 3,
+      height: 6,
+      marginTop: theme.spacing.sm,
+      overflow: "hidden",
     },
-    levelText: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 15,
-      lineHeight: 20,
-    },
-    locationPill: {
-      alignItems: "center",
-      alignSelf: "flex-start",
-      backgroundColor: theme.colors.elevatedSurface,
-      borderColor: theme.colors.border,
-      borderRadius: 999,
-      borderWidth: 1,
-      flexDirection: "row",
-      gap: theme.spacing.xs,
-      marginTop: theme.spacing.md,
-      minHeight: 36,
-      paddingHorizontal: theme.spacing.md,
-    },
-    locationDot: {
+    fill: {
       backgroundColor: theme.colors.primary,
-      borderRadius: 4,
-      height: 8,
-      width: 8,
+      borderRadius: 3,
+      height: 6,
     },
-    locationText: {
-      color: theme.colors.muted,
-      fontFamily: theme.typography.heading,
-      fontSize: 13,
-      lineHeight: 18,
-    },
-    statRow: {
-      flexDirection: "row",
-      gap: theme.spacing.sm,
-      marginTop: theme.spacing.md,
-    },
-    stat: {
-      alignItems: "center",
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.md,
-      borderWidth: 1,
-      flex: 1,
-      flexDirection: "row",
-      gap: theme.spacing.sm,
-      minHeight: 58,
-      paddingHorizontal: theme.spacing.md,
-      ...theme.elevation.card,
-    },
-    statLabel: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 14,
-      lineHeight: 18,
-    },
-    statMeta: {
+    caption: {
       color: theme.colors.muted,
       fontFamily: theme.typography.body,
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: 13,
+      lineHeight: 18,
+      marginTop: theme.spacing.xs,
     },
   } );
 
+  const isMaxLevel = summary.loaded && nextLevelCount === null;
+  const levelFloor = level ? level.count : 0;
+  const progress = isMaxLevel || !nextLevelCount
+    ? 1
+    : Math.min( 1, Math.max( 0, ( speciesCount - levelFloor ) / ( nextLevelCount - levelFloor ) ) );
+  const remaining = nextLevelCount ? Math.max( 0, nextLevelCount - speciesCount ) : 0;
+  const caption = isMaxLevel
+    ? i18n.t( "badges.observe_max" )
+    : i18n.t( "badges.observe_plural", { count: localizeNumber( remaining ) } );
+  const levelName = level ? i18n.t( level.intlName ) : "";
+
   return (
     <View style={styles.container}>
-      <View style={styles.topRow}>
-        <View>
-          <Text style={styles.kicker}>Field notebook</Text>
-          <Text accessibilityRole="header" style={styles.title}>Hello, Naturalist</Text>
-        </View>
-        <View
-          accessibilityLabel="Level 1"
-          accessibilityRole="summary"
-          style={styles.levelRing}
-        >
-          <Text style={styles.levelText}>1</Text>
-        </View>
-      </View>
-      <View style={styles.locationPill}>
-        <View style={styles.locationDot} />
-        <Text numberOfLines={1} style={styles.locationText}>Species near you</Text>
-      </View>
-      <View style={styles.statRow}>
-        <View style={styles.stat}>
-          <BinocularsIcon color={theme.colors.primary} size={22} />
-          <View>
-            <Text style={styles.statLabel}>Nearby</Text>
-            <Text style={styles.statMeta}>Species</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${i18n.t( "badges.your_level" )}: ${levelName}. ${summary.loaded ? caption : ""}`}
+        onPress={() => navigation.navigate( "Achievements" )}
+        style={( { pressed } ) => [styles.card, pressed && styles.cardPressed]}
+        testID="homeLevelCard"
+      >
+        {level && badgeImages[level.earnedIconName]
+          ? <Image source={badgeImages[level.earnedIconName]} style={styles.badge} />
+          : <View style={styles.badgePlaceholder} />}
+        <View style={styles.textColumn}>
+          <Text style={styles.kicker}>{i18n.t( "badges.your_level" )}</Text>
+          <Text accessibilityRole="header" numberOfLines={1} style={styles.title}>
+            {levelName}
+          </Text>
+          <View style={styles.track}>
+            <View style={[styles.fill, { width: `${Math.round( progress * 100 )}%` }]} />
           </View>
+          {summary.loaded && <Text style={styles.caption}>{caption}</Text>}
         </View>
-        <View style={styles.stat}>
-          <TrophyIcon color={theme.colors.accent} size={22} />
-          <View>
-            <Text style={styles.statLabel}>Quests</Text>
-            <Text style={styles.statMeta}>In season</Text>
-          </View>
-        </View>
-      </View>
+      </Pressable>
     </View>
   );
 };
 
-const HomeCollectionStrip = ( { navigation } ) => {
+const HomeCollectionStrip = ( { summary, navigation } ) => {
   const { theme } = useTheme( );
   const styles = StyleSheet.create( {
     container: {
@@ -208,7 +179,7 @@ const HomeCollectionStrip = ( { navigation } ) => {
       borderRadius: theme.radii.md,
       borderWidth: 1,
       flex: 1,
-      minHeight: 94,
+      minHeight: 104,
       padding: theme.spacing.md,
       ...theme.elevation.card,
     },
@@ -218,8 +189,8 @@ const HomeCollectionStrip = ( { navigation } ) => {
     value: {
       color: theme.colors.text,
       fontFamily: theme.typography.heading,
-      fontSize: 19,
-      lineHeight: 24,
+      fontSize: 22,
+      lineHeight: 28,
       marginTop: theme.spacing.sm,
     },
     label: {
@@ -227,49 +198,59 @@ const HomeCollectionStrip = ( { navigation } ) => {
       fontFamily: theme.typography.body,
       fontSize: 12,
       lineHeight: 16,
-      marginTop: theme.spacing.xs,
+      marginTop: theme.spacing.xxs,
     },
   } );
+
+  const formatCount = ( count: number ) => ( summary.loaded ? localizeNumber( count ) : "–" );
   const items = [
     {
+      key: "species",
       icon: BinocularsIcon,
-      label: "Log",
-      route: "Observations",
-      value: "Species",
+      label: i18n.t( "badges.observed" ),
+      onPress: ( ) => navigation.navigate( "Observations" ),
+      value: formatCount( summary.speciesCount ),
+      testID: "homeSpeciesCount",
     },
     {
+      key: "challenges",
       icon: TrophyIcon,
-      label: "Quests",
-      route: "Challenges",
-      value: "Active",
+      label: i18n.t( "challenges.in_progress" ),
+      onPress: ( ) => navigation.navigate( "Challenges" ),
+      value: formatCount( summary.challengesInProgress ),
+      testID: "homeChallengesCount",
     },
     {
+      key: "badges",
       icon: AwardIcon,
-      label: "Badges",
-      route: "Achievements",
-      value: "Earned",
+      label: i18n.t( "badges.earned" ),
+      onPress: ( ) => navigation.navigate( "Achievements" ),
+      value: formatCount( summary.badgesEarned ),
+      testID: "homeBadgesCount",
     },
   ];
 
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Text style={styles.header}>Your collection</Text>
+        <Text accessibilityRole="header" style={styles.header}>{i18n.t( "home.your_collection" )}</Text>
       </View>
       <View style={styles.grid}>
         {items.map( item => {
           const Icon = item.icon;
+          const label = item.label.replace( /\n/g, " " );
           return (
             <Pressable
-              accessibilityLabel={item.label}
+              accessibilityLabel={`${item.value} ${label}`}
               accessibilityRole="button"
-              key={item.label}
-              onPress={() => navigation.navigate( item.route )}
+              key={item.key}
+              onPress={item.onPress}
               style={( { pressed } ) => [styles.card, pressed && styles.cardPressed]}
+              testID={item.testID}
             >
               <Icon color={theme.colors.primary} size={20} />
               <Text style={styles.value}>{item.value}</Text>
-              <Text style={styles.label}>{item.label}</Text>
+              <Text numberOfLines={2} style={styles.label}>{label}</Text>
             </Pressable>
           );
         } )}
@@ -280,6 +261,7 @@ const HomeCollectionStrip = ( { navigation } ) => {
 
 const HomeScreen = ( ) => {
   const navigation = useNavigation( );
+  const summary = useProgressSummary( );
   const [showModal, setModal] = useState( false );
   const [showUploadCard, setShowUploadCard] = useState( false );
   const [successfulUploads, setSuccessfulUploads] = useState( 0 );
@@ -357,7 +339,7 @@ const HomeScreen = ( ) => {
         closeModal={closeModal}
         modal={<GetStarted closeModal={closeModal} />}
       />
-      <HomeHero />
+      <HomeHero summary={summary} navigation={navigation} />
       {showUploadCard && (
         <UploadStatus
           successfulUploads={successfulUploads}
@@ -367,7 +349,7 @@ const HomeScreen = ( ) => {
         />
       )}
       <SpeciesNearby />
-      <HomeCollectionStrip navigation={navigation} />
+      <HomeCollectionStrip summary={summary} navigation={navigation} />
       <Announcements />
       <SeekYearInReviewCard />
       <Updates />

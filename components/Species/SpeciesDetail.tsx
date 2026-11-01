@@ -15,7 +15,7 @@ import OnlineSpeciesContainer from "./OnlineSpeciesContainer";
 import SpeciesHeader from "./SpeciesHeader";
 import OfflineSpeciesContainer from "./OfflineSpeciesContainer";
 import SpeciesPhotosLandscape from "./SpeciesPhotosLandscape";
-import GreenHeader from "../UIComponents/GreenHeader";
+import { AppHeader } from "../UIComponents/AppPrimitives";
 import SpeciesName from "./SpeciesName";
 import IconicTaxaName from "./IconicTaxaName";
 import { useInternetStatus } from "../../utility/customHooks";
@@ -202,7 +202,7 @@ const SpeciesDetail = ( ) => {
   const renderLandscapeMode = () => (
     <SafeAreaView style={[styles.container, themedStyles.landscapeShell]} edges={["top"]}>
       <StatusBar barStyle={theme.isDark ? "light-content" : "dark-content"} />
-      <GreenHeader plainText={commonName || scientificName} />
+      <AppHeader title={commonName || scientificName} showNotifications={false} />
       <View style={[viewStyles.twoColumnContainer, themedStyles.twoColumn]}>
         <View style={{ width: columnWidth }}>
           <SpeciesPhotosLandscape loading={loading} photos={photos} id={id} />

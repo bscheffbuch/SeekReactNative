@@ -178,6 +178,9 @@
     "about": "About",
     "settings": "Settings"
   },
+  "home": {
+    "your_collection": "Your collection"
+  },
   "onboarding": {
     "onboarding_1": "Use Seek’s Camera to identify plants, animals, and fungi",
     "onboarding_2": "Learn about the organisms all around you",
@@ -420,7 +423,44 @@
     "best_for_wild_organisms": "Best for wild organisms",
     "best_for_captive_organisms": "Best for garden plants, pets, or captive organisms",
     "flash_on": "Flash on",
-    "flash_off": "Flash off"
+    "flash_off": "Flash off",
+    "filter_all": "All life",
+    "filter_plants": "Plants",
+    "filter_non_plants": "Non-plants",
+    "zoom": "Zoom",
+    "focus": "Focus",
+    "peak": "Peak",
+    "auto": "Auto",
+    "focus_macro": "Macro",
+    "focus_infinity": "Inf",
+    "sensitivity_low": "Low",
+    "sensitivity_medium": "Med",
+    "sensitivity_high": "High",
+    "settings": "Camera settings",
+    "close_settings": "Close camera settings",
+    "what_to_identify": "What to identify",
+    "saving": "Saving",
+    "capture": "Capture",
+    "queue_mode": "Queue mode",
+    "queue_mode_sub": "Keep shooting; save a burst at once",
+    "macro": "Macro",
+    "macro_sub": "Close-up focus",
+    "macro_on": "On - close-up focus",
+    "focus_peaking": "Focus peaking",
+    "focus_peaking_sub": "Highlight sharp edges",
+    "focus_peaking_on": "On - adds wheel tab",
+    "hdr": "HDR",
+    "hdr_sub": "High dynamic range",
+    "hdr_on": "On - high dynamic range",
+    "stabilize": "Stabilize",
+    "stabilize_sub": "Reduce motion blur",
+    "stabilize_on": "On - less motion blur",
+    "grid": "Grid",
+    "grid_sub": "Composition guide",
+    "grid_on": "On - rule of thirds",
+    "save_location": "Save location",
+    "save_location_sub": "Tag where you find it",
+    "save_location_on": "On - tag where found"
   },
   "gallery": {
     "import_photos_from": "Import Photos From"
@@ -781,7 +821,8 @@
     "seasonality_option_2": "Display seasonality based on iNaturalist observations near my current location (species not found near my location will have no seasonality)",
     "donate_ios": "Please visit the following link to make a donation to Seek:",
     "change_language": "Switch the in-app language to {{language}}?",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "camera_stream_resolution": "Camera stream resolution"
   },
   "seek_challenges": {
     "badge": "Seek badge",

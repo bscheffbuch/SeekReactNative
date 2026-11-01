@@ -215,7 +215,7 @@ const CameraSettings = ( ) => {
       <View style={themedStyles.pickerStack}>
         <SettingsSelect
           items={cameraViewportResolutionOptions}
-          label="Camera stream resolution"
+          label={i18n.t( "settings.camera_stream_resolution" )}
           onValueChange={updateCameraViewportResolution}
           value={settings.cameraViewportResolution || "720p"}
         />

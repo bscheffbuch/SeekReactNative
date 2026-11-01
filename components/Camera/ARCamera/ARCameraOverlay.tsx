@@ -187,22 +187,22 @@ const zoomFmt = ( value: number ) => {
 
 const focusFmt = ( value: number ) => {
   if ( value < 0.05 ) {
-    return "Macro";
+    return i18n.t( "camera.focus_macro" );
   }
   if ( value > 0.95 ) {
-    return "Inf";
+    return i18n.t( "camera.focus_infinity" );
   }
   return `${( 0.1 + value * 2.9 ).toFixed( 1 )} m`;
 };
 
 const peakFmt = ( value: number ) => {
   if ( value < 0.34 ) {
-    return "Low";
+    return i18n.t( "camera.sensitivity_low" );
   }
   if ( value < 0.67 ) {
-    return "Med";
+    return i18n.t( "camera.sensitivity_medium" );
   }
-  return "High";
+  return i18n.t( "camera.sensitivity_high" );
 };
 
 const GlassButton = ( {
@@ -566,7 +566,7 @@ const ARCameraOverlay = ( {
       negativeFilter: true,
       taxonId: null,
       text: i18n.t( "camera.filters_off" ),
-      shortText: "All life",
+      shortText: i18n.t( "camera.filter_all" ),
       segmentIcon: SearchIcon,
       color: colors.cameraFilterGray,
     },
@@ -574,7 +574,7 @@ const ARCameraOverlay = ( {
       negativeFilter: false,
       taxonId: "47126",
       text: i18n.t( "camera.plant_filter" ),
-      shortText: "Plants",
+      shortText: i18n.t( "camera.filter_plants" ),
       segmentIcon: LeafIcon,
       color: null,
     },
@@ -582,7 +582,7 @@ const ARCameraOverlay = ( {
       negativeFilter: true,
       taxonId: "47126",
       text: i18n.t( "camera.non_plant_filter" ),
-      shortText: "Animals",
+      shortText: i18n.t( "camera.filter_non_plants" ),
       segmentIcon: EyeIcon,
       color: colors.seekTeal,
     },
@@ -658,9 +658,9 @@ const ARCameraOverlay = ( {
       accessibilityLabel: i18n.t( "accessibility.manual_focus" ),
       format: focusFmt,
       majors: [
-        { value: 0, label: "Macro" },
+        { value: 0, label: i18n.t( "camera.focus_macro" ) },
         { value: 0.5, label: "1.5 m" },
-        { value: 1, label: "Inf" },
+        { value: 1, label: i18n.t( "camera.focus_infinity" ) },
       ],
       max: 1,
       min: 0,
@@ -673,9 +673,9 @@ const ARCameraOverlay = ( {
         accessibilityLabel: i18n.t( "accessibility.focus_peaking_sensitivity" ),
         format: peakFmt,
         majors: [
-          { value: 0, label: "Low" },
-          { value: 0.5, label: "Med" },
-          { value: 1, label: "High" },
+          { value: 0, label: i18n.t( "camera.sensitivity_low" ) },
+          { value: 0.5, label: i18n.t( "camera.sensitivity_medium" ) },
+          { value: 1, label: i18n.t( "camera.sensitivity_high" ) },
         ],
         max: 1,
         min: 0,
@@ -819,7 +819,7 @@ const ARCameraOverlay = ( {
             <ModeTab
               active={wheelMode === "zoom"}
               icon={CameraIcon}
-              label="Zoom"
+              label={i18n.t( "camera.zoom" )}
               onPress={() => selectWheelMode( "zoom" )}
               value={zoomFmt( selectedZoom )}
             />
@@ -827,23 +827,23 @@ const ARCameraOverlay = ( {
               <ModeTab
                 active={wheelMode === "focus"}
                 icon={FocusIcon}
-                label="Focus"
+                label={i18n.t( "camera.focus" )}
                 onPress={() => selectWheelMode( "focus" )}
-                value={manualFocusEnabled ? focusFmt( manualFocusValue ) : "Auto"}
+                value={manualFocusEnabled ? focusFmt( manualFocusValue ) : i18n.t( "camera.auto" )}
               />
             )}
             {focusPeakingEnabled && (
               <ModeTab
                 active={wheelMode === "peak"}
                 icon={SlidersIcon}
-                label="Peak"
+                label={i18n.t( "camera.peak" )}
                 onPress={() => selectWheelMode( "peak" )}
                 value={peakFmt( focusPeakingSensitivity )}
               />
             )}
           </View>
           <GlassButton
-            accessibilityLabel="Camera settings"
+            accessibilityLabel={i18n.t( "camera.settings" )}
             active={settingsOpen}
             badge={settingsBadgeCount}
             onPress={() => setSettingsOpen( true )}
@@ -941,10 +941,10 @@ const ARCameraOverlay = ( {
               <View style={viewStyles.sheetHandle} />
               <View style={viewStyles.sheetHeader}>
                 <StyledText style={textStyles.sheetTitle}>
-                  Camera settings
+                  {i18n.t( "camera.settings" )}
                 </StyledText>
                 <TouchableOpacity
-                  accessibilityLabel="Close camera settings"
+                  accessibilityLabel={i18n.t( "camera.close_settings" )}
                   accessibilityRole="button"
                   onPress={closeSettings}
                   style={viewStyles.sheetCloseButton}
@@ -959,7 +959,7 @@ const ARCameraOverlay = ( {
               showsVerticalScrollIndicator={false}
             >
               <StyledText style={textStyles.sectionLabel}>
-                What to identify
+                {i18n.t( "camera.what_to_identify" )}
               </StyledText>
               <SettingSegment
                 onChange={setFilterIndex}
@@ -968,67 +968,67 @@ const ARCameraOverlay = ( {
               />
 
               <StyledText style={textStyles.sectionLabel}>
-                Saving
+                {i18n.t( "camera.saving" )}
               </StyledText>
               <SettingRow
                 active={queueMode}
                 icon={QueueIcon}
-                label="Queue mode"
+                label={i18n.t( "camera.queue_mode" )}
                 onPress={toggleQueueMode}
-                sub="Keep shooting; save a burst at once"
+                sub={i18n.t( "camera.queue_mode_sub" )}
               />
 
               <StyledText style={textStyles.sectionLabel}>
-                Capture
+                {i18n.t( "camera.capture" )}
               </StyledText>
               <View style={viewStyles.proTileGrid}>
                 {supportsMacro && (
                   <ProTile
                     active={macroEnabled}
                     icon={LeafIcon}
-                    label="Macro"
+                    label={i18n.t( "camera.macro" )}
                     onPress={toggleMacro}
-                    sub={macroEnabled ? "On - close-up focus" : "Close-up focus"}
+                    sub={i18n.t( macroEnabled ? "camera.macro_on" : "camera.macro_sub" )}
                   />
                 )}
                 <ProTile
                   active={focusPeakingEnabled}
                   icon={FocusIcon}
-                  label="Focus peaking"
+                  label={i18n.t( "camera.focus_peaking" )}
                   onPress={toggleFocusPeaking}
-                  sub={focusPeakingEnabled ? "On - adds wheel tab" : "Highlight sharp edges"}
+                  sub={i18n.t( focusPeakingEnabled ? "camera.focus_peaking_on" : "camera.focus_peaking_sub" )}
                 />
                 {supportsPhotoHdr && (
                   <ProTile
                     active={photoHdrEnabled}
                     icon={MountainIcon}
-                    label="HDR"
+                    label={i18n.t( "camera.hdr" )}
                     onPress={togglePhotoHdr}
-                    sub={photoHdrEnabled ? "On - high dynamic range" : "High dynamic range"}
+                    sub={i18n.t( photoHdrEnabled ? "camera.hdr_on" : "camera.hdr_sub" )}
                   />
                 )}
                 {supportsDigitalStabilization && (
                   <ProTile
                     active={digitalStabilizationEnabled}
                     icon={SlidersIcon}
-                    label="Stabilize"
+                    label={i18n.t( "camera.stabilize" )}
                     onPress={toggleDigitalStabilization}
-                    sub={digitalStabilizationEnabled ? "On - less motion blur" : "Reduce motion blur"}
+                    sub={i18n.t( digitalStabilizationEnabled ? "camera.stabilize_on" : "camera.stabilize_sub" )}
                   />
                 )}
                 <ProTile
                   active={gridEnabled}
                   icon={GridIcon}
-                  label="Grid"
+                  label={i18n.t( "camera.grid" )}
                   onPress={() => setGridEnabled( current => !current )}
-                  sub={gridEnabled ? "On - rule of thirds" : "Composition guide"}
+                  sub={i18n.t( gridEnabled ? "camera.grid_on" : "camera.grid_sub" )}
                 />
                 <ProTile
                   active={useLocation}
                   icon={MapPinIcon}
-                  label="Save location"
+                  label={i18n.t( "camera.save_location" )}
                   onPress={toggleLocation}
-                  sub={useLocation ? "On - tag where found" : "Tag where you find it"}
+                  sub={i18n.t( useLocation ? "camera.save_location_on" : "camera.save_location_sub" )}
                 />
               </View>
             </ScrollView>

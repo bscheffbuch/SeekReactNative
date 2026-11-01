@@ -171,6 +171,11 @@ jest.mock( "@react-navigation/native", () => {
     } ),
     useRoute: () => ( {} ),
     useScrollToTop: () => jest.fn(),
+    // Tests render screens outside a navigator, so treat them as focused on mount
+    useFocusEffect: ( effect ) => {
+      const { useEffect } = jest.requireActual( "react" );
+      useEffect( () => effect(), [effect] );
+    },
   };
 } );
 

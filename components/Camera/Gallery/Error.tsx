@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import i18n from "../../../i18n";
-import GreenHeader from "../../UIComponents/GreenHeader";
+import { AppHeader } from "../../UIComponents/AppPrimitives";
 import { viewStyles, textStyles } from "../../../styles/camera/error";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
@@ -40,9 +40,9 @@ const ErrorScreen = ( { error, number }: Props ) => {
 
   return (
     <SafeAreaView style={[viewStyles.container, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
-      <GreenHeader />
+      <AppHeader showNotifications={false} />
       <View style={viewStyles.textContainer}>
-        <StyledText style={[baseTextStyles.emptyStateWhite, textStyles.errorText]}>{errorText}</StyledText>
+        <StyledText style={[baseTextStyles.emptyStateWhite, textStyles.errorText, { color: theme.colors.text }]}>{errorText}</StyledText>
       </View>
     </SafeAreaView>
   );

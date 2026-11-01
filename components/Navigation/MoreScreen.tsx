@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -8,6 +9,8 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import {
   AwardIcon,
+  BellIcon,
+  ChevronRightIcon,
   CircleHelpIcon,
   CloudUploadIcon,
   InfoIcon,
@@ -17,6 +20,8 @@ import {
 
 import i18n from "../../i18n";
 import { useTheme } from "../Providers/ThemeProvider";
+import badgeImages from "../../assets/badges";
+import useProgressSummary from "../Achievements/hooks/useProgressSummary";
 import {
   AppHeader,
   AppScreen,
@@ -28,6 +33,9 @@ import {
 const MoreScreen = ( ) => {
   const navigation = useNavigation( );
   const { theme } = useTheme( );
+  const summary = useProgressSummary( );
+  const { level } = summary;
+  const levelName = level ? i18n.t( level.intlName ) : "";
   const styles = StyleSheet.create( {
     content: {
       padding: theme.spacing.md,
@@ -53,6 +61,10 @@ const MoreScreen = ( ) => {
       height: 54,
       justifyContent: "center",
       width: 54,
+    },
+    levelBadge: {
+      height: 56,
+      width: 56,
     },
     profileText: {
       flex: 1,
@@ -85,17 +97,28 @@ const MoreScreen = ( ) => {
       <View style={styles.content}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={i18n.t( "menu.achievements" )}
+          accessibilityLabel={`${i18n.t( "badges.your_level" )}: ${levelName}`}
           onPress={() => navigation.navigate( "Achievements" as never )}
           style={( { pressed } ) => [styles.profileCard, pressed && { opacity: 0.82 }]}
+          testID="moreLevelCard"
         >
-          <View style={styles.profileMark}>
-            <AwardIcon color={theme.colors.primary} size={28} />
-          </View>
+          {level && badgeImages[level.earnedIconName] ? (
+            <Image source={badgeImages[level.earnedIconName]} style={styles.levelBadge} />
+          ) : (
+            <View style={styles.profileMark}>
+              <AwardIcon color={theme.colors.primary} size={28} />
+            </View>
+          )}
           <View style={styles.profileText}>
-            <Text style={styles.profileTitle}>Field Notebook</Text>
-            <Text style={styles.profileMeta}>Achievements, saved observations, and settings</Text>
+            <Text style={styles.profileMeta}>{i18n.t( "badges.your_level" )}</Text>
+            <Text numberOfLines={1} style={styles.profileTitle}>{levelName}</Text>
+            {summary.loaded && (
+              <Text style={styles.profileMeta}>
+                {i18n.t( "banner.number_seen_plural", { count: summary.speciesCount } )}
+              </Text>
+            )}
           </View>
+          <ChevronRightIcon color={theme.colors.muted} size={20} />
         </Pressable>
         <SectionHeading>{i18n.t( "menu.more" )}</SectionHeading>
         <SurfaceCard style={styles.group}>
@@ -118,16 +141,16 @@ const MoreScreen = ( ) => {
             testID="moreINaturalistLink"
           />
           <ListRow
+            icon={BellIcon}
+            label={i18n.t( "menu.notifications" )}
+            onPress={() => navigation.navigate( "Notifications" as never )}
+            testID="moreNotificationsLink"
+          />
+          <ListRow
             icon={SettingsIcon}
             label={i18n.t( "menu.settings" )}
             onPress={() => navigation.navigate( "Settings" as never )}
             testID="moreSettingsLink"
-          />
-          <ListRow
-            icon={InfoIcon}
-            label={i18n.t( "menu.about" )}
-            onPress={() => navigation.navigate( "About" as never )}
-            testID="moreAboutLink"
           />
         </SurfaceCard>
         <View style={styles.spacer} />
@@ -135,9 +158,15 @@ const MoreScreen = ( ) => {
         <SurfaceCard style={styles.group}>
           <ListRow
             icon={CircleHelpIcon}
-            label={i18n.t( "menu.notifications" )}
-            onPress={() => navigation.navigate( "Notifications" as never )}
-            testID="moreNotificationsLink"
+            label={i18n.t( "camera_help.title" )}
+            onPress={() => navigation.navigate( "CameraHelp" as never )}
+            testID="moreCameraHelpLink"
+          />
+          <ListRow
+            icon={InfoIcon}
+            label={i18n.t( "menu.about" )}
+            onPress={() => navigation.navigate( "About" as never )}
+            testID="moreAboutLink"
           />
         </SurfaceCard>
       </View>

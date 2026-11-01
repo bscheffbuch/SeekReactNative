@@ -31,8 +31,10 @@ const TapToLoad = ( { handlePress, backgroundColor }: Props ) => {
     >
       <StyledText
         style={[
+          baseTextStyles.body,
           textStyles.text,
-          backgroundColor === "white" ? baseTextStyles.body : baseTextStyles.bodyWhite,
+          // primary reads on both the canvas and the green container, in both themes
+          { color: backgroundColor === "white" ? theme.colors.text : theme.colors.primary },
         ]}>
           {i18n.t( "results.tap" )}
       </StyledText>
