@@ -70,10 +70,12 @@ def photo_urls( session, taxon_id, n, before ):
 
 def main( ):
     ap = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter )
-    ap.add_argument( "--species-json", required=True )
-    ap.add_argument( "--taxa-csv", required=True )
-    ap.add_argument( "--text-embeddings", required=True )
-    ap.add_argument( "--text-ids", required=True )
+    ap.add_argument( "--ids-json", help="taxon ids to build prototypes for (skips --species-json/--taxa-csv "
+                                        "and the head blending: just writes prototypes.npz)" )
+    ap.add_argument( "--species-json" )
+    ap.add_argument( "--taxa-csv" )
+    ap.add_argument( "--text-embeddings" )
+    ap.add_argument( "--text-ids" )
     ap.add_argument( "--classes", default="Actinopterygii",
                      help="comma list of iNat class names to build prototypes for, or 'all'" )
     ap.add_argument( "--per-species", type=int, default=8 )
@@ -91,11 +93,14 @@ def main( ):
 
     device = args.device if torch.cuda.is_available( ) or args.device == "cpu" else "cpu"
     os.makedirs( args.out, exist_ok=True )
-    species = [s for s in json.load( open( args.species_json ) ) if s["rank"] in ( "species", "hybrid" )]
-    ids = [s["id"] for s in species]
-    wanted = None if args.classes == "all" else set( c.strip( ) for c in args.classes.split( "," ) )
-    classes = lineage_classes( args.taxa_csv, ids ) if wanted else {}
-    todo = [tid for tid in ids if wanted is None or classes.get( tid ) in wanted]
+    if args.ids_json:
+        todo = [int( t ) for t in json.load( open( args.ids_json ) )]
+    else:
+        species = [s for s in json.load( open( args.species_json ) ) if s["rank"] in ( "species", "hybrid" )]
+        ids = [s["id"] for s in species]
+        wanted = None if args.classes == "all" else set( c.strip( ) for c in args.classes.split( "," ) )
+        classes = lineage_classes( args.taxa_csv, ids ) if wanted else {}
+        todo = [tid for tid in ids if wanted is None or classes.get( tid ) in wanted]
     if args.limit:
         todo = todo[:args.limit]
     print( f"{len( todo )} species in {args.classes}", flush=True )
@@ -140,6 +145,9 @@ def main( ):
             print( f"  {k}/{len( todo )} species, {len( done )} with prototypes", flush=True )
         time.sleep( max( 0, 1.05 - ( time.time( ) - t0 ) ) )  # API: <= 1 request/second
     save( )
+    print( f"prototypes: {len( done )} species -> {ckpt_path}", flush=True )
+    if args.ids_json or not args.text_embeddings:
+        return
 
     text = np.load( args.text_embeddings ).astype( np.float32 )
     row = {int( t ): i for i, t in enumerate( json.load( open( args.text_ids ) ) )}
