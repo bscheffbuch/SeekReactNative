@@ -115,9 +115,12 @@ const SpeciesImageCell = ( { item }: Props ) => {
       <StyledText
         numberOfLines={3}
         style={[
-          name === "ChallengeDetails" ? baseTextStyles.body : baseTextStyles.bodyWhite,
+          baseTextStyles.body,
           textStyles.speciesNameText,
-          !commonName && baseTextStyles.italicWhite,
+          !commonName && baseTextStyles.italic,
+          // the list sits on the theme's surface card in both themes; white text
+          // (the old bodyWhite) was invisible on it in light mode
+          { color: theme.colors.text },
         ]}>
       {commonName
           ? i18n.locale === "de" ? commonName.replace( /(- |-)/g, "-\n" ) : commonName

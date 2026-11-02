@@ -185,7 +185,7 @@ exports[`SpeciesNearbyList should render correctly 1`] = `
               },
               [
                 {
-                  "color": "#ffffff",
+                  "color": "#111512",
                   "fontFamily": "Lato-Regular",
                   "fontSize": 15,
                   "letterSpacing": 0,
@@ -196,6 +196,9 @@ exports[`SpeciesNearbyList should render correctly 1`] = `
                   "textAlign": "center",
                 },
                 false,
+                {
+                  "color": "#111512",
+                },
               ],
               null,
             ]
