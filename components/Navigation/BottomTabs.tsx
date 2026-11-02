@@ -53,11 +53,16 @@ const getStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
     flex: 1,
     minHeight: 56,
   },
+  // Always give the pill a background (transparent when inactive) and clip it:
+  // on the new architecture a background added after mount can lose the radius.
   indicator: {
     alignItems: "center",
+    backgroundColor: "transparent",
+    borderCurve: "continuous",
     borderRadius: 16,
     height: 32,
     justifyContent: "center",
+    overflow: "hidden",
     width: 64,
   },
   indicatorActive: {
