@@ -13,18 +13,38 @@ import type { ModelPack } from "./modelPacks";
 const Realm = require( "realm" );
 const realmConfig = require( "../models/index" );
 
+// Lists ask for the same names again as rows scroll in and out; remember them per
+// locale. Cleared whenever names are (re)loaded into Realm.
+const nameCache = new Map<string, string | null>( );
+const NAME_CACHE_LIMIT = 5000;
+
+const clearCommonNameCache = ( ) => nameCache.clear( );
+
 const getTaxonCommonName = ( taxonID?: number ) => (
   new Promise<string | null>( ( resolve, reject ) => {
-    if ( !taxonID ) { return; }
+    if ( !taxonID ) {
+      resolve( null );
+      return;
+    }
+    // need this because realm isn't guaranteed to only contain
+    // one locale; we could solve this by deleting the realm database each time
+    // the app loads or including this searchLocale parameter
+    const searchLocale = localeNoHyphens( ( i18n.locale ) );
+    const cacheKey = `${searchLocale}:${taxonID}`;
+    if ( nameCache.has( cacheKey ) ) {
+      resolve( nameCache.get( cacheKey ) );
+      return;
+    }
     Realm.open( realmConfig.default ).then( ( realm ) => {
-      // need this because realm isn't guaranteed to only contain
-      // one locale; we could solve this by deleting the realm database each time
-      // the app loads or including this searchLocale parameter
-      const searchLocale = localeNoHyphens( ( i18n.locale ) );
       // look up common names for predicted taxon in the current locale
       const commonNamesRealm = realm.objects( "CommonNamesRealm" )
-        .filtered( `taxon_id == ${taxonID} and locale == '${searchLocale}'` );
-      resolve( commonNamesRealm.length > 0 ? capitalizeNames( commonNamesRealm[0].name ) : null );
+        .filtered( "taxon_id == $0 and locale == $1", taxonID, searchLocale );
+      const name = commonNamesRealm.length > 0 ? capitalizeNames( commonNamesRealm[0].name ) : null;
+      if ( nameCache.size >= NAME_CACHE_LIMIT ) {
+        nameCache.clear( );
+      }
+      nameCache.set( cacheKey, name );
+      resolve( name );
     } ).catch( ( err: Error ) => {
       console.log( "[DEBUG] Failed to open realm, error: ", err );
       reject( err );
@@ -73,6 +93,7 @@ const loadModelPackCommonNames = async ( pack: ModelPack, seekLocale: string ): 
       known.add( row.taxon_id );
     } );
     const missing = rows.filter( ( r ) => !known.has( r.i ) );
+    clearCommonNameCache( );
     for ( let i = 0; i < missing.length; i += PACK_NAMES_CHUNK ) {
       realm.write( ( ) => {
         missing.slice( i, i + PACK_NAMES_CHUNK ).forEach( ( r ) => {
@@ -81,6 +102,7 @@ const loadModelPackCommonNames = async ( pack: ModelPack, seekLocale: string ): 
       } );
       await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
     }
+    clearCommonNameCache( );
     await AsyncStorage.setItem( PACK_NAMES_KEY, marker );
     return missing.length;
   } catch ( e ) {
@@ -117,6 +139,7 @@ const setupCommonNames = ( preferredLanguage: string ) => {
         }
 
         // otherwise, delete all existing common names from Realm and update with preferred language
+        clearCommonNameCache( );
         realm.delete( realm.objects( "CommonNamesRealm" ) );
         // load names from each file. React-native requires need to be strings
         // so each file is listed here instead of some kind of loop
@@ -134,6 +157,7 @@ const setupCommonNames = ( preferredLanguage: string ) => {
 };
 
 export {
+  clearCommonNameCache,
   loadModelPackCommonNames,
   loadActivePackCommonNames,
   getTaxonCommonName,

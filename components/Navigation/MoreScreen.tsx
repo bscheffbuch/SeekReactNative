@@ -2,7 +2,6 @@ import React from "react";
 import {
   Image,
   Pressable,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -20,6 +19,8 @@ import {
 
 import i18n from "../../i18n";
 import { useTheme } from "../Providers/ThemeProvider";
+import { makeThemedStyles } from "../../styles/themedStyles";
+import type { ThemeTokens } from "../../styles/theme";
 import badgeImages from "../../assets/badges";
 import useProgressSummary from "../Achievements/hooks/useProgressSummary";
 import {
@@ -30,66 +31,68 @@ import {
   SurfaceCard,
 } from "../UIComponents/AppPrimitives";
 
+const getMoreStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
+  content: {
+    padding: theme.spacing.md,
+  },
+  profileCard: {
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radii.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+    padding: theme.spacing.md,
+    ...theme.elevation.card,
+  },
+  profileMark: {
+    alignItems: "center",
+    backgroundColor: theme.colors.primaryContainer,
+    borderColor: theme.colors.primary,
+    borderRadius: 27,
+    borderWidth: 2,
+    height: 54,
+    justifyContent: "center",
+    width: 54,
+  },
+  levelBadge: {
+    height: 56,
+    width: 56,
+  },
+  profileText: {
+    flex: 1,
+  },
+  profileTitle: {
+    color: theme.colors.text,
+    fontFamily: theme.typography.heading,
+    fontSize: 18,
+    lineHeight: 23,
+  },
+  profileMeta: {
+    color: theme.colors.muted,
+    fontFamily: theme.typography.body,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: theme.spacing.xxs,
+  },
+  group: {
+    paddingHorizontal: 0,
+    paddingVertical: theme.spacing.xs,
+  },
+  spacer: {
+    height: theme.spacing.lg,
+  },
+} ) );
+
 const MoreScreen = ( ) => {
   const navigation = useNavigation( );
   const { theme } = useTheme( );
   const summary = useProgressSummary( );
   const { level } = summary;
   const levelName = level ? i18n.t( level.intlName ) : "";
-  const styles = StyleSheet.create( {
-    content: {
-      padding: theme.spacing.md,
-    },
-    profileCard: {
-      alignItems: "center",
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.lg,
-      borderWidth: 1,
-      flexDirection: "row",
-      gap: theme.spacing.md,
-      marginBottom: theme.spacing.lg,
-      padding: theme.spacing.md,
-      ...theme.elevation.card,
-    },
-    profileMark: {
-      alignItems: "center",
-      backgroundColor: theme.colors.primaryContainer,
-      borderColor: theme.colors.primary,
-      borderRadius: 27,
-      borderWidth: 2,
-      height: 54,
-      justifyContent: "center",
-      width: 54,
-    },
-    levelBadge: {
-      height: 56,
-      width: 56,
-    },
-    profileText: {
-      flex: 1,
-    },
-    profileTitle: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 18,
-      lineHeight: 23,
-    },
-    profileMeta: {
-      color: theme.colors.muted,
-      fontFamily: theme.typography.body,
-      fontSize: 13,
-      lineHeight: 18,
-      marginTop: theme.spacing.xxs,
-    },
-    group: {
-      paddingHorizontal: 0,
-      paddingVertical: theme.spacing.xs,
-    },
-    spacer: {
-      height: theme.spacing.lg,
-    },
-  } );
+  const styles = getMoreStyles( theme );
 
   return (
     <AppScreen>

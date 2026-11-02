@@ -9,7 +9,6 @@ import {
   Image,
   Platform,
   Pressable,
-  StyleSheet,
   Text,
   View,
 } from "react-native";
@@ -38,78 +37,82 @@ import {
   TrophyIcon,
 } from "../UIComponents/AppIcons";
 import { useTheme } from "../Providers/ThemeProvider";
+import { makeThemedStyles } from "../../styles/themedStyles";
+import type { ThemeTokens } from "../../styles/theme";
+
+const getHeroStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
+  container: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
+  },
+  card: {
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radii.lg,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: theme.spacing.md,
+    padding: theme.spacing.md,
+    ...theme.elevation.card,
+  },
+  cardPressed: {
+    backgroundColor: theme.colors.primaryContainer,
+  },
+  badge: {
+    height: 64,
+    width: 64,
+  },
+  badgePlaceholder: {
+    backgroundColor: theme.colors.primaryContainer,
+    borderRadius: 32,
+    height: 64,
+    width: 64,
+  },
+  textColumn: {
+    flex: 1,
+  },
+  kicker: {
+    color: theme.colors.muted,
+    fontFamily: theme.typography.heading,
+    fontSize: 12,
+    letterSpacing: 0,
+    lineHeight: 16,
+  },
+  title: {
+    color: theme.colors.text,
+    fontFamily: theme.typography.heading,
+    fontSize: 24,
+    letterSpacing: 0,
+    lineHeight: 30,
+    marginTop: theme.spacing.xxs,
+  },
+  track: {
+    backgroundColor: theme.colors.primaryContainer,
+    borderRadius: 3,
+    height: 6,
+    marginTop: theme.spacing.sm,
+    overflow: "hidden",
+  },
+  fill: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 3,
+    height: 6,
+  },
+  caption: {
+    color: theme.colors.muted,
+    fontFamily: theme.typography.body,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: theme.spacing.xs,
+  },
+} ) );
 
 const HomeHero = ( { summary, navigation } ) => {
   const { theme } = useTheme( );
   const { level, nextLevelCount, speciesCount } = summary;
-  const styles = StyleSheet.create( {
-    container: {
-      paddingHorizontal: theme.spacing.lg,
-      paddingTop: theme.spacing.md,
-      paddingBottom: theme.spacing.sm,
-    },
-    card: {
-      alignItems: "center",
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.lg,
-      borderWidth: 1,
-      flexDirection: "row",
-      gap: theme.spacing.md,
-      padding: theme.spacing.md,
-      ...theme.elevation.card,
-    },
-    cardPressed: {
-      backgroundColor: theme.colors.primaryContainer,
-    },
-    badge: {
-      height: 64,
-      width: 64,
-    },
-    badgePlaceholder: {
-      backgroundColor: theme.colors.primaryContainer,
-      borderRadius: 32,
-      height: 64,
-      width: 64,
-    },
-    textColumn: {
-      flex: 1,
-    },
-    kicker: {
-      color: theme.colors.muted,
-      fontFamily: theme.typography.heading,
-      fontSize: 12,
-      letterSpacing: 0,
-      lineHeight: 16,
-    },
-    title: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 24,
-      letterSpacing: 0,
-      lineHeight: 30,
-      marginTop: theme.spacing.xxs,
-    },
-    track: {
-      backgroundColor: theme.colors.primaryContainer,
-      borderRadius: 3,
-      height: 6,
-      marginTop: theme.spacing.sm,
-      overflow: "hidden",
-    },
-    fill: {
-      backgroundColor: theme.colors.primary,
-      borderRadius: 3,
-      height: 6,
-    },
-    caption: {
-      color: theme.colors.muted,
-      fontFamily: theme.typography.body,
-      fontSize: 13,
-      lineHeight: 18,
-      marginTop: theme.spacing.xs,
-    },
-  } );
+  const styles = getHeroStyles( theme );
 
   const isMaxLevel = summary.loaded && nextLevelCount === null;
   const levelFloor = level ? level.count : 0;
@@ -149,58 +152,60 @@ const HomeHero = ( { summary, navigation } ) => {
   );
 };
 
+const getCollectionStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
+  container: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
+  },
+  headerRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: theme.spacing.sm,
+  },
+  header: {
+    color: theme.colors.text,
+    fontFamily: theme.typography.heading,
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  grid: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+  },
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radii.md,
+    borderWidth: 1,
+    flex: 1,
+    minHeight: 104,
+    padding: theme.spacing.md,
+    ...theme.elevation.card,
+  },
+  cardPressed: {
+    backgroundColor: theme.colors.primaryContainer,
+  },
+  value: {
+    color: theme.colors.text,
+    fontFamily: theme.typography.heading,
+    fontSize: 22,
+    lineHeight: 28,
+    marginTop: theme.spacing.sm,
+  },
+  label: {
+    color: theme.colors.muted,
+    fontFamily: theme.typography.body,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: theme.spacing.xxs,
+  },
+} ) );
+
 const HomeCollectionStrip = ( { summary, navigation } ) => {
   const { theme } = useTheme( );
-  const styles = StyleSheet.create( {
-    container: {
-      paddingHorizontal: theme.spacing.lg,
-      paddingTop: theme.spacing.md,
-      paddingBottom: theme.spacing.sm,
-    },
-    headerRow: {
-      alignItems: "center",
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginBottom: theme.spacing.sm,
-    },
-    header: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 18,
-      lineHeight: 24,
-    },
-    grid: {
-      flexDirection: "row",
-      gap: theme.spacing.sm,
-    },
-    card: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.md,
-      borderWidth: 1,
-      flex: 1,
-      minHeight: 104,
-      padding: theme.spacing.md,
-      ...theme.elevation.card,
-    },
-    cardPressed: {
-      backgroundColor: theme.colors.primaryContainer,
-    },
-    value: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 22,
-      lineHeight: 28,
-      marginTop: theme.spacing.sm,
-    },
-    label: {
-      color: theme.colors.muted,
-      fontFamily: theme.typography.body,
-      fontSize: 12,
-      lineHeight: 16,
-      marginTop: theme.spacing.xxs,
-    },
-  } );
+  const styles = getCollectionStyles( theme );
 
   const formatCount = ( count: number ) => ( summary.loaded ? localizeNumber( count ) : "–" );
   const items = [

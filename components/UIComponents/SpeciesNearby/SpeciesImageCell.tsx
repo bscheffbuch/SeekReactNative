@@ -1,6 +1,6 @@
 // @ts-nocheck
 import * as React from "react";
-import { TouchableOpacity, Image, View, StyleSheet } from "react-native";
+import { TouchableOpacity, Image, View } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 
 import { viewStyles, textStyles } from "../../../styles/uiComponents/speciesNearby/speciesObservedCell";
@@ -14,6 +14,7 @@ import { baseTextStyles } from "../../../styles/textStyles";
 import { useSpeciesDetail } from "../../Providers/SpeciesDetailProvider";
 import { CheckIcon } from "../AppIcons";
 import { useTheme } from "../../Providers/ThemeProvider";
+import { makeThemedStyles } from "../../../styles/themedStyles";
 
 interface Props {
   readonly item: {
@@ -39,6 +40,15 @@ interface Props {
   };
 }
 
+const getCellStyles = makeThemedStyles( ( theme ) => ( {
+  checkbox: {
+    alignItems: "center",
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
+    justifyContent: "center",
+  },
+} ) );
+
 const SpeciesImageCell = ( { item }: Props ) => {
   const { setId } = useSpeciesDetail( );
   const navigation = useNavigation( );
@@ -46,14 +56,7 @@ const SpeciesImageCell = ( { item }: Props ) => {
   const route = useRoute( );
   const { name } = route;
   const { theme } = useTheme();
-  const themedStyles = StyleSheet.create( {
-    checkbox: {
-      alignItems: "center",
-      backgroundColor: theme.colors.primary,
-      borderRadius: 12,
-      justifyContent: "center",
-    },
-  } );
+  const themedStyles = getCellStyles( theme );
 
   const seenTaxa = useSeenTaxa( item.id );
   const commonName = useCommonName( item.id );

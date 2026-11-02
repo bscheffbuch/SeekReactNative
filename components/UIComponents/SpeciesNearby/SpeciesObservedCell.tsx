@@ -4,7 +4,6 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
-  StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -20,6 +19,7 @@ import { baseTextStyles } from "../../../styles/textStyles";
 import { useSpeciesDetail } from "../../Providers/SpeciesDetailProvider";
 import { CheckIcon } from "../AppIcons";
 import { useTheme } from "../../Providers/ThemeProvider";
+import { makeThemedStyles } from "../../../styles/themedStyles";
 
 interface Props {
   readonly item: {
@@ -31,19 +31,21 @@ interface Props {
   };
 }
 
+const getCellStyles = makeThemedStyles( ( theme ) => ( {
+  checkbox: {
+    alignItems: "center",
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
+    justifyContent: "center",
+  },
+} ) );
+
 const SpeciesObservedCell = ( { item }: Props ) => {
   const { setId } = useSpeciesDetail();
   const { navigate } = useNavigation();
   const { taxon } = item;
   const { theme } = useTheme();
-  const themedStyles = StyleSheet.create( {
-    checkbox: {
-      alignItems: "center",
-      backgroundColor: theme.colors.primary,
-      borderRadius: 12,
-      justifyContent: "center",
-    },
-  } );
+  const themedStyles = getCellStyles( theme );
   const commonName = useCommonName( taxon.id );
 
   const seenTaxa = useSeenTaxa( taxon.id );

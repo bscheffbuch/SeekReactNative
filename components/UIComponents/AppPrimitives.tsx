@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   View,
   
@@ -27,6 +26,7 @@ import i18n from "../../i18n";
 import realmConfig from "../../models";
 import { useTheme } from "../Providers/ThemeProvider";
 import type { ThemeTokens } from "../../styles/theme";
+import { makeThemedStyles } from "../../styles/themedStyles";
 
 type AppIconProps = {
   icon: GlyphIcon;
@@ -80,7 +80,7 @@ type ListRowProps = {
 
 const tabRootRoutes = ["Home", "Observations", "Challenges", "More"];
 
-const themedStyles = ( theme: ThemeTokens ) => StyleSheet.create( {
+const themedStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   screen: {
     flex: 1,
     backgroundColor: theme.colors.canvas,
@@ -228,7 +228,7 @@ const themedStyles = ( theme: ThemeTokens ) => StyleSheet.create( {
     marginTop: theme.spacing.sm,
     textAlign: "center",
   },
-} );
+} ) );
 
 const useUnreadNotifications = ( providedUnread?: boolean ) => {
   const navigation = useNavigation( );

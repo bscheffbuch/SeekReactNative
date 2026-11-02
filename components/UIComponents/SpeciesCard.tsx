@@ -4,7 +4,6 @@ import {
   TouchableOpacity,
   View,
   ImageBackground,
-  StyleSheet,
 } from "react-native";
 
 import { viewStyles, textStyles } from "../../styles/uiComponents/speciesCard";
@@ -13,6 +12,7 @@ import i18n from "../../i18n";
 import StyledText from "./StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useTheme } from "../Providers/ThemeProvider";
+import { makeThemedStyles } from "../../styles/themedStyles";
 
 interface Props {
   handlePress?: () => void;
@@ -25,6 +25,20 @@ interface Props {
   };
 }
 
+const getCardStyles = makeThemedStyles( ( theme ) => ( {
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.border,
+  },
+  commonName: {
+    color: theme.colors.text,
+    fontFamily: theme.typography.heading,
+  },
+  scientificName: {
+    color: theme.colors.muted,
+  },
+} ) );
+
 const SpeciesCard = ( {
   handlePress,
   photo,
@@ -33,19 +47,7 @@ const SpeciesCard = ( {
 }: Props ) => {
   const { preferredCommonName, name, iconicTaxonId } = taxon;
   const { theme } = useTheme( );
-  const themedStyles = StyleSheet.create( {
-    card: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-    },
-    commonName: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-    },
-    scientificName: {
-      color: theme.colors.muted,
-    },
-  } );
+  const themedStyles = getCardStyles( theme );
 
   return (
     <TouchableOpacity

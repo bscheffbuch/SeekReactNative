@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { Image, ImageBackground } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -13,14 +13,20 @@ import { checkForHotStarts, checkForColdStarts, setQuickActions } from "../utili
 import { deleteFromAsyncStorage, setupUserSettings } from "../utility/settingsHelpers";
 import { useAppOrientation } from "./Providers/AppOrientationProvider";
 
+// Keep the splash up at least this long so a fast start doesn't flash it.
+// It used to wait a fixed 2 s after setup had already finished.
+const MIN_SPLASH_MS = 600;
+
 const SplashScreen = ( ) => {
   const { isTablet } = useAppOrientation( );
   const navigation = useNavigation( );
+  const shownAt = useRef( Date.now( ) );
   const navToCamera = useCallback( ( ) => navigation.navigate( "Camera" ), [navigation] );
 
   const resetRouter = useCallback( ( name ) => {
     const params = name === "MainTabs" ? { screen: "Home" } : undefined;
-    setTimeout( ( ) => navigation.reset( { routes: [{ name, params }] } ), 2000 );
+    const wait = Math.max( 0, MIN_SPLASH_MS - ( Date.now( ) - shownAt.current ) );
+    setTimeout( ( ) => navigation.reset( { routes: [{ name, params }] } ), wait );
   }, [navigation] );
 
   const checkForQuickAction = useCallback( ( ) => {
