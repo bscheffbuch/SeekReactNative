@@ -111,7 +111,7 @@ const SeekYearInReviewScreen = () => {
       footer
     >
       {!!state.level && countObservationsThisYear !== null && (
-        <TouchableOpacity onPress={openModal}>
+        <TouchableOpacity accessibilityRole="button" onPress={openModal}>
           <Modal
             showModal={showModal}
             closeModal={closeModal}

@@ -120,13 +120,13 @@ const SeekYearInReviewMapScreen = ( ) => {
           </Marker>
         )}
       </MapView>
-      <TouchableOpacity onPress={openModal} style={viewStyles.legend}>
+      <TouchableOpacity accessibilityRole="button" onPress={openModal} style={viewStyles.legend}>
         <StyledText style={[baseTextStyles.modalBanner, textStyles.whiteText]}>
           {i18n.t( "species_detail.legend" )}
         </StyledText>
       </TouchableOpacity>
       {user.latitude && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           accessibilityLabel={i18n.t( "accessibility.user_location" )}
           accessible
           testID="user-location-button"

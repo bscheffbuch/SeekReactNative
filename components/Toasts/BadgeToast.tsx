@@ -26,7 +26,7 @@ const BadgeToast = ( { badge }: Props ) => {
   const { theme } = useTheme( );
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={() => navigation.navigate( "Achievements" )}
       style={[viewStyles.row, { backgroundColor: theme.colors.surface }]}
     >

@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 
+import i18n from "../../i18n";
 import { CheckIcon, ChevronDownIcon } from "../UIComponents/AppIcons";
 import { useTheme } from "../Providers/ThemeProvider";
 
@@ -167,7 +168,12 @@ const SettingsSelect = <T extends string | number,>( {
         transparent
         visible={open}
       >
-        <Pressable style={styles.backdrop} onPress={closePicker}>
+        <Pressable
+          accessibilityLabel={i18n.t( "accessibility.close" )}
+          accessibilityRole="button"
+          style={styles.backdrop}
+          onPress={closePicker}
+        >
           <Pressable style={styles.sheet}>
             <View style={styles.handle} />
             <Text style={styles.sheetTitle}>{label}</Text>

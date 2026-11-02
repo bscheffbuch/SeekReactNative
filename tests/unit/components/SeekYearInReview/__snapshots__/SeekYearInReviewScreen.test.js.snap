@@ -216,6 +216,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
   >
     <View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1067,11 +1068,12 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           </View>
         </View>
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
               "checked": undefined,
-              "disabled": undefined,
+              "disabled": false,
               "expanded": undefined,
               "selected": undefined,
             }
@@ -1985,11 +1987,12 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           }
         />
         <View
+          accessibilityRole="button"
           accessibilityState={
             {
               "busy": undefined,
               "checked": undefined,
-              "disabled": undefined,
+              "disabled": false,
               "expanded": undefined,
               "selected": undefined,
             }

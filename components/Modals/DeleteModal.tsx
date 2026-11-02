@@ -56,7 +56,8 @@ const DeleteModal = ( {
           <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText]}>
             {i18n.t( "delete.header" )}
           </StyledText>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
+            accessibilityLabel={i18n.t( "accessibility.close" )}
             onPress={closeModal}
             style={viewStyles.flagBackButton}
           >

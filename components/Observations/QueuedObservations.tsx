@@ -332,7 +332,7 @@ const QueuedObservations = ( ) => {
                 <StyledText style={[baseTextStyles.bodySmall, styles.selectBarText, themedStyles.selectBarText]}>
                   {i18n.t( "queue.selected" )}: {selected.length}
                 </StyledText>
-                <TouchableOpacity onPress={exitSelectMode} accessible>
+                <TouchableOpacity accessibilityRole="button" onPress={exitSelectMode} accessible>
                   <StyledText style={[baseTextStyles.bodySmall, styles.selectBarDone, themedStyles.selectBarDone]}>
                     {i18n.t( "queue.done" )}
                   </StyledText>
@@ -342,7 +342,7 @@ const QueuedObservations = ( ) => {
             {drafts.map( ( draft ) => {
               const isSelected = selected.includes( draft.uuid );
               return (
-                <TouchableOpacity
+                <TouchableOpacity accessibilityRole="button"
                   key={draft.uuid}
                   testID={`queuedDraft-${draft.uuid}`}
                   onPress={( ) => handleRowPress( draft )}
@@ -400,7 +400,7 @@ const QueuedObservations = ( ) => {
                   {selectMode ? null : (
                     <View style={styles.rowActions}>
                       <ChevronRightIcon color={theme.colors.muted} size={22} strokeWidth={2.2} />
-                      <TouchableOpacity
+                      <TouchableOpacity accessibilityRole="button"
                         onPress={( ) => handleDelete( draft.uuid )}
                         style={styles.deleteButton}
                         accessibilityLabel={i18n.t( "queue.delete_confirm" )}

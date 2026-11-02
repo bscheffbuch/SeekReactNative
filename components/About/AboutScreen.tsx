@@ -74,7 +74,7 @@ const AboutScreen = ( ) => {
         <View style={viewStyles.marginSmallest} />
         <StyledText style={[baseTextStyles.body, textStyles.text, themedStyles.text]}>{i18n.t( "about.join_crowdin" )}</StyledText>
         <PrivacyAndTerms login={login} />
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={navToDebug}
           style={viewStyles.debug}
           disabled={disabled}

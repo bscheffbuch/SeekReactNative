@@ -125,6 +125,7 @@ exports[`SpeciesNearbyList should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

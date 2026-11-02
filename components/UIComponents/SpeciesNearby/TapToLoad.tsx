@@ -16,7 +16,7 @@ const TapToLoad = ( { handlePress, backgroundColor }: Props ) => {
   const { theme } = useTheme( );
 
   return (
-    <Pressable
+    <Pressable accessibilityRole="button"
       onPress={handlePress}
       style={[
         viewStyles.center,

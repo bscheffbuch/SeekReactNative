@@ -38,7 +38,7 @@ const GreenButton = ( {
   }
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={handlePress}
       style={[
         viewStyles.greenButton,
@@ -47,6 +47,7 @@ const GreenButton = ( {
         widthStyle,
       ]}
       disabled={disabled}
+      accessibilityState={{ disabled: !!disabled }}
       testID={testID || "greenButton"}
     >
       <StyledText

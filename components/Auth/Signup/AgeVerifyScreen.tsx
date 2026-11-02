@@ -46,7 +46,7 @@ const AgeVerifyScreen = () => {
           {i18n.t( "inat_signup.permission" )}
         </StyledText>
         <View style={styles.marginLarge} />
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={openPicker}
           style={[styles.dateButton, styles.center]}
         >

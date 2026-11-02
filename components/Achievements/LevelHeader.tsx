@@ -43,7 +43,7 @@ const LevelHeader = ( { level, nextLevelCount, speciesCount }: Props ) => {
   );
 
   return (
-    <TouchableOpacity onPress={openModal}>
+    <TouchableOpacity accessibilityRole="button" onPress={openModal}>
       <Modal
         showModal={showModal}
         closeModal={closeModal}

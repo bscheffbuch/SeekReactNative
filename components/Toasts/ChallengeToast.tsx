@@ -32,7 +32,7 @@ const ChallengeToast = ( { challenge }: Props ) => {
   };
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={navToChallenge}
       style={[viewStyles.row, { backgroundColor: theme.colors.surface }]}
     >

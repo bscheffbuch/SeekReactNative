@@ -60,7 +60,7 @@ const NotificationCard = ( { item }: Props ) => {
   };
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={goToNotification}
       style={[viewStyles.card, viewStyles.row]}
     >

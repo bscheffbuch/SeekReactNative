@@ -70,7 +70,7 @@ const INatObs = ( { id, timesSeen, region }: Props ) => {
       obs = (
         <SpeciesDetailCard text="species_detail.inat_obs">
           <View style={[viewStyles.center, viewStyles.row]}>
-            <TouchableOpacity onPress={navToINatStats}>
+            <TouchableOpacity accessibilityRole="button" onPress={navToINatStats}>
               <Image source={logos.bird} style={imageStyles.bird} />
             </TouchableOpacity>
             <View style={viewStyles.textContainer}>

@@ -212,6 +212,7 @@ exports[`NotificationsScreen should render correctly 1`] = `
       onScroll={[Function]}
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -337,6 +338,7 @@ exports[`NotificationsScreen should render correctly 1`] = `
         />
       </View>
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

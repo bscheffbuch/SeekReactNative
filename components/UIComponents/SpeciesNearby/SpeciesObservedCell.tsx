@@ -58,7 +58,7 @@ const SpeciesObservedCell = ( { item }: Props ) => {
   };
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       style={viewStyles.gridCell}
       onPress={navToSpeciesDetails}
     >

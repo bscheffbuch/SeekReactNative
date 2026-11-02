@@ -774,7 +774,8 @@
     "location": "Location",
     "disable_location": "Disable location",
     "enable_location": "Enable location",
-    "close": "Close"
+    "close": "Close",
+    "clear_search": "Clear search"
   },
   "review": {
     "title": "Rate this app",

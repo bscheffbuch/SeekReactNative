@@ -32,7 +32,7 @@ const AchievementsScreen = ( ) => {
   }, [navigation] );
 
   const renderStats = ( disabled: boolean, headerText: string, text: number ) => (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={navToObservations}
       style={viewStyles.secondHeaderText}
       disabled={disabled}

@@ -28,7 +28,7 @@ const INatCardLoggedOut = ( { challenge }: Props ) => {
       />
       <View style={[viewStyles.textContainer, viewStyles.marginBottom]}>
         <INatValueProps />
-        <Pressable onPress={navToINatStats} >
+        <Pressable accessibilityRole="button" onPress={navToINatStats} >
           <StyledText style={[baseTextStyles.bodyGreen, textStyles.linkText]}>
             {i18n.t( "about_inat.learn_more_about_inat" )}
           </StyledText>

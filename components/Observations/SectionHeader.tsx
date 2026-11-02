@@ -48,7 +48,7 @@ const SectionHeader = ( { id, dataLength, open, toggleSection }: Props ) => {
   useEffect( () => fetchBadgeCount(), [fetchBadgeCount] );
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={() => toggleSection( id )}
       style={[styles.header, styles.row]}
     >

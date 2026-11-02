@@ -100,11 +100,12 @@ exports[`SeekYearInReviewMap should render correctly 1`] = `
     </View>
   </View>,
   <View
+    accessibilityRole="button"
     accessibilityState={
       {
         "busy": undefined,
         "checked": undefined,
-        "disabled": undefined,
+        "disabled": false,
         "expanded": undefined,
         "selected": undefined,
       }

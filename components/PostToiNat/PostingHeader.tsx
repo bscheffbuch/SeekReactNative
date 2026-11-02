@@ -50,7 +50,7 @@ const PostingHeader = ( {
           updateTaxon={updateTaxon}
         />
       </Modal>
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         onPress={openModal}
         style={styles.card}
       >

@@ -85,7 +85,7 @@ const SpeciesStats = ( { loading, stats, region, id, seenDate }: Props ) => {
     return (
       <View style={[viewStyles.tagContainer, seenDate ? viewStyles.tagAndSeenDate : {}]}>
         {tagsToShow.map( tag => (
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
             onPress={() => showAlert( tag )}
             style={viewStyles.tag}
             key={tag}

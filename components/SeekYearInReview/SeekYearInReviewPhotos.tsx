@@ -39,7 +39,7 @@ const SeekYearInReviewPhotoItem = ( { observation, index } ) => {
   };
 
   return (
-    <Pressable
+    <Pressable accessibilityRole="button"
       key={index}
       style={viewStyles.center}
       onPress={() => navToSpecies()}

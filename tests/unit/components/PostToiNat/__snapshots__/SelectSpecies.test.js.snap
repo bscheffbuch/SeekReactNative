@@ -310,6 +310,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -486,6 +487,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -659,6 +661,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -832,6 +835,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1005,6 +1009,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1178,6 +1183,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1351,6 +1357,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1524,6 +1531,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1697,6 +1705,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -1870,6 +1879,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -2043,6 +2053,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -2216,6 +2227,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -2389,6 +2401,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,
@@ -2562,6 +2575,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       }
     >
       <View
+        accessibilityRole="button"
         accessibilityState={
           {
             "busy": undefined,

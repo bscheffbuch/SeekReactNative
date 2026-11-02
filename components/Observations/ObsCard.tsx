@@ -118,7 +118,7 @@ const ObservationCard = ( {
           handlePress={handleSpeciesCardPress}
           photo={photo}
         />
-        <Pressable
+        <Pressable accessibilityRole="button"
           onPress={handleDeletePress}
           style={styles.deleteButton}
         >

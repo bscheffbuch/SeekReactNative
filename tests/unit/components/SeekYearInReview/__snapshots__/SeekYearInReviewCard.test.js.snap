@@ -100,11 +100,12 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
     }
   />
   <View
+    accessibilityRole="button"
     accessibilityState={
       {
         "busy": undefined,
         "checked": undefined,
-        "disabled": undefined,
+        "disabled": false,
         "expanded": undefined,
         "selected": undefined,
       }
@@ -287,11 +288,12 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
     }
   />
   <View
+    accessibilityRole="button"
     accessibilityState={
       {
         "busy": undefined,
         "checked": undefined,
-        "disabled": undefined,
+        "disabled": false,
         "expanded": undefined,
         "selected": undefined,
       }

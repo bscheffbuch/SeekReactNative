@@ -48,7 +48,8 @@ const ModalWithGradient = ( {
               ? i18n.t( "replace_photo.header" )
               : i18n.t( "results.flag" )}
           </StyledText>
-          <TouchableOpacity
+          <TouchableOpacity accessibilityRole="button"
+            accessibilityLabel={i18n.t( "accessibility.close" )}
             onPress={closeModal}
             style={viewStyles.backButton}
           >

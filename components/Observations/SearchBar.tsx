@@ -30,7 +30,8 @@ const SearchBar = ( { fetchFilteredObservations, searchText, clearText }: Props 
     <View style={[viewStyles.row, viewStyles.margins, themedStyles.row]}>
       <SearchIcon color={theme.colors.primary} size={21} strokeWidth={2.2} />
       {searchText.length > 0 && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
+          accessibilityLabel={i18n.t( "accessibility.clear_search" )}
           onPress={clearText}
           style={viewStyles.top}
         >

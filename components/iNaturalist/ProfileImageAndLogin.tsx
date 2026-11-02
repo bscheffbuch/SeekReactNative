@@ -33,7 +33,7 @@ const ProfileImageAndLogin = ( { count, reload }: Props ) => {
 
   if ( !isHomeScreen && ( !isConnected || count === null ) ) {
     return (
-      <TouchableOpacity onPress={handlePress}>
+      <TouchableOpacity accessibilityRole="button" onPress={handlePress}>
         <View style={viewStyles.center}>
           <View
             style={[viewStyles.linearGradientTextContainer, viewStyles.row]}

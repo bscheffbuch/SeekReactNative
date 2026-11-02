@@ -266,6 +266,7 @@ exports[`RangeMap should change map region to user's location when button is pre
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -337,6 +338,7 @@ exports[`RangeMap should change map region to user's location when button is pre
     </View>
     <View
       accessibilityLabel="Return to your current location"
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -650,6 +652,7 @@ exports[`RangeMap should render correctly 1`] = `
       </View>
     </View>
     <View
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,
@@ -721,6 +724,7 @@ exports[`RangeMap should render correctly 1`] = `
     </View>
     <View
       accessibilityLabel="Return to your current location"
+      accessibilityRole="button"
       accessibilityState={
         {
           "busy": undefined,

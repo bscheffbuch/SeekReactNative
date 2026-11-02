@@ -19,7 +19,7 @@ const Button = ( { index }: Props ) => {
   const navToHome = ( ) => navigation.navigate( "MainTabs", { screen: "Home" } );
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={navToHome}
       style={[viewStyles.buttonContainer, viewStyles.center]}
     >

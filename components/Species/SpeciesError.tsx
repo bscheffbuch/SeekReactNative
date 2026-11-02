@@ -22,7 +22,7 @@ const SpeciesError = ( { seenTaxa, checkForInternet }: Props ) => {
 
   return (
     <View style={[viewStyles.background, { backgroundColor: theme.colors.canvas }]}>
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         onPress={checkForInternet}
         style={[viewStyles.errorContainer, viewStyles.center, viewStyles.row]}
       >

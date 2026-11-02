@@ -59,7 +59,7 @@ const LocationPickerCard = ( { location, updateLocation, observation }: Props ) 
           />
         </SafeAreaProvider>
       </Modal>
-      <TouchableOpacity onPress={openModal} style={styles.thinCard}>
+      <TouchableOpacity accessibilityRole="button" onPress={openModal} style={styles.thinCard}>
         <Image source={posting.location} style={styles.extraMargin} />
         <View style={styles.row}>
           <StyledText style={baseTextStyles.postSectionHeader}>

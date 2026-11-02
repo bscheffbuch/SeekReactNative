@@ -99,7 +99,7 @@ const SpeciesImageCell = ( { item }: Props ) => {
   };
 
   return (
-    <TouchableOpacity onPress={navToNextScreen} style={viewStyles.gridCell}>
+    <TouchableOpacity accessibilityRole="button" onPress={navToNextScreen} style={viewStyles.gridCell}>
       {renderSpeciesImage( )}
       {seenTaxa && (
         <View

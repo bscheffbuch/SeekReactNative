@@ -33,11 +33,12 @@ exports[`iNatSignOut should render correctly 1`] = `
 Thanks for being part of this community!
   </Text>,
   <View
+    accessibilityRole="button"
     accessibilityState={
       {
         "busy": undefined,
         "checked": undefined,
-        "disabled": undefined,
+        "disabled": false,
         "expanded": undefined,
         "selected": undefined,
       }

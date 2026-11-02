@@ -25,7 +25,7 @@ const CopyButton = ( { stringToCopy, children, handleHighlight }: Props ) => {
   const finishAnimation = ( ) => setCopied( false );
 
   return (
-    <Pressable
+    <Pressable accessibilityRole="button"
       onPress={copyToClipboard}
       style={viewStyles.pressableArea}
     >

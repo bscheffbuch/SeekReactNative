@@ -44,7 +44,7 @@ const SpeciesPhotos = ( { loading, photos, id }: Props ) => {
     return (
       <View key={`image${photo.medium_url}`}>
         <Image source={{ uri: photo.medium_url }} style={imageStyles.image} />
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           onPress={showLicense}
           style={viewStyles.ccButton}
         >

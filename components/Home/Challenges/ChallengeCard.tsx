@@ -72,7 +72,7 @@ const ChallengeCard = ( ) => {
 
   return (
     <View style={[viewStyles.container, themedStyles.container]}>
-      <TouchableOpacity onPress={navToChallenges} style={viewStyles.header}>
+      <TouchableOpacity accessibilityRole="button" onPress={navToChallenges} style={viewStyles.header}>
         <GreenText text="challenges_card.header" />
       </TouchableOpacity>
       {challenge ? renderLatestChallenge( ) : <NoChallenges />}

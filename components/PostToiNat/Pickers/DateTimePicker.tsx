@@ -39,7 +39,7 @@ const DatePicker = ( { dateToDisplay, handleDatePicked }: Props ) => {
         onDatePicked={handlePicked}
         toggleDateTimePicker={closeModal}
       />
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         onPress={openModal}
         style={styles.thinCard}
       >

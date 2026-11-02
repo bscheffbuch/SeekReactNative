@@ -58,7 +58,7 @@ const SpeciesNearbyError = ( {
   );
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={handlePress}
       disabled={error === "downtime"}
     >

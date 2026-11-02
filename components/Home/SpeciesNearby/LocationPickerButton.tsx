@@ -39,7 +39,7 @@ const LocationPickerButton = ( {
   } );
   const locationText = location ? location : i18n.t( "species_nearby.no_location" );
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={openLocationPicker}
       style={[viewStyles.row, viewStyles.locationPickerButton]}
       disabled={disabled}

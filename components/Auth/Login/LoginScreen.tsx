@@ -123,7 +123,7 @@ const LoginScreen = ( ) => {
         text={password}
         type="password"
       />
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         onPress={navToForgotPassword}
         style={styles.rightTextContainer}
       >

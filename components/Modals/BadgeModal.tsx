@@ -81,7 +81,7 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
   } );
 
   const renderLeftArrow = ( ) => (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       accessibilityLabel={i18n.t( "accessibility.scroll_left" )}
       accessible
       onPress={scrollLeft}
@@ -92,7 +92,7 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
   );
 
   const renderRightArrow = ( ) => (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       accessibilityLabel={i18n.t( "accessibility.scroll_right" )}
       accessible
       onPress={scrollRight}
@@ -103,7 +103,7 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
   );
 
   const renderBulletsAndSmallImages = ( ) => [0, 1, 2].map( ( item, index ) => (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       key={item}
       onPress={() => scroll( index )}
     >

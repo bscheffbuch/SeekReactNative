@@ -26,7 +26,7 @@ const Button = ( {
   greenText = false,
   login = false,
 }: Props ) => (
-  <TouchableOpacity
+  <TouchableOpacity accessibilityRole="button"
     testID={testID || "button"}
     onPress={() => handlePress()}
     style={[

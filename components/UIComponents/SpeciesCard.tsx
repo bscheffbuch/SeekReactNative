@@ -50,7 +50,7 @@ const SpeciesCard = ( {
   const themedStyles = getCardStyles( theme );
 
   return (
-    <TouchableOpacity
+    <TouchableOpacity accessibilityRole="button"
       onPress={handlePress}
       style={[
         !handlePress ? viewStyles.notTouchable : viewStyles.touchableArea,

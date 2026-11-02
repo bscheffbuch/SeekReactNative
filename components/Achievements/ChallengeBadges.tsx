@@ -1,4 +1,5 @@
 // @ts-nocheck
+import i18n from "../../i18n";
 import React, { useState, useCallback, useMemo } from "react";
 import {
   Image,
@@ -56,7 +57,13 @@ const ChallengeBadges = ( ) => {
       };
 
       return (
-        <TouchableOpacity onPress={openChallengeBadgeModal} key={item.earnedIconName}>
+        <TouchableOpacity
+          accessibilityLabel={item.name ? i18n.t( item.name ) : i18n.t( "badges.challenge_badges" )}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: item.percentComplete !== 100 }}
+          key={item.earnedIconName}
+          onPress={openChallengeBadgeModal}
+        >
           <Image
             source={item.percentComplete === 100 ? badgeImages[item.earnedIconName] : badgeImages.badge_empty}
             style={[

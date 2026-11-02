@@ -119,7 +119,7 @@ const RangeMap = () => {
           </Marker>
         )}
       </MapView>
-      <TouchableOpacity
+      <TouchableOpacity accessibilityRole="button"
         onPress={openModal}
         style={[viewStyles.legend, {
           backgroundColor: theme.colors.surface,
@@ -131,7 +131,7 @@ const RangeMap = () => {
         </StyledText>
       </TouchableOpacity>
       {user.latitude && (
-        <TouchableOpacity
+        <TouchableOpacity accessibilityRole="button"
           accessibilityLabel={i18n.t( "accessibility.user_location" )}
           accessible
           testID="user-location-button"
