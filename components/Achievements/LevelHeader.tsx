@@ -50,7 +50,7 @@ const LevelHeader = ( { level, nextLevelCount, speciesCount }: Props ) => {
         modal={renderModalContent}
       />
       <LinearGradient
-        colors={[colors.greenGradientDark, colors.greenGradientLight]}
+        colors={[colors.seekDeepGreen, colors.seekDeepGreen]}
         style={[viewStyles.header, viewStyles.center, viewStyles.row]}
       >
         {level && (

@@ -35,15 +35,15 @@ const ModalWithGradient = ( {
 
   return (
     <View style={[viewStyles.container, {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surfaceContainerHigh,
+      borderColor: theme.colors.surfaceContainerHigh,
     }]}>
       <LinearGradient
         colors={[theme.colors.primaryContainer, theme.colors.primaryContainer]}
         style={viewStyles.header}
       >
         <View style={[viewStyles.headerTextContainer, viewStyles.row]}>
-          <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText]}>
+          <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText, { color: theme.colors.onPrimaryContainer }]}>
             {color === "green"
               ? i18n.t( "replace_photo.header" )
               : i18n.t( "results.flag" )}

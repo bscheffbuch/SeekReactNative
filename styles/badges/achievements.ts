@@ -33,11 +33,10 @@ const viewStyles = StyleSheet.create( {
     maxWidth: 150,
   },
   header: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E6E9E4",
-    borderRadius: 18,
-    borderWidth: 1,
+    backgroundColor: "#14794F",
+    borderRadius: 24,
     marginHorizontal: 16,
+    overflow: "hidden",
     minHeight: 117 + 25 + 26,
   },
   textContainer: {

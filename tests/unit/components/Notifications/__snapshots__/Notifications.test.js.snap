@@ -50,7 +50,7 @@ exports[`NotificationsScreen should render correctly 1`] = `
         {
           "color": "#171D19",
           "flex": 1,
-          "fontFamily": "Lato-Bold",
+          "fontFamily": "Lato-Regular",
           "fontSize": 22,
           "lineHeight": 28,
           "marginHorizontal": 8,

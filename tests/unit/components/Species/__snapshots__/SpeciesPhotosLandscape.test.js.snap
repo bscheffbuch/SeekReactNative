@@ -40,9 +40,9 @@ exports[`SpeciesPhotosLandscape should render correctly 1`] = `
             {
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
-              "fontSize": 15,
-              "letterSpacing": 1,
-              "lineHeight": 21,
+              "fontSize": 14,
+              "letterSpacing": 0.1,
+              "lineHeight": 20,
             },
             {
               "backgroundColor": "#000000",

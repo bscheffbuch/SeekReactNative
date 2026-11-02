@@ -285,12 +285,13 @@ const QueuedObservations = ( ) => {
       color: theme.colors.muted,
     },
     row: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderColor: theme.colors.surfaceContainerLow,
+      borderRadius: 16,
     },
     rowSelected: {
-      backgroundColor: theme.colors.primaryContainer,
-      borderColor: theme.colors.primary,
+      backgroundColor: theme.colors.secondaryContainer,
+      borderColor: theme.colors.secondaryContainer,
     },
     selectBarText: {
       color: theme.colors.text,

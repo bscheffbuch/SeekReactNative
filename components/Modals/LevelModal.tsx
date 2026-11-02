@@ -38,7 +38,7 @@ const LevelModal = ( {
       />
     </View>
     <LinearGradient
-      colors={[colors.greenGradientLight, colors.greenGradientDark]}
+      colors={[colors.seekDeepGreen, colors.seekDeepGreen]}
       style={viewStyles.backgroundColor}
     >
       <Image

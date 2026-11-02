@@ -50,7 +50,7 @@ exports[`RangeMap should change map region to user's location when button is pre
         {
           "color": "#171D19",
           "flex": 1,
-          "fontFamily": "Lato-Bold",
+          "fontFamily": "Lato-Regular",
           "fontSize": 22,
           "lineHeight": 28,
           "marginHorizontal": 8,
@@ -321,7 +321,7 @@ exports[`RangeMap should change map region to user's location when button is pre
                 "color": "#ffffff",
                 "fontFamily": "Lato-Bold",
                 "fontSize": 18,
-                "letterSpacing": 1.12,
+                "letterSpacing": 0.1,
               },
               {
                 "color": "#111512",
@@ -329,7 +329,9 @@ exports[`RangeMap should change map region to user's location when button is pre
                 "textAlign": "center",
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -438,7 +440,7 @@ exports[`RangeMap should render correctly 1`] = `
         {
           "color": "#171D19",
           "flex": 1,
-          "fontFamily": "Lato-Bold",
+          "fontFamily": "Lato-Regular",
           "fontSize": 22,
           "lineHeight": 28,
           "marginHorizontal": 8,
@@ -707,7 +709,7 @@ exports[`RangeMap should render correctly 1`] = `
                 "color": "#ffffff",
                 "fontFamily": "Lato-Bold",
                 "fontSize": 18,
-                "letterSpacing": 1.12,
+                "letterSpacing": 0.1,
               },
               {
                 "color": "#111512",
@@ -715,7 +717,9 @@ exports[`RangeMap should render correctly 1`] = `
                 "textAlign": "center",
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >

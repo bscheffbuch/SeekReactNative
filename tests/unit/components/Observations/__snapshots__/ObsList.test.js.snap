@@ -197,7 +197,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -227,7 +229,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -1188,7 +1192,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -1218,7 +1224,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -1349,7 +1357,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -1379,7 +1389,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -1510,7 +1522,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -1540,7 +1554,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -1671,7 +1687,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -1701,7 +1719,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -1832,7 +1852,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -1862,7 +1884,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -1993,7 +2017,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -2023,7 +2049,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -2154,7 +2182,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -2184,7 +2214,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -2315,7 +2347,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -2345,7 +2379,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -2476,7 +2512,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -2506,7 +2544,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >
@@ -2637,7 +2677,9 @@ exports[`ObsList should render correctly 1`] = `
               "alignSelf": "center",
             },
           ],
-          null,
+          {
+            "color": "#171D19",
+          },
         ]
       }
     >
@@ -2667,7 +2709,9 @@ exports[`ObsList should render correctly 1`] = `
                 "letterSpacing": 0.78,
               },
             ],
-            null,
+            {
+              "color": "#171D19",
+            },
           ]
         }
       >

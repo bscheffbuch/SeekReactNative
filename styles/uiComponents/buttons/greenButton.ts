@@ -10,16 +10,12 @@ const viewStyles = StyleSheet.create( {
   greenButton: {
     alignSelf: "center",
     backgroundColor: colors.seekDeepGreen,
-    borderRadius: 14,
+    borderRadius: getFontScale() > 1 ? 32 : 24,
     height: getFontScale() > 1 ? 64 : 48,
     justifyContent: "center",
     maxWidth: 317,
-    shadowColor: colors.seekDeepGreen,
-    shadowOffset: { width: 0, height: 7 },
-    shadowOpacity: 0.16,
-    shadowRadius: 12,
+    paddingHorizontal: 24,
     width: dimensions.width < 500 ? 293 : 317,
-    elevation: 2,
   } as const,
   loginHeight: {
     height: 52,
@@ -29,6 +25,8 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   buttonText: {
+    fontSize: 15,
+    letterSpacing: 0.1,
     textAlign: "center",
   } as const,
 } );

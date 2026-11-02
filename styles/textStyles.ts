@@ -45,9 +45,9 @@ const header = {
 const button = {
   color: colors.white,
   fontFamily: fonts.bold,
-  fontSize: ( fontScale > 1 ) ? 15 : 17,
-  letterSpacing: 1,
-  lineHeight: 21,
+  fontSize: ( fontScale > 1 ) ? 14 : 15,
+  letterSpacing: 0.1,
+  lineHeight: 20,
 } as const;
 
 const buttonSmall = {
@@ -109,7 +109,7 @@ const banner = {
   color: colors.white,
   fontFamily: fonts.bold,
   fontSize: 18,
-  letterSpacing: 1,
+  letterSpacing: 0.1,
   lineHeight: 22,
 } as const;
 
@@ -117,7 +117,7 @@ const bannerSmall = {
   color: colors.white,
   fontFamily: fonts.bold,
   fontSize: 14,
-  letterSpacing: 0.42,
+  letterSpacing: 0.1,
   lineHeight: 34,
 } as const;
 
@@ -125,21 +125,21 @@ const modalBanner = {
   color: colors.white,
   fontFamily: fonts.bold,
   fontSize: 18,
-  letterSpacing: 1.12,
+  letterSpacing: 0.1,
 } as const;
 
 const sideMenu = {
   color: colors.white,
   fontFamily: fonts.bold,
   fontSize: 17,
-  letterSpacing: 1.0,
+  letterSpacing: 0.1,
 } as const;
 
 const challengeMonth = {
   color: colors.white,
   fontFamily: fonts.regular,
   fontSize: ( fontScale > 1 ) ? 15 : 17,
-  letterSpacing: 0.75,
+  letterSpacing: 0.1,
   lineHeight: 21,
 } as const;
 
@@ -147,7 +147,7 @@ const challengeTitle = {
   color: colors.white,
   fontFamily: fonts.bold,
   fontSize: ( fontScale > 1 ) ? 19 : 22,
-  letterSpacing: 1.0,
+  letterSpacing: 0.1,
   lineHeight: 27,
 } as const;
 
@@ -162,7 +162,7 @@ const smallLightHeading = {
   color: colors.seekInk,
   fontFamily: fonts.regular,
   fontSize: 13,
-  letterSpacing: 0.75,
+  letterSpacing: 0.1,
   lineHeight: 16,
 } as const;
 
@@ -191,9 +191,9 @@ const toastLink = {
 const species = {
   color: colors.black,
   fontFamily: fonts.regular,
-  fontSize: 29,
+  fontSize: 28,
   lineHeight: 35,
-  letterSpacing: 0.3,
+  letterSpacing: 0.1,
 } as const;
 
 const speciesSmall = {
@@ -261,7 +261,7 @@ const postSectionHeader = {
   color: colors.seekDeepGreen,
   fontFamily: fonts.bold,
   fontSize: 17,
-  letterSpacing: 1.0,
+  letterSpacing: 0.1,
 } as const;
 
 const loginOrSignup = {
@@ -281,7 +281,7 @@ const passwordEmailHeader = {
   color: colors.seekDeepGreen,
   fontFamily: fonts.bold,
   fontSize: 23,
-  letterSpacing: 1.0,
+  letterSpacing: 0.1,
   lineHeight: 30,
 } as const;
 
@@ -296,7 +296,7 @@ const donationLink = {
   color: colors.greenGradientLight,
   fontFamily: fonts.regular,
   fontSize: 17,
-  letterSpacing: 1.0,
+  letterSpacing: 0.1,
 } as const;
 
 const coords = {

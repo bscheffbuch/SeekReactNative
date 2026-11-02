@@ -50,7 +50,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         {
           "color": "#171D19",
           "flex": 1,
-          "fontFamily": "Lato-Bold",
+          "fontFamily": "Lato-Regular",
           "fontSize": 22,
           "lineHeight": 28,
           "marginHorizontal": 8,
@@ -308,7 +308,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                       "color": "#ffffff",
                       "fontFamily": "Lato-Regular",
                       "fontSize": 15,
-                      "letterSpacing": 0.75,
+                      "letterSpacing": 0.1,
                       "lineHeight": 21,
                     },
                     {
@@ -331,7 +331,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "color": "#ffffff",
                     "fontFamily": "Lato-Bold",
                     "fontSize": 19,
-                    "letterSpacing": 1,
+                    "letterSpacing": 0.1,
                     "lineHeight": 27,
                   },
                   null,
@@ -741,7 +741,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -769,7 +771,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -797,7 +801,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1099,20 +1105,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           style={
             {
               "alignSelf": "center",
-              "backgroundColor": "#14794f",
-              "borderRadius": 14,
-              "elevation": 2,
+              "backgroundColor": "#14794F",
+              "borderRadius": 32,
               "height": 64,
               "justifyContent": "center",
               "maxWidth": 317,
               "opacity": 1,
-              "shadowColor": "#14794f",
-              "shadowOffset": {
-                "height": 7,
-                "width": 0,
-              },
-              "shadowOpacity": 0.16,
-              "shadowRadius": 12,
+              "paddingHorizontal": 24,
               "width": 317,
             }
           }
@@ -1129,12 +1128,17 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   {
                     "color": "#ffffff",
                     "fontFamily": "Lato-Bold",
-                    "fontSize": 15,
-                    "letterSpacing": 1,
-                    "lineHeight": 21,
+                    "fontSize": 14,
+                    "letterSpacing": 0.1,
+                    "lineHeight": 20,
                   },
                   {
+                    "fontSize": 15,
+                    "letterSpacing": 0.1,
                     "textAlign": "center",
+                  },
+                  {
+                    "color": "#FFFFFF",
                   },
                   undefined,
                   undefined,
@@ -1206,7 +1210,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
-              null,
+              {
+                "color": "#171D19",
+              },
             ]
           }
         >
@@ -1228,7 +1234,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1252,7 +1260,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1304,7 +1314,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1328,7 +1340,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1352,7 +1366,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1376,7 +1392,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1400,7 +1418,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1424,7 +1444,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1448,7 +1470,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1480,7 +1504,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
-              null,
+              {
+                "color": "#171D19",
+              },
             ]
           }
         >
@@ -1562,7 +1588,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
-              null,
+              {
+                "color": "#171D19",
+              },
             ]
           }
         >
@@ -1584,7 +1612,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1608,7 +1638,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1660,7 +1692,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1684,7 +1718,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1708,7 +1744,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1732,7 +1770,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                     "textAlign": "center",
                   },
                 ],
-                null,
+                {
+                  "color": "#171D19",
+                },
               ]
             }
           >
@@ -1942,7 +1982,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
-              null,
+              {
+                "color": "#171D19",
+              },
             ]
           }
         >
@@ -1973,7 +2015,9 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   "textAlign": "center",
                 },
               ],
-              null,
+              {
+                "color": "#171D19",
+              },
             ]
           }
         >
@@ -2018,20 +2062,13 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
           style={
             {
               "alignSelf": "center",
-              "backgroundColor": "#14794f",
-              "borderRadius": 14,
-              "elevation": 2,
+              "backgroundColor": "#14794F",
+              "borderRadius": 32,
               "height": 64,
               "justifyContent": "center",
               "maxWidth": 317,
               "opacity": 1,
-              "shadowColor": "#14794f",
-              "shadowOffset": {
-                "height": 7,
-                "width": 0,
-              },
-              "shadowOpacity": 0.16,
-              "shadowRadius": 12,
+              "paddingHorizontal": 24,
               "width": 317,
             }
           }
@@ -2048,12 +2085,17 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                   {
                     "color": "#ffffff",
                     "fontFamily": "Lato-Bold",
-                    "fontSize": 15,
-                    "letterSpacing": 1,
-                    "lineHeight": 21,
+                    "fontSize": 14,
+                    "letterSpacing": 0.1,
+                    "lineHeight": 20,
                   },
                   {
+                    "fontSize": 15,
+                    "letterSpacing": 0.1,
                     "textAlign": "center",
+                  },
+                  {
+                    "color": "#FFFFFF",
                   },
                   undefined,
                   undefined,

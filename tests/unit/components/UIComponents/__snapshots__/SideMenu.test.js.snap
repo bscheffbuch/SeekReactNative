@@ -141,7 +141,7 @@ exports[`SideMenu should render correctly 1`] = `
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
               "fontSize": 17,
-              "letterSpacing": 1,
+              "letterSpacing": 0.1,
             },
             {
               "color": "#111512",
@@ -234,7 +234,7 @@ exports[`SideMenu should render correctly 1`] = `
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
               "fontSize": 17,
-              "letterSpacing": 1,
+              "letterSpacing": 0.1,
             },
             {
               "color": "#111512",
@@ -327,7 +327,7 @@ exports[`SideMenu should render correctly 1`] = `
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
               "fontSize": 17,
-              "letterSpacing": 1,
+              "letterSpacing": 0.1,
             },
             {
               "color": "#111512",
@@ -420,7 +420,7 @@ exports[`SideMenu should render correctly 1`] = `
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
               "fontSize": 17,
-              "letterSpacing": 1,
+              "letterSpacing": 0.1,
             },
             {
               "color": "#111512",
@@ -513,7 +513,7 @@ exports[`SideMenu should render correctly 1`] = `
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
               "fontSize": 17,
-              "letterSpacing": 1,
+              "letterSpacing": 0.1,
             },
             {
               "color": "#111512",
@@ -606,7 +606,7 @@ exports[`SideMenu should render correctly 1`] = `
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
               "fontSize": 17,
-              "letterSpacing": 1,
+              "letterSpacing": 0.1,
             },
             {
               "color": "#111512",
@@ -696,7 +696,7 @@ exports[`SideMenu should render correctly 1`] = `
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
               "fontSize": 17,
-              "letterSpacing": 1,
+              "letterSpacing": 0.1,
             },
             {
               "color": "#111512",

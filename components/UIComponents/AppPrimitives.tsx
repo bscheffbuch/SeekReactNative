@@ -100,7 +100,7 @@ const themedStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   headerTitle: {
     color: theme.colors.text,
     flex: 1,
-    fontFamily: theme.typography.heading,
+    fontFamily: theme.typography.body,
     fontSize: 22,
     lineHeight: 28,
     marginHorizontal: theme.spacing.sm,
@@ -134,46 +134,43 @@ const themedStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   },
   button: {
     alignItems: "center",
-    borderRadius: theme.radii.sm,
+    borderRadius: 24,
     flexDirection: "row",
     justifyContent: "center",
     minHeight: 48,
-    paddingHorizontal: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
     paddingVertical: theme.spacing.sm,
   },
   primaryButton: {
     backgroundColor: theme.colors.primary,
   },
+  // M3 tonal button
   secondaryButton: {
-    backgroundColor: theme.colors.primaryContainer,
-    borderColor: theme.colors.border,
-    borderWidth: 1,
+    backgroundColor: theme.colors.secondaryContainer,
   },
   disabledButton: {
     opacity: 0.48,
   },
   primaryButtonText: {
-    color: theme.colors.inverseText,
+    color: theme.colors.onPrimary,
     fontFamily: theme.typography.heading,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
   },
   secondaryButtonText: {
-    color: theme.colors.primary,
+    color: theme.colors.onSecondaryContainer,
     fontFamily: theme.typography.heading,
-    fontSize: 16,
+    fontSize: 15,
     lineHeight: 22,
   },
+  // M3 filled card
   card: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radii.lg,
-    borderWidth: 1,
+    backgroundColor: theme.colors.surfaceContainerLow,
+    borderRadius: 16,
     padding: theme.spacing.md,
-    ...theme.elevation.card,
   },
   cardPressed: {
-    backgroundColor: theme.colors.primaryContainer,
+    backgroundColor: theme.colors.surfaceContainerHigh,
   },
   row: {
     alignItems: "center",
@@ -190,19 +187,19 @@ const themedStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   },
   rowLabel: {
     color: theme.colors.text,
-    fontFamily: theme.typography.heading,
+    fontFamily: theme.typography.body,
     fontSize: 16,
     lineHeight: 22,
   },
   rowDetail: {
-    color: theme.colors.muted,
+    color: theme.colors.onSurfaceVariant,
     fontFamily: theme.typography.body,
     fontSize: 14,
     lineHeight: 20,
     marginTop: theme.spacing.xxs,
   },
   sectionHeading: {
-    color: theme.colors.muted,
+    color: theme.colors.primary,
     fontFamily: theme.typography.heading,
     fontSize: 14,
     lineHeight: 18,

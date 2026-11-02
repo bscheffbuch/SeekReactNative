@@ -64,20 +64,13 @@ Thanks for being part of this community!
     style={
       {
         "alignSelf": "center",
-        "backgroundColor": "#14794f",
-        "borderRadius": 14,
-        "elevation": 2,
+        "backgroundColor": "#14794F",
+        "borderRadius": 32,
         "height": 64,
         "justifyContent": "center",
         "maxWidth": 317,
         "opacity": 1,
-        "shadowColor": "#14794f",
-        "shadowOffset": {
-          "height": 7,
-          "width": 0,
-        },
-        "shadowOpacity": 0.16,
-        "shadowRadius": 12,
+        "paddingHorizontal": 24,
         "width": 317,
       }
     }
@@ -94,12 +87,17 @@ Thanks for being part of this community!
             {
               "color": "#ffffff",
               "fontFamily": "Lato-Bold",
-              "fontSize": 15,
-              "letterSpacing": 1,
-              "lineHeight": 21,
+              "fontSize": 14,
+              "letterSpacing": 0.1,
+              "lineHeight": 20,
             },
             {
+              "fontSize": 15,
+              "letterSpacing": 0.1,
               "textAlign": "center",
+            },
+            {
+              "color": "#FFFFFF",
             },
             undefined,
             undefined,

@@ -27,7 +27,7 @@ const INatHeaderLoggedIn = ( ) => {
   return (
     <>
       <LinearGradient
-        colors={[colors.greenGradientDark, colors.greenGradientLight]}
+        colors={[colors.seekDeepGreen, colors.seekDeepGreen]}
         style={viewStyles.linearGradient}
       >
         <ProfileImageAndLogin count={count} reload={reload} />

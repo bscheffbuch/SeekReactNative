@@ -12,28 +12,31 @@ const StyledText = ( props: TextProps ) => {
   const color = flattenedStyle?.color;
   // Legacy baseTextStyles bake light-theme ink/gray colors into most variants,
   // so bare call sites would render near-black text on the dark canvas.
+  // Legacy baseTextStyles bake fixed Seek colors into most variants. Map them onto
+  // the Material 3 roles so every screen follows the theme (light and dark).
   const isInkColor = color === undefined
     || color === colors.seekInk
-    || color === colors.black;
+    || color === colors.black
+    || color === colors.darkGray;
   const isMutedColor = color === colors.errorGray
     || color === colors.settingsGray
     || color === colors.placeholderGray;
-  const darkColorOverride = theme.isDark && isInkColor
+  const isBrandGreen = color === colors.seekDeepGreen
+    || color === colors.seekGreen
+    || color === colors.seekTeal
+    || color === colors.seekForestGreen;
+  const themeColorOverride = isInkColor
     ? { color: theme.colors.text }
-    : theme.isDark && isMutedColor
-      ? { color: theme.colors.muted }
-      : theme.isDark && (
-        color === colors.seekDeepGreen
-        || color === colors.seekGreen
-        || color === colors.seekTeal
-      )
+    : isMutedColor
+      ? { color: theme.colors.onSurfaceVariant }
+      : isBrandGreen
         ? { color: theme.colors.primary }
         : null;
 
   return (
     <Text
       {...props}
-      style={[leftText, props.style, darkColorOverride]}
+      style={[leftText, props.style, themeColorOverride]}
     >
       { children }
     </Text>

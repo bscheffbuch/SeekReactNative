@@ -34,8 +34,9 @@ const WhiteModal = ( {
       <View style={[
         styles.innerContainer,
         {
-          backgroundColor: theme.colors.surface,
-          borderColor: theme.colors.border,
+          // M3 dialog: surface container high, 28px corners, no outline
+          backgroundColor: theme.colors.surfaceContainerHigh,
+          borderColor: theme.colors.surfaceContainerHigh,
           shadowColor: theme.colors.shadow,
         },
         widthStyle,
