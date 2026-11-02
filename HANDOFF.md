@@ -10,7 +10,7 @@ the open issue below is much faster to close on real hardware.
 - Base: `origin/full-redesign` (bottom tabs, dark mode, camera settings sheet,
   observation queue) with all still-relevant fixes re-applied on top.
 - Toolchain green: `npm ci`, `npx tsc --noEmit` (0 errors), `npx eslint .`
-  (0 errors), `npx jest tests/unit` (30/30 suites, 85/85 tests).
+  (0 errors), `npx jest tests/unit` (31/31 suites, 94/94 tests).
   `tsc` needs a `config.js` (gitignored): `cp config.example.js config.js`.
 - CI: every push to this branch builds a standalone arm64 debug APK and
   publishes it as a GitHub Release (`debug-apk-N`), via
@@ -81,6 +81,51 @@ canvas with readable text and no white flashes during navigation.
 To eyeball on device: Home (light + dark, fresh install vs. a few
 observations), More, the camera settings sheet, Wikipedia from a species
 page, Donate from Settings, and Home → Species nearby → location picker.
+
+## BioCLIP 2 readiness, performance and accessibility (this branch)
+
+**Model packs** (`utility/modelPacks.ts`, Android). The app can now run models
+other than the built-in one. A pack is a folder with `manifest.json`, a TFLite
+model, the plugin's taxonomy CSV and optional geomodel and common names. Packs
+are found in the app's files dir and its external files dir, so this installs
+one on a test phone:
+
+```sh
+adb push packs/bioclip2-100k /sdcard/Android/data/org.inaturalist.seek.debug/files/models/
+```
+
+Then Settings → Seek Camera → Identification model. The live camera and gallery
+switch without a restart (the plugin patch now reloads its classifier when the
+model files change). Pack common names load in the background, chunked, only
+for taxa that have no name yet in the current locale.
+
+Building a BioCLIP 2 pack: `scripts/bioclip2/README.md` (GPU recommended). The
+pack's model takes the plugin's input unchanged; its built-in preprocessing was
+checked against BioCLIP 2's own on 200 benchmark photos (same accuracy). The
+TFLite conversion and on-device speed have **not** been run yet. Packs have no
+location model yet, so location scoring is off when one is selected.
+
+**Performance**
+- Vision plugin patch: the per-frame taxonomy rollup skips branches below the
+  rollup cutoff. On a real 99,988-species taxonomy: 80.7 → 17.5 ms per frame
+  (desktop JVM), identical predictions; also 4–6× faster at 20k species and
+  slightly faster for today's 507-species model. Verified with a side-by-side
+  harness against the original code, including filters, geo scores and
+  common-ancestor mode.
+- Android stops re-copying the model out of the APK on every launch (copies
+  only when missing or a different size).
+- Splash waits at least 600 ms instead of a fixed 2 s after startup work.
+- Common-name lookups: `CommonNamesRealm.taxon_id` is indexed (schema 47), and
+  lookups are cached per locale in memory.
+- `styles/themedStyles.ts` (`makeThemedStyles`): styles built once per theme
+  for the shared primitives, list cells, Home and More.
+
+**Accessibility**: about 40 touchables gained `accessibilityRole="button"`;
+icon-only controls gained labels.
+
+To check on device: switch models in Settings (with a pack pushed), confirm
+the camera keeps classifying, and run TalkBack over Home, More, Observations
+and a species page.
 
 ## Open issue 1 — crash on opening the camera (`debug-apk-2`)
 
