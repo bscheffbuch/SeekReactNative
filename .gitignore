@@ -102,3 +102,9 @@ db.realm*
 
 # Eslint cache
 .eslintcache
+# Python
+__pycache__/
+*.pyc
+scripts/bioclip2/packs/
+scripts/bioclip2/species.json
+scripts/bioclip2/taxa.csv
