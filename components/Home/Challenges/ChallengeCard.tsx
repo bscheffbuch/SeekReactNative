@@ -25,8 +25,11 @@ const ChallengeCard = ( ) => {
   const challenge = useLatestChallenge( );
   const { theme } = useTheme( );
   const themedStyles = StyleSheet.create( {
+    // M3 card with the challenge artwork as media
     challengeContainer: {
-      borderRadius: 12,
+      borderRadius: 28,
+      marginHorizontal: 16,
+      overflow: "hidden",
     },
     container: {
       backgroundColor: theme.colors.canvas,

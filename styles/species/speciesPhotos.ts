@@ -1,5 +1,4 @@
 import { StyleSheet, Dimensions } from "react-native";
-import { colors } from "../global";
 
 const { width } = Dimensions.get( "screen" );
 
@@ -10,17 +9,18 @@ const viewStyles = StyleSheet.create( {
     position: "absolute",
     right: 15,
     zIndex: 1,
-    backgroundColor: colors.ccGray,
+    backgroundColor: "rgba(0, 0, 0, 0.55)",
     borderRadius: 8,
+    paddingHorizontal: 10,
   },
   photoContainer: {
-    backgroundColor: colors.black,
+    backgroundColor: "#0F1511",
     height: 250,
     width,
   },
   errorContainer: {
     justifyContent: "center",
-    backgroundColor: colors.black,
+    backgroundColor: "#0F1511",
     height: 250,
   },
 } );

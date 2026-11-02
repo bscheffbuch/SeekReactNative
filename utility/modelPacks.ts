@@ -11,6 +11,8 @@ import {
   readDirAssets,
   readFile,
   stat,
+  unlink,
+  writeFile,
 } from "@dr.pogodin/react-native-fs";
 
 import { dirModel, dirGeomodel, dirTaxonomy } from "./dirStorage";
@@ -64,6 +66,7 @@ export interface ManifestResult {
 }
 
 export const BUILT_IN_PACK_ID = "seek";
+const ASSET_PREFIX = "asset:/";
 const SELECTED_PACK_KEY = "model_pack_id";
 const PACK_ID_PATTERN = /^[a-z0-9_-]{1,64}$/;
 const FILE_NAME_PATTERN = /^[A-Za-z0-9._-]{1,128}$/;
@@ -156,7 +159,16 @@ const readPack = async ( dir: string ): Promise<ModelPack | null> => {
       console.log( `[ModelPacks] ignoring ${dir}: ${error}` );
       return null;
     }
-    const required = [pack.modelPath, pack.taxonomyPath];
+    // Bundled packs keep their model inside the APK (stored uncompressed, memory-mapped
+    // by the plugin in place); a "<model>.asset" marker holds the asset path.
+    const assetMarker = `${pack.modelPath}.asset`;
+    if ( !( await exists( pack.modelPath ) ) && await exists( assetMarker ) ) {
+      const assetPath = ( await readFile( assetMarker, "utf8" ) ).trim( );
+      if ( assetPath.startsWith( ASSET_PREFIX ) ) {
+        pack.modelPath = assetPath;
+      }
+    }
+    const required = [pack.modelPath, pack.taxonomyPath].filter( ( p ) => !p.startsWith( ASSET_PREFIX ) );
     const present = await Promise.all( required.map( ( p ) => exists( p ) ) );
     if ( present.includes( false ) ) {
       console.log( `[ModelPacks] ignoring ${dir}: model or taxonomy file missing` );
@@ -270,6 +282,21 @@ export const installBundledPacks = async ( ): Promise<boolean> => {
       files.sort( ( a, b ) => Number( a.name === "manifest.json" ) - Number( b.name === "manifest.json" ) );
       for ( const file of files ) {
         const destination = `${target}/${file.name}`;
+        if ( file.name.endsWith( ".tflite" ) ) {
+          // mapped straight from the APK: write a marker instead of a ~400 MB copy,
+          // and drop a copy left by earlier versions of the app
+          const marker = `${destination}.asset`;
+          const assetPath = `${ASSET_PREFIX}models/${dir.name}/${file.name}`;
+          if ( !( await exists( marker ) ) || ( await readFile( marker, "utf8" ) ).trim( ) !== assetPath ) {
+            await writeFile( marker, assetPath, "utf8" );
+            copied = true;
+          }
+          if ( await exists( destination ) ) {
+            await unlink( destination );
+            copied = true;
+          }
+          continue;
+        }
         let upToDate = false;
         try {
           upToDate = ( await exists( destination ) ) && Number( ( await stat( destination ) ).size ) === Number( file.size );

@@ -236,8 +236,21 @@ index 0000000..d93241f
 +  }
 +
 +}
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/GeoClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/GeoClassifier.java
+index 41eeb39..423d768 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/GeoClassifier.java
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/GeoClassifier.java
+@@ -46,7 +46,7 @@ public class GeoClassifier {
+         mTFlite = new Interpreter(loadModelFile());
+         Timber.tag(TAG).d("Created a Tensorflow Lite Geomodel Classifier.");
+ 
+-        mTaxonomy = new Taxonomy(new FileInputStream(mTaxonomyFilename), mModelVersion);
++        mTaxonomy = new Taxonomy(ModelFiles.open(mTaxonomyFilename), mModelVersion);
+         mModelSize = mTaxonomy.getModelSize();
+     }
+ 
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-index dd91fb5..ab6ff77 100644
+index dd91fb5..2660f48 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 @@ -2,9 +2,11 @@ package com.visioncameraplugininatvision;
@@ -286,7 +299,7 @@ index dd91fb5..ab6ff77 100644
      private float[][] mGeomodelScores;
  
      public void setFilterByTaxonId(Integer taxonId) {
-@@ -79,7 +105,8 @@ public class ImageClassifier {
+@@ -79,15 +105,20 @@ public class ImageClassifier {
          mModelFilename = modelPath;
          mTaxonomyFilename = taxonomyPath;
          mModelVersion = version;
@@ -296,9 +309,11 @@ index dd91fb5..ab6ff77 100644
          imgData =
                  ByteBuffer.allocateDirect(
                          4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
-@@ -88,6 +115,10 @@ public class ImageClassifier {
+         imgData.order(ByteOrder.nativeOrder());
+         Timber.tag(TAG).d("Created a Tensorflow Lite Image Classifier.");
  
-         mTaxonomy = new Taxonomy(new FileInputStream(mTaxonomyFilename), mModelVersion);
+-        mTaxonomy = new Taxonomy(new FileInputStream(mTaxonomyFilename), mModelVersion);
++        mTaxonomy = new Taxonomy(ModelFiles.open(mTaxonomyFilename), mModelVersion);
          mModelSize = mTaxonomy.getModelSize();
 +        inputArray = new Object[]{ imgData };
 +        outputScores = new float[1][mModelSize];
@@ -382,7 +397,7 @@ index dd91fb5..ab6ff77 100644
          } catch (Exception exc) {
              exc.printStackTrace();
              return new ArrayList<Prediction>();
-@@ -140,8 +199,87 @@ public class ImageClassifier {
+@@ -140,15 +199,93 @@ public class ImageClassifier {
  
      /** Closes tflite to release resources. */
      public void close() {
@@ -471,7 +486,16 @@ index dd91fb5..ab6ff77 100644
      }
  
      /** Memory-map the model file in Assets. */
-@@ -158,46 +296,139 @@ public class ImageClassifier {
+     private MappedByteBuffer loadModelFile() throws IOException {
+-        FileInputStream inputStream = new FileInputStream(mModelFilename);
+-        FileChannel fileChannel = inputStream.getChannel();
+-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, inputStream.available());
++        // file path or "asset:/..." (mapped in place from the APK)
++        return ModelFiles.map(mModelFilename);
+     }
+ 
+     /** Writes Image data into a {@code ByteBuffer}. */
+@@ -158,46 +295,139 @@ public class ImageClassifier {
          }
          imgData.rewind();
  
@@ -639,7 +663,7 @@ index dd91fb5..ab6ff77 100644
          float sum = 0.0f;
  
          // First multiply the scores
-@@ -214,8 +445,6 @@ public class ImageClassifier {
+@@ -214,8 +444,6 @@ public class ImageClassifier {
                  combinedScores[i] = combinedScores[i] / sum;
              }
          }
@@ -648,6 +672,67 @@ index dd91fb5..ab6ff77 100644
      }
  
  }
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ModelFiles.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ModelFiles.java
+new file mode 100644
+index 0000000..921d10c
+--- /dev/null
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ModelFiles.java
+@@ -0,0 +1,55 @@
++package com.visioncameraplugininatvision;
++
++import android.content.Context;
++import android.content.res.AssetFileDescriptor;
++
++import java.io.FileInputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.nio.MappedByteBuffer;
++import java.nio.channels.FileChannel;
++
++/**
++ * Opens model and taxonomy files from either a file path or, for paths starting with
++ * "asset:/", directly from the APK. A model stored uncompressed in the APK can be
++ * memory-mapped in place, so large bundled models (e.g. a ~400 MB BioCLIP 2 pack)
++ * don't need a second copy in app storage.
++ */
++final class ModelFiles {
++    static final String ASSET_PREFIX = "asset:/";
++    private static Context sAppContext;
++
++    private ModelFiles() {}
++
++    static void init(Context context) {
++        if (context != null) {
++            sAppContext = context.getApplicationContext();
++        }
++    }
++
++    private static String assetName(String path) throws IOException {
++        if (sAppContext == null) {
++            throw new IOException("No context to open " + path);
++        }
++        return path.substring(ASSET_PREFIX.length());
++    }
++
++    static MappedByteBuffer map(String path) throws IOException {
++        if (path.startsWith(ASSET_PREFIX)) {
++            try (AssetFileDescriptor fd = sAppContext == null ? null : sAppContext.getAssets().openFd(assetName(path));
++                 FileInputStream in = new FileInputStream(fd.getFileDescriptor())) {
++                return in.getChannel().map(FileChannel.MapMode.READ_ONLY, fd.getStartOffset(), fd.getDeclaredLength());
++            }
++        }
++        try (FileInputStream in = new FileInputStream(path)) {
++            return in.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, in.getChannel().size());
++        }
++    }
++
++    static InputStream open(String path) throws IOException {
++        if (path.startsWith(ASSET_PREFIX)) {
++            return sAppContext.getAssets().open(assetName(path));
++        }
++        return new FileInputStream(path);
++    }
++}
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Node.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Node.java
 index df84da8..92a0ad2 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Node.java
@@ -763,6 +848,48 @@ index df84da8..92a0ad2 100644
      }
  
      public Node() {
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/SharedImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/SharedImageClassifier.java
+new file mode 100644
+index 0000000..17fae20
+--- /dev/null
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/SharedImageClassifier.java
+@@ -0,0 +1,36 @@
++package com.visioncameraplugininatvision;
++
++import java.io.IOException;
++
++/**
++ * One image classifier per process, shared by the camera frame processor and the
++ * gallery/photo module. Large models (e.g. BioCLIP 2, ~400 MB) were otherwise loaded
++ * twice while the camera screen was open, and the gallery path created (and never
++ * closed) a new interpreter, GPU delegate and taxonomy for every photo.
++ *
++ * Callers hold {@link #LOCK} for the whole get + configure + classify sequence: the
++ * interpreter is not thread-safe and filters / geomodel scores are per call.
++ */
++final class SharedImageClassifier {
++    static final Object LOCK = new Object();
++
++    private static ImageClassifier sClassifier;
++    private static String sKey;
++
++    private SharedImageClassifier() {}
++
++    /** Returns the classifier for these files, (re)loading it if they changed. Call with LOCK held. */
++    static ImageClassifier get(String modelPath, String taxonomyPath, String version) throws IOException {
++        String key = modelPath + "|" + taxonomyPath + "|" + version;
++        if (sClassifier != null && !key.equals(sKey)) {
++            sClassifier.close();
++            sClassifier = null;
++            sKey = null;
++        }
++        if (sClassifier == null) {
++            sClassifier = new ImageClassifier(modelPath, taxonomyPath, version);
++            sKey = key;
++        }
++        return sClassifier;
++    }
++}
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Taxonomy.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Taxonomy.java
 index 90495d0..eee040f 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Taxonomy.java
@@ -940,6 +1067,98 @@ index 90495d0..eee040f 100644
                  aggregatedGeoScores.put(currentNode.key, geoScore);
                } else {
                  aggregatedGeoScores.put(currentNode.key, null);
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java
+index 627b53f..2179148 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java
+@@ -38,6 +38,7 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+     public VisionCameraPluginInatVisionModule(ReactApplicationContext reactContext) {
+         super(reactContext);
+         mContext = reactContext;
++        ModelFiles.init(reactContext);
+     }
+ 
+     public Context getContext(){
+@@ -140,25 +141,6 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+             Timber.tag(TAG).d("Not using geomodel.");
+         }
+ 
+-        ImageClassifier classifier = null;
+-        try {
+-            classifier = new ImageClassifier(modelFilename, taxonomyFilename, version);
+-        } catch (IOException e) {
+-            e.printStackTrace();
+-            promise.reject("E_CLASSIFIER", "Failed to initialize an image mClassifier: " + e.getMessage());
+-            return;
+-        } catch (OutOfMemoryError e) {
+-            e.printStackTrace();
+-            Timber.tag(TAG).w("Out of memory - Device not supported - classifier failed to load - " + e);
+-            promise.reject("E_OUT_OF_MEMORY", "Out of memory");
+-            return;
+-        } catch (Exception e) {
+-            e.printStackTrace();
+-            Timber.tag(TAG).w("Other type of exception - Device not supported - classifier failed to load - " + e);
+-            promise.reject("E_UNSUPPORTED_DEVICE", "Android version is too old - needs to be at least 6.0");
+-            return;
+-        }
+-
+         // Get predictions for that image
+         Bitmap bitmap = null;
+ 
+@@ -169,6 +151,7 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+                 String msg = String.format("Couldn't read image '%s'", uri.toString());
+                 Timber.tag(TAG).w(msg);
+                 promise.reject("E_IO_EXCEPTION", msg);
++                return;
+             }
+             Log.d(TAG, "originalBitmap: " + bitmap + ": " + bitmap.getWidth() + " x " + bitmap.getHeight());
+             // Crop the center square of the frame with the given crop ratio
+@@ -193,10 +176,42 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+             return;
+         }
+ 
+-        classifier.setGeomodelScores(geomodelScores);
+         Boolean commonAncestorMode = Objects.equals(mode, "COMMON_ANCESTOR");
+-        // Does not set a taxonomyRollupCutoff here, i.e. uses the default value (top score * 0.001)
+-        List<Prediction> predictions = classifier.classifyBitmap(bitmap, null, commonAncestorMode);
++        List<Prediction> predictions;
++        // Shared with the camera frame processor: one model in memory (see SharedImageClassifier)
++        synchronized (SharedImageClassifier.LOCK) {
++            ImageClassifier classifier;
++            try {
++                classifier = SharedImageClassifier.get(modelFilename, taxonomyFilename, version);
++            } catch (IOException e) {
++                e.printStackTrace();
++                bitmap.recycle();
++                promise.reject("E_CLASSIFIER", "Failed to initialize an image mClassifier: " + e.getMessage());
++                return;
++            } catch (OutOfMemoryError e) {
++                e.printStackTrace();
++                bitmap.recycle();
++                Timber.tag(TAG).w("Out of memory - Device not supported - classifier failed to load - " + e);
++                promise.reject("E_OUT_OF_MEMORY", "Out of memory");
++                return;
++            } catch (Exception e) {
++                e.printStackTrace();
++                bitmap.recycle();
++                Timber.tag(TAG).w("Other type of exception - Device not supported - classifier failed to load - " + e);
++                promise.reject("E_UNSUPPORTED_DEVICE", "Android version is too old - needs to be at least 6.0");
++                return;
++            }
++            // photos are classified without the camera's live taxon filter
++            Integer cameraFilter = classifier.getFilterByTaxonId();
++            boolean cameraNegative = classifier.getNegativeFilter();
++            classifier.setFilterByTaxonId(null);
++            classifier.setNegativeFilter(false);
++            classifier.setGeomodelScores(geomodelScores);
++            // Does not set a taxonomyRollupCutoff here, i.e. uses the default value (top score * 0.001)
++            predictions = classifier.classifyBitmap(bitmap, null, commonAncestorMode);
++            classifier.setFilterByTaxonId(cameraFilter);
++            classifier.setNegativeFilter(cameraNegative);
++        }
+         bitmap.recycle();
+ 
+         WritableArray cleanedPredictions = Arguments.createArray();
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
 index 18f1134..0bbf19f 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
@@ -953,7 +1172,7 @@ index 18f1134..0bbf19f 100644
  
    @NonNull
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
-index 0c2b46a..9817d7c 100644
+index 0c2b46a..be2043d 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
 @@ -1,9 +1,7 @@
@@ -966,11 +1185,12 @@ index 0c2b46a..9817d7c 100644
  
  import androidx.annotation.NonNull;
  import androidx.annotation.Nullable;
-@@ -24,13 +22,16 @@ import timber.log.Timber;
+@@ -24,28 +22,25 @@ import timber.log.Timber;
  public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
    VisionCameraPluginInatVisionPlugin(@NonNull VisionCameraProxy proxy, @Nullable Map<String, Object> options) {
      super();
 -    Log.d("VisionCameraPluginInatVisionPlugin", "initialized with options: " + options);
++    ModelFiles.init(proxy.getContext());
    }
  
    private final static String TAG = "VisionCameraPluginInatVisionPlugin";
@@ -979,12 +1199,26 @@ index 0c2b46a..9817d7c 100644
    private GeoClassifier mGeoClassifier = null;
 +  // Files the current classifiers were built from; a different model pack
 +  // (another model/taxonomy/geomodel) rebuilds them instead of reusing the old ones.
-+  private String mLoadedModelKey = null;
 +  private String mLoadedGeomodelKey = null;
  
    private Integer mFilterByTaxonId = null; // If null -> no filter by taxon ID defined
    public void setFilterByTaxonId(Integer taxonId) {
-@@ -60,12 +61,6 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+       mFilterByTaxonId = taxonId;
+-      if (mImageClassifier != null) {
+-          mImageClassifier.setFilterByTaxonId(mFilterByTaxonId);
+-      }
+   }
+ 
+   private boolean mNegativeFilter = false;
+   public void setNegativeFilter(boolean negativeFilter) {
+       mNegativeFilter = negativeFilter;
+-      if (mImageClassifier != null) {
+-        mImageClassifier.setNegativeFilter(mNegativeFilter);
+-      }
+   }
+ 
+   private double mCropRatio = 1.0;
+@@ -60,12 +55,6 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
      // This should give the orientation of the passed in frame, as of vision-camera v3.2.2 this is not working though
      // instead we use a string passed in via the arguments to signify the device orientation
      // String orientation = frame.getOrientation();
@@ -997,7 +1231,7 @@ index 0c2b46a..9817d7c 100644
  
      if (arguments == null) {
        throw new RuntimeException("Options object is null");
-@@ -121,7 +116,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+@@ -121,7 +110,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
          Double elevation = location.get("elevation");
  
          // Geomodel classifier initialization with model and taxonomy files
@@ -1012,7 +1246,7 @@ index 0c2b46a..9817d7c 100644
            Timber.tag(TAG).d("Initializing geo classifier: " + geomodelPath + " / " + taxonomyPath);
            try {
              mGeoClassifier = new GeoClassifier(geomodelPath, taxonomyPath, version);
-@@ -139,11 +141,18 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+@@ -139,17 +135,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
          }
          geomodelScores = mGeoClassifier.predictionsForLocation(latitude, longitude, elevation);
      } else {
@@ -1020,21 +1254,31 @@ index 0c2b46a..9817d7c 100644
 +      geomodelScores = null;
      }
  
-     // Image classifier initialization with model and taxonomy files
-+    String modelKey = modelPath + "|" + taxonomyPath + "|" + version;
-+    if (mImageClassifier != null && !modelKey.equals(mLoadedModelKey)) {
-+      Timber.tag(TAG).d("Model files changed, reloading: " + modelKey);
-+      mImageClassifier.close();
-+      mImageClassifier = null;
-+    }
-     if (mImageClassifier == null) {
-+      mLoadedModelKey = modelKey;
-       Timber.tag(TAG).d("Initializing classifier: " + modelPath + " / " + taxonomyPath);
- 
+-    // Image classifier initialization with model and taxonomy files
+-    if (mImageClassifier == null) {
+-      Timber.tag(TAG).d("Initializing classifier: " + modelPath + " / " + taxonomyPath);
+-
++    // Image classifier: shared with the gallery module (see SharedImageClassifier)
++    List<Map> cleanedPredictions = new ArrayList<>();
++    synchronized (SharedImageClassifier.LOCK) {
        try {
-@@ -167,29 +176,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
-     List<Map> cleanedPredictions = new ArrayList<>();
-     if (mImageClassifier != null) {
+-        mImageClassifier = new ImageClassifier(modelPath, taxonomyPath, version);
+-        setFilterByTaxonId(mFilterByTaxonId);
+-        setNegativeFilter(mNegativeFilter);
++        mImageClassifier = SharedImageClassifier.get(modelPath, taxonomyPath, version);
+       } catch (IOException e) {
+         e.printStackTrace();
+         throw new RuntimeException("Failed to initialize an image mClassifier: " + e.getMessage());
+@@ -162,34 +155,10 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+         Timber.tag(TAG).w("Other type of exception - Device not supported - classifier failed to load - " + e);
+         throw new RuntimeException("Android version is too old - needs to be at least 6.0");
+       }
+-    }
+-
+-    List<Map> cleanedPredictions = new ArrayList<>();
+-    if (mImageClassifier != null) {
++      mImageClassifier.setFilterByTaxonId(mFilterByTaxonId);
++      mImageClassifier.setNegativeFilter(mNegativeFilter);
        mImageClassifier.setGeomodelScores(geomodelScores);
 -      Bitmap bmp = BitmapUtils.getBitmap(image);
 -      Log.d(TAG, "originalBitmap: " + bmp + ": " + bmp.getWidth() + " x " + bmp.getHeight());

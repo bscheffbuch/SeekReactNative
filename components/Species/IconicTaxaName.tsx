@@ -3,7 +3,7 @@ import { StyleSheet, View } from "react-native";
 
 import i18n from "../../i18n";
 import { iconicTaxaNames } from "../../utility/dictionaries/taxonomyDicts";
-import { textStyles, viewStyles } from "../../styles/species/species";
+import { viewStyles } from "../../styles/species/species";
 import StyledText from "../UIComponents/StyledText";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
 import { baseTextStyles } from "../../styles/textStyles";
@@ -21,9 +21,20 @@ const IconicTaxaName = ( { loading, iconicTaxonId }: Props ) => {
     ribbon: {
       backgroundColor: theme.colors.primaryContainer,
     },
+    // M3 assist chip for the iconic taxon (was a full-width green banner)
     label: {
-      backgroundColor: theme.colors.primaryContainer,
-      color: theme.colors.primary,
+      alignSelf: "flex-start",
+      backgroundColor: theme.colors.secondaryContainer,
+      borderRadius: 8,
+      color: theme.colors.onSecondaryContainer,
+      fontFamily: theme.typography.heading,
+      fontSize: 14,
+      lineHeight: 20,
+      marginLeft: 24,
+      marginTop: 16,
+      overflow: "hidden",
+      paddingHorizontal: 12,
+      paddingVertical: 6,
     },
   } );
   return (
@@ -32,9 +43,7 @@ const IconicTaxaName = ( { loading, iconicTaxonId }: Props ) => {
       <StyledText
         style={[
           baseTextStyles.headerWhite,
-          textStyles.iconicTaxaText,
           styles.label,
-          isLandscape && textStyles.largerPadding,
         ]}
       >
         {!loading ? (

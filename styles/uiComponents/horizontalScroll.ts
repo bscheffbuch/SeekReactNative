@@ -1,5 +1,5 @@
 import { StyleSheet, I18nManager } from "react-native";
-import { colors } from "../global";
+
 
 const viewStyles = StyleSheet.create( {
   leftArrow: {
@@ -30,7 +30,7 @@ const viewStyles = StyleSheet.create( {
     top: 100,
   },
   speciesPhotoContainer: {
-    backgroundColor: colors.black,
+    backgroundColor: "#0F1511",
   },
   speciesRightArrow: {
     top: 100,
