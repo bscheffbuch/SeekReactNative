@@ -3,7 +3,9 @@ import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   bottomDeck: {
-    backgroundColor: "rgba(6, 9, 7, 0.84)",
+    backgroundColor: "rgba(15, 21, 17, 0.92)",
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     bottom: 0,
     gap: 11,
     left: 0,
@@ -76,8 +78,8 @@ const viewStyles = StyleSheet.create( {
   },
   glassCircle: {
     alignItems: "center",
-    backgroundColor: "rgba(16, 20, 17, 0.58)",
-    borderColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "#252B27",
+    borderColor: "transparent",
     borderRadius: 24,
     borderWidth: 1,
     height: 48,
@@ -85,7 +87,7 @@ const viewStyles = StyleSheet.create( {
     width: 48,
   },
   glassCircleActive: {
-    backgroundColor: colors.seekGold,
+    backgroundColor: "#364B3E",
     borderColor: "transparent",
   },
   glassCircleDisabled: {
@@ -135,9 +137,9 @@ const viewStyles = StyleSheet.create( {
   },
   modeTab: {
     alignItems: "center",
-    backgroundColor: "rgba(16, 20, 17, 0.58)",
-    borderColor: "rgba(255, 255, 255, 0.16)",
-    borderRadius: 14,
+    backgroundColor: "transparent",
+    borderColor: "#89938C",
+    borderRadius: 24,
     borderWidth: 1,
     flex: 1,
     gap: 1,
@@ -147,8 +149,8 @@ const viewStyles = StyleSheet.create( {
     paddingHorizontal: 4,
   },
   modeTabActive: {
-    backgroundColor: colors.seekGold,
-    borderColor: "transparent",
+    backgroundColor: "#364B3E",
+    borderColor: "#364B3E",
   },
   modeTabs: {
     flex: 1,
@@ -189,8 +191,8 @@ const viewStyles = StyleSheet.create( {
     width: "48.5%",
   },
   proTileActive: {
-    backgroundColor: "rgba(224, 168, 46, 0.16)",
-    borderColor: colors.seekGold,
+    backgroundColor: "#364B3E",
+    borderColor: "#364B3E",
   },
   proTileDot: {
     borderColor: "rgba(255, 255, 255, 0.3)",
@@ -200,8 +202,8 @@ const viewStyles = StyleSheet.create( {
     width: 10,
   },
   proTileDotActive: {
-    backgroundColor: colors.seekGold,
-    borderColor: colors.seekGold,
+    backgroundColor: "#8AD6AD",
+    borderColor: "#8AD6AD",
   },
   proTileGrid: {
     flexDirection: "row",
@@ -217,7 +219,7 @@ const viewStyles = StyleSheet.create( {
     width: 34,
   },
   proTileIconActive: {
-    backgroundColor: colors.seekGold,
+    backgroundColor: "#8AD6AD",
   },
   proTileIconRow: {
     alignItems: "center",
@@ -258,7 +260,7 @@ const viewStyles = StyleSheet.create( {
     width: 36,
   },
   settingIconBoxActive: {
-    backgroundColor: colors.seekGold,
+    backgroundColor: "#8AD6AD",
   },
   settingRow: {
     alignItems: "center",
@@ -272,7 +274,7 @@ const viewStyles = StyleSheet.create( {
     paddingVertical: 11,
   },
   settingRowActive: {
-    borderColor: colors.seekGold,
+    borderColor: "#364B3E",
   },
   settingSegment: {
     backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -295,7 +297,7 @@ const viewStyles = StyleSheet.create( {
     paddingHorizontal: 4,
   },
   settingSegmentItemActive: {
-    backgroundColor: colors.seekGold,
+    backgroundColor: "#364B3E",
   },
   settingsScrim: {
     ...StyleSheet.absoluteFillObject,
@@ -303,7 +305,7 @@ const viewStyles = StyleSheet.create( {
     zIndex: 6,
   },
   settingsSheet: {
-    backgroundColor: "rgba(14, 20, 16, 0.97)",
+    backgroundColor: "#171D19",
     borderColor: "rgba(255, 255, 255, 0.12)",
     borderTopLeftRadius: 26,
     borderTopRightRadius: 26,
@@ -330,7 +332,7 @@ const viewStyles = StyleSheet.create( {
     width: 44,
   },
   settingSwitchActive: {
-    backgroundColor: colors.seekGold,
+    backgroundColor: "#8AD6AD",
   },
   settingSwitchKnob: {
     backgroundColor: colors.white,
@@ -399,7 +401,7 @@ const viewStyles = StyleSheet.create( {
     width: 60,
   },
   shutterInnerActive: {
-    backgroundColor: colors.seekGreen,
+    backgroundColor: "#8AD6AD",
   },
   shutterInnerQueue: {
     borderRadius: 30,
@@ -410,50 +412,50 @@ const textStyles = StyleSheet.create( {
   coachingText: {
     color: colors.white,
     fontSize: 13.5,
-    fontWeight: "700",
+    fontWeight: "500",
     textAlign: "center",
   },
   glassBadgeText: {
     color: colors.white,
     fontSize: 10.5,
-    fontWeight: "800",
+    fontWeight: "500",
     textAlign: "center",
   },
   glassLabel: {
     color: "rgba(255, 255, 255, 0.8)",
     fontSize: 9,
-    fontWeight: "800",
+    fontWeight: "500",
     letterSpacing: 0,
     textAlign: "center",
   },
   glassLabelActive: {
-    color: colors.seekGold,
+    color: "#D0E8D7",
   },
   modeIcon: {
     color: colors.white,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   modeLabel: {
     color: colors.white,
     fontSize: 12.5,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   modeTextActive: {
-    color: colors.seekInk,
+    color: "#D0E8D7",
   },
   modeValue: {
     color: "rgba(255, 255, 255, 0.6)",
     fontSize: 10.5,
-    fontWeight: "700",
+    fontWeight: "500",
   },
   proTileIconText: {
     color: colors.white,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   proTileIconTextActive: {
-    color: colors.seekInk,
+    color: "#003822",
   },
   proTileSub: {
     color: "rgba(255, 255, 255, 0.52)",
@@ -464,7 +466,7 @@ const textStyles = StyleSheet.create( {
   proTileTitle: {
     color: colors.white,
     fontSize: 14,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   scanText: {
     textAlign: "center",
@@ -472,30 +474,30 @@ const textStyles = StyleSheet.create( {
   sectionLabel: {
     color: "rgba(255, 255, 255, 0.5)",
     fontSize: 11,
-    fontWeight: "800",
+    fontWeight: "500",
     letterSpacing: 0,
     marginTop: 6,
   },
   settingIcon: {
     color: colors.white,
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   settingIconActive: {
-    color: colors.seekInk,
+    color: "#003822",
   },
   settingSegmentIcon: {
     color: "rgba(255, 255, 255, 0.8)",
     fontSize: 12,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   settingSegmentText: {
     color: "rgba(255, 255, 255, 0.8)",
     fontSize: 12.5,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   settingSegmentTextActive: {
-    color: colors.seekInk,
+    color: "#D0E8D7",
   },
   settingSub: {
     color: "rgba(255, 255, 255, 0.55)",
@@ -506,17 +508,17 @@ const textStyles = StyleSheet.create( {
   settingTitle: {
     color: colors.white,
     fontSize: 14.5,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   sheetTitle: {
     color: colors.white,
     fontSize: 19,
-    fontWeight: "800",
+    fontWeight: "500",
   },
   shutterPlus: {
     color: colors.white,
     fontSize: 31,
-    fontWeight: "700",
+    fontWeight: "500",
     lineHeight: 36,
     textAlign: "center",
   },

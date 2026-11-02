@@ -21,7 +21,7 @@ exports[`iNatSignOut should render correctly 1`] = `
             "marginTop": 19,
           },
           {
-            "color": "#111512",
+            "color": "#171D19",
           },
         ],
         null,

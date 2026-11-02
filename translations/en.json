@@ -344,7 +344,14 @@
     "nearby": "Species nearby in this taxon",
     "nothing_nearby": "Looks like there haven’t been many species observed nearby in this taxon! Try taking another photo or posting it to iNaturalist.",
     "tap": "Tap to load species nearby",
-    "social": "Share on social"
+    "social": "Share on social",
+    "match": "Match",
+    "your_photo": "Your photo",
+    "reference": "Reference",
+    "names": "Names",
+    "classification": "Classification",
+    "scan_again": "Scan again",
+    "new_species_chip": "New species"
   },
   "queue": {
     "header": "Queued Observations",
@@ -460,7 +467,9 @@
     "grid_on": "On - rule of thirds",
     "save_location": "Save location",
     "save_location_sub": "Tag where you find it",
-    "save_location_on": "On - tag where found"
+    "save_location_on": "On - tag where found",
+    "show_controls": "Show camera controls",
+    "hide_controls": "Hide camera controls"
   },
   "gallery": {
     "import_photos_from": "Import Photos From"

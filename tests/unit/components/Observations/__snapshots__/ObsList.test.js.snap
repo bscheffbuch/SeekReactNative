@@ -25,8 +25,8 @@ exports[`ObsList should render correctly 1`] = `
           "marginTop": 12,
         },
         {
-          "backgroundColor": "#FAF8F1",
-          "borderColor": "#E6E9E4",
+          "backgroundColor": "#E9EFE8",
+          "borderColor": "#DDE5DC",
         },
       ]
     }
@@ -109,7 +109,7 @@ exports[`ObsList should render correctly 1`] = `
       defaultValue=""
       onChangeText={[Function]}
       placeholder="Search observations"
-      placeholderTextColor="#707A72"
+      placeholderTextColor="#404943"
       style={
         [
           {
@@ -130,7 +130,7 @@ exports[`ObsList should render correctly 1`] = `
             "width": "auto",
           },
           {
-            "color": "#111512",
+            "color": "#171D19",
             "fontFamily": "Lato-Regular",
           },
         ]
@@ -357,8 +357,8 @@ exports[`ObsList should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#E6E9E4",
+              "backgroundColor": "#EFF5EE",
+              "borderColor": "#DDE5DC",
               "borderRadius": 12,
               "borderWidth": 1,
               "flexDirection": "row",
@@ -454,7 +454,7 @@ exports[`ObsList should render correctly 1`] = `
                       "lineHeight": 22,
                     },
                     {
-                      "color": "#111512",
+                      "color": "#171D19",
                       "fontFamily": "Lato-Bold",
                     },
                   ],
@@ -484,7 +484,7 @@ exports[`ObsList should render correctly 1`] = `
                       "marginTop": 3,
                     },
                     {
-                      "color": "#707A72",
+                      "color": "#404943",
                     },
                   ],
                   null,
@@ -639,8 +639,8 @@ exports[`ObsList should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#E6E9E4",
+              "backgroundColor": "#EFF5EE",
+              "borderColor": "#DDE5DC",
               "borderRadius": 12,
               "borderWidth": 1,
               "flexDirection": "row",
@@ -736,7 +736,7 @@ exports[`ObsList should render correctly 1`] = `
                       "lineHeight": 22,
                     },
                     {
-                      "color": "#111512",
+                      "color": "#171D19",
                       "fontFamily": "Lato-Bold",
                     },
                   ],
@@ -766,7 +766,7 @@ exports[`ObsList should render correctly 1`] = `
                       "marginTop": 3,
                     },
                     {
-                      "color": "#707A72",
+                      "color": "#404943",
                     },
                   ],
                   null,
@@ -921,8 +921,8 @@ exports[`ObsList should render correctly 1`] = `
           style={
             {
               "alignItems": "center",
-              "backgroundColor": "#FFFFFF",
-              "borderColor": "#E6E9E4",
+              "backgroundColor": "#EFF5EE",
+              "borderColor": "#DDE5DC",
               "borderRadius": 12,
               "borderWidth": 1,
               "flexDirection": "row",
@@ -1018,7 +1018,7 @@ exports[`ObsList should render correctly 1`] = `
                       "lineHeight": 22,
                     },
                     {
-                      "color": "#111512",
+                      "color": "#171D19",
                       "fontFamily": "Lato-Bold",
                     },
                   ],
@@ -1048,7 +1048,7 @@ exports[`ObsList should render correctly 1`] = `
                       "marginTop": 3,
                     },
                     {
-                      "color": "#707A72",
+                      "color": "#404943",
                     },
                   ],
                   null,
@@ -1280,7 +1280,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -1441,7 +1441,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -1602,7 +1602,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -1763,7 +1763,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -1924,7 +1924,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -2085,7 +2085,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -2246,7 +2246,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -2407,7 +2407,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -2568,7 +2568,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -2708,7 +2708,7 @@ exports[`ObsList should render correctly 1`] = `
             "textAlign": "center",
           },
           {
-            "color": "#707A72",
+            "color": "#404943",
           },
         ],
         null,
@@ -2725,7 +2725,7 @@ exports[`ObsList should render correctly 1`] = `
           "paddingBottom": 60,
         },
         {
-          "backgroundColor": "#F3F1E8",
+          "backgroundColor": "#F5FBF4",
         },
       ]
     }

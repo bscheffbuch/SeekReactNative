@@ -9,12 +9,11 @@ import styles from "../../styles/match/match";
 import Footer from "../UIComponents/Footer";
 import MatchFooter from "./MatchFooter";
 import Padding from "../UIComponents/Padding";
-import TopSpacer from "../UIComponents/TopSpacer";
 import MatchHeader from "./MatchHeader";
 import MatchContainer from "./MatchContainer";
 import { useScrollToTop } from "../../utility/customHooks";
 import { useFetchUserSettings } from "../../utility/customHooks/useFetchUserSettings";
-import { setGradients, setScreenType } from "../../utility/matchHelpers";
+import { setScreenType } from "../../utility/matchHelpers";
 import MatchModals from "./MatchModals";
 import { useObservation } from "../Providers/ObservationProvider";
 import { useTheme } from "../Providers/ThemeProvider";
@@ -79,14 +78,13 @@ const MatchScreen = ( ) => {
   );
 
   const speciesIdentified = screenType === "resighted" || screenType === "newSpecies";
-  const { gradientDark } = setGradients( screenType );
 
   if ( !observation ) {
     return null;
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: gradientDark }]} edges={["top"]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
       <MatchModals
         observation={observation}
         screenType={screenType}
@@ -97,7 +95,6 @@ const MatchScreen = ( ) => {
         scientificNames={scientificNames}
       />
       <ScrollView ref={scrollView} contentContainerStyle={[styles.whiteContainer, { backgroundColor: theme.colors.canvas }]}>
-        <TopSpacer backgroundColor={gradientDark} />
         <MatchHeader
           observation={observation}
           screenType={screenType}

@@ -3,9 +3,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   DocumentDirectoryPath,
   ExternalDirectoryPath,
+  copyFileAssets,
   exists,
+  existsAssets,
+  mkdir,
   readDir,
+  readDirAssets,
   readFile,
+  stat,
 } from "@dr.pogodin/react-native-fs";
 
 import { dirModel, dirGeomodel, dirTaxonomy } from "./dirStorage";
@@ -132,10 +137,11 @@ export const parseManifest = ( raw: unknown, dir: string ): ManifestResult => {
   };
 };
 
-/** Picks the selected pack, falling back to the built-in one if it is missing. */
+/** Picks the selected pack, falling back to the built-in one, then any installed pack. */
 export const choosePack = ( packs: ModelPack[], selectedId: string | null ): ModelPack => (
   packs.find( ( p ) => p.id === selectedId )
   || packs.find( ( p ) => p.builtIn )
+  || packs[0]
   || builtInPack( )
 );
 
@@ -170,7 +176,19 @@ const readPack = async ( dir: string ): Promise<ModelPack | null> => {
   }
 };
 
-/** The built-in pack plus every valid installed pack (first directory wins on duplicate ids). */
+const builtInAvailable = async ( ): Promise<boolean> => {
+  try {
+    return await exists( dirModel );
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * The built-in pack plus every valid installed pack (first directory wins on duplicate
+ * ids). Builds without the private Seek model files (e.g. open-source builds that ship
+ * a BioCLIP 2 pack instead) leave the built-in entry out when another pack exists.
+ */
 export const listModelPacks = async ( ): Promise<ModelPack[]> => {
   const packs: ModelPack[] = [builtInPack( )];
   for ( const root of modelPackDirs( ) ) {
@@ -192,6 +210,9 @@ export const listModelPacks = async ( ): Promise<ModelPack[]> => {
         packs.push( pack );
       }
     }
+  }
+  if ( packs.length > 1 && Platform?.OS === "android" && !( await builtInAvailable( ) ) ) {
+    return packs.filter( ( p ) => !p.builtIn );
   }
   return packs;
 };
@@ -223,4 +244,50 @@ export const onActivePackChange = ( fn: Listener ): ( ( ) => void ) => {
   return ( ) => {
     listeners.delete( fn );
   };
+};
+
+/**
+ * Packs bundled in the APK under assets/models/<id>/ are copied once to
+ * DocumentDirectoryPath/models/<id>/ (the vision plugin needs real file paths).
+ * Files are re-copied only when missing or a different size. Returns true when
+ * anything was copied, and notifies listeners so the camera picks the pack up.
+ */
+export const installBundledPacks = async ( ): Promise<boolean> => {
+  if ( Platform?.OS !== "android" ) {
+    return false;
+  }
+  let copied = false;
+  try {
+    if ( !( await existsAssets( "models" ) ) ) {
+      return false;
+    }
+    const packDirs = ( await readDirAssets( "models" ) ).filter( ( e ) => e.isDirectory( ) );
+    for ( const dir of packDirs ) {
+      const target = `${DocumentDirectoryPath}/models/${dir.name}`;
+      await mkdir( target );
+      const files = ( await readDirAssets( `models/${dir.name}` ) ).filter( ( e ) => e.isFile( ) );
+      // manifest last, so a half-copied pack is never picked up
+      files.sort( ( a, b ) => Number( a.name === "manifest.json" ) - Number( b.name === "manifest.json" ) );
+      for ( const file of files ) {
+        const destination = `${target}/${file.name}`;
+        let upToDate = false;
+        try {
+          upToDate = ( await exists( destination ) ) && Number( ( await stat( destination ) ).size ) === Number( file.size );
+        } catch {
+          upToDate = false;
+        }
+        if ( !upToDate ) {
+          await copyFileAssets( `models/${dir.name}/${file.name}`, destination );
+          copied = true;
+        }
+      }
+    }
+  } catch ( e ) {
+    console.log( "[ModelPacks] could not install bundled packs:", e );
+  }
+  if ( copied ) {
+    const pack = await getActiveModelPack( );
+    listeners.forEach( ( fn ) => fn( pack ) );
+  }
+  return copied;
 };

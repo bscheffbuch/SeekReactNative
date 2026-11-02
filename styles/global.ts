@@ -1,4 +1,4 @@
-import { Dimensions } from "react-native";
+import { Dimensions, Platform } from "react-native";
 import { defaultSystemFonts } from "react-native-render-html";
 
 const { width, height } = Dimensions.get( "window" );
@@ -52,13 +52,23 @@ export const colors: Colors = {
   ccGray: "#363636",
 };
 
-export const fonts = {
-  medium: "Lato-Medium",
-  bold: "Lato-Bold",
-  regular: "Lato-Regular",
-  italic: "Lato-Italic",
-  boldItalic: "Lato-BoldItalic",
-};
+// Material 3: Roboto on Android, with Medium (500) for titles and labels.
+// iOS keeps the bundled Lato until the Roboto files are added to the Xcode project.
+export const fonts = Platform.OS === "android"
+  ? {
+    medium: "Roboto-Medium",
+    bold: "Roboto-Medium",
+    regular: "Roboto-Regular",
+    italic: "Roboto-Italic",
+    boldItalic: "Roboto-MediumItalic",
+  }
+  : {
+    medium: "Lato-Medium",
+    bold: "Lato-Bold",
+    regular: "Lato-Regular",
+    italic: "Lato-Italic",
+    boldItalic: "Lato-BoldItalic",
+  };
 
 export const htmlFonts = [
   fonts.regular,

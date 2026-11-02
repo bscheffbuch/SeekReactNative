@@ -81,6 +81,10 @@ interface Props {
   hasPermission: boolean;
   onCaptureStarted: ( ) => void;
   photoQualityBalance?: "speed" | "balanced" | "quality";
+  // one-finger swipes on the viewfinder: up/down = focus, left/right = peaking
+  onViewfinderPanStart?: ( ) => void;
+  onViewfinderPan?: ( translationX: number, translationY: number ) => void;
+  onViewfinderPanEnd?: ( ) => void;
 }
 
 const PEAKING_SAMPLE_INTERVAL_MS = 33;
@@ -738,6 +742,15 @@ const FrameProcessorCamera = ( props: Props ) => {
     ]
   );
 
+  const { onViewfinderPanStart, onViewfinderPan, onViewfinderPanEnd } = props;
+  const viewfinderPan = useMemo( ( ) => Gesture.Pan( )
+    .runOnJS( true )
+    .maxPointers( 1 )
+    .minDistance( 18 )
+    .onStart( ( ) => onViewfinderPanStart?.( ) )
+    .onUpdate( event => onViewfinderPan?.( event.translationX, event.translationY ) )
+    .onFinalize( ( ) => onViewfinderPanEnd?.( ) ), [onViewfinderPan, onViewfinderPanEnd, onViewfinderPanStart] );
+
   const active = isActive && isFocused && isForeground;
   const handlePreviewOrientationChanged = useCallback( ( nextPreviewOrientation: Orientation ) => {
     previewOrientation.value = nextPreviewOrientation;
@@ -761,7 +774,7 @@ const FrameProcessorCamera = ( props: Props ) => {
   return (
     device && cameraPermissionStatus === "granted" && (
       <View onLayout={handlePreviewLayout} style={StyleSheet.absoluteFill}>
-        <GestureDetector gesture={Gesture.Simultaneous( tapToFocus )}>
+        <GestureDetector gesture={Gesture.Simultaneous( tapToFocus, viewfinderPan )}>
           <Camera
             ref={cameraRef}
             style={StyleSheet.absoluteFill}

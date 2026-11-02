@@ -197,7 +197,7 @@ exports[`SpeciesNearbyList should render correctly 1`] = `
                 },
                 false,
                 {
-                  "color": "#111512",
+                  "color": "#171D19",
                 },
               ],
               null,

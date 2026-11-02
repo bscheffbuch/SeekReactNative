@@ -11,7 +11,7 @@ exports[`SideMenu should render correctly 1`] = `
         "justifyContent": "center",
       },
       {
-        "backgroundColor": "#F3F1E8",
+        "backgroundColor": "#F5FBF4",
       },
     ]
   }
@@ -149,7 +149,7 @@ exports[`SideMenu should render correctly 1`] = `
               "paddingEnd": 4,
             },
             {
-              "color": "#111512",
+              "color": "#171D19",
             },
           ],
           null,
@@ -242,7 +242,7 @@ exports[`SideMenu should render correctly 1`] = `
               "paddingEnd": 4,
             },
             {
-              "color": "#111512",
+              "color": "#171D19",
             },
           ],
           null,
@@ -335,7 +335,7 @@ exports[`SideMenu should render correctly 1`] = `
               "paddingEnd": 4,
             },
             {
-              "color": "#111512",
+              "color": "#171D19",
             },
           ],
           null,
@@ -428,7 +428,7 @@ exports[`SideMenu should render correctly 1`] = `
               "paddingEnd": 4,
             },
             {
-              "color": "#111512",
+              "color": "#171D19",
             },
           ],
           null,
@@ -521,7 +521,7 @@ exports[`SideMenu should render correctly 1`] = `
               "paddingEnd": 4,
             },
             {
-              "color": "#111512",
+              "color": "#171D19",
             },
           ],
           null,
@@ -614,7 +614,7 @@ exports[`SideMenu should render correctly 1`] = `
               "paddingEnd": 4,
             },
             {
-              "color": "#111512",
+              "color": "#171D19",
             },
           ],
           null,
@@ -704,7 +704,7 @@ exports[`SideMenu should render correctly 1`] = `
               "paddingEnd": 4,
             },
             {
-              "color": "#111512",
+              "color": "#171D19",
             },
           ],
           null,

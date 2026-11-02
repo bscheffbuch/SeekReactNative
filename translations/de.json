@@ -333,7 +333,14 @@
     "nearby": "Beobachtungen dieser Art in der Umgebung",
     "nothing_nearby": "Sieht so aus, als ob diese Art in der Umgebung noch nicht oft beobachtet wurde! Versuche ein anderes Foto zu machen oder veröffentliche diese Beobachtung auf iNaturalist.",
     "tap": "Tippe, um Arten in der Umgebung zu laden",
-    "social": "Auf Sozialen Netzwerken teilen"
+    "social": "Auf Sozialen Netzwerken teilen",
+    "match": "Treffer",
+    "your_photo": "Dein Foto",
+    "reference": "Referenz",
+    "names": "Namen",
+    "classification": "Systematik",
+    "scan_again": "Erneut scannen",
+    "new_species_chip": "Neue Art"
   },
   "banner": {
     "view": "Abzeichen ansehen",
@@ -386,7 +393,9 @@
     "best_for_wild_organisms": "Empfohlen für wilde Lebewesen",
     "best_for_captive_organisms": "Empfohlen für Gartenpflanzen, Haustiere oder Zootiere",
     "flash_on": "Blitz an",
-    "flash_off": "Blitz aus"
+    "flash_off": "Blitz aus",
+    "show_controls": "Kamerasteuerung einblenden",
+    "hide_controls": "Kamerasteuerung ausblenden"
   },
   "gallery": {
     "import_photos_from": "Fotos importieren von"

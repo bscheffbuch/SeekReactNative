@@ -17,7 +17,7 @@ exports[`SelectSpecies should render correctly 1`] = `
         "flex": 1,
       },
       {
-        "backgroundColor": "#F3F1E8",
+        "backgroundColor": "#F5FBF4",
       },
     ]
   }
@@ -31,7 +31,7 @@ exports[`SelectSpecies should render correctly 1`] = `
           "height": 55,
         },
         {
-          "backgroundColor": "#F3F1E8",
+          "backgroundColor": "#F5FBF4",
         },
       ]
     }
@@ -84,7 +84,7 @@ exports[`SelectSpecies should render correctly 1`] = `
         meetOrSlice={0}
         minX={0}
         minY={0}
-        stroke="#111512"
+        stroke="#171D19"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth={2}
@@ -118,7 +118,7 @@ exports[`SelectSpecies should render correctly 1`] = `
           }
           stroke={
             {
-              "payload": 4279309586,
+              "payload": 4279704857,
               "type": 0,
             }
           }
@@ -201,7 +201,7 @@ exports[`SelectSpecies should render correctly 1`] = `
           "justifyContent": "center",
         },
         {
-          "backgroundColor": "#F3F1E8",
+          "backgroundColor": "#F5FBF4",
         },
       ]
     }
@@ -231,7 +231,7 @@ exports[`SelectSpecies should render correctly 1`] = `
       defaultValue={null}
       onChangeText={[Function]}
       placeholder="Look up a species by name"
-      placeholderTextColor="#707A72"
+      placeholderTextColor="#404943"
       style={
         [
           {
@@ -252,9 +252,9 @@ exports[`SelectSpecies should render correctly 1`] = `
             "width": 679,
           },
           {
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
-            "color": "#111512",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
+            "color": "#171D19",
           },
         ]
       }
@@ -288,7 +288,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                 "lineHeight": 24,
               },
               {
-                "color": "#111512",
+                "color": "#171D19",
                 "fontFamily": "Lato-Bold",
               },
               false,
@@ -341,8 +341,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -398,7 +398,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -428,7 +428,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -465,7 +465,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                 "lineHeight": 24,
               },
               {
-                "color": "#111512",
+                "color": "#171D19",
                 "fontFamily": "Lato-Bold",
               },
               false,
@@ -518,8 +518,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -610,7 +610,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -640,7 +640,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -692,8 +692,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -784,7 +784,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -814,7 +814,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -866,8 +866,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -958,7 +958,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -988,7 +988,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -1040,8 +1040,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -1132,7 +1132,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -1162,7 +1162,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -1214,8 +1214,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -1306,7 +1306,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -1336,7 +1336,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -1388,8 +1388,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -1480,7 +1480,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -1510,7 +1510,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -1562,8 +1562,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -1654,7 +1654,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -1684,7 +1684,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -1736,8 +1736,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -1828,7 +1828,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -1858,7 +1858,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -1910,8 +1910,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -2002,7 +2002,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -2032,7 +2032,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -2084,8 +2084,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -2176,7 +2176,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -2206,7 +2206,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -2258,8 +2258,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -2350,7 +2350,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -2380,7 +2380,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -2432,8 +2432,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -2524,7 +2524,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -2554,7 +2554,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -2606,8 +2606,8 @@ exports[`SelectSpecies should render correctly 1`] = `
         style={
           {
             "alignItems": "center",
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
+            "backgroundColor": "#EFF5EE",
+            "borderColor": "#DDE5DC",
             "borderRadius": 12,
             "borderWidth": 1,
             "flexDirection": "row",
@@ -2698,7 +2698,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "lineHeight": 22,
                   },
                   {
-                    "color": "#111512",
+                    "color": "#171D19",
                     "fontFamily": "Lato-Bold",
                   },
                 ],
@@ -2728,7 +2728,7 @@ exports[`SelectSpecies should render correctly 1`] = `
                     "marginTop": 3,
                   },
                   {
-                    "color": "#707A72",
+                    "color": "#404943",
                   },
                 ],
                 null,
@@ -2748,7 +2748,7 @@ exports[`SelectSpecies should render correctly 1`] = `
             "paddingBottom": 60,
           },
           {
-            "backgroundColor": "#F3F1E8",
+            "backgroundColor": "#F5FBF4",
           },
         ]
       }

@@ -19,44 +19,46 @@ const AppearanceSettings = ( ) => {
       marginBottom: theme.spacing.lg,
     },
     heading: {
-      color: theme.colors.text,
+      color: theme.colors.primary,
       fontFamily: theme.typography.heading,
-      fontSize: 18,
-      lineHeight: 24,
+      fontSize: 14,
+      lineHeight: 20,
       marginBottom: theme.spacing.sm,
     },
+    // M3 segmented button: outlined pill, selected segment in secondary container
     group: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.sm,
+      borderColor: theme.colors.outline,
+      borderRadius: 24,
       borderWidth: 1,
       flexDirection: "row",
-      padding: theme.spacing.xs,
+      overflow: "hidden",
     },
     option: {
       alignItems: "center",
-      borderRadius: theme.radii.sm - theme.spacing.xs,
+      borderColor: theme.colors.outline,
       flex: 1,
       justifyContent: "center",
       minHeight: 48,
       paddingHorizontal: theme.spacing.sm,
-      paddingVertical: theme.spacing.sm,
+    },
+    optionDivider: {
+      borderLeftWidth: 1,
     },
     optionSelected: {
-      backgroundColor: theme.colors.primaryContainer,
+      backgroundColor: theme.colors.secondaryContainer,
     },
     optionPressed: {
       backgroundColor: theme.colors.pressed,
     },
     optionText: {
-      color: theme.colors.muted,
+      color: theme.colors.text,
       fontFamily: theme.typography.heading,
       fontSize: 15,
       lineHeight: 20,
       textAlign: "center",
     },
     optionTextSelected: {
-      color: theme.colors.primary,
+      color: theme.colors.onSecondaryContainer,
     },
   } );
 
@@ -78,7 +80,7 @@ const AppearanceSettings = ( ) => {
         {i18n.t( "settings.appearance" )}
       </Text>
       <View style={styles.group}>
-        {options.map( option => {
+        {options.map( ( option, index ) => {
           const selected = option.value === themePreference;
           return (
             <Pressable
@@ -90,13 +92,14 @@ const AppearanceSettings = ( ) => {
               onPress={() => handlePreference( option.value )}
               style={( { pressed } ) => [
                 styles.option,
+                index > 0 && styles.optionDivider,
                 selected && styles.optionSelected,
                 pressed && styles.optionPressed,
               ]}
               testID={`appearance-${option.value}`}
             >
               <Text style={[styles.optionText, selected && styles.optionTextSelected]}>
-                {i18n.t( option.labelKey )}
+                {selected ? "✓ " : ""}{i18n.t( option.labelKey )}
               </Text>
             </Pressable>
           );

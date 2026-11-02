@@ -85,8 +85,8 @@ const SpeciesNearby = ( ) => {
       fontFamily: theme.typography.heading,
     },
     speciesNearbyContainer: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderColor: theme.colors.surfaceContainerLow,
     },
     speciesNearbyPadding: {
       backgroundColor: theme.colors.canvas,

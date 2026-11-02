@@ -14,17 +14,17 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
         "padding": 16,
       },
       {
-        "backgroundColor": "#FFFFFF",
-        "borderColor": "#E6E9E4",
+        "backgroundColor": "#EFF5EE",
+        "borderColor": "#DDE5DC",
         "borderRadius": 12,
-        "elevation": 2,
-        "shadowColor": "#142018",
+        "elevation": 0,
+        "shadowColor": "#000000",
         "shadowOffset": {
-          "height": 6,
+          "height": 0,
           "width": 0,
         },
-        "shadowOpacity": 0.07,
-        "shadowRadius": 14,
+        "shadowOpacity": 0,
+        "shadowRadius": 0,
       },
     ]
   }
@@ -48,7 +48,7 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
             "paddingLeft": 0,
           },
           {
-            "color": "#111512",
+            "color": "#171D19",
             "fontFamily": "Lato-Bold",
           },
         ],
@@ -81,7 +81,7 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
             },
             false,
             {
-              "color": "#707A72",
+              "color": "#404943",
               "fontFamily": "Lato-Regular",
             },
           ],
@@ -202,17 +202,17 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
         "padding": 16,
       },
       {
-        "backgroundColor": "#FFFFFF",
-        "borderColor": "#E6E9E4",
+        "backgroundColor": "#EFF5EE",
+        "borderColor": "#DDE5DC",
         "borderRadius": 12,
-        "elevation": 2,
-        "shadowColor": "#142018",
+        "elevation": 0,
+        "shadowColor": "#000000",
         "shadowOffset": {
-          "height": 6,
+          "height": 0,
           "width": 0,
         },
-        "shadowOpacity": 0.07,
-        "shadowRadius": 14,
+        "shadowOpacity": 0,
+        "shadowRadius": 0,
       },
     ]
   }
@@ -236,7 +236,7 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
             "paddingLeft": 0,
           },
           {
-            "color": "#111512",
+            "color": "#171D19",
             "fontFamily": "Lato-Bold",
           },
         ],
@@ -269,7 +269,7 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
             },
             false,
             {
-              "color": "#707A72",
+              "color": "#404943",
               "fontFamily": "Lato-Regular",
             },
           ],

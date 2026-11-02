@@ -1,6 +1,8 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import {
   BinocularsIcon,
@@ -17,6 +19,7 @@ import Observations from "../Observations/Observations";
 import Challenges from "../Challenges/ChallengeScreen/ChallengeScreen";
 import More from "./MoreScreen";
 import { useTheme } from "../Providers/ThemeProvider";
+import { makeThemedStyles } from "../../styles/themedStyles";
 import type { ThemeTokens } from "../../styles/theme";
 import type { BottomTabParamList } from "./types";
 import { handleScanTabPress, tabLabels } from "./bottomTabHelpers";
@@ -38,94 +41,163 @@ const tabDisplayLabels: Partial<Record<keyof BottomTabParamList, string>> = {
   Challenges: "Quests",
 };
 
-type TabIconProps = {
-  routeName: keyof BottomTabParamList;
-  color: string;
-  focused: boolean;
-  theme: ThemeTokens;
-};
-
-const tabIconStyles = ( theme: ThemeTokens, focused: boolean ) => StyleSheet.create( {
-  scanIcon: {
-    alignItems: "center",
-    backgroundColor: theme.colors.primary,
-    borderColor: focused ? theme.colors.accent : theme.colors.surface,
-    borderRadius: 27,
-    borderWidth: 2,
-    height: 54,
-    justifyContent: "center",
-    marginTop: -theme.spacing.lg,
-    shadowColor: theme.colors.primary,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.26,
-    shadowRadius: 16,
-    width: 54,
-    elevation: 5,
+const getStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
+  bar: {
+    backgroundColor: theme.colors.surfaceContainer,
+    flexDirection: "row",
+    paddingHorizontal: theme.spacing.sm,
+    paddingTop: 12,
   },
-} );
+  item: {
+    alignItems: "center",
+    flex: 1,
+    minHeight: 56,
+  },
+  indicator: {
+    alignItems: "center",
+    borderRadius: 16,
+    height: 32,
+    justifyContent: "center",
+    width: 64,
+  },
+  indicatorActive: {
+    backgroundColor: theme.colors.secondaryContainer,
+  },
+  label: {
+    color: theme.colors.onSurfaceVariant,
+    fontFamily: theme.typography.body,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: theme.spacing.xs,
+  },
+  labelActive: {
+    color: theme.colors.text,
+    fontFamily: theme.typography.heading,
+  },
+  fab: {
+    alignItems: "center",
+    backgroundColor: theme.colors.primaryContainer,
+    borderRadius: 16,
+    elevation: 6,
+    flexDirection: "row",
+    gap: 12,
+    height: 56,
+    paddingLeft: theme.spacing.md,
+    paddingRight: 20,
+    position: "absolute",
+    right: theme.spacing.md,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: theme.isDark ? 0.4 : 0.16,
+    shadowRadius: 8,
+  },
+  fabPressed: {
+    opacity: 0.88,
+  },
+  fabLabel: {
+    color: theme.colors.onPrimaryContainer,
+    fontFamily: theme.typography.heading,
+    fontSize: 15,
+    lineHeight: 20,
+  },
+} ) );
 
-const TabIcon = ( { routeName, color, focused, theme }: TabIconProps ) => {
-  const Icon = tabIcons[routeName];
-  const styles = tabIconStyles( theme, focused );
+// Material 3 navigation bar: tonal surface, pill indicator behind the active icon,
+// and the camera promoted to an extended FAB above the bar (M3 bars have no raised
+// centre button).
+const M3TabBar = ( { state, navigation }: BottomTabBarProps ) => {
+  const { theme } = useTheme( );
+  const styles = getStyles( theme );
+  const insets = useSafeAreaInsets( );
+  const barHeight = 68 + Math.max( insets.bottom, 12 );
+  const routes = state.routes.filter( route => route.name !== "Scan" );
 
   return (
-    <View style={routeName === "Scan" ? styles.scanIcon : undefined}>
-      <Icon color={routeName === "Scan" ? theme.colors.inverseText : color} size={routeName === "Scan" ? 26 : 23} strokeWidth={2.2} />
+    <View>
+      <View accessibilityRole="tablist" style={[styles.bar, { height: barHeight, paddingBottom: Math.max( insets.bottom, 12 ) }]}>
+        {routes.map( route => {
+          const name = route.name as keyof BottomTabParamList;
+          const focused = state.routes[state.index]?.key === route.key;
+          const Icon = tabIcons[name];
+          const label = tabDisplayLabels[name] || i18n.t( tabLabels[name] );
+          const onPress = ( ) => {
+            const event = navigation.emit( { type: "tabPress", target: route.key, canPreventDefault: true } );
+            if ( !focused && !event.defaultPrevented ) {
+              navigation.navigate( route.name, route.params );
+            }
+          };
+          return (
+            <Pressable
+              accessibilityLabel={label}
+              accessibilityRole="tab"
+              accessibilityState={{ selected: focused }}
+              key={route.key}
+              onPress={onPress}
+              style={styles.item}
+              testID={`tab-${name}`}
+            >
+              <View style={[styles.indicator, focused && styles.indicatorActive]}>
+                <Icon
+                  color={focused ? theme.colors.onSecondaryContainer : theme.colors.onSurfaceVariant}
+                  size={24}
+                  strokeWidth={focused ? 2.4 : 2}
+                />
+              </View>
+              <Text numberOfLines={1} style={[styles.label, focused && styles.labelActive]}>{label}</Text>
+            </Pressable>
+          );
+        } )}
+      </View>
     </View>
   );
 };
 
-const BottomTabs = ( ) => {
-  const navigation = useNavigation( );
-  const { theme } = useTheme( );
+const renderTabBar = ( props: BottomTabBarProps ) => <M3TabBar {...props} />;
 
+// The FAB sits over the navigator (not inside the bar) so its whole area takes touches.
+const ScanFab = ( ) => {
+  const { theme } = useTheme( );
+  const styles = getStyles( theme );
+  const insets = useSafeAreaInsets( );
+  const navigation = useNavigation( );
+  const barHeight = 68 + Math.max( insets.bottom, 12 );
   return (
-    <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={( { route } ) => {
-        return {
-          headerShown: false,
-          tabBarActiveTintColor: theme.colors.primary,
-          tabBarInactiveTintColor: theme.colors.muted,
-          tabBarLabel: tabDisplayLabels[route.name] || i18n.t( tabLabels[route.name] ),
-          tabBarLabelStyle: {
-            fontFamily: theme.typography.heading,
-            fontSize: 11,
-            lineHeight: 15,
-          },
-          tabBarStyle: {
-            backgroundColor: theme.colors.surface,
-            borderTopColor: theme.colors.border,
-            borderTopWidth: StyleSheet.hairlineWidth,
-            minHeight: 68,
-            paddingBottom: theme.spacing.xs,
-            paddingTop: theme.spacing.sm,
-            shadowColor: theme.colors.shadow,
-            shadowOffset: { width: 0, height: -6 },
-            shadowOpacity: theme.isDark ? 0.22 : 0.08,
-            shadowRadius: 14,
-          },
-          // React Navigation expects a render callback here.
-          // eslint-disable-next-line react/no-unstable-nested-components
-          tabBarIcon: ( { color, focused } ) => (
-            <TabIcon color={color} focused={focused} routeName={route.name} theme={theme} />
-          ),
-        };
-      }}
+    <Pressable
+      accessibilityLabel={i18n.t( tabLabels.Scan )}
+      accessibilityRole="button"
+      onPress={( ) => navigation.navigate( "Camera" as never )}
+      style={( { pressed } ) => [styles.fab, { bottom: barHeight + 16 }, pressed && styles.fabPressed]}
+      testID="scanFab"
     >
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Observations" component={Observations} />
-      <Tab.Screen
-        name="Scan"
-        component={ScanPlaceholder}
-        listeners={{
-          tabPress: handleScanTabPress( navigation ),
-        }}
-      />
-      <Tab.Screen name="Challenges" component={Challenges} />
-      <Tab.Screen name="More" component={More} />
-    </Tab.Navigator>
+      <CameraIcon color={theme.colors.onPrimaryContainer} size={24} strokeWidth={2} />
+      <Text style={styles.fabLabel}>{i18n.t( tabLabels.Scan )}</Text>
+    </Pressable>
   );
 };
+
+const BottomTabs = ( ) => (
+  <View style={fill.container}>
+    <Tab.Navigator
+    initialRouteName="Home"
+    screenOptions={{ headerShown: false }}
+    tabBar={renderTabBar}
+  >
+    <Tab.Screen name="Home" component={Home} />
+    <Tab.Screen name="Observations" component={Observations} />
+    <Tab.Screen
+      name="Scan"
+      component={ScanPlaceholder}
+      listeners={( { navigation } ) => ( {
+        tabPress: handleScanTabPress( navigation ),
+      } )}
+    />
+    <Tab.Screen name="Challenges" component={Challenges} />
+    <Tab.Screen name="More" component={More} />
+    </Tab.Navigator>
+    <ScanFab />
+  </View>
+);
+
+const fill = StyleSheet.create( { container: { flex: 1 } } );
 
 export default BottomTabs;

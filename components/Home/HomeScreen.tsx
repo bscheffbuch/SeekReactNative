@@ -42,30 +42,27 @@ import type { ThemeTokens } from "../../styles/theme";
 
 const getHeroStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   container: {
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
   },
   card: {
     alignItems: "center",
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radii.lg,
-    borderWidth: 1,
+    backgroundColor: theme.colors.primaryContainer,
+    borderRadius: 24,
     flexDirection: "row",
     gap: theme.spacing.md,
-    padding: theme.spacing.md,
-    ...theme.elevation.card,
+    padding: 20,
   },
   cardPressed: {
-    backgroundColor: theme.colors.primaryContainer,
+    opacity: 0.9,
   },
   badge: {
     height: 64,
     width: 64,
   },
   badgePlaceholder: {
-    backgroundColor: theme.colors.primaryContainer,
+    backgroundColor: theme.colors.secondaryContainer,
     borderRadius: 32,
     height: 64,
     width: 64,
@@ -74,38 +71,57 @@ const getHeroStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
     flex: 1,
   },
   kicker: {
-    color: theme.colors.muted,
+    color: theme.colors.onPrimaryContainer,
     fontFamily: theme.typography.heading,
     fontSize: 12,
-    letterSpacing: 0,
+    letterSpacing: 0.4,
     lineHeight: 16,
+    opacity: 0.8,
   },
   title: {
-    color: theme.colors.text,
-    fontFamily: theme.typography.heading,
+    color: theme.colors.onPrimaryContainer,
+    fontFamily: theme.typography.body,
     fontSize: 24,
     letterSpacing: 0,
-    lineHeight: 30,
-    marginTop: theme.spacing.xxs,
+    lineHeight: 32,
   },
-  track: {
-    backgroundColor: theme.colors.primaryContainer,
-    borderRadius: 3,
-    height: 6,
-    marginTop: theme.spacing.sm,
-    overflow: "hidden",
+  // M3 linear progress, thick variant: active part, 4px gap, track
+  progressRow: {
+    flexDirection: "row",
+    gap: 4,
+    height: 12,
+    marginTop: 12,
   },
   fill: {
     backgroundColor: theme.colors.primary,
-    borderRadius: 3,
-    height: 6,
+    borderRadius: 6,
+    height: 12,
+  },
+  track: {
+    backgroundColor: theme.isDark ? "rgba(166, 242, 200, 0.22)" : "rgba(0, 33, 19, 0.14)",
+    borderRadius: 6,
+    flex: 1,
+    height: 12,
+  },
+  captionRow: {
+    flexDirection: "row",
+    gap: theme.spacing.sm,
+    justifyContent: "space-between",
+    marginTop: theme.spacing.sm,
   },
   caption: {
-    color: theme.colors.muted,
+    color: theme.colors.onPrimaryContainer,
+    flexShrink: 1,
     fontFamily: theme.typography.body,
-    fontSize: 13,
-    lineHeight: 18,
-    marginTop: theme.spacing.xs,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  count: {
+    color: theme.colors.onPrimaryContainer,
+    fontFamily: theme.typography.heading,
+    fontSize: 14,
+    fontVariant: ["tabular-nums"],
+    lineHeight: 20,
   },
 } ) );
 
@@ -142,10 +158,18 @@ const HomeHero = ( { summary, navigation } ) => {
           <Text accessibilityRole="header" numberOfLines={1} style={styles.title}>
             {levelName}
           </Text>
-          <View style={styles.track}>
-            <View style={[styles.fill, { width: `${Math.round( progress * 100 )}%` }]} />
+          <View style={styles.progressRow}>
+            {progress > 0 && <View style={[styles.fill, { width: `${Math.round( progress * 100 )}%` }]} />}
+            {progress < 1 && <View style={styles.track} />}
           </View>
-          {summary.loaded && <Text style={styles.caption}>{caption}</Text>}
+          {summary.loaded && (
+            <View style={styles.captionRow}>
+              <Text style={styles.caption}>{caption}</Text>
+              {!isMaxLevel && nextLevelCount
+                ? <Text style={styles.count}>{`${localizeNumber( speciesCount )} / ${localizeNumber( nextLevelCount )}`}</Text>
+                : null}
+            </View>
+          )}
         </View>
       </Pressable>
     </View>
@@ -154,7 +178,7 @@ const HomeHero = ( { summary, navigation } ) => {
 
 const getCollectionStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   container: {
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing.sm,
   },
@@ -167,7 +191,7 @@ const getCollectionStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   header: {
     color: theme.colors.text,
     fontFamily: theme.typography.heading,
-    fontSize: 18,
+    fontSize: 16,
     lineHeight: 24,
   },
   grid: {
@@ -175,17 +199,22 @@ const getCollectionStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
     gap: theme.spacing.sm,
   },
   card: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radii.md,
-    borderWidth: 1,
+    backgroundColor: theme.colors.surfaceContainerHighest,
+    borderRadius: 12,
     flex: 1,
-    minHeight: 104,
-    padding: theme.spacing.md,
-    ...theme.elevation.card,
+    minHeight: 112,
+    padding: 12,
   },
   cardPressed: {
-    backgroundColor: theme.colors.primaryContainer,
+    backgroundColor: theme.colors.surfaceContainerHigh,
+  },
+  iconDisc: {
+    alignItems: "center",
+    backgroundColor: theme.colors.secondaryContainer,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
   },
   value: {
     color: theme.colors.text,
@@ -195,7 +224,7 @@ const getCollectionStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
     marginTop: theme.spacing.sm,
   },
   label: {
-    color: theme.colors.muted,
+    color: theme.colors.onSurfaceVariant,
     fontFamily: theme.typography.body,
     fontSize: 12,
     lineHeight: 16,
@@ -253,7 +282,9 @@ const HomeCollectionStrip = ( { summary, navigation } ) => {
               style={( { pressed } ) => [styles.card, pressed && styles.cardPressed]}
               testID={item.testID}
             >
-              <Icon color={theme.colors.primary} size={20} />
+              <View style={styles.iconDisc}>
+                <Icon color={theme.colors.onSecondaryContainer} size={18} />
+              </View>
               <Text style={styles.value}>{item.value}</Text>
               <Text numberOfLines={2} style={styles.label}>{label}</Text>
             </Pressable>

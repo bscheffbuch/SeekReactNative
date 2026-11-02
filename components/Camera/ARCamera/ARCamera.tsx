@@ -271,7 +271,7 @@ const ARCamera = ( ) => {
       case ACTION.SET_PREDICTIONS:
         return { ...currentState, allPredictions: action.predictions };
       case ACTION.RESET_STATE:
-        // eslint-disable-next-line react-hooks/react-compiler
+         
         pictureTaken.value = false;
         return {
           ...currentState,
@@ -472,6 +472,43 @@ const ARCamera = ( ) => {
 
   const updateFocusPeakingSensitivity = useCallback( ( sensitivity: number ) => {
     setFocusPeakingSensitivity( Math.min( Math.max( sensitivity, 0 ), 1 ) );
+  }, [] );
+
+  // Viewfinder gestures (work with or without the on-screen controls):
+  // swipe up/down = focus far/close, swipe left/right = focus peaking sensitivity.
+  // Pinch-to-zoom is handled natively by the camera view.
+  const panStartRef = useRef( { focus: 0.5, peak: 0.5, axis: null as null | "x" | "y" } );
+  const hudTimerRef = useRef<ReturnType<typeof setTimeout> | null>( null );
+  const [gestureHud, setGestureHud] = useState<null | { mode: "focus" | "peak"; value: number }>( null );
+  const handleViewfinderPanStart = useCallback( ( ) => {
+    panStartRef.current = { focus: manualFocusValueRef.current, peak: focusPeakingSensitivity, axis: null };
+    if ( hudTimerRef.current ) {
+      clearTimeout( hudTimerRef.current );
+    }
+  }, [focusPeakingSensitivity] );
+  const handleViewfinderPan = useCallback( ( dx: number, dy: number ) => {
+    const start = panStartRef.current;
+    if ( !start.axis ) {
+      start.axis = Math.abs( dy ) >= Math.abs( dx ) ? "y" : "x";
+    }
+    if ( start.axis === "y" ) {
+      if ( !supportsManualFocus ) {
+        return;
+      }
+      if ( !manualFocusEnabledRef.current ) {
+        toggleManualFocus( );
+      }
+      const value = Math.min( 1, Math.max( 0, start.focus - dy / 420 ) );
+      updateManualFocusValue( value );
+      setGestureHud( { mode: "focus", value } );
+    } else if ( focusPeakingEnabled ) {
+      const value = Math.min( 1, Math.max( 0, start.peak + dx / 320 ) );
+      updateFocusPeakingSensitivity( value );
+      setGestureHud( { mode: "peak", value } );
+    }
+  }, [focusPeakingEnabled, supportsManualFocus, toggleManualFocus, updateFocusPeakingSensitivity, updateManualFocusValue] );
+  const handleViewfinderPanEnd = useCallback( ( ) => {
+    hudTimerRef.current = setTimeout( ( ) => setGestureHud( null ), 900 );
   }, [] );
 
   const toggleDigitalStabilization = useCallback( () => {
@@ -975,6 +1012,9 @@ const ARCamera = ( ) => {
         useLocation={useLocation}
         hasPermission={hasPermission}
         onCaptureStarted={handleNativeShutter}
+        onViewfinderPanStart={handleViewfinderPanStart}
+        onViewfinderPan={handleViewfinderPan}
+        onViewfinderPanEnd={handleViewfinderPanEnd}
       />
     );
   };
@@ -1034,6 +1074,7 @@ const ARCamera = ( ) => {
           queueMode={queueMode}
           toggleQueueMode={toggleQueueMode}
           navToQueue={navToQueue}
+          gestureHud={gestureHud}
         />
       )}
       <TouchableOpacity

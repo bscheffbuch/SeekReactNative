@@ -1,12 +1,11 @@
 // @ts-nocheck
 import React from "react";
-import { View, Image } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
+import { View, Image, Pressable, Text, StyleSheet } from "react-native";
 
-import styles from "../../styles/match/match";
-import CustomBackArrow from "../UIComponents/Buttons/CustomBackArrow";
-import { setGradients } from "../../utility/matchHelpers";
+import i18n from "../../i18n";
+import { ChevronLeftIcon } from "../UIComponents/AppIcons";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 import type { Observation } from "../Providers/ObservationProvider";
 
 interface Props {
@@ -15,41 +14,104 @@ interface Props {
   setNavigationPath: ( path: string ) => void;
 }
 
+// M3: small top app bar, then the user's photo and the reference photo side by
+// side as large rounded images with label chips.
 const MatchHeader = ( {
   observation,
   screenType,
   setNavigationPath,
 }: Props ) => {
   const { isLandscape } = useAppOrientation( );
+  const { theme } = useTheme( );
   const taxon = observation && observation.taxon;
   const image = observation && observation.image;
   const imageUri = image && image.uri;
-
-  const { gradientDark, gradientLight } = setGradients( screenType );
-
-  const setCameraPath = ( ) => setNavigationPath( "Camera" );
-
   const showSpeciesImage = ( taxon && taxon.speciesSeenImage ) && screenType !== "unidentified";
+  const imageHeight = isLandscape ? 260 : 156;
+
+  const styles = StyleSheet.create( {
+    bar: {
+      alignItems: "center",
+      flexDirection: "row",
+      height: 64,
+      paddingHorizontal: 4,
+    },
+    back: {
+      alignItems: "center",
+      borderRadius: 24,
+      height: 48,
+      justifyContent: "center",
+      width: 48,
+    },
+    title: {
+      color: theme.colors.text,
+      flex: 1,
+      fontFamily: theme.typography.body,
+      fontSize: 22,
+      lineHeight: 28,
+      marginLeft: 4,
+    },
+    images: {
+      flexDirection: "row",
+      gap: 8,
+      paddingHorizontal: 16,
+    },
+    image: {
+      backgroundColor: theme.colors.surfaceContainerHigh,
+      borderRadius: 28,
+      flex: 1,
+      height: imageHeight,
+    },
+    fill: {
+      ...StyleSheet.absoluteFillObject,
+      borderRadius: 28,
+    },
+    chip: {
+      backgroundColor: "rgba(0, 0, 0, 0.55)",
+      borderRadius: 8,
+      bottom: 10,
+      color: "#FFFFFF",
+      fontFamily: theme.typography.heading,
+      fontSize: 12,
+      left: 10,
+      overflow: "hidden",
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      position: "absolute",
+    },
+  } );
 
   return (
-    <LinearGradient colors={[gradientDark, gradientLight]} style={styles.header}>
-      <CustomBackArrow handlePress={setCameraPath} style={styles.backButton} />
-      <View style={styles.imageContainer}>
-        {imageUri && <Image source={{ uri: imageUri }} style={[styles.imageCell, isLandscape && styles.landscapeImage]} />}
-        {showSpeciesImage && (
-          <Image
-            source={{ uri: taxon.speciesSeenImage }}
-            style={[
-              styles.imageCell,
-              styles.marginLeft,
-              isLandscape && styles.landscapeImage,
-              isLandscape && styles.largeMargin,
-            ]}
-          />
-        )}
-        {isLandscape && !showSpeciesImage && <View style={[styles.landscapeImage, styles.largeMargin]} />}
+    <View>
+      <View style={styles.bar}>
+        <Pressable
+          accessibilityLabel={i18n.t( "accessibility.back", { defaultValue: "Back" } )}
+          accessibilityRole="button"
+          onPress={( ) => setNavigationPath( "Camera" )}
+          style={styles.back}
+          testID="matchBack"
+        >
+          <ChevronLeftIcon color={theme.colors.text} size={26} />
+        </Pressable>
+        <Text accessibilityRole="header" style={styles.title}>
+          {i18n.t( "results.match", { defaultValue: "Match" } )}
+        </Text>
       </View>
-    </LinearGradient>
+      <View style={styles.images}>
+        {imageUri && (
+          <View style={styles.image}>
+            <Image source={{ uri: imageUri }} style={styles.fill} />
+            <Text style={styles.chip}>{i18n.t( "results.your_photo", { defaultValue: "Your photo" } )}</Text>
+          </View>
+        )}
+        {showSpeciesImage && (
+          <View style={styles.image}>
+            <Image source={{ uri: taxon.speciesSeenImage }} style={styles.fill} />
+            <Text style={styles.chip}>{i18n.t( "results.reference", { defaultValue: "Reference" } )}</Text>
+          </View>
+        )}
+      </View>
+    </View>
   );
 };
 

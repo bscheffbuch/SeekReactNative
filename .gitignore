@@ -108,3 +108,6 @@ __pycache__/
 scripts/bioclip2/packs/
 scripts/bioclip2/species.json
 scripts/bioclip2/taxa.csv
+
+# Bundled model packs (hundreds of MB; built with scripts/bioclip2)
+android/app/src/main/assets/models/

@@ -6,6 +6,7 @@ import React, {
 } from "react";
 import {
   Animated,
+  StyleSheet,
   PanResponder,
   Platform,
   ScrollView,
@@ -35,6 +36,7 @@ import { TOAST } from "./ARCamera";
 import type { BackCameraZoomPreset } from "./helpers/cameraDeviceHelpers";
 import {
   CameraIcon,
+  ChevronDownIcon,
   EyeIcon,
   FlashIcon,
   FocusIcon,
@@ -104,6 +106,7 @@ interface Props {
   queueMode: boolean;
   toggleQueueMode: ( ) => void;
   navToQueue: ( ) => void;
+  gestureHud?: null | { mode: "focus" | "peak"; value: number };
 }
 
 interface GlassButtonProps {
@@ -266,7 +269,7 @@ const ModeTab = ( {
   value,
 }: ModeTabProps ) => {
   const Icon = icon;
-  const iconColor = active ? colors.seekInk : colors.white;
+  const iconColor = active ? "#D0E8D7" : colors.white;
   return (
     <TouchableOpacity
       accessibilityLabel={label}
@@ -322,7 +325,7 @@ const SettingSegment = ( {
             active && viewStyles.settingSegmentItemActive,
           ]}
         >
-          <Icon color={active ? colors.seekInk : colors.white} size={14} strokeWidth={2.2} />
+          <Icon color={active ? "#D0E8D7" : colors.white} size={14} strokeWidth={2.2} />
           <StyledText
             maxFontSizeMultiplier={1.1}
             numberOfLines={1}
@@ -357,7 +360,7 @@ const SettingRow = ( {
       style={[viewStyles.settingRow, active && viewStyles.settingRowActive]}
     >
       <View style={[viewStyles.settingIconBox, active && viewStyles.settingIconBoxActive]}>
-        <Icon color={active ? colors.seekInk : colors.white} size={18} strokeWidth={2.2} />
+        <Icon color={active ? "#003822" : colors.white} size={18} strokeWidth={2.2} />
       </View>
       <View style={viewStyles.settingCopy}>
         <StyledText
@@ -401,7 +404,7 @@ const ProTile = ( {
     >
       <View style={viewStyles.proTileIconRow}>
         <View style={[viewStyles.proTileIcon, active && viewStyles.proTileIconActive]}>
-          <Icon color={active ? colors.seekInk : colors.white} size={18} strokeWidth={2.2} />
+          <Icon color={active ? "#003822" : colors.white} size={18} strokeWidth={2.2} />
         </View>
         <View style={[viewStyles.proTileDot, active && viewStyles.proTileDotActive]} />
       </View>
@@ -510,6 +513,7 @@ const ARCameraOverlay = ( {
   queueMode,
   toggleQueueMode,
   navToQueue,
+  gestureHud = null,
 }: Props ) => {
   const { isLandscape } = useAppOrientation( );
   const rankToRender = prediction?.rank;
@@ -525,6 +529,8 @@ const ARCameraOverlay = ( {
   const [settingsOpen, setSettingsOpen] = useState( false );
   const [wheelMode, setWheelMode] = useState<WheelMode>( "zoom" );
   const [gridEnabled, setGridEnabled] = useState( false );
+  // Controls can be tucked away; gestures on the viewfinder keep working.
+  const [controlsHidden, setControlsHidden] = useState( false );
   const settingsTranslateY = React.useRef( new Animated.Value( 0 ) ).current;
   const closeSettings = useCallback( () => {
     Animated.timing( settingsTranslateY, {
@@ -711,7 +717,7 @@ const ARCameraOverlay = ( {
     queueMode,
     filterIndex !== 0,
   ].filter( Boolean ).length;
-  const deckAccent = isSpecies ? colors.seekGreen : colors.seekGold;
+  const deckAccent = isSpecies ? "#8AD6AD" : "#EDC060";
   const shutterDisabled = !isSpecies && !queueMode;
   const shutterAction = queueMode ? saveForLater : takePicture;
   const filterOptions = filterSettings.map( setting => ( {
@@ -794,7 +800,27 @@ const ARCameraOverlay = ( {
         rectangleColor={colors.seekGreen}
       />
 
+      {gestureHud && (
+        <View pointerEvents="none" style={m3Styles.hud}>
+          <StyledText style={m3Styles.hudText}>
+            {gestureHud.mode === "focus"
+              ? `${i18n.t( "camera.focus" )} · ${focusFmt( gestureHud.value )}`
+              : `${i18n.t( "camera.peak" )} · ${peakFmt( gestureHud.value )}`}
+          </StyledText>
+        </View>
+      )}
       <View style={viewStyles.bottomDeck}>
+        <TouchableOpacity
+          accessibilityLabel={i18n.t( controlsHidden ? "camera.show_controls" : "camera.hide_controls" )}
+          accessibilityRole="button"
+          accessibilityState={{ expanded: !controlsHidden }}
+          hitSlop={{ top: 12, bottom: 8, left: 40, right: 40 }}
+          onPress={() => setControlsHidden( hidden => !hidden )}
+          style={m3Styles.handleTouch}
+          testID="camera-controls-toggle"
+        >
+          <View style={m3Styles.handle} />
+        </TouchableOpacity>
         <View style={viewStyles.coachingRow}>
           <StyledText
             maxFontSizeMultiplier={1.1}
@@ -813,8 +839,25 @@ const ARCameraOverlay = ( {
             onPress={toggleFlash}
             testID="flash-wheel-button"
           >
-            <FlashIcon color={flashEnabled ? colors.seekInk : colors.white} size={23} strokeWidth={2.2} />
+            <FlashIcon color={flashEnabled ? "#D0E8D7" : colors.white} size={23} strokeWidth={2.2} />
           </GlassButton>
+          {controlsHidden ? (
+            <TouchableOpacity
+              accessibilityLabel={i18n.t( "camera.show_controls" )}
+              accessibilityRole="button"
+              onPress={() => setControlsHidden( false )}
+              style={m3Styles.valuePill}
+            >
+              <StyledText numberOfLines={1} style={m3Styles.valuePillText}>
+                {[
+                  zoomFmt( selectedZoom ),
+                  supportsManualFocus ? ( manualFocusEnabled ? focusFmt( manualFocusValue ) : i18n.t( "camera.auto" ) ) : null,
+                  focusPeakingEnabled ? peakFmt( focusPeakingSensitivity ) : null,
+                ].filter( Boolean ).join( "  ·  " )}
+              </StyledText>
+              <ChevronDownIcon color="#BFC9C1" size={18} strokeWidth={2.2} />
+            </TouchableOpacity>
+          ) : (
           <View style={viewStyles.modeTabs}>
             <ModeTab
               active={wheelMode === "zoom"}
@@ -842,6 +885,7 @@ const ARCameraOverlay = ( {
               />
             )}
           </View>
+          )}
           <GlassButton
             accessibilityLabel={i18n.t( "camera.settings" )}
             active={settingsOpen}
@@ -849,15 +893,17 @@ const ARCameraOverlay = ( {
             onPress={() => setSettingsOpen( true )}
             testID="camera-settings-sheet-button"
           >
-            <SettingsIcon color={settingsOpen ? colors.seekInk : colors.white} size={23} strokeWidth={2.2} />
+            <SettingsIcon color={settingsOpen ? "#D0E8D7" : colors.white} size={23} strokeWidth={2.2} />
           </GlassButton>
         </View>
 
-        <CameraJogWheel
-          {...wheelConfig}
-          onChange={updateWheelValue}
-          testID="camera-jog-wheel"
-        />
+        {!controlsHidden && (
+          <CameraJogWheel
+            {...wheelConfig}
+            onChange={updateWheelValue}
+            testID="camera-jog-wheel"
+          />
+        )}
 
         <View style={viewStyles.captureRow}>
           <View style={viewStyles.gallerySlot}>
@@ -908,7 +954,7 @@ const ARCameraOverlay = ( {
                   <PlusIcon color={colors.white} size={34} strokeWidth={2.5} />
                 ) : (
                   <CameraIcon
-                    color={isSpecies ? colors.white : colors.seekInk}
+                    color={isSpecies ? "#003822" : colors.seekInk}
                     size={34}
                     strokeWidth={2.25}
                   />
@@ -1038,5 +1084,54 @@ const ARCameraOverlay = ( {
     </>
   );
 };
+
+const m3Styles = StyleSheet.create( {
+  handleTouch: {
+    alignItems: "center",
+    alignSelf: "center",
+    height: 12,
+    justifyContent: "center",
+    marginTop: -6,
+    width: 64,
+  },
+  handle: {
+    backgroundColor: "rgba(191, 201, 193, 0.5)",
+    borderRadius: 2,
+    height: 4,
+    width: 32,
+  },
+  hud: {
+    alignSelf: "center",
+    backgroundColor: "#EDC060",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    position: "absolute",
+    top: "38%",
+    zIndex: 6,
+  },
+  hudText: {
+    color: "#271900",
+    fontSize: 15,
+    fontWeight: "500",
+  },
+  valuePill: {
+    alignItems: "center",
+    backgroundColor: "#252B27",
+    borderRadius: 20,
+    flex: 1,
+    flexDirection: "row",
+    gap: 8,
+    height: 40,
+    justifyContent: "center",
+    paddingHorizontal: 12,
+  },
+  valuePillText: {
+    color: "#DEE4DD",
+    flexShrink: 1,
+    fontSize: 13,
+    fontWeight: "500",
+  },
+} );
 
 export default ARCameraOverlay;

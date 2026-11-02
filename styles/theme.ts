@@ -21,6 +21,21 @@ export interface ThemeTokens {
     shadow: string;
     overlay: string;
     pressed: string;
+    // Material 3 roles (tonal scheme from the Seek green; tertiary = Seek gold)
+    onPrimary: string;
+    onPrimaryContainer: string;
+    secondaryContainer: string;
+    onSecondaryContainer: string;
+    tertiary: string;
+    tertiaryContainer: string;
+    onTertiaryContainer: string;
+    surfaceContainerLow: string;
+    surfaceContainer: string;
+    surfaceContainerHigh: string;
+    surfaceContainerHighest: string;
+    onSurfaceVariant: string;
+    outline: string;
+    outlineVariant: string;
   };
   spacing: {
     xxs: number;
@@ -62,10 +77,11 @@ const spacing = {
   xxl: 40,
 } as const;
 
+// M3 shape scale: small 8 / medium 12-16 / large 28 (sheets, images, big cards)
 const radii = {
-  sm: 10,
+  sm: 12,
   md: 16,
-  lg: 22,
+  lg: 28,
 } as const;
 
 const typography = {
@@ -78,31 +94,46 @@ export const lightTheme: ThemeTokens = {
   name: "light",
   isDark: false,
   colors: {
-    canvas: "#F3F1E8",
-    surface: "#FFFFFF",
-    elevatedSurface: "#FAF8F1",
+    canvas: "#F5FBF4",
+    surface: "#EFF5EE",
+    elevatedSurface: "#E9EFE8",
     primary: "#14794F",
-    primaryContainer: "#DEF0E7",
-    text: "#111512",
-    muted: "#707A72",
-    border: "#E6E9E4",
-    accent: "#E0A82E",
-    destructive: "#B33A3A",
+    primaryContainer: "#A6F2C8",
+    text: "#171D19",
+    muted: "#404943",
+    border: "#DDE5DC",
+    accent: "#C99520",
+    destructive: "#BA1A1A",
     inverseText: "#FFFFFF",
-    shadow: "#10251D",
-    overlay: "rgba(6, 12, 9, 0.58)",
+    shadow: "#000000",
+    overlay: "rgba(0, 0, 0, 0.32)",
     pressed: "rgba(20, 121, 79, 0.12)",
+    onPrimary: "#FFFFFF",
+    onPrimaryContainer: "#002113",
+    secondaryContainer: "#D0E8D7",
+    onSecondaryContainer: "#0B1F15",
+    tertiary: "#7B5800",
+    tertiaryContainer: "#FFDEA6",
+    onTertiaryContainer: "#271900",
+    surfaceContainerLow: "#EFF5EE",
+    surfaceContainer: "#E9EFE8",
+    surfaceContainerHigh: "#E3EAE3",
+    surfaceContainerHighest: "#DEE4DD",
+    onSurfaceVariant: "#404943",
+    outline: "#707973",
+    outlineVariant: "#BFC9C1",
   },
   spacing,
   radii,
   typography,
   elevation: {
+    // M3 filled cards: tonal surfaces instead of drop shadows
     card: {
-      shadowColor: "#142018",
-      shadowOpacity: 0.07,
-      shadowRadius: 14,
-      shadowOffset: { width: 0, height: 6 },
-      elevation: 2,
+      shadowColor: "#000000",
+      shadowOpacity: 0,
+      shadowRadius: 0,
+      shadowOffset: { width: 0, height: 0 },
+      elevation: 0,
     },
   },
 };
@@ -111,20 +142,34 @@ export const darkTheme: ThemeTokens = {
   name: "dark",
   isDark: true,
   colors: {
-    canvas: "#0A0D0B",
-    surface: "#131714",
-    elevatedSurface: "#1A1F1B",
-    primary: "#2BB673",
-    primaryContainer: "#16301F",
-    text: "#F2F5F2",
-    muted: "#828C84",
-    border: "#232925",
-    accent: "#E0A82E",
+    canvas: "#0F1511",
+    surface: "#171D19",
+    elevatedSurface: "#1B211D",
+    primary: "#8AD6AD",
+    primaryContainer: "#005235",
+    text: "#DEE4DD",
+    muted: "#BFC9C1",
+    border: "#2A302C",
+    accent: "#EDC060",
     destructive: "#FFB4AB",
-    inverseText: "#05120B",
+    inverseText: "#003822",
     shadow: "#000000",
-    overlay: "rgba(0, 0, 0, 0.68)",
-    pressed: "rgba(143, 211, 175, 0.16)",
+    overlay: "rgba(0, 0, 0, 0.6)",
+    pressed: "rgba(138, 214, 173, 0.12)",
+    onPrimary: "#003822",
+    onPrimaryContainer: "#A6F2C8",
+    secondaryContainer: "#364B3E",
+    onSecondaryContainer: "#D0E8D7",
+    tertiary: "#EDC060",
+    tertiaryContainer: "#5D4200",
+    onTertiaryContainer: "#FFDEA6",
+    surfaceContainerLow: "#171D19",
+    surfaceContainer: "#1B211D",
+    surfaceContainerHigh: "#252B27",
+    surfaceContainerHighest: "#303632",
+    onSurfaceVariant: "#BFC9C1",
+    outline: "#89938C",
+    outlineVariant: "#404943",
   },
   spacing,
   radii,
@@ -132,10 +177,10 @@ export const darkTheme: ThemeTokens = {
   elevation: {
     card: {
       shadowColor: "#000000",
-      shadowOpacity: 0.24,
-      shadowRadius: 12,
-      shadowOffset: { width: 0, height: 6 },
-      elevation: 3,
+      shadowOpacity: 0,
+      shadowRadius: 0,
+      shadowOffset: { width: 0, height: 0 },
+      elevation: 0,
     },
   },
 };

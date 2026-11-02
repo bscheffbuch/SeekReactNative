@@ -8,6 +8,7 @@ import logos from "../assets/logos";
 import backgrounds from "../assets/backgrounds";
 import { checkIfFirstLaunch, setCameraLaunched } from "../utility/helpers";
 import { addARCameraFiles } from "../utility/cameraFilesHelpers";
+import { installBundledPacks } from "../utility/modelPacks";
 import { setupBadges } from "../utility/badgeHelpers";
 import { checkForHotStarts, checkForColdStarts, setQuickActions } from "../utility/navigationHelpers";
 import { deleteFromAsyncStorage, setupUserSettings } from "../utility/settingsHelpers";
@@ -43,6 +44,7 @@ const SplashScreen = ( ) => {
       // originally, I thought we could move AR camera files into the main bundle on first launch only,
       // but this breaks the camera for offloaded apps on iOS
       addARCameraFiles( );
+      installBundledPacks( );
       const isFirstLaunch = await checkIfFirstLaunch( );
 
       if ( isFirstLaunch ) {

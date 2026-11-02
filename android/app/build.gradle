@@ -113,6 +113,11 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    // Without the iNaturalist release keystore (e.g. open-source/CI builds), release
+    // builds are signed with the debug key and get their own package id, so they
+    // install next to the Play Store app instead of conflicting with it.
+    def hasReleaseKeystore = file(SEEK_RELEASE_STORE_FILE).exists()
+
     base.archivesName = defaultConfig.applicationId + "-v" + defaultConfig.versionName + "+" + defaultConfig.versionCode
     
     signingConfigs {
@@ -131,12 +136,24 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
+            if (hasReleaseKeystore) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+                applicationIdSuffix ".preview"
+                versionNameSuffix "-preview"
+            }
             ndk {
                 // attempt to get rid of warning in Play Console
                 debugSymbolLevel "FULL"
             }
         }
+    }
+
+    // Model packs are copied out of the APK on first launch; storing them
+    // uncompressed makes that a straight copy.
+    androidResources {
+        noCompress += ["tflite"]
     }
 
     if (includeDebugCameraAssetsInRelease) {
