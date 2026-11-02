@@ -3,6 +3,7 @@ import { Alert, Platform } from "react-native";
 import {
   copyFileAssets,
   exists,
+  existsAssets,
   readDirAssets,
   readDir,
   stat,
@@ -33,6 +34,22 @@ const needsCopy = async ( assetSize: number | undefined, destination: string ): 
   }
 };
 
+// Builds without the private Seek model can ship a model pack in assets/models/
+// instead (installed by installBundledPacks); only warn when neither exists.
+const warnIfNoModelAtAll = async ( ) => {
+  try {
+    if ( await existsAssets( "models" ) && ( await readDirAssets( "models" ) ).some( ( e ) => e.isDirectory( ) ) ) {
+      return;
+    }
+  } catch {
+    // fall through to the warning
+  }
+  Alert.alert(
+    i18n.t( "model.not_found_error" ),
+    i18n.t( "model.not_found_error_description" )
+  );
+};
+
 const addCameraFilesAndroid = () => {
   const copyFilesAndroid = async ( source: string, destination: string, assetSize?: number ) => {
     if ( !( await needsCopy( assetSize, destination ) ) ) {
@@ -61,10 +78,7 @@ const addCameraFilesAndroid = () => {
       copyFilesAndroid( `camera/${taxonomy}`, dirTaxonomy, sizeOf( taxonomy ) );
     } else {
       console.log( "No model asset found to copy into document directory." );
-      Alert.alert(
-        i18n.t( "model.not_found_error" ),
-        i18n.t( "model.not_found_error_description" )
-      );
+      warnIfNoModelAtAll( );
     }
     if ( hasGeoModel !== undefined ) {
       console.log( "Found geomodel asset with filename", geomodel );
@@ -72,6 +86,9 @@ const addCameraFilesAndroid = () => {
     } else {
       console.log( "No geomodel asset found to copy into document directory." );
     }
+  } ).catch( ( ) => {
+    // no camera/ folder in this build's assets (e.g. builds that ship a model pack)
+    warnIfNoModelAtAll( );
   } );
 };
 

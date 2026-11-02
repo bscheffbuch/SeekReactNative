@@ -90,9 +90,19 @@ const usePatchedRunAsync = () => {
   }, [isAsyncContextBusy, queuedFrame] );
 
   useEffect( () => () => {
-    drainQueuedFrame().catch( ( e ) => {
+    // createRunAsync's return value differs between worklets-core versions (a
+    // Promise in some, nothing in others), and a throw here would crash the
+    // whole screen while the camera unmounts.
+    try {
+      const result = typeof drainQueuedFrame === "function" ? drainQueuedFrame() : null;
+      if ( result && typeof result.catch === "function" ) {
+        result.catch( ( e ) => {
+          console.log( "drainQueuedFrame error", e?.message ?? e );
+        } );
+      }
+    } catch ( e ) {
       console.log( "drainQueuedFrame error", e?.message ?? e );
-    } );
+    }
   }, [drainQueuedFrame] );
 
   return customRunAsync;
