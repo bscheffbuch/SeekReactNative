@@ -396,7 +396,8 @@
     "flash_on": "Blitz an",
     "flash_off": "Blitz aus",
     "show_controls": "Kamerasteuerung einblenden",
-    "hide_controls": "Kamerasteuerung ausblenden"
+    "hide_controls": "Kamerasteuerung ausblenden",
+    "general": "Allgemein"
   },
   "gallery": {
     "import_photos_from": "Fotos importieren von"
@@ -724,7 +725,9 @@
     "seasonality_option_2": "Zeige die jahreszeitliche Verteilung basierend auf iNaturalist-Beobachtungen in der Nähe meines aktuellen Standortes (bei nicht in der Nähe meines Standortes gefundenen Arten wird diese Verteilung nicht angezeigt)",
     "donate_ios": "Bitte besuchen den folgenden Link, um an Seek zu spenden:",
     "change_language": "Die In-App-Sprache auf {{language}} umschalten?",
-    "confirm": "Bestätigen"
+    "confirm": "Bestätigen",
+    "dynamic_color": "Dynamische Farben",
+    "dynamic_color_sub": "Farben aus deinem Hintergrundbild verwenden (Material You)"
   },
   "seek_challenges": {
     "badge": "Seek-Abzeichen",

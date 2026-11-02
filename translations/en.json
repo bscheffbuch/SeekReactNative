@@ -470,7 +470,8 @@
     "save_location_sub": "Tag where you find it",
     "save_location_on": "On - tag where found",
     "show_controls": "Show camera controls",
-    "hide_controls": "Hide camera controls"
+    "hide_controls": "Hide camera controls",
+    "general": "General"
   },
   "gallery": {
     "import_photos_from": "Import Photos From"
@@ -838,7 +839,9 @@
     "identification_model": "Identification model",
     "model_built_in": "Seek (built in)",
     "model_species": "{{count}} species",
-    "model_install_hint": "To add a model, copy its folder (with manifest.json) into {{path}}"
+    "model_install_hint": "To add a model, copy its folder (with manifest.json) into {{path}}",
+    "dynamic_color": "Dynamic color",
+    "dynamic_color_sub": "Use colors from your wallpaper (Material You)"
   },
   "seek_challenges": {
     "badge": "Seek badge",

@@ -6,7 +6,6 @@ import React, {
 } from "react";
 import {
   Animated,
-  StyleSheet,
   PanResponder,
   Platform,
   ScrollView,
@@ -16,7 +15,13 @@ import {
 import Svg, { Circle } from "react-native-svg";
 
 import i18n from "../../../i18n";
-import { viewStyles, textStyles } from "../../../styles/camera/arCameraOverlay";
+import useCameraStyles from "./hooks/useCameraStyles";
+import { useNavigation } from "@react-navigation/native";
+import useActiveModelPack from "../../../utility/customHooks/useActiveModelPack";
+import { localizeNumber } from "../../../utility/helpers";
+import { useTheme } from "../../Providers/ThemeProvider";
+import { makeThemedStyles } from "../../../styles/themedStyles";
+import type { ThemeTokens } from "../../../styles/theme";
 import LoadingWheel from "../../UIComponents/LoadingWheel";
 import ARCameraHeader from "./ARCameraHeader";
 import GreenRectangle from "../../UIComponents/GreenRectangle";
@@ -36,7 +41,9 @@ import { TOAST } from "./ARCamera";
 import type { BackCameraZoomPreset } from "./helpers/cameraDeviceHelpers";
 import {
   CameraIcon,
+  CheckIcon,
   ChevronDownIcon,
+  ChevronRightIcon,
   EyeIcon,
   FlashIcon,
   FocusIcon,
@@ -218,7 +225,9 @@ const GlassButton = ( {
   onLongPress,
   onPress,
   testID,
-}: GlassButtonProps ) => (
+}: GlassButtonProps ) => {
+  const { viewStyles, textStyles } = useCameraStyles( );
+  return (
   <TouchableOpacity
     accessibilityLabel={accessibilityLabel}
     accessibilityRole="button"
@@ -259,7 +268,8 @@ const GlassButton = ( {
       </StyledText>
     )}
   </TouchableOpacity>
-);
+  );
+};
 
 const ModeTab = ( {
   active,
@@ -268,8 +278,10 @@ const ModeTab = ( {
   onPress,
   value,
 }: ModeTabProps ) => {
+  const { viewStyles, textStyles } = useCameraStyles( );
+  const { cameraTheme } = useTheme( );
   const Icon = icon;
-  const iconColor = active ? "#D0E8D7" : colors.white;
+  const iconColor = active ? cameraTheme.colors.onSecondaryContainer : colors.white;
   return (
     <TouchableOpacity
       accessibilityLabel={label}
@@ -303,44 +315,182 @@ const ModeTab = ( {
   );
 };
 
+// Camera settings sheet (Material 3, as in the design canvas): segmented button
+// with a check on the selected option, two-line list items with tonal icon discs
+// and M3 switches, and tonal capture cards. Colors come from the camera theme.
+const getSheetStyles = makeThemedStyles( ( t: ThemeTokens ) => ( {
+  segment: {
+    borderColor: t.colors.outline,
+    borderRadius: 20,
+    borderWidth: 1,
+    flexDirection: "row",
+    height: 40,
+    overflow: "hidden",
+  },
+  segmentItem: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+  },
+  segmentDivider: {
+    borderLeftColor: t.colors.outline,
+    borderLeftWidth: 1,
+  },
+  segmentItemActive: {
+    backgroundColor: t.colors.secondaryContainer,
+  },
+  segmentText: {
+    color: t.colors.text,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  segmentTextActive: {
+    color: t.colors.onSecondaryContainer,
+  },
+  row: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 16,
+    minHeight: 72,
+    paddingVertical: 8,
+  },
+  iconDisc: {
+    alignItems: "center",
+    backgroundColor: t.colors.secondaryContainer,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
+  rowCopy: {
+    flex: 1,
+    minWidth: 0,
+  },
+  rowTitle: {
+    color: t.colors.text,
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  rowSub: {
+    color: t.colors.onSurfaceVariant,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  switchTrack: {
+    alignItems: "center",
+    backgroundColor: t.colors.surfaceContainerHighest,
+    borderColor: t.colors.outline,
+    borderRadius: 16,
+    borderWidth: 2,
+    flexDirection: "row",
+    height: 32,
+    paddingHorizontal: 6,
+    width: 52,
+  },
+  switchTrackOn: {
+    backgroundColor: t.colors.primary,
+    borderColor: t.colors.primary,
+    justifyContent: "flex-end",
+    paddingHorizontal: 2,
+  },
+  switchThumb: {
+    backgroundColor: t.colors.outline,
+    borderRadius: 8,
+    height: 16,
+    width: 16,
+  },
+  switchThumbOn: {
+    alignItems: "center",
+    backgroundColor: t.colors.onPrimary,
+    borderRadius: 12,
+    height: 24,
+    justifyContent: "center",
+    width: 24,
+  },
+  card: {
+    backgroundColor: t.colors.surfaceContainerHigh,
+    borderRadius: 16,
+    gap: 8,
+    justifyContent: "space-between",
+    minHeight: 96,
+    padding: 12,
+    width: "31.5%",
+  },
+  cardOn: {
+    backgroundColor: t.colors.secondaryContainer,
+  },
+  cardTop: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cardIcon: {
+    alignItems: "center",
+    backgroundColor: t.colors.surfaceContainerHighest,
+    borderRadius: 18,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  cardIconOn: {
+    backgroundColor: t.colors.primary,
+  },
+  cardTitle: {
+    color: t.colors.text,
+    fontSize: 14,
+    fontWeight: "500",
+    lineHeight: 20,
+  },
+  cardTitleOn: {
+    color: t.colors.onSecondaryContainer,
+  },
+  cardSub: {
+    color: t.colors.onSurfaceVariant,
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  cardSubOn: {
+    color: t.colors.onSecondaryContainer,
+  },
+} ) );
+
 const SettingSegment = ( {
   onChange,
   options,
   value,
-}: SettingSegmentProps ) => (
-  <View style={viewStyles.settingSegment}>
-    {options.map( option => {
-      const active = option.value === value;
-      const Icon = option.icon;
-      return (
-        <TouchableOpacity
-          accessibilityLabel={option.label}
-          accessibilityRole="button"
-          accessibilityState={{ selected: active }}
-          activeOpacity={0.7}
-          key={option.value}
-          onPress={() => onChange( option.value )}
-          style={[
-            viewStyles.settingSegmentItem,
-            active && viewStyles.settingSegmentItemActive,
-          ]}
-        >
-          <Icon color={active ? "#D0E8D7" : colors.white} size={14} strokeWidth={2.2} />
-          <StyledText
-            maxFontSizeMultiplier={1.1}
-            numberOfLines={1}
-            style={[
-              textStyles.settingSegmentText,
-              active && textStyles.settingSegmentTextActive,
-            ]}
+}: SettingSegmentProps ) => {
+  const { cameraTheme } = useTheme( );
+  const styles = getSheetStyles( cameraTheme );
+  return (
+    <View accessibilityRole="radiogroup" style={styles.segment}>
+      {options.map( ( option, index ) => {
+        const active = option.value === value;
+        return (
+          <TouchableOpacity
+            accessibilityLabel={option.label}
+            accessibilityRole="radio"
+            accessibilityState={{ checked: active }}
+            activeOpacity={0.7}
+            key={option.value}
+            onPress={() => onChange( option.value )}
+            style={[styles.segmentItem, index > 0 && styles.segmentDivider, active && styles.segmentItemActive]}
           >
-            {option.label}
-          </StyledText>
-        </TouchableOpacity>
-      );
-    } )}
-  </View>
-);
+            {active && <CheckIcon color={cameraTheme.colors.onSecondaryContainer} size={16} strokeWidth={2.6} />}
+            <StyledText
+              maxFontSizeMultiplier={1.1}
+              numberOfLines={1}
+              style={[styles.segmentText, active && styles.segmentTextActive]}
+            >
+              {option.label}
+            </StyledText>
+          </TouchableOpacity>
+        );
+      } )}
+    </View>
+  );
+};
 
 const SettingRow = ( {
   active,
@@ -348,39 +498,40 @@ const SettingRow = ( {
   label,
   onPress,
   sub,
-}: SettingRowProps ) => {
+  chevron = false,
+}: SettingRowProps & { chevron?: boolean } ) => {
+  const { cameraTheme } = useTheme( );
+  const styles = getSheetStyles( cameraTheme );
   const Icon = icon;
   return (
     <TouchableOpacity
       accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
+      accessibilityRole={chevron ? "button" : "switch"}
+      accessibilityState={chevron ? undefined : { checked: active }}
       activeOpacity={0.7}
       onPress={onPress}
-      style={[viewStyles.settingRow, active && viewStyles.settingRowActive]}
+      style={styles.row}
     >
-      <View style={[viewStyles.settingIconBox, active && viewStyles.settingIconBoxActive]}>
-        <Icon color={active ? "#003822" : colors.white} size={18} strokeWidth={2.2} />
+      <View style={styles.iconDisc}>
+        <Icon color={cameraTheme.colors.onSecondaryContainer} size={20} strokeWidth={2} />
       </View>
-      <View style={viewStyles.settingCopy}>
-        <StyledText
-          maxFontSizeMultiplier={1.1}
-          numberOfLines={1}
-          style={textStyles.settingTitle}
-        >
+      <View style={styles.rowCopy}>
+        <StyledText maxFontSizeMultiplier={1.1} numberOfLines={1} style={styles.rowTitle}>
           {label}
         </StyledText>
-        <StyledText
-          maxFontSizeMultiplier={1.1}
-          numberOfLines={1}
-          style={textStyles.settingSub}
-        >
+        <StyledText maxFontSizeMultiplier={1.1} numberOfLines={1} style={styles.rowSub}>
           {sub}
         </StyledText>
       </View>
-      <View style={[viewStyles.settingSwitch, active && viewStyles.settingSwitchActive]}>
-        <View style={[viewStyles.settingSwitchKnob, active && viewStyles.settingSwitchKnobActive]} />
-      </View>
+      {chevron ? (
+        <ChevronRightIcon color={cameraTheme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
+      ) : (
+        <View style={[styles.switchTrack, active && styles.switchTrackOn]}>
+          <View style={active ? styles.switchThumbOn : styles.switchThumb}>
+            {active && <CheckIcon color={cameraTheme.colors.primary} size={16} strokeWidth={3} />}
+          </View>
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -392,36 +543,30 @@ const ProTile = ( {
   onPress,
   sub,
 }: ProTileProps ) => {
+  const { cameraTheme } = useTheme( );
+  const styles = getSheetStyles( cameraTheme );
   const Icon = icon;
   return (
     <TouchableOpacity
       accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ selected: active }}
+      accessibilityRole="switch"
+      accessibilityState={{ checked: active }}
       activeOpacity={0.7}
       onPress={onPress}
-      style={[viewStyles.proTile, active && viewStyles.proTileActive]}
+      style={[styles.card, active && styles.cardOn]}
     >
-      <View style={viewStyles.proTileIconRow}>
-        <View style={[viewStyles.proTileIcon, active && viewStyles.proTileIconActive]}>
-          <Icon color={active ? "#003822" : colors.white} size={18} strokeWidth={2.2} />
+      <View style={styles.cardTop}>
+        <View style={[styles.cardIcon, active && styles.cardIconOn]}>
+          <Icon color={active ? cameraTheme.colors.onPrimary : cameraTheme.colors.text} size={18} strokeWidth={2.2} />
         </View>
-        <View style={[viewStyles.proTileDot, active && viewStyles.proTileDotActive]} />
+        {active && <CheckIcon color={cameraTheme.colors.primary} size={18} strokeWidth={2.8} />}
       </View>
       <View>
-        <StyledText
-          maxFontSizeMultiplier={1.1}
-          numberOfLines={1}
-          style={textStyles.proTileTitle}
-        >
+        <StyledText maxFontSizeMultiplier={1.1} numberOfLines={1} style={[styles.cardTitle, active && styles.cardTitleOn]}>
           {label}
         </StyledText>
-        <StyledText
-          maxFontSizeMultiplier={1.1}
-          numberOfLines={1}
-          style={textStyles.proTileSub}
-        >
-          {sub}
+        <StyledText maxFontSizeMultiplier={1.1} numberOfLines={1} style={[styles.cardSub, active && styles.cardSubOn]}>
+          {active ? i18n.t( "camera.on" ) : sub}
         </StyledText>
       </View>
     </TouchableOpacity>
@@ -436,6 +581,7 @@ const ProgressRing = ( {
   stroke,
   trackColor = "rgba(255, 255, 255, 0.3)",
 }: ProgressRingProps ) => {
+  const { viewStyles } = useCameraStyles( );
   const radius = ( size - stroke ) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * ( 1 - clamp( progress, 0, 1 ) );
@@ -515,6 +661,11 @@ const ARCameraOverlay = ( {
   navToQueue,
   gestureHud = null,
 }: Props ) => {
+  const { viewStyles, textStyles } = useCameraStyles( );
+  const { cameraTheme } = useTheme( );
+  const m3Styles = getM3Styles( cameraTheme );
+  const navigation = useNavigation( );
+  const activeModelPack = useActiveModelPack( );
   const { isLandscape } = useAppOrientation( );
   const rankToRender = prediction?.rank;
   const rankIndex = rankToRender ? RANK_LIST.indexOf( rankToRender ) : -1;
@@ -717,7 +868,7 @@ const ARCameraOverlay = ( {
     queueMode,
     filterIndex !== 0,
   ].filter( Boolean ).length;
-  const deckAccent = isSpecies ? "#8AD6AD" : "#EDC060";
+  const deckAccent = isSpecies ? cameraTheme.colors.primary : "rgba(255, 255, 255, 0.85)";
   const shutterDisabled = !isSpecies && !queueMode;
   const shutterAction = queueMode ? saveForLater : takePicture;
   const filterOptions = filterSettings.map( setting => ( {
@@ -797,7 +948,7 @@ const ARCameraOverlay = ( {
         finishAnimation={handleToastEnd}
         styles={viewStyles.plantFilter}
         toastText={i18n.t( "queue.saved_pending", { count: queueCount } )}
-        rectangleColor={colors.seekGreen}
+        rectangleColor={cameraTheme.colors.primary}
       />
 
       {gestureHud && (
@@ -839,7 +990,7 @@ const ARCameraOverlay = ( {
             onPress={toggleFlash}
             testID="flash-wheel-button"
           >
-            <FlashIcon color={flashEnabled ? "#D0E8D7" : colors.white} size={23} strokeWidth={2.2} />
+            <FlashIcon color={flashEnabled ? cameraTheme.colors.onSecondaryContainer : colors.white} size={23} strokeWidth={2.2} />
           </GlassButton>
           {controlsHidden ? (
             <TouchableOpacity
@@ -855,7 +1006,7 @@ const ARCameraOverlay = ( {
                   focusPeakingEnabled ? peakFmt( focusPeakingSensitivity ) : null,
                 ].filter( Boolean ).join( "  ·  " )}
               </StyledText>
-              <ChevronDownIcon color="#BFC9C1" size={18} strokeWidth={2.2} />
+              <ChevronDownIcon color={cameraTheme.colors.onSurfaceVariant} size={18} strokeWidth={2.2} />
             </TouchableOpacity>
           ) : (
           <View style={viewStyles.modeTabs}>
@@ -893,7 +1044,7 @@ const ARCameraOverlay = ( {
             onPress={() => setSettingsOpen( true )}
             testID="camera-settings-sheet-button"
           >
-            <SettingsIcon color={settingsOpen ? "#D0E8D7" : colors.white} size={23} strokeWidth={2.2} />
+            <SettingsIcon color={settingsOpen ? cameraTheme.colors.onSecondaryContainer : colors.white} size={23} strokeWidth={2.2} />
           </GlassButton>
         </View>
 
@@ -954,7 +1105,7 @@ const ARCameraOverlay = ( {
                   <PlusIcon color={colors.white} size={34} strokeWidth={2.5} />
                 ) : (
                   <CameraIcon
-                    color={isSpecies ? "#003822" : colors.seekInk}
+                    color={isSpecies ? cameraTheme.colors.onPrimary : colors.seekInk}
                     size={34}
                     strokeWidth={2.25}
                   />
@@ -995,7 +1146,7 @@ const ARCameraOverlay = ( {
                   onPress={closeSettings}
                   style={viewStyles.sheetCloseButton}
                 >
-                  <XIcon color={colors.white} size={22} strokeWidth={2.2} />
+                  <XIcon color={cameraTheme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -1014,8 +1165,19 @@ const ARCameraOverlay = ( {
               />
 
               <StyledText style={textStyles.sectionLabel}>
-                {i18n.t( "camera.saving" )}
+                {i18n.t( "camera.general" )}
               </StyledText>
+              <SettingRow
+                active={false}
+                chevron
+                icon={LeafIcon}
+                label={i18n.t( "settings.identification_model" )}
+                onPress={() => {
+                  closeSettings( );
+                  navigation.navigate( "Settings" as never );
+                }}
+                sub={activeModelPack ? `${activeModelPack.name}${activeModelPack.taxa ? ` · ${localizeNumber( activeModelPack.taxa )}` : ""}` : ""}
+              />
               <SettingRow
                 active={queueMode}
                 icon={QueueIcon}
@@ -1085,7 +1247,7 @@ const ARCameraOverlay = ( {
   );
 };
 
-const m3Styles = StyleSheet.create( {
+const getM3Styles = makeThemedStyles( ( t: ThemeTokens ) => ( {
   handleTouch: {
     alignItems: "center",
     alignSelf: "center",
@@ -1095,14 +1257,14 @@ const m3Styles = StyleSheet.create( {
     width: 64,
   },
   handle: {
-    backgroundColor: "rgba(191, 201, 193, 0.5)",
+    backgroundColor: t.colors.outlineVariant,
     borderRadius: 2,
     height: 4,
     width: 32,
   },
   hud: {
     alignSelf: "center",
-    backgroundColor: "#EDC060",
+    backgroundColor: t.colors.primaryContainer,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -1111,13 +1273,13 @@ const m3Styles = StyleSheet.create( {
     zIndex: 6,
   },
   hudText: {
-    color: "#271900",
+    color: t.colors.onPrimaryContainer,
     fontSize: 15,
     fontWeight: "500",
   },
   valuePill: {
     alignItems: "center",
-    backgroundColor: "#252B27",
+    backgroundColor: t.colors.surfaceContainerHigh,
     borderRadius: 20,
     flex: 1,
     flexDirection: "row",
@@ -1127,11 +1289,11 @@ const m3Styles = StyleSheet.create( {
     paddingHorizontal: 12,
   },
   valuePillText: {
-    color: "#DEE4DD",
+    color: t.colors.text,
     flexShrink: 1,
     fontSize: 13,
     fontWeight: "500",
   },
-} );
+} ) );
 
 export default ARCameraOverlay;

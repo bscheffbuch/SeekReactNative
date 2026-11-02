@@ -185,7 +185,7 @@ exports[`RangeMap should change map region to user's location when button is pre
       <View
         style={
           {
-            "backgroundColor": "#C99520",
+            "backgroundColor": "#14794F",
             "borderColor": "#EFF5EE",
             "borderRadius": 5,
             "borderWidth": 1,
@@ -575,7 +575,7 @@ exports[`RangeMap should render correctly 1`] = `
       <View
         style={
           {
-            "backgroundColor": "#C99520",
+            "backgroundColor": "#14794F",
             "borderColor": "#EFF5EE",
             "borderRadius": 5,
             "borderWidth": 1,

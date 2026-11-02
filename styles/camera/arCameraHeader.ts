@@ -68,7 +68,7 @@ const textStyles = StyleSheet.create( {
     color: colors.seekGreen,
   },
   rankLabel: {
-    color: colors.seekGold,
+    color: "#8AD6AD",
     fontSize: 9.5,
     fontWeight: "800",
     letterSpacing: 0,

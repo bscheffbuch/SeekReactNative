@@ -18,6 +18,7 @@ import type {
 } from "react-native";
 
 import { colors } from "../../../styles/global";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface MajorTick {
   value: number;
@@ -58,6 +59,9 @@ const CameraJogWheel = ( {
   testID,
   value,
 }: Props ) => {
+  // single accent: wheel marks follow the camera theme primary (Material You aware)
+  const { cameraTheme } = useTheme( );
+  const accent = { backgroundColor: cameraTheme.colors.primary };
   const [wheelWidth, setWheelWidth] = useState( 1 );
   const startPageXRef = useRef( 0 );
   const startValueRef = useRef( value );
@@ -221,7 +225,7 @@ const CameraJogWheel = ( {
               key={`${tick.value}`}
               style={[styles.tick, { left: tick.offset - TICK_WIDTH / 2 }]}
             >
-              <View style={[styles.tickLine, tick.major && styles.majorTickLine]} />
+              <View style={[styles.tickLine, tick.major && styles.majorTickLine, tick.major && accent]} />
               {tick.label && (
                 <Text
                   maxFontSizeMultiplier={1.1}
@@ -235,10 +239,10 @@ const CameraJogWheel = ( {
         </View>
       </View>
       <View pointerEvents="none" style={styles.centerReadout}>
-        <Text maxFontSizeMultiplier={1.1} style={styles.valueLabel}>
+        <Text maxFontSizeMultiplier={1.1} style={[styles.valueLabel, accent, { color: cameraTheme.colors.onPrimary }]}>
           {format( displayValue )}
         </Text>
-        <View style={styles.playhead} />
+        <View style={[styles.playhead, accent]} />
       </View>
       <View pointerEvents="none" style={styles.shade} />
     </View>

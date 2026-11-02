@@ -93,10 +93,11 @@ const PEAKING_MIN_THRESHOLD = 5;
 const PEAKING_MAX_THRESHOLD = 34;
 const PEAKING_SCAN_STRIDE = 2;
 const PEAKING_MIN_RUN_LENGTH = 1;
-// The native Android preview shader can alter preview color even when inactive
-// on some devices. Keep focus peaking in the JS overlay path so normal scanning
-// stays on the unmodified camera preview.
-const USE_NATIVE_FOCUS_PEAKING = false;
+// Focus peaking runs as a GPU shader on the Android preview (fast). The shader is
+// only attached while peaking is switched on (see the vision-camera patch), so the
+// normal preview stays unmodified; the CPU overlay path is the iOS fallback and was
+// too slow on Android (per-frame edge scan + SVG path).
+const USE_NATIVE_FOCUS_PEAKING = Platform.OS === "android";
 // Classifier cadence. Inference now runs on the GPU delegate (with NNAPI/CPU fallback),
 // so 1 fps left the device idle between frames and made the live ID feel laggy/stale.
 // 2 fps keeps results fresh; lower this if low-end devices on the CPU fallback overheat.

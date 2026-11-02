@@ -193,7 +193,7 @@ index f91ce83..3f48cc0 100644
          left.zoom != right.zoom ||
          left.exposure != right.exposure
 diff --git a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
-index 1e9c0de..9ab9765 100644
+index 1e9c0de..c8106d2 100644
 --- a/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 +++ b/node_modules/react-native-vision-camera/android/src/main/java/com/mrousavy/camera/core/CameraSession+Configuration.kt
 @@ -1,8 +1,19 @@
@@ -350,7 +350,7 @@ index 1e9c0de..9ab9765 100644
    // Notify callback
    callback.onInitialized()
  
-@@ -336,6 +392,217 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
+@@ -336,6 +392,220 @@ internal fun CameraSession.configureSideProps(config: CameraConfiguration) {
    if (currentExposureCompensation != exposureCompensation) {
      camera.cameraControl.setExposureCompensationIndex(exposureCompensation)
    }
@@ -459,7 +459,10 @@ index 1e9c0de..9ab9765 100644
 +  characteristics: CameraCharacteristics,
 +  requestedMode: VideoStabilizationMode
 +) {
-+  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || !requestedMode.isAtLeast(VideoStabilizationMode.STANDARD)) {
++  // Stream use cases are set in every stabilization mode. Without them, Samsung HALs
++  // (S24 Ultra) render the preview with wrong/inverted colors; with them (which used
++  // to happen only when stabilization was on) colors are correct.
++  if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
 +    return
 +  }
 +

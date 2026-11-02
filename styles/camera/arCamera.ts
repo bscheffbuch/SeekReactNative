@@ -57,7 +57,7 @@ const viewStyles = StyleSheet.create( {
   },
   queueBadge: {
     alignItems: "center",
-    backgroundColor: colors.seekGold,
+    backgroundColor: colors.seekDeepGreen,
     borderRadius: 11,
     height: 22,
     justifyContent: "center",

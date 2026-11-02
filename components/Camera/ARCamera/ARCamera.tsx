@@ -172,7 +172,8 @@ const ARCamera = ( ) => {
   const [cameraRecovering, setCameraRecovering] = useState( false );
   const [focusPeakingEnabled, setFocusPeakingEnabled] = useState( false );
   const [focusPeakingSensitivity, setFocusPeakingSensitivity] = useState( DEFAULT_FOCUS_PEAKING_SENSITIVITY );
-  const [digitalStabilizationEnabled, setDigitalStabilizationEnabled] = useState( false );
+  // On by default: this is the configuration with verified-correct preview colors on Samsung devices
+  const [digitalStabilizationEnabled, setDigitalStabilizationEnabled] = useState( true );
   const [photoHdrEnabled, setPhotoHdrEnabled] = useState( false );
   const [torch, setTorch] = useState<"off" | "on">( "off" );
   const cameraDevices = useCameraDevices();
