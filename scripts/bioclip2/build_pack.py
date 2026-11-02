@@ -111,16 +111,32 @@ def write_common_names( species, locales, path ):
         ids = [sp["id"] for sp in species]
         for loc in extra:
             seek_locale = loc.replace( "-", "" )
-            for i in range( 0, len( ids ), 30 ):
-                t0 = time.time( )
-                r = s.get( f"https://api.inaturalist.org/v1/taxa/{','.join( map( str, ids[i:i + 30] ) )}",
-                           params={"locale": loc}, timeout=60 )
+            # checkpoint per locale so an interrupted run (proxy hiccups, rate limits) resumes
+            ckpt_path = f"{path}.{loc}.partial.json"
+            ckpt = json.load( open( ckpt_path ) ) if os.path.exists( ckpt_path ) else {"done": 0, "rows": []}
+            for i in range( ckpt["done"], len( ids ), 30 ):
+                for attempt in range( 8 ):
+                    t0 = time.time( )
+                    try:
+                        r = s.get( f"https://api.inaturalist.org/v1/taxa/{','.join( map( str, ids[i:i + 30] ) )}",
+                                   params={"locale": loc}, timeout=60 )
+                        if r.status_code == 429 or r.status_code >= 500:
+                            raise IOError( f"HTTP {r.status_code}" )
+                        break
+                    except Exception as e:  # noqa: BLE001 - network errors of any kind are retried
+                        print( f"  retry {attempt + 1} at {i}: {e}", flush=True )
+                        time.sleep( min( 60, 2 ** attempt ) )
+                else:
+                    raise SystemExit( f"giving up at {i}; rerun to resume from the checkpoint" )
                 if r.ok:
-                    rows += [{"i": t["id"], "l": seek_locale, "n": t["preferred_common_name"]}
-                             for t in r.json( )["results"] if t.get( "preferred_common_name" )]
+                    ckpt["rows"] += [{"i": t["id"], "l": seek_locale, "n": t["preferred_common_name"]}
+                                     for t in r.json( )["results"] if t.get( "preferred_common_name" )]
+                ckpt["done"] = i + 30
                 time.sleep( max( 0, 1.05 - ( time.time( ) - t0 ) ) )  # iNat asks for <= 1 request/second
                 if i % 3000 == 0:
+                    json.dump( ckpt, open( ckpt_path, "w" ), ensure_ascii=False )
                     print( f"  names {loc}: {i}/{len( ids )}", flush=True )
+            rows += ckpt["rows"]
     json.dump( rows, open( path, "w", encoding="utf8" ), ensure_ascii=False )
     return len( rows )
 
@@ -182,18 +198,25 @@ def build_model( species, taxa, args ):
     torch.save( {"gamma": args.gamma}, os.path.join( args.out, "build_info.pt" ) )
     if args.export == "none":
         return wrapper
-    import ai_edge_torch
-    flags = {}
-    if args.precision == "fp16":
-        import tensorflow as tf
-        flags = {"optimizations": [tf.lite.Optimize.DEFAULT], "target_spec": {"supported_types": [tf.float16]}}
-    elif args.precision == "int8-weights":
-        import tensorflow as tf
-        flags = {"optimizations": [tf.lite.Optimize.DEFAULT]}
-    print( f"converting to TFLite ({args.precision})", flush=True )
-    edge = ai_edge_torch.convert( wrapper, sample, _ai_edge_converter_flags=flags ) if flags else \
-        ai_edge_torch.convert( wrapper, sample )
-    edge.export( os.path.join( args.out, "model.tflite" ) )
+    out_path = os.path.join( args.out, "model.tflite" )
+    fp32_path = out_path if args.precision == "fp32" else os.path.join( args.out, "model_fp32.tflite" )
+    print( "converting to TFLite (fp32)", flush=True )
+    try:
+        import litert_torch as converter  # ai-edge-torch's new name (>= 0.7)
+    except ImportError:
+        import ai_edge_torch as converter
+    converter.convert( wrapper, sample ).export( fp32_path )
+    if args.precision != "fp32":
+        # post-training weight quantization with ai-edge-quantizer
+        from ai_edge_quantizer import quantizer, recipe
+        print( f"quantizing weights ({args.precision})", flush=True )
+        qt = quantizer.Quantizer( fp32_path )
+        qt.load_quantization_recipe(
+            recipe.weight_only_wi8_afp32( )
+        )
+        qt.quantize( ).export_model( out_path, overwrite=True )
+        if not args.keep_fp32:
+            os.remove( fp32_path )
     return wrapper
 
 
@@ -206,7 +229,9 @@ def main( ):
     ap.add_argument( "--species", type=int, default=100_000, help="keep the N most-observed species" )
     ap.add_argument( "--gamma", type=float, default=0.1,
                      help="popularity prior weight; 0.1 was best in the benchmark's cross-validation" )
-    ap.add_argument( "--precision", choices=["fp32", "fp16", "int8-weights"], default="fp16" )
+    ap.add_argument( "--precision", choices=["fp32", "int8-weights"], default="int8-weights",
+                     help="int8-weights: per-channel int8 weights, float activations (~4x smaller)" )
+    ap.add_argument( "--keep-fp32", action="store_true", help="also keep model_fp32.tflite (for verify_pack)" )
     ap.add_argument( "--export", choices=["tflite", "none"], default="tflite" )
     ap.add_argument( "--skip-model", action="store_true", help="only taxonomy, names and manifest" )
     ap.add_argument( "--text-embeddings", help="reuse a .npy of normalized text embeddings" )

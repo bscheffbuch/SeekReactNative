@@ -24,7 +24,7 @@ A GPU is strongly recommended (100k text prompts and the TFLite conversion).
 
 ```sh
 python -m venv .venv && . .venv/bin/activate
-pip install torch open_clip_torch ai-edge-torch ai-edge-litert tensorflow requests pillow numpy
+pip install torch open_clip_torch litert-torch ai-edge-quantizer ai-edge-litert requests pillow numpy
 
 python fetch_species.py --n 100000           # species.json (~40 min at iNat's 1 request/second)
 python build_pack.py --out packs/bioclip2-100k
@@ -35,11 +35,11 @@ Useful options:
 
 - `--species 30000`: a smaller pack (fewer look-alike mix-ups, smaller head).
 - `fetch_species.py --place-id 97391`: species for one iNat place (Europe here), for a regional pack.
-- `--precision fp16` (default), `int8-weights` (smaller, check accuracy with `verify_pack.py`), or `fp32`.
+- `--precision int8-weights` (default: per-channel int8 weights, float activations, ~4x smaller than fp32) or `fp32`; `--keep-fp32` keeps the unquantized file for `verify_pack.py`.
 - `--locales en,de,fr`: common names in more languages (about an hour per extra language).
 - `--skip-model`: taxonomy, names and manifest only, in seconds.
 
-Expect roughly 700 MB at fp16 for 100k species.
+Expect roughly 400 MB with int8 weights for 100k species.
 
 ## Install on a phone (debug build)
 
