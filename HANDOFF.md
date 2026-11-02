@@ -127,6 +127,41 @@ To check on device: switch models in Settings (with a pack pushed), confirm
 the camera keeps classifying, and run TalkBack over Home, More, Observations
 and a species page.
 
+## Material 3 port and preview APK (this branch)
+
+The Material 3 design from the design canvas is in the code:
+
+- `styles/theme.ts`: M3 tonal roles (primary/secondary/tertiary containers,
+  surface containers, outline, onSurfaceVariant) for light and dark. Old keys
+  (`canvas`, `surface`, `muted`, `border`...) map onto M3 roles, so untouched
+  screens pick up the palette. Cards have no shadow (`elevation.card` is flat).
+- `styles/global.ts`: Roboto on Android (`assets/fonts/Roboto-*.ttf`), Medium
+  for titles. iOS still uses Lato: the Roboto files are not in the Xcode project yet.
+- `components/Navigation/BottomTabs.tsx`: custom M3 navigation bar (4 tabs, pill
+  indicator) and a Scan extended FAB overlaid above it.
+- Home: primary-container level card, thick progress bar with count, tonal
+  collection cards.
+- Match: `MatchHeader` (top app bar + two rounded photos), `MatchDetails`
+  (DE/EN/LAT names via `taxa/{id}?all_names=true`, Google/Wikipedia buttons,
+  classification from the prediction's ancestors), `MatchFooter` (flag, Scan
+  again, View species).
+- Camera: dark tonal controls; `FrameProcessorCamera` takes `onViewfinderPan*`
+  callbacks (one-finger pan; pinch zoom stays native), `ARCamera` maps vertical
+  swipes to manual focus and horizontal swipes to peaking sensitivity, with a
+  gold value readout. A handle at the top of the controls hides them; a value
+  pill stays and gestures keep working.
+
+Preview builds: without `inaturalist-android.keystore`, `assembleRelease` signs
+with the debug key and uses the package `org.inaturalist.seek.preview`. Model
+packs placed in `android/app/src/main/assets/models/<id>/` (gitignored) are
+copied to the app's documents folder on first launch (`installBundledPacks`),
+and become the default when the private Seek model is not in the build.
+
+Build environment notes: Maven Central rate-limits the cloud container (429), so
+`~/.gradle/init.d/maven-mirror.gradle` points Gradle at Google's Maven Central
+mirror and forces foojay-resolver 1.0.0 (0.5.0, pinned by
+`@react-native/gradle-plugin`, fails on Gradle 9).
+
 ## Open issue 1 — crash on opening the camera (`debug-apk-2`)
 
 Symptom (from a phone screenshot of the error boundary):
