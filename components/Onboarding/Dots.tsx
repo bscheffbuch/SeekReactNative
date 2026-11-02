@@ -2,26 +2,31 @@ import * as React from "react";
 import { View } from "react-native";
 
 import { viewStyles } from "../../styles/onboarding";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   index: number;
+  count?: number;
 }
 
-const Dots = ( { index }: Props ) => {
-  const ActiveDot = <View style={[viewStyles.dot, viewStyles.activeDot]} />;
-  const Dot = <View style={viewStyles.dot} />;
-
-  const dots = [];
-
-  for ( let key = 0; key < 3; key += 1 ) {
-    dots.push( key === index
-      ? React.cloneElement( ActiveDot, { key } )
-      : React.cloneElement( Dot, { key } ) );
-  }
-
+// M3 page indicator: the current page is a primary pill, others small dots.
+const Dots = ( { index, count = 3 }: Props ) => {
+  const { theme } = useTheme( );
   return (
-    <View style={[viewStyles.pagination, viewStyles.center]}>
-      {dots}
+    <View
+      accessibilityLabel={`${index + 1} / ${count}`}
+      style={[viewStyles.pagination, viewStyles.center]}
+    >
+      {Array.from( { length: count }, ( _, key ) => (
+        <View
+          key={key}
+          style={[
+            viewStyles.dot,
+            { backgroundColor: theme.colors.outlineVariant },
+            key === index && [viewStyles.activeDot, { backgroundColor: theme.colors.primary }],
+          ]}
+        />
+      ) )}
     </View>
   );
 };

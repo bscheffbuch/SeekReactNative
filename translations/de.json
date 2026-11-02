@@ -177,7 +177,8 @@
     "onboarding_2": "Erfahre mehr über die Natur um dich herum",
     "onboarding_3": "Verdiene dir Abzeichen für das Entdecken verschiedener Arten",
     "skip": "Vorerst überspringen",
-    "continue": "Fortfahren"
+    "continue": "Fortfahren",
+    "next": "Weiter"
   },
   "location_picker": {
     "species_nearby": "Arten in der Nähe",

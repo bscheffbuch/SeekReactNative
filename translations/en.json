@@ -186,7 +186,8 @@
     "onboarding_2": "Learn about the organisms all around you",
     "onboarding_3": "Earn badges for observing different types of species",
     "skip": "Skip for now",
-    "continue": "Continue"
+    "continue": "Continue",
+    "next": "Next"
   },
   "location_picker": {
     "species_nearby": "Species nearby",

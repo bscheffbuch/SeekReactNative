@@ -1,43 +1,48 @@
 // @ts-nocheck
 import * as React from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, Pressable, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-import { viewStyles, textStyles } from "../../styles/onboarding";
+import { viewStyles } from "../../styles/onboarding";
 import i18n from "../../i18n";
-import StyledText from "../UIComponents/StyledText";
-import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   index: number;
+  last: boolean;
+  onNext: ( ) => void;
 }
 
-const Button = ( { index }: Props ) => {
+const Button = ( { last, onNext }: Props ) => {
   const navigation = useNavigation( );
+  const { theme } = useTheme( );
 
   // TODO: navigation TS
   const navToHome = ( ) => navigation.navigate( "MainTabs", { screen: "Home" } );
 
   return (
-    <TouchableOpacity accessibilityRole="button"
-      onPress={navToHome}
-      style={[viewStyles.buttonContainer, viewStyles.center]}
-    >
-      {index === 2
-        ? (
-          <View style={viewStyles.button}>
-            <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.continue]}>
-              {i18n.t( "onboarding.continue" )}
-            </StyledText>
-          </View>
-        ) : (
-          <View style={viewStyles.buttonUncolored}>
-            <StyledText allowFontScaling={false} style={[baseTextStyles.bodyWhite, textStyles.skipText]}>
-              {i18n.t( "onboarding.skip" )}
-            </StyledText>
-          </View>
-        )}
-    </TouchableOpacity>
+    <View style={viewStyles.buttonRow}>
+      {!last ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={navToHome}
+          style={( { pressed } ) => [viewStyles.textButton, pressed && { backgroundColor: theme.colors.pressed }]}
+        >
+          <Text style={[viewStyles.textButtonLabel, { color: theme.colors.primary, fontFamily: theme.typography.heading }]}>
+            {i18n.t( "onboarding.skip" )}
+          </Text>
+        </Pressable>
+      ) : <View />}
+      <Pressable
+        accessibilityRole="button"
+        onPress={last ? navToHome : onNext}
+        style={( { pressed } ) => [viewStyles.button, { backgroundColor: theme.colors.primary }, pressed && { opacity: 0.88 }]}
+      >
+        <Text style={[viewStyles.buttonLabel, { color: theme.colors.onPrimary, fontFamily: theme.typography.heading }]}>
+          {i18n.t( last ? "onboarding.continue" : "onboarding.next" )}
+        </Text>
+      </Pressable>
+    </View>
   );
 };
 

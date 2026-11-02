@@ -1,82 +1,86 @@
 import { StyleSheet, Dimensions } from "react-native";
-import {
-  colors,
-  center,
-} from "./global";
+import { center } from "./global";
 
-const { width, height } = Dimensions.get( "window" );
+const { height } = Dimensions.get( "window" );
 
 const viewStyles = StyleSheet.create( {
   activeDot: {
-    backgroundColor: colors.seekSurface,
-    borderRadius: 10 / 2,
-    height: 10,
-    width: 10,
+    borderRadius: 4,
+    width: 24,
   },
   button: {
-    backgroundColor: colors.seekDeepGreen,
-    borderRadius: 14,
-    height: 50,
+    alignItems: "center",
+    borderRadius: 28,
+    height: 56,
     justifyContent: "center",
-    width: 293,
+    minWidth: 140,
+    paddingHorizontal: 28,
   },
-  buttonUncolored: {
-    height: 50,
-    justifyContent: "center",
+  buttonLabel: {
+    fontSize: 16,
+    letterSpacing: 0.1,
   },
-  buttonContainer: {
-    marginBottom: 51,
-  },
-  buttonHeight: {
-    padding: 15,
+  buttonRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingBottom: 24,
+    paddingHorizontal: 16,
   },
   center,
   container: {
-    backgroundColor: colors.seekCanvas,
     flex: 1,
   },
   contentContainer: {
     alignItems: "center",
-    justifyContent: "flex-end",
-    width,
+    justifyContent: "center",
   },
   dot: {
-    backgroundColor: colors.seekMuted,
-    borderRadius: 6 / 2,
-    height: 6,
-    marginBottom: 3,
-    marginHorizontal: 16,
-    marginTop: 3,
-    width: 6,
+    borderRadius: 4,
+    height: 8,
+    marginHorizontal: 4,
+    width: 8,
   },
-  image: {
+  imageCard: {
     alignItems: "center",
+    borderRadius: 28,
+    height: Math.min( 360, height * 0.42 ),
+    justifyContent: "center",
+    overflow: "hidden",
+    width: "100%",
   },
-  margin: {
-    marginTop: 29,
+  imageFill: {
+    height: "100%",
+    width: "100%",
+  },
+  page: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    width: "100%",
   },
   pagination: {
     flexDirection: "row",
-    marginBottom: height > 570 ? 37 : 27,
-    marginTop: height > 570 ? 57 : 27,
+    marginBottom: 24,
+    marginTop: 16,
   },
-} );
-
-const textStyles = StyleSheet.create( {
-  skipText: {
-    textAlign: "center",
-    textDecorationLine: "underline",
+  textButton: {
+    borderRadius: 20,
+    justifyContent: "center",
+    minHeight: 48,
+    paddingHorizontal: 12,
   },
-  text: {
-    maxWidth: 292,
-    textAlign: "center",
+  textButtonLabel: {
+    fontSize: 15,
   },
-  continue: {
+  title: {
+    fontSize: 24,
+    lineHeight: 32,
+    marginTop: 32,
+    maxWidth: 340,
     textAlign: "center",
   },
 } );
 
 export {
-  textStyles,
   viewStyles,
 };

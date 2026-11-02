@@ -795,7 +795,10 @@ const FrameProcessorCamera = ( props: Props ) => {
             onShutter={onCaptureStarted}
             outputOrientation="device"
             photoQualityBalance={photoQualityBalance}
-            video={digitalStabilizationEnabled && formatStabilizationMode != null}
+            // Keep the video output on in every mode (as on main). With it off, the
+            // Preview/ImageAnalysis/ImageCapture combination renders wrong colors on
+            // Samsung devices (S24 Ultra); only the stabilization mode is toggled.
+            video
             videoStabilizationMode={digitalStabilizationEnabled ? videoStabilizationMode : undefined}
             {...nativeFocusPeakingProps}
             enableLocation={hasPermission}
