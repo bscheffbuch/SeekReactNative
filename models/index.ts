@@ -59,7 +59,8 @@ export default {
     UploadPhotoRealm,
     UserSettingsRealm,
   ],
-  schemaVersion: 46,
+  // 47: index on CommonNamesRealm.taxon_id (no data change)
+  schemaVersion: 47,
   path: "db.realm",
   onMigration,
 };

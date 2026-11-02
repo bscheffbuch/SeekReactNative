@@ -2,8 +2,10 @@
 import { Alert, Platform } from "react-native";
 import {
   copyFileAssets,
+  exists,
   readDirAssets,
   readDir,
+  stat,
   DocumentDirectoryPath,
   MainBundlePath,
   unlink,
@@ -13,8 +15,29 @@ import i18n from "../i18n";
 import { dirModel, dirGeomodel, dirTaxonomy } from "./dirStorage";
 import modelFiles from "../constants/modelFileNames";
 
+// Copying the model out of the APK on every launch costs seconds of I/O for a
+// large model. Copy only when the destination is missing or a different size
+// (an app update that ships a new model changes its size).
+const needsCopy = async ( assetSize: number | undefined, destination: string ): Promise<boolean> => {
+  try {
+    if ( !( await exists( destination ) ) ) {
+      return true;
+    }
+    if ( assetSize === undefined || assetSize < 0 ) {
+      return true;
+    }
+    const { size } = await stat( destination );
+    return Number( size ) !== Number( assetSize );
+  } catch {
+    return true;
+  }
+};
+
 const addCameraFilesAndroid = () => {
-  const copyFilesAndroid = ( source: string, destination: string ) => {
+  const copyFilesAndroid = async ( source: string, destination: string, assetSize?: number ) => {
+    if ( !( await needsCopy( assetSize, destination ) ) ) {
+      return;
+    }
     copyFileAssets( source, destination ).then( ( _result ) => {
       console.log( `moved file from ${source} to ${destination}` );
     } ).catch( ( error ) => {
@@ -23,6 +46,7 @@ const addCameraFilesAndroid = () => {
   };
 
   readDirAssets( "camera" ).then( ( results ) => {
+    const sizeOf = ( name: string ) => results.find( ( r ) => r.name === name )?.size;
     const model = modelFiles.ANDROIDMODEL;
     const geomodel = modelFiles.ANDROIDGEOMODEL;
     const taxonomy = modelFiles.ANDROIDTAXONOMY;
@@ -33,8 +57,8 @@ const addCameraFilesAndroid = () => {
     // Android writes over existing files
     if ( hasModel !== undefined ) {
       console.log( "Found model asset with filename", model );
-      copyFilesAndroid( `camera/${model}`, dirModel );
-      copyFilesAndroid( `camera/${taxonomy}`, dirTaxonomy );
+      copyFilesAndroid( `camera/${model}`, dirModel, sizeOf( model ) );
+      copyFilesAndroid( `camera/${taxonomy}`, dirTaxonomy, sizeOf( taxonomy ) );
     } else {
       console.log( "No model asset found to copy into document directory." );
       Alert.alert(
@@ -44,7 +68,7 @@ const addCameraFilesAndroid = () => {
     }
     if ( hasGeoModel !== undefined ) {
       console.log( "Found geomodel asset with filename", geomodel );
-      copyFilesAndroid( `camera/${geomodel}`, dirGeomodel );
+      copyFilesAndroid( `camera/${geomodel}`, dirGeomodel, sizeOf( geomodel ) );
     } else {
       console.log( "No geomodel asset found to copy into document directory." );
     }

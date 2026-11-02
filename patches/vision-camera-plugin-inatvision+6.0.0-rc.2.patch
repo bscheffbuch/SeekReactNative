@@ -648,6 +648,298 @@ index dd91fb5..ab6ff77 100644
      }
  
  }
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Node.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Node.java
+index df84da8..92a0ad2 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Node.java
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Node.java
+@@ -17,6 +17,12 @@ public class Node {
+ 
+     public Double geoThreshold;
+ 
++    /** Position in the taxonomy's post-order array; set by Taxonomy after the tree is built. */
++    public transient int index = -1;
++
++    /** leafId parsed once; -1 for internal nodes. */
++    public transient int leafIndex = -1;
++
+     public transient Node parent;
+ 
+     public transient List<Node> children = new ArrayList<>();
+@@ -31,41 +37,79 @@ public class Node {
+     // Seek model 1.0:
+     // parent_taxon_id,taxon_id,rank_level,leaf_class_id,name
+     public Node(String[] headers, String line) {
++        this(columnIndices(headers), headers.length, line);
++    }
++
++    /** Column positions for the fields a node reads, looked up once per file instead of once per line. */
++    public static int[] columnIndices(String[] headers) {
++        List<String> headerList = new ArrayList<>(Arrays.asList(headers));
++        return new int[] {
++            headerList.indexOf("parent_taxon_id"),
++            headerList.indexOf("taxon_id"),
++            headerList.indexOf("rank_level"),
++            headerList.indexOf("leaf_class_id"),
++            headerList.indexOf("geo_threshold"),
++            headerList.indexOf("name"),
++        };
++    }
++
++    public Node(int[] columns, int columnCount, String line) {
++        String[] parts = line.trim().split(",", columnCount);
++        if (columns[0] >= 0) {
++          this.parentKey = parts[columns[0]];
++        }
++        if (columns[1] >= 0) {
++          this.key = parts[columns[1]];
++        }
++        if (columns[2] >= 0) {
++          this.rank = Float.parseFloat(parts[columns[2]]);
++        }
++        if (columns[3] >= 0) {
++          this.leafId = parts[columns[3]];
++          if (this.leafId.length() > 0) {
++            this.leafIndex = Integer.parseInt(this.leafId);
++          }
++        }
++        if (columns[4] >= 0) {
++          String spatialThreshold = parts[columns[4]];
++          if (spatialThreshold.length() > 0) {
++            this.geoThreshold = Double.valueOf(spatialThreshold);
++          }
++        }
++        if (columns[5] >= 0) {
++          this.name = parts[columns[5]];
++        }
++    }
++
++    /** Original per-line parser, kept for reference; the constructor above is equivalent. */
++    @SuppressWarnings("unused")
++    private static Node parseSlow(String[] headers, String line) {
++        Node node = new Node();
+         String[] parts = line.trim().split(",", headers.length);
+         List<String> headerList = new ArrayList<>(Arrays.asList(headers));
+ 
+         if (headerList.contains("parent_taxon_id")) {
+-          int parentTaxonIdIndex = headerList.indexOf("parent_taxon_id");
+-          this.parentKey = parts[parentTaxonIdIndex];
++          node.parentKey = parts[headerList.indexOf("parent_taxon_id")];
+         }
+-
+         if (headerList.contains("taxon_id")) {
+-          int taxonIdIndex = headerList.indexOf("taxon_id");
+-          this.key = parts[taxonIdIndex];
++          node.key = parts[headerList.indexOf("taxon_id")];
+         }
+-
+         if (headerList.contains("rank_level")) {
+-          int rankLevelIndex = headerList.indexOf("rank_level");
+-          this.rank = Float.parseFloat(parts[rankLevelIndex]);
++          node.rank = Float.parseFloat(parts[headerList.indexOf("rank_level")]);
+         }
+-
+         if (headerList.contains("leaf_class_id")) {
+-          int leafClassIdIndex = headerList.indexOf("leaf_class_id");
+-          this.leafId = parts[leafClassIdIndex];
++          node.leafId = parts[headerList.indexOf("leaf_class_id")];
+         }
+-
+         if (headerList.contains("geo_threshold")) {
+-          int spatialThresholdIndex = headerList.indexOf("geo_threshold");
+-          String spatialThreshold = parts[spatialThresholdIndex];
++          String spatialThreshold = parts[headerList.indexOf("geo_threshold")];
+           if (spatialThreshold.length() > 0) {
+-            this.geoThreshold = Double.valueOf(parts[spatialThresholdIndex]);
++            node.geoThreshold = Double.valueOf(spatialThreshold);
+           }
+         }
+-
+         if (headerList.contains("name")) {
+-          int nameIndex = headerList.indexOf("name");
+-          this.name = parts[nameIndex];
++          node.name = parts[headerList.indexOf("name")];
+         }
++        return node;
+     }
+ 
+     public Node() {
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Taxonomy.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Taxonomy.java
+index 90495d0..eee040f 100644
+--- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Taxonomy.java
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/Taxonomy.java
+@@ -68,6 +68,18 @@ public class Taxonomy {
+     private float mExcludedLeafCombinedScoresSum = 0.0f;
+     private float mExcludedLeafVisionScoresSum = 0.0f;
+ 
++    // Branch pruning. With large label sets (e.g. 100k species) almost every leaf
++    // falls below the rollup cutoff, and walking the whole tree while building
++    // hash maps at every node costs far more than the model's own scoring.
++    // Nodes are numbered in post-order once; each frame one pass over primitive
++    // arrays finds every branch's best leaf score, and branches whose best leaf
++    // is below the cutoff are skipped with their scores added to the excluded
++    // sums -- exactly what visiting each leaf would have done.
++    private Node[] mPostOrder;
++    private float[] mBranchMaxScore;
++    private float[] mBranchCombinedSum;
++    private float[] mBranchVisionSum;
++
+     public void setFilterByTaxonId(Integer taxonId) {
+         if (mFilterByTaxonId != taxonId) {
+             Timber.tag(TAG).d("setFilterByTaxonId: changing taxonID filter from " + mFilterByTaxonId + " to " + taxonId);
+@@ -105,12 +117,12 @@ public class Taxonomy {
+             String headerLine = reader.readLine();
+             // Transform header line to array
+             String[] headers = headerLine.split(",");
+-
++            int[] columns = Node.columnIndices(headers);
+ 
+             mNodes = new ArrayList<>();
+             mLeaves = new ArrayList<>();
+             for (String line; (line = reader.readLine()) != null; ) {
+-                Node node = new Node(headers, line);
++                Node node = new Node(columns, headers.length, line);
+                 mNodes.add(node);
+                 if ((node.leafId != null) && (node.leafId.length() > 0)) {
+                     mLeaves.add(node);
+@@ -142,6 +154,69 @@ public class Taxonomy {
+             }
+         }
+ 
++        indexNodes();
++    }
++
++    /** Numbers every node in post-order (children before parents), iteratively to avoid deep recursion. */
++    private void indexNodes() {
++        List<Node> order = new ArrayList<>(mNodes.size() + 1);
++        List<Node> stack = new ArrayList<>();
++        List<Integer> childPos = new ArrayList<>();
++        stack.add(mLifeNode);
++        childPos.add(0);
++        while (!stack.isEmpty()) {
++            int top = stack.size() - 1;
++            Node node = stack.get(top);
++            int next = childPos.get(top);
++            if (next < node.children.size()) {
++                childPos.set(top, next + 1);
++                stack.add(node.children.get(next));
++                childPos.add(0);
++            } else {
++                stack.remove(top);
++                childPos.remove(top);
++                node.index = order.size();
++                order.add(node);
++            }
++        }
++        mPostOrder = order.toArray(new Node[0]);
++        mBranchMaxScore = new float[mPostOrder.length];
++        mBranchCombinedSum = new float[mPostOrder.length];
++        mBranchVisionSum = new float[mPostOrder.length];
++    }
++
++    /** One post-order pass: best leaf score and score sums for every branch. */
++    private void computeBranchStats(float[] combinedScores, float[] visionScores) {
++        for (Node node : mPostOrder) {
++            int i = node.index;
++            if (node.children.isEmpty()) {
++                if (node.leafIndex >= 0) {
++                    float c = combinedScores[node.leafIndex];
++                    mBranchMaxScore[i] = c;
++                    mBranchCombinedSum[i] = c;
++                    mBranchVisionSum[i] = visionScores[node.leafIndex];
++                } else {
++                    mBranchMaxScore[i] = Float.NEGATIVE_INFINITY;
++                    mBranchCombinedSum[i] = 0f;
++                    mBranchVisionSum[i] = 0f;
++                }
++            } else {
++                float max = Float.NEGATIVE_INFINITY;
++                float sumC = 0f;
++                float sumV = 0f;
++                for (Node child : node.children) {
++                    int c = child.index;
++                    if (mBranchMaxScore[c] > max) {
++                        max = mBranchMaxScore[c];
++                    }
++                    sumC += mBranchCombinedSum[c];
++                    sumV += mBranchVisionSum[c];
++                }
++                mBranchMaxScore[i] = max;
++                mBranchCombinedSum[i] = sumC;
++                mBranchVisionSum[i] = sumV;
++            }
++        }
+     }
+ 
+     private Node createLifeNode() {
+@@ -158,12 +233,13 @@ public class Taxonomy {
+     }
+ 
+     public List<Prediction> predict(float[] combinedScores, float[] visionScores, float[] geoScores, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
+-        // Make a copy of results
+-        float[] cSCopy = combinedScores.clone();
+-        // Make sure results is sorted by score
+-        Arrays.sort(cSCopy);
+-        // Get result with the highest score
+-        float topCombinedScore = cSCopy[cSCopy.length - 1];
++        // Highest score; a single scan instead of copying and sorting every score each frame
++        float topCombinedScore = Float.NEGATIVE_INFINITY;
++        for (float s : combinedScores) {
++            if (s > topCombinedScore) {
++                topCombinedScore = s;
++            }
++        }
+         float scoreRatioCutoff = 0.001f;
+         float cutoff = topCombinedScore * scoreRatioCutoff;
+         setTaxonomyRollupCutoff(cutoff);
+@@ -171,7 +247,6 @@ public class Taxonomy {
+         if (taxonomyRollupCutoff != null) {
+           setTaxonomyRollupCutoff(taxonomyRollupCutoff.floatValue());
+         }
+-        cSCopy = null;
+ 
+         Map<String, Map> aggregatedScores = aggregateAndNormalizeScores(combinedScores, visionScores, geoScores);
+         if (commonAncestorMode) {
+@@ -231,6 +306,7 @@ public class Taxonomy {
+         // Reset the sum of removed leaf scores
+         mExcludedLeafCombinedScoresSum = 0.0f;
+         mExcludedLeafVisionScoresSum = 0.0f;
++        computeBranchStats(combinedScores, visionScores);
+         Map<String, Map> aggregatedScores = aggregateScores(combinedScores, visionScores, geoScores, mLifeNode);
+         Map<String, Float> aggregatedCombinedScores = aggregatedScores.get("aggregatedCombinedScores");
+         Map<String, Float> aggregatedVisionScores = aggregatedScores.get("aggregatedVisionScores");
+@@ -260,7 +336,13 @@ public class Taxonomy {
+         Map<String, Float> aggregatedGeoScores = new HashMap<>();
+         Map<String, Double> aggregatedGeoThresholds = new HashMap<>();
+ 
+-        if (currentNode.children.size() > 0) {
++        if (mBranchMaxScore != null && currentNode.index >= 0
++                && mBranchMaxScore[currentNode.index] < mTaxonomyRollupCutoff) {
++            // Every leaf in this branch is below the cutoff: it would add nothing to the
++            // maps and all of its scores to the excluded sums.
++            mExcludedLeafCombinedScoresSum += mBranchCombinedSum[currentNode.index];
++            mExcludedLeafVisionScoresSum += mBranchVisionSum[currentNode.index];
++        } else if (currentNode.children.size() > 0) {
+             float thisScore = 0.0f;
+             float thisVisionScore = 0.0f;
+             float thisGeoScore = 0.0f;
+@@ -321,13 +403,14 @@ public class Taxonomy {
+                 filterOut = (containsAncestor && mNegativeFilter) || (!containsAncestor && !mNegativeFilter);
+             }
+ 
+-            float combinedScore = combinedScores[Integer.valueOf(currentNode.leafId)];
+-            float visionScore = visionScores[Integer.valueOf(currentNode.leafId)];
++            int leaf = currentNode.leafIndex >= 0 ? currentNode.leafIndex : Integer.parseInt(currentNode.leafId);
++            float combinedScore = combinedScores[leaf];
++            float visionScore = visionScores[leaf];
+             if (!filterOut && combinedScore >= mTaxonomyRollupCutoff) {
+               aggregatedCombinedScores.put(currentNode.key, combinedScore);
+               aggregatedVisionScores.put(currentNode.key, visionScore);
+               if (hasGeoScores) {
+-                float geoScore = geoScores[Integer.parseInt(currentNode.leafId)];
++                float geoScore = geoScores[leaf];
+                 aggregatedGeoScores.put(currentNode.key, geoScore);
+               } else {
+                 aggregatedGeoScores.put(currentNode.key, null);
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
 index 18f1134..0bbf19f 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
@@ -661,7 +953,7 @@ index 18f1134..0bbf19f 100644
  
    @NonNull
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
-index 0c2b46a..31aed21 100644
+index 0c2b46a..9817d7c 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
 @@ -1,9 +1,7 @@
@@ -674,7 +966,7 @@ index 0c2b46a..31aed21 100644
  
  import androidx.annotation.NonNull;
  import androidx.annotation.Nullable;
-@@ -24,7 +22,6 @@ import timber.log.Timber;
+@@ -24,13 +22,16 @@ import timber.log.Timber;
  public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
    VisionCameraPluginInatVisionPlugin(@NonNull VisionCameraProxy proxy, @Nullable Map<String, Object> options) {
      super();
@@ -682,7 +974,17 @@ index 0c2b46a..31aed21 100644
    }
  
    private final static String TAG = "VisionCameraPluginInatVisionPlugin";
-@@ -60,12 +57,6 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+ 
+   private ImageClassifier mImageClassifier = null;
+   private GeoClassifier mGeoClassifier = null;
++  // Files the current classifiers were built from; a different model pack
++  // (another model/taxonomy/geomodel) rebuilds them instead of reusing the old ones.
++  private String mLoadedModelKey = null;
++  private String mLoadedGeomodelKey = null;
+ 
+   private Integer mFilterByTaxonId = null; // If null -> no filter by taxon ID defined
+   public void setFilterByTaxonId(Integer taxonId) {
+@@ -60,12 +61,6 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
      // This should give the orientation of the passed in frame, as of vision-camera v3.2.2 this is not working though
      // instead we use a string passed in via the arguments to signify the device orientation
      // String orientation = frame.getOrientation();
@@ -695,7 +997,22 @@ index 0c2b46a..31aed21 100644
  
      if (arguments == null) {
        throw new RuntimeException("Options object is null");
-@@ -139,7 +130,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+@@ -121,7 +116,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+         Double elevation = location.get("elevation");
+ 
+         // Geomodel classifier initialization with model and taxonomy files
++        String geomodelKey = geomodelPath + "|" + taxonomyPath + "|" + version;
++        if (mGeoClassifier != null && !geomodelKey.equals(mLoadedGeomodelKey)) {
++          Timber.tag(TAG).d("Geomodel files changed, reloading: " + geomodelKey);
++          mGeoClassifier.close();
++          mGeoClassifier = null;
++        }
+         if (mGeoClassifier == null) {
++          mLoadedGeomodelKey = geomodelKey;
+           Timber.tag(TAG).d("Initializing geo classifier: " + geomodelPath + " / " + taxonomyPath);
+           try {
+             mGeoClassifier = new GeoClassifier(geomodelPath, taxonomyPath, version);
+@@ -139,11 +141,18 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
          }
          geomodelScores = mGeoClassifier.predictionsForLocation(latitude, longitude, elevation);
      } else {
@@ -704,7 +1021,18 @@ index 0c2b46a..31aed21 100644
      }
  
      // Image classifier initialization with model and taxonomy files
-@@ -167,29 +158,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
++    String modelKey = modelPath + "|" + taxonomyPath + "|" + version;
++    if (mImageClassifier != null && !modelKey.equals(mLoadedModelKey)) {
++      Timber.tag(TAG).d("Model files changed, reloading: " + modelKey);
++      mImageClassifier.close();
++      mImageClassifier = null;
++    }
+     if (mImageClassifier == null) {
++      mLoadedModelKey = modelKey;
+       Timber.tag(TAG).d("Initializing classifier: " + modelPath + " / " + taxonomyPath);
+ 
+       try {
+@@ -167,29 +176,7 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
      List<Map> cleanedPredictions = new ArrayList<>();
      if (mImageClassifier != null) {
        mImageClassifier.setGeomodelScores(geomodelScores);

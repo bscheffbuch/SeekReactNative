@@ -823,7 +823,11 @@
     "donate_ios": "Please visit the following link to make a donation to Seek:",
     "change_language": "Switch the in-app language to {{language}}?",
     "confirm": "Confirm",
-    "camera_stream_resolution": "Camera stream resolution"
+    "camera_stream_resolution": "Camera stream resolution",
+    "identification_model": "Identification model",
+    "model_built_in": "Seek (built in)",
+    "model_species": "{{count}} species",
+    "model_install_hint": "To add a model, copy its folder (with manifest.json) into {{path}}"
   },
   "seek_challenges": {
     "badge": "Seek badge",

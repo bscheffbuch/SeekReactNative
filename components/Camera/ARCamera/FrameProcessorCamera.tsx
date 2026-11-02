@@ -16,7 +16,7 @@ import {
   useTruncatedUserCoords,
 } from "../../../utility/customHooks";
 import InatVision from "./helpers/visionPluginWrapper";
-import { dirModel, dirGeomodel, dirTaxonomy } from "../../../utility/dirStorage";
+import useActiveModelPack from "../../../utility/customHooks/useActiveModelPack";
 import usePatchedRunAsync from "../../../utility/visionCameraPatches";
 
 import {
@@ -531,7 +531,13 @@ const FrameProcessorCamera = ( props: Props ) => {
 
   const patchedRunAsync = usePatchedRunAsync();
   const hasUserLocation = coords?.latitude != null && coords?.longitude != null;
-  const useGeomodel = useLocation && hasUserLocation;
+  const modelPack = useActiveModelPack( );
+  // plain strings so the frame-processor worklet captures values, not the pack object
+  const modelVersion = modelPack.version;
+  const modelPath = modelPack.modelPath;
+  const taxonomyPath = modelPack.taxonomyPath;
+  const geomodelPath = modelPack.geomodelPath ?? "";
+  const useGeomodel = useLocation && hasUserLocation && geomodelPath !== "";
   // The vision-plugin has a function to look up the location of the user in a h3 gridded world
   // unfortunately, I was not able to run this new function in the worklets directly,
   // so we need to do this here before calling the frame processor hook.
@@ -592,15 +598,15 @@ const FrameProcessorCamera = ( props: Props ) => {
         try {
           const timeBefore = Date.now();
           const result = InatVision.inatVision( frame, {
-            version: "2.13",
-            modelPath: dirModel,
-            taxonomyPath: dirTaxonomy,
+            version: modelVersion,
+            modelPath,
+            taxonomyPath,
             numStoredResults: NUM_STORED_RESULTS,
             confidenceThreshold,
             filterByTaxonId,
             negativeFilter,
             useGeomodel,
-            geomodelPath: dirGeomodel,
+            geomodelPath,
             location: {
               latitude: geoModelCellLocation?.latitude ?? 0,
               longitude: geoModelCellLocation?.longitude ?? 0,
@@ -638,6 +644,10 @@ const FrameProcessorCamera = ( props: Props ) => {
       hasUserLocation,
       geoModelCellLocation,
       useGeomodel,
+      modelVersion,
+      modelPath,
+      taxonomyPath,
+      geomodelPath,
       useOverlayFocusPeaking,
       peakingThreshold,
       handlePeakingPath,

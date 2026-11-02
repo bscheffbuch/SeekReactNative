@@ -9,7 +9,7 @@ import {
 
 import i18n from "../../../i18n";
 import { checkForPhotoMetaData } from "../../../utility/photoHelpers";
-import { dirTaxonomy, dirModel, dirGeomodel } from "../../../utility/dirStorage";
+import { getActiveModelPack } from "../../../utility/modelPacks";
 import { UserContext } from "../../UserContext";
 import { useObservation } from "../../Providers/ObservationProvider";
 import type { ObservationImage } from "../../Providers/ObservationProvider";
@@ -108,11 +108,12 @@ const GalleryButton = ( { setIsActive }: Props ) => {
     }
   };
 
-  const getPredictions = ( uri: string, timestamp: number, location: PhotoLocation ) => {
+  const getPredictions = async ( uri: string, timestamp: number, location: PhotoLocation ) => {
+    const pack = await getActiveModelPack( );
     const path = uri.split( "file://" );
     const reactUri = Platform.OS === "android" ? path[1] : uri;
 
-    const hasLocation = location.latitude != null && location.longitude != null;
+    const hasLocation = location.latitude != null && location.longitude != null && pack.geomodelPath != null;
     const geomodelLocation = hasLocation
       ? {
         latitude: location.latitude as number,
@@ -120,12 +121,12 @@ const GalleryButton = ( { setIsActive }: Props ) => {
       }
       : undefined;
     InatVision.getPredictionsForImage( {
-      version: "2.13",
+      version: pack.version,
       uri: reactUri,
-      modelPath: dirModel,
-      taxonomyPath: dirTaxonomy,
+      modelPath: pack.modelPath,
+      taxonomyPath: pack.taxonomyPath,
       useGeomodel: hasLocation,
-      geomodelPath: dirGeomodel,
+      geomodelPath: pack.geomodelPath ?? undefined,
       location: geomodelLocation,
     } )
       .then( ( result ) => {
@@ -173,7 +174,7 @@ const GalleryButton = ( { setIsActive }: Props ) => {
     const selectedTimestamp = typeof timestamp === "string"
       ? getUnixTime( new Date( timestamp ) )
       : timestamp || unixTimestamp;
-    getPredictions( uri, selectedTimestamp, location );
+    getPredictions( uri, selectedTimestamp, location ).catch( ( e ) => console.log( "[GalleryButton] predictions failed", e ) );
   };
 
   if ( imageSelected ) {

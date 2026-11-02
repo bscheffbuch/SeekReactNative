@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View, Switch } from "react-native";
+import { Platform, StyleSheet, Text, View, Switch } from "react-native";
 import { RadioButton, RadioButtonInput, RadioButtonLabel } from "react-native-simple-radio-button";
 import Realm from "realm";
 
@@ -11,6 +11,16 @@ import realmConfig from "../../models";
 import StyledText from "../UIComponents/StyledText";
 import { useTheme } from "../Providers/ThemeProvider";
 import SettingsSelect from "./SettingsSelect";
+import {
+  BUILT_IN_PACK_ID,
+  choosePack,
+  getSelectedPackId,
+  listModelPacks,
+  modelPackDirs,
+  setSelectedPack,
+} from "../../utility/modelPacks";
+import type { ModelPack } from "../../utility/modelPacks";
+import { loadActivePackCommonNames } from "../../utility/commonNamesHelpers";
 
 interface State {
   autoCapture?: boolean;
@@ -52,8 +62,18 @@ const settingsToPlainObject = ( userSettings ): State => ( {
   photoQualityBalance: userSettings.photoQualityBalance,
   confidenceThreshold: userSettings.confidenceThreshold,
 } );
+const packLabel = ( pack: ModelPack ) => (
+  pack.builtIn
+    ? i18n.t( "settings.model_built_in" )
+    : pack.taxa
+      ? `${pack.name} · ${i18n.t( "settings.model_species", { count: pack.taxa.toLocaleString( ) } )}`
+      : pack.name
+);
+
 const CameraSettings = ( ) => {
   const [settings, setSettings] = useState<State>( {} );
+  const [packs, setPacks] = useState<ModelPack[]>( [] );
+  const [packId, setPackId] = useState<string>( BUILT_IN_PACK_ID );
   const { theme } = useTheme( );
   const themedStyles = StyleSheet.create( {
     title: {
@@ -140,6 +160,16 @@ const CameraSettings = ( ) => {
     } );
   };
 
+  const updateModelPack = async ( id: string ) => {
+    if ( !id || id === packId ) {
+      return;
+    }
+    const pack = await setSelectedPack( id );
+    setPackId( pack.id );
+    // the pack's own common names, if it ships any, in the background
+    loadActivePackCommonNames( );
+  };
+
   const switchTrackColor = {
     false: theme.colors.border,
     true: theme.colors.primary,
@@ -158,6 +188,14 @@ const CameraSettings = ( ) => {
       }
     };
     fetchUserSettings( );
+    const fetchModelPacks = async ( ) => {
+      const [available, selected] = await Promise.all( [listModelPacks( ), getSelectedPackId( )] );
+      if ( isCurrent ) {
+        setPacks( available );
+        setPackId( choosePack( available, selected ).id );
+      }
+    };
+    fetchModelPacks( );
     return ( ) => {
       isCurrent = false;
     };
@@ -213,6 +251,22 @@ const CameraSettings = ( ) => {
         </StyledText>
       </View>
       <View style={themedStyles.pickerStack}>
+        {Platform.OS === "android" && packs.length > 0 && (
+          <>
+            <SettingsSelect
+              items={packs.map( ( pack ) => ( { label: packLabel( pack ), value: pack.id } ) )}
+              label={i18n.t( "settings.identification_model" )}
+              onValueChange={updateModelPack}
+              testID="identification-model-select"
+              value={packId}
+            />
+            {packs.length === 1 && (
+              <Text selectable style={themedStyles.groupLabel}>
+                {i18n.t( "settings.model_install_hint", { path: modelPackDirs( )[0] } )}
+              </Text>
+            )}
+          </>
+        )}
         <SettingsSelect
           items={cameraViewportResolutionOptions}
           label={i18n.t( "settings.camera_stream_resolution" )}
