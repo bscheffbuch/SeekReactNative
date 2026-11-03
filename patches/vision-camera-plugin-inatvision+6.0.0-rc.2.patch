@@ -250,7 +250,7 @@ index 41eeb39..423d768 100644
      }
  
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-index dd91fb5..2660f48 100644
+index dd91fb5..cac9b1d 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 @@ -2,9 +2,11 @@ package com.visioncameraplugininatvision;
@@ -265,7 +265,7 @@ index dd91fb5..2660f48 100644
  
  import java.io.FileInputStream;
  import java.io.IOException;
-@@ -49,9 +51,33 @@ public class ImageClassifier {
+@@ -49,9 +51,35 @@ public class ImageClassifier {
      /** An instance of the driver class to run model inference with Tensorflow Lite. */
      private Interpreter mTFlite;
  
@@ -294,12 +294,14 @@ index dd91fb5..2660f48 100644
 +    private int[] sourceYs = new int[DIM_IMG_SIZE_Y];
 +    private int lastImageWidth = -1;
 +    private int lastImageHeight = -1;
-+    private double lastCropRatio = -1.0;
++    private int lastCropLeft = -1;
++    private int lastCropTop = -1;
++    private int lastCropSize = -1;
 +
      private float[][] mGeomodelScores;
  
      public void setFilterByTaxonId(Integer taxonId) {
-@@ -79,15 +105,20 @@ public class ImageClassifier {
+@@ -79,15 +107,20 @@ public class ImageClassifier {
          mModelFilename = modelPath;
          mTaxonomyFilename = taxonomyPath;
          mModelVersion = version;
@@ -322,7 +324,7 @@ index dd91fb5..2660f48 100644
      }
  
      /** Classifies a frame from the preview stream. */
-@@ -102,31 +133,59 @@ public class ImageClassifier {
+@@ -102,31 +135,68 @@ public class ImageClassifier {
          }
          convertBitmapToByteBuffer(bitmap);
  
@@ -335,10 +337,19 @@ index dd91fb5..2660f48 100644
 -        for (int i = 0; i < 1; i++) {
 -            expectedOutputs.put(i, new float[1][mModelSize]);
 +    public List<Prediction> classifyImage(Image image, double cropRatio, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
++        return classifyImage(image, cropRatio, null, taxonomyRollupCutoff, commonAncestorMode);
++    }
++
++    /**
++     * cropRect: optional {left, top, width, height} as fractions of the frame (sensor
++     * orientation). The model sees the smallest square around it (padded 10%, kept
++     * inside the frame); null uses the centered cropRatio square.
++     */
++    public List<Prediction> classifyImage(Image image, double cropRatio, float[] cropRect, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
 +        if (mTFlite == null) {
 +            Timber.tag(TAG).e("Image classifier has not been initialized; Skipped.");
 +            return new ArrayList<Prediction>();
-+        }
+         }
 +        if (image == null) {
 +            Timber.tag(TAG).e("Null input image");
 +            return new ArrayList<Prediction>();
@@ -346,8 +357,8 @@ index dd91fb5..2660f48 100644
 +        if (image.getPlanes().length < 3) {
 +            Timber.tag(TAG).e("Expected YUV image with three planes");
 +            return new ArrayList<Prediction>();
-         }
-+        convertImageToByteBuffer(image, cropRatio);
++        }
++        convertImageToByteBuffer(image, cropRatio, cropRect);
 +
 +        return runInference(taxonomyRollupCutoff, commonAncestorMode);
 +    }
@@ -397,7 +408,7 @@ index dd91fb5..2660f48 100644
          } catch (Exception exc) {
              exc.printStackTrace();
              return new ArrayList<Prediction>();
-@@ -140,15 +199,93 @@ public class ImageClassifier {
+@@ -140,15 +210,93 @@ public class ImageClassifier {
  
      /** Closes tflite to release resources. */
      public void close() {
@@ -495,7 +506,7 @@ index dd91fb5..2660f48 100644
      }
  
      /** Writes Image data into a {@code ByteBuffer}. */
-@@ -158,46 +295,139 @@ public class ImageClassifier {
+@@ -158,46 +306,159 @@ public class ImageClassifier {
          }
          imgData.rewind();
  
@@ -528,7 +539,7 @@ index dd91fb5..2660f48 100644
 -        // Convert to ByteBuffer
 +    }
 +
-+    private void convertImageToByteBuffer(Image image, double cropRatio) {
++    private void convertImageToByteBuffer(Image image, double cropRatio, float[] cropRect) {
 +        if (imgData == null) {
 +            return;
 +        }
@@ -543,7 +554,10 @@ index dd91fb5..2660f48 100644
 +        ByteBuffer vBuffer = vPlane.getBuffer();
 +        int imageWidth = image.getWidth();
 +        int imageHeight = image.getHeight();
-+        updateCropMaps(imageWidth, imageHeight, cropRatio);
++        int[] square = cropRect != null
++            ? squareAround(imageWidth, imageHeight, cropRect)
++            : centerSquare(imageWidth, imageHeight, cropRatio);
++        updateCropMaps(imageWidth, imageHeight, square[0], square[1], square[2]);
 +
          try {
 -            ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * input.length * input[0].length * input[0][0].length * input[0][0][0].length);
@@ -581,15 +595,30 @@ index dd91fb5..2660f48 100644
          }
      }
  
-+    private void updateCropMaps(int imageWidth, int imageHeight, double cropRatio) {
-+        if (imageWidth == lastImageWidth && imageHeight == lastImageHeight && Double.compare(cropRatio, lastCropRatio) == 0) {
-+            return;
-+        }
-+
++    private static int[] centerSquare(int imageWidth, int imageHeight, double cropRatio) {
 +        int cropSize = Math.max(1, (int)Math.round(Math.min(imageWidth, imageHeight) * cropRatio));
 +        cropSize = Math.min(cropSize, Math.min(imageWidth, imageHeight));
-+        int cropLeft = (imageWidth - cropSize) / 2;
-+        int cropTop = (imageHeight - cropSize) / 2;
++        return new int[] { (imageWidth - cropSize) / 2, (imageHeight - cropSize) / 2, cropSize };
++    }
++
++    /** Smallest square containing the rect (fractions of the image), padded 10%, shifted to stay inside. */
++    public static int[] squareAround(int imageWidth, int imageHeight, float[] rect) {
++        float cx = (rect[0] + rect[2] / 2f) * imageWidth;
++        float cy = (rect[1] + rect[3] / 2f) * imageHeight;
++        int size = Math.round(Math.max(rect[2] * imageWidth, rect[3] * imageHeight) * 1.1f);
++        size = Math.max(16, Math.min(size, Math.min(imageWidth, imageHeight)));
++        int left = Math.round(cx - size / 2f);
++        int top = Math.round(cy - size / 2f);
++        left = Math.max(0, Math.min(left, imageWidth - size));
++        top = Math.max(0, Math.min(top, imageHeight - size));
++        return new int[] { left, top, size };
++    }
++
++    private void updateCropMaps(int imageWidth, int imageHeight, int cropLeft, int cropTop, int cropSize) {
++        if (imageWidth == lastImageWidth && imageHeight == lastImageHeight
++            && cropLeft == lastCropLeft && cropTop == lastCropTop && cropSize == lastCropSize) {
++            return;
++        }
 +
 +        for (int x = 0; x < DIM_IMG_SIZE_X; x++) {
 +            sourceXs[x] = cropLeft + Math.min(cropSize - 1, (int)(((x + 0.5f) * cropSize) / DIM_IMG_SIZE_X));
@@ -600,7 +629,9 @@ index dd91fb5..2660f48 100644
 +
 +        lastImageWidth = imageWidth;
 +        lastImageHeight = imageHeight;
-+        lastCropRatio = cropRatio;
++        lastCropLeft = cropLeft;
++        lastCropTop = cropTop;
++        lastCropSize = cropSize;
 +    }
 +
 +    private void putYuvPixel(
@@ -663,7 +694,7 @@ index dd91fb5..2660f48 100644
          float sum = 0.0f;
  
          // First multiply the scores
-@@ -214,8 +444,6 @@ public class ImageClassifier {
+@@ -214,8 +475,6 @@ public class ImageClassifier {
                  combinedScores[i] = combinedScores[i] / sum;
              }
          }
@@ -1068,10 +1099,19 @@ index 90495d0..eee040f 100644
                } else {
                  aggregatedGeoScores.put(currentNode.key, null);
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java
-index 627b53f..2179148 100644
+index 627b53f..cf85bcc 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionModule.java
-@@ -38,6 +38,7 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+@@ -3,6 +3,8 @@ package com.visioncameraplugininatvision;
+ import android.content.Context;
+ import android.graphics.Bitmap;
+ import android.graphics.BitmapFactory;
++import android.graphics.Matrix;
++import android.media.ExifInterface;
+ import android.net.Uri;
+ import android.os.SystemClock;
+ import android.util.Log;
+@@ -38,6 +40,7 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
      public VisionCameraPluginInatVisionModule(ReactApplicationContext reactContext) {
          super(reactContext);
          mContext = reactContext;
@@ -1079,7 +1119,16 @@ index 627b53f..2179148 100644
      }
  
      public Context getContext(){
-@@ -140,25 +141,6 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+@@ -71,6 +74,8 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+     public static final String OPTION_MODEL_PATH = "modelPath";
+     public static final String OPTION_TAXONOMY_PATH = "taxonomyPath";
+     public static final String OPTION_CROP_RATIO = "cropRatio";
++    // {left, top, width, height}: fractions of the photo as displayed (EXIF rotation applied)
++    public static final String OPTION_CROP_RECT = "cropRect";
+     public static final String OPTION_USE_GEOMODEL = "useGeomodel";
+     public static final String OPTION_GEOMODEL_PATH = "geomodelPath";
+     public static final String OPTION_LOCATION = "location";
+@@ -140,25 +145,6 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
              Timber.tag(TAG).d("Not using geomodel.");
          }
  
@@ -1105,15 +1154,50 @@ index 627b53f..2179148 100644
          // Get predictions for that image
          Bitmap bitmap = null;
  
-@@ -169,6 +151,7 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+@@ -169,12 +155,38 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
                  String msg = String.format("Couldn't read image '%s'", uri.toString());
                  Timber.tag(TAG).w(msg);
                  promise.reject("E_IO_EXCEPTION", msg);
 +                return;
              }
              Log.d(TAG, "originalBitmap: " + bitmap + ": " + bitmap.getWidth() + " x " + bitmap.getHeight());
-             // Crop the center square of the frame with the given crop ratio
-@@ -193,10 +176,42 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+-            // Crop the center square of the frame with the given crop ratio
+-            int minDim = (int) Math.round(Math.min(bitmap.getWidth(), bitmap.getHeight()) * cropRatio);
+-            int cropX = (bitmap.getWidth() - minDim) / 2;
+-            int cropY = (bitmap.getHeight() - minDim) / 2;
++            float[] cropRect = null;
++            if (options.hasKey(OPTION_CROP_RECT) && options.getType(OPTION_CROP_RECT) == com.facebook.react.bridge.ReadableType.Map) {
++                ReadableMap r = options.getMap(OPTION_CROP_RECT);
++                if (r.hasKey("left") && r.hasKey("top") && r.hasKey("width") && r.hasKey("height")
++                    && r.getDouble("width") > 0 && r.getDouble("height") > 0) {
++                    cropRect = new float[] { (float) r.getDouble("left"), (float) r.getDouble("top"),
++                        (float) r.getDouble("width"), (float) r.getDouble("height") };
++                }
++            }
++            int minDim;
++            int cropX;
++            int cropY;
++            if (cropRect != null) {
++                // The rect is in display orientation: rotate the pixels like the EXIF tag says first
++                Bitmap upright = applyExifRotation(bitmap, uri.getPath());
++                if (upright != bitmap) {
++                    bitmap.recycle();
++                    bitmap = upright;
++                }
++                int[] square = ImageClassifier.squareAround(bitmap.getWidth(), bitmap.getHeight(), cropRect);
++                cropX = square[0];
++                cropY = square[1];
++                minDim = square[2];
++            } else {
++                // Crop the center square of the frame with the given crop ratio
++                minDim = (int) Math.round(Math.min(bitmap.getWidth(), bitmap.getHeight()) * cropRatio);
++                cropX = (bitmap.getWidth() - minDim) / 2;
++                cropY = (bitmap.getHeight() - minDim) / 2;
++            }
+             Log.d(TAG, "croppingParams: " + minDim + "; " + cropX + "; " + cropY);
+             Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, cropX, cropY, minDim, minDim);
+ 
+@@ -193,10 +205,42 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
              return;
          }
  
@@ -1159,6 +1243,33 @@ index 627b53f..2179148 100644
          bitmap.recycle();
  
          WritableArray cleanedPredictions = Arguments.createArray();
+@@ -267,4 +311,26 @@ public class VisionCameraPluginInatVisionModule extends ReactContextBaseJavaModu
+         resultMap.putDouble("timeElapsed", (endTime - startTime) / 1000.0);
+         promise.resolve(resultMap);
+   }
++
++    /** The bitmap rotated/flipped as its file's EXIF orientation says (same bitmap if upright). */
++    static Bitmap applyExifRotation(Bitmap bitmap, String path) {
++        int orientation;
++        try {
++            orientation = new ExifInterface(path).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
++        } catch (IOException e) {
++            return bitmap;
++        }
++        Matrix m = new Matrix();
++        switch (orientation) {
++            case ExifInterface.ORIENTATION_ROTATE_90: m.postRotate(90); break;
++            case ExifInterface.ORIENTATION_ROTATE_180: m.postRotate(180); break;
++            case ExifInterface.ORIENTATION_ROTATE_270: m.postRotate(270); break;
++            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL: m.postScale(-1, 1); break;
++            case ExifInterface.ORIENTATION_FLIP_VERTICAL: m.postScale(1, -1); break;
++            case ExifInterface.ORIENTATION_TRANSPOSE: m.postRotate(90); m.postScale(-1, 1); break;
++            case ExifInterface.ORIENTATION_TRANSVERSE: m.postRotate(270); m.postScale(-1, 1); break;
++            default: return bitmap;
++        }
++        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
++    }
+ }
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
 index 18f1134..0bbf19f 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPackage.java
@@ -1172,7 +1283,7 @@ index 18f1134..0bbf19f 100644
  
    @NonNull
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
-index 0c2b46a..be2043d 100644
+index 0c2b46a..ca35e2d 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/VisionCameraPluginInatVisionPlugin.java
 @@ -1,9 +1,7 @@
@@ -1218,7 +1329,25 @@ index 0c2b46a..be2043d 100644
    }
  
    private double mCropRatio = 1.0;
-@@ -60,12 +55,6 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+@@ -53,6 +48,17 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+       mCropRatio = cropRatio;
+   }
+ 
++  @Nullable
++  static float[] rectFrom(@Nullable Object value) {
++    if (!(value instanceof Map)) return null;
++    Map<?, ?> m = (Map<?, ?>)value;
++    Object l = m.get("left"), t = m.get("top"), w = m.get("width"), h = m.get("height");
++    if (!(l instanceof Number) || !(t instanceof Number) || !(w instanceof Number) || !(h instanceof Number)) return null;
++    float[] r = { ((Number)l).floatValue(), ((Number)t).floatValue(), ((Number)w).floatValue(), ((Number)h).floatValue() };
++    if (r[2] <= 0 || r[3] <= 0) return null;
++    return r;
++  }
++
+   @Override
+   public Object callback(@NonNull Frame frame, @Nullable Map<String, Object> arguments) throws FrameInvalidError {
+     long startTime = SystemClock.uptimeMillis();
+@@ -60,12 +66,6 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
      // This should give the orientation of the passed in frame, as of vision-camera v3.2.2 this is not working though
      // instead we use a string passed in via the arguments to signify the device orientation
      // String orientation = frame.getOrientation();
@@ -1231,7 +1360,17 @@ index 0c2b46a..be2043d 100644
  
      if (arguments == null) {
        throw new RuntimeException("Options object is null");
-@@ -121,7 +110,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+@@ -101,6 +101,9 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+     if (cropRatio != null) {
+       setCropRatio(cropRatio);
+     }
++    // Optional subject region {left, top, width, height}, fractions of the frame in
++    // sensor orientation (the app maps screen/detector boxes into this space)
++    float[] cropRect = rectFrom(arguments.get("cropRect"));
+ 
+     // Destructure geomodel parameters. Those can be null
+     Boolean useGeomodel = (Boolean)arguments.get("useGeomodel");
+@@ -121,7 +124,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
          Double elevation = location.get("elevation");
  
          // Geomodel classifier initialization with model and taxonomy files
@@ -1246,7 +1385,7 @@ index 0c2b46a..be2043d 100644
            Timber.tag(TAG).d("Initializing geo classifier: " + geomodelPath + " / " + taxonomyPath);
            try {
              mGeoClassifier = new GeoClassifier(geomodelPath, taxonomyPath, version);
-@@ -139,17 +135,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+@@ -139,17 +149,14 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
          }
          geomodelScores = mGeoClassifier.predictionsForLocation(latitude, longitude, elevation);
      } else {
@@ -1269,7 +1408,7 @@ index 0c2b46a..be2043d 100644
        } catch (IOException e) {
          e.printStackTrace();
          throw new RuntimeException("Failed to initialize an image mClassifier: " + e.getMessage());
-@@ -162,34 +155,10 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
+@@ -162,34 +169,10 @@ public class VisionCameraPluginInatVisionPlugin extends FrameProcessorPlugin {
          Timber.tag(TAG).w("Other type of exception - Device not supported - classifier failed to load - " + e);
          throw new RuntimeException("Android version is too old - needs to be at least 6.0");
        }
@@ -1303,7 +1442,7 @@ index 0c2b46a..be2043d 100644
 -      croppedBitmap.recycle();
 -
 -      Log.d(TAG, "Predictions: " + predictions.size());
-+      List<Prediction> predictions = mImageClassifier.classifyImage(image, mCropRatio, taxonomyRollupCutoff, false);
++      List<Prediction> predictions = mImageClassifier.classifyImage(image, mCropRatio, cropRect, taxonomyRollupCutoff, false);
  
        for (Prediction prediction : predictions) {
          Map map = Taxonomy.nodeToMap(prediction);
@@ -1321,3 +1460,39 @@ index 76960db..5d12b3d 100644
      // Destructure version out of options
      NSString *version = arguments[@"version"];
      // Destructure model path out of options
+diff --git a/node_modules/vision-camera-plugin-inatvision/lib/typescript/index.d.ts b/node_modules/vision-camera-plugin-inatvision/lib/typescript/index.d.ts
+index 935f539..fadedd7 100644
+--- a/node_modules/vision-camera-plugin-inatvision/lib/typescript/index.d.ts
++++ b/node_modules/vision-camera-plugin-inatvision/lib/typescript/index.d.ts
+@@ -148,6 +148,13 @@ interface BaseOptions {
+      * As a fraction of 1. E.g. 0.8 will crop the center 80% of the frame before sending it to the cv model.
+      */
+     cropRatio?: number;
++  /**
++   * *Android only.* Subject region to classify instead of the center square:
++   * fractions of the frame (sensor orientation) for inatVision, fractions of the
++   * photo as displayed (EXIF rotation applied) for getPredictionsForImage. The model
++   * sees the smallest square around it, padded 10%.
++   */
++  cropRect?: { left: number; top: number; width: number; height: number };
+     /**
+      *
+      * Whether to use the geomodel.
+diff --git a/node_modules/vision-camera-plugin-inatvision/src/index.tsx b/node_modules/vision-camera-plugin-inatvision/src/index.tsx
+index dabf115..7dad3cf 100644
+--- a/node_modules/vision-camera-plugin-inatvision/src/index.tsx
++++ b/node_modules/vision-camera-plugin-inatvision/src/index.tsx
+@@ -410,6 +410,13 @@ interface BaseOptions {
+    * As a fraction of 1. E.g. 0.8 will crop the center 80% of the frame before sending it to the cv model.
+    */
+   cropRatio?: number;
++  /**
++   * *Android only.* Subject region to classify instead of the center square:
++   * fractions of the frame (sensor orientation) for inatVision, fractions of the
++   * photo as displayed (EXIF rotation applied) for getPredictionsForImage. The model
++   * sees the smallest square around it, padded 10%.
++   */
++  cropRect?: { left: number; top: number; width: number; height: number };
+   /**
+    *
+    * Whether to use the geomodel.

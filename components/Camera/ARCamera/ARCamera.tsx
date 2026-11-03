@@ -13,6 +13,7 @@ import {
   Platform,
 } from "react-native";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation, useIsFocused, useFocusEffect } from "@react-navigation/native";
 import isNumber from "lodash/isNumber";
 import { useSharedValue } from "react-native-worklets-core";
@@ -47,6 +48,7 @@ import WarningModal from "../../Modals/WarningModal";
 import { UserContext } from "../../UserContext";
 import type { ErrorMessage, ReasonMessage } from "./FrameProcessorCamera";
 import FrameProcessorCamera from "./FrameProcessorCamera";
+import { subjectDetectionAvailable } from "./helpers/subjectDetection";
 import { log } from "../../../react-native-logs.config";
 import { useCameraLocationPreference } from "../../Providers/CameraLocationPreferenceProvider";
 import { useObservation } from "../../Providers/ObservationProvider";
@@ -74,6 +76,7 @@ import { CircleHelpIcon, XIcon } from "../../UIComponents/AppIcons";
 
 const logger = log.extend( "ARCamera.js" );
 const CAMERA_RECOVERY_DELAY_MS = 650;
+const SUBJECT_DETECTION_KEY = "subject_detection";
 const MAX_CAMERA_RECOVERY_ATTEMPTS = 5;
 const DEFAULT_FOCUS_PEAKING_SENSITIVITY = 0.35;
 const SPECIES_PREDICTION_HOLD_MS = 1000;
@@ -139,6 +142,8 @@ type Action = { type: ACTION.RESET_PREDICTIONS }
 interface HandledPhoto extends PhotoFile {
   predictions: Prediction[];
   uri: string;
+  // open the Reframe screen (pick / adjust the subject) before the match
+  reframe?: boolean;
 }
 
 const ARCamera = ( ) => {
@@ -174,6 +179,25 @@ const ARCamera = ( ) => {
   const [focusPeakingSensitivity, setFocusPeakingSensitivity] = useState( DEFAULT_FOCUS_PEAKING_SENSITIVITY );
   // On by default: this is the configuration with verified-correct preview colors on Samsung devices
   const [digitalStabilizationEnabled, setDigitalStabilizationEnabled] = useState( true );
+  // "On subject": find and track the subject and identify that region (remembered)
+  const supportsSubjectDetection = subjectDetectionAvailable( );
+  const [subjectDetectionEnabled, setSubjectDetectionEnabled] = useState( supportsSubjectDetection );
+  useEffect( ( ) => {
+    AsyncStorage.getItem( SUBJECT_DETECTION_KEY )
+      .then( value => {
+        if ( value === "false" ) {
+          setSubjectDetectionEnabled( false );
+        }
+      } )
+      .catch( ( ) => null );
+  }, [] );
+  const toggleSubjectDetection = useCallback( ( ) => {
+    setSubjectDetectionEnabled( current => {
+      const next = !current;
+      AsyncStorage.setItem( SUBJECT_DETECTION_KEY, String( next ) ).catch( ( ) => null );
+      return next;
+    } );
+  }, [] );
   const [photoHdrEnabled, setPhotoHdrEnabled] = useState( false );
   const [torch, setTorch] = useState<"off" | "on">( "off" );
   const cameraDevices = useCameraDevices();
@@ -584,7 +608,7 @@ const ARCamera = ( ) => {
     updateError( null );
   }, [clearCameraRecoveryTimeout, updateError] );
 
-  const navigateToResults = useCallback( async ( uri: string, predictions: Prediction[] ) => {
+  const navigateToResults = useCallback( async ( uri: string, predictions: Prediction[], reframePath?: string ) => {
     const userImage = {
       time: createTimestamp( ), // add current time to AR camera photos
       uri,
@@ -615,6 +639,11 @@ const ARCamera = ( ) => {
       latitude: image.latitude ?? null,
       longitude: image.longitude ?? null,
     };
+    if ( reframePath ) {
+      // Reframe identifies the chosen crop and then starts the observation itself
+      navigation.navigate( "Reframe", { image: imageWithMetadata, photoPath: reframePath } );
+      return;
+    }
     startObservationWithImage( imageWithMetadata, () => {
       navigation.navigate( "Match", { origin: "camera" } );
     } );
@@ -640,7 +669,7 @@ const ARCamera = ( ) => {
         // camera roll but not read anything about it. Keep in mind this is just
         // a hack around a bug in CameraRoll. See our fork of @react-native-camera-roll
         const uriForResults = ( uri && !uri.match( /placeholder/ ) ) ? uri : photo.uri;
-        navigateToResults( uriForResults, photo.predictions );
+        navigateToResults( uriForResults, photo.predictions, photo.reframe ? photo.uri : undefined );
       } )
       .catch( ( e ) => handleCameraRollSaveError( photo.uri, photo.predictions, e ) );
   }, [handleCameraRollSaveError, navigateToResults] );
@@ -835,20 +864,24 @@ const ARCamera = ( ) => {
     } );
   }, [sortedPredictions, handleCaptureError, takePhotoOptions] );
 
-  const takePicture = useCallback( async () => {
+  // options.auto: taken by auto-capture at species level, which skips the Reframe step
+  const takePicture = useCallback( async ( options?: { auto?: boolean } ) => {
     pictureTaken.value = true;
     setIsCaptureInProgress( true );
+    const reframe = supportsSubjectDetection && subjectDetectionEnabled && options?.auto !== true;
 
     if ( Platform.OS === "ios" ) {
-      await visionCameraTakePhoto( ( photo: HandledPhoto ) => savePhoto( photo ) );
+      await visionCameraTakePhoto( ( photo: HandledPhoto ) => savePhoto( { ...photo, reframe } ) );
     } else if ( Platform.OS === "android" ) {
-      await visionCameraTakePhoto( ( photo: HandledPhoto ) => requestAndroidSavePermissions( photo ) );
+      await visionCameraTakePhoto( ( photo: HandledPhoto ) => requestAndroidSavePermissions( { ...photo, reframe } ) );
     }
   }, [
     savePhoto,
     requestAndroidSavePermissions,
     visionCameraTakePhoto,
     pictureTaken,
+    supportsSubjectDetection,
+    subjectDetectionEnabled,
   ] );
 
   // "Save for Later": persist the photo + the live AR-camera prediction + GPS +
@@ -1011,6 +1044,7 @@ const ARCamera = ( ) => {
         isActive={isActive && !cameraRecovering}
         manualFocusEnabled={manualFocusEnabled}
         digitalStabilizationEnabled={digitalStabilizationEnabled}
+        subjectDetectionEnabled={supportsSubjectDetection && subjectDetectionEnabled}
         focusPeakingEnabled={focusPeakingEnabled}
         focusPeakingSensitivity={focusPeakingSensitivity}
         viewportResolution={viewportResolution}
@@ -1066,6 +1100,9 @@ const ARCamera = ( ) => {
           digitalStabilizationEnabled={digitalStabilizationEnabled}
           supportsDigitalStabilization={supportsDigitalStabilization}
           toggleDigitalStabilization={toggleDigitalStabilization}
+          supportsSubjectDetection={supportsSubjectDetection}
+          subjectDetectionEnabled={subjectDetectionEnabled}
+          toggleSubjectDetection={toggleSubjectDetection}
           photoHdrEnabled={photoHdrEnabled && supportsPhotoHdr}
           supportsPhotoHdr={supportsPhotoHdr}
           togglePhotoHdr={togglePhotoHdr}

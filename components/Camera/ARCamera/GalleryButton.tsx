@@ -27,6 +27,8 @@ const logger = log.extend( "GalleryButton.tsx" );
 
 interface Props {
   setIsActive: ( arg0: boolean ) => void;
+  // pick / adjust the subject on the Reframe screen, which then identifies the crop
+  reframe?: boolean;
 }
 
 interface PhotoLocation {
@@ -34,7 +36,7 @@ interface PhotoLocation {
   longitude?: number;
 }
 
-const GalleryButton = ( { setIsActive }: Props ) => {
+const GalleryButton = ( { setIsActive, reframe = false }: Props ) => {
   const { startObservationWithImage } = useObservation();
   const { login } = useContext( UserContext );
   const navigation = useNavigation( );
@@ -85,6 +87,14 @@ const GalleryButton = ( { setIsActive }: Props ) => {
         longitude: null,
         accuracy: null,
       };
+    }
+
+    if ( reframe ) {
+      const path = uri.replace( /^file:\/\//, "" );
+      // allow coming back to the camera from Reframe ("Retake")
+      setImageSelected( false );
+      navigation.navigate( "Reframe", { image, photoPath: path } );
+      return;
     }
 
     if ( predictions && predictions.length > 0 ) {
@@ -174,6 +184,11 @@ const GalleryButton = ( { setIsActive }: Props ) => {
     const selectedTimestamp = typeof timestamp === "string"
       ? getUnixTime( new Date( timestamp ) )
       : timestamp || unixTimestamp;
+    if ( reframe ) {
+      // Reframe runs the model on the chosen crop
+      navigateToResults( uri, selectedTimestamp, location, [] );
+      return;
+    }
     getPredictions( uri, selectedTimestamp, location ).catch( ( e ) => console.log( "[GalleryButton] predictions failed", e ) );
   };
 

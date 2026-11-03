@@ -54,6 +54,7 @@ import {
   MountainIcon,
   PlusIcon,
   QueueIcon,
+  ScanIcon,
   SearchIcon,
   SettingsIcon,
   SlidersIcon,
@@ -71,7 +72,7 @@ interface Prediction {
 }
 
 interface Props {
-  takePicture: ( ) => void;
+  takePicture: ( options?: { auto?: boolean } ) => void;
   prediction?: Prediction;
   pictureTaken: boolean;
   cameraLoaded: boolean;
@@ -97,6 +98,9 @@ interface Props {
   digitalStabilizationEnabled: boolean;
   supportsDigitalStabilization: boolean;
   toggleDigitalStabilization: ( ) => void;
+  supportsSubjectDetection?: boolean;
+  subjectDetectionEnabled?: boolean;
+  toggleSubjectDetection?: ( ) => void;
   photoHdrEnabled: boolean;
   supportsPhotoHdr: boolean;
   togglePhotoHdr: ( ) => void;
@@ -643,6 +647,9 @@ const ARCameraOverlay = ( {
   digitalStabilizationEnabled,
   supportsDigitalStabilization,
   toggleDigitalStabilization,
+  supportsSubjectDetection = false,
+  subjectDetectionEnabled = false,
+  toggleSubjectDetection,
   photoHdrEnabled,
   supportsPhotoHdr,
   togglePhotoHdr,
@@ -771,7 +778,7 @@ const ARCameraOverlay = ( {
   useEffect( ( ) => {
     let isCurrent = true;
     if ( isSpecies && autoCapture && isCurrent && !pictureTaken && !queueMode ) {
-      takePicture( );
+      takePicture( { auto: true } );
     }
     return ( ) => {
       isCurrent = false;
@@ -871,7 +878,9 @@ const ARCameraOverlay = ( {
   ].filter( Boolean ).length;
   const deckAccent = isSpecies ? cameraTheme.colors.primary : "rgba(255, 255, 255, 0.85)";
   const shutterDisabled = !isSpecies && !queueMode;
-  const shutterAction = queueMode ? saveForLater : takePicture;
+  // a shutter press is a manual capture (auto-capture passes { auto: true })
+  const takePictureManually = useCallback( ( ) => takePicture( ), [takePicture] );
+  const shutterAction = queueMode ? saveForLater : takePictureManually;
   const filterOptions = filterSettings.map( setting => ( {
     icon: setting.segmentIcon,
     label: setting.shortText,
@@ -1065,7 +1074,7 @@ const ARCameraOverlay = ( {
 
         <View style={viewStyles.captureRow}>
           <View style={viewStyles.gallerySlot}>
-            <GalleryButton setIsActive={setIsActive} />
+            <GalleryButton setIsActive={setIsActive} reframe={supportsSubjectDetection && subjectDetectionEnabled} />
             {queueCount > 0 && (
               <TouchableOpacity
                 accessibilityLabel={i18n.t( "queue.view_queue" )}
@@ -1197,6 +1206,15 @@ const ARCameraOverlay = ( {
                 {i18n.t( "camera.capture" )}
               </StyledText>
               <View style={viewStyles.proTileGrid}>
+                {supportsSubjectDetection && toggleSubjectDetection && (
+                  <ProTile
+                    active={subjectDetectionEnabled}
+                    icon={ScanIcon}
+                    label={i18n.t( "camera.subject" )}
+                    onPress={toggleSubjectDetection}
+                    sub={i18n.t( subjectDetectionEnabled ? "camera.subject_on" : "camera.subject_sub" )}
+                  />
+                )}
                 {supportsMacro && (
                   <ProTile
                     active={macroEnabled}

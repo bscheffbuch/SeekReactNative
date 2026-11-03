@@ -33,6 +33,20 @@ import {
   getPreferredVideoStabilizationMode,
 } from "./helpers/cameraDeviceHelpers";
 import { getFocusPeakingPoints } from "./helpers/focusPeakingPlugin";
+import {
+  frameRectToPreview,
+  getRelativeOrientation,
+  getRotatedFrameSize,
+  mapNormalizedPointToCoveredPreview,
+  previewRectToFrame,
+  previewSquareAround,
+  rectContains,
+  rotateNormalizedPoint,
+} from "./helpers/previewGeometry";
+import type { NormalizedRect } from "./helpers/previewGeometry";
+import { detectFrameSubjects } from "./helpers/subjectDetection";
+import type { FrameSubject } from "./helpers/subjectDetection";
+import SubjectBox from "./SubjectBox";
 
 export interface ErrorMessage {
   nativeEvent: {
@@ -85,6 +99,8 @@ interface Props {
   onViewfinderPanStart?: ( ) => void;
   onViewfinderPan?: ( translationX: number, translationY: number ) => void;
   onViewfinderPanEnd?: ( ) => void;
+  // find and track the subject; classify that region instead of the whole frame
+  subjectDetectionEnabled?: boolean;
 }
 
 const PEAKING_SAMPLE_INTERVAL_MS = 33;
@@ -106,127 +122,14 @@ const CLASSIFICATION_FPS = 2;
 // less temporal lag when the camera is swung to a new subject (old high-confidence result
 // stops winning sooner). At CLASSIFICATION_FPS=2 this is a ~1.5s memory.
 const NUM_STORED_RESULTS = 3;
-
-const orientationToDegrees = ( orientation: Orientation ): number => {
-  "worklet";
-
-  switch ( orientation ) {
-    case "portrait":
-      return 0;
-    case "landscape-left":
-      return 90;
-    case "portrait-upside-down":
-      return 180;
-    case "landscape-right":
-      return 270;
-    default:
-      return 0;
-  }
-};
-
-const degreesToOrientation = ( degrees: number ): Orientation => {
-  "worklet";
-
-  const clampedDegrees = ( degrees + 360 ) % 360;
-  if ( clampedDegrees >= 315 || clampedDegrees <= 45 ) {
-    return "portrait";
-  }
-  if ( clampedDegrees > 45 && clampedDegrees <= 135 ) {
-    return "landscape-left";
-  }
-  if ( clampedDegrees > 135 && clampedDegrees <= 225 ) {
-    return "portrait-upside-down";
-  }
-  return "landscape-right";
-};
-
-const getRelativeOrientation = (
-  frameOrientation: Orientation,
-  previewOrientation: Orientation
-): Orientation => {
-  "worklet";
-
-  return degreesToOrientation(
-    orientationToDegrees( frameOrientation ) - orientationToDegrees( previewOrientation )
-  );
-};
-
-const rotateNormalizedPoint = (
-  x: number,
-  y: number,
-  orientation: Orientation,
-  isMirrored: boolean
-): { x: number; y: number } => {
-  "worklet";
-
-  let rotatedX = x;
-  let rotatedY = y;
-
-  switch ( orientation ) {
-    case "landscape-left":
-      rotatedX = y;
-      rotatedY = 1 - x;
-      break;
-    case "landscape-right":
-      rotatedX = 1 - y;
-      rotatedY = x;
-      break;
-    case "portrait-upside-down":
-      rotatedX = 1 - x;
-      rotatedY = 1 - y;
-      break;
-    case "portrait":
-    default:
-      break;
-  }
-
-  return {
-    x: isMirrored ? 1 - rotatedX : rotatedX,
-    y: rotatedY,
-  };
-};
-
-const getRotatedFrameSize = (
-  frameWidth: number,
-  frameHeight: number,
-  orientation: Orientation
-) => {
-  "worklet";
-
-  if ( orientation === "landscape-left" || orientation === "landscape-right" ) {
-    return { width: frameHeight, height: frameWidth };
-  }
-  return { width: frameWidth, height: frameHeight };
-};
-
-const mapNormalizedPointToCoveredPreview = (
-  x: number,
-  y: number,
-  sourceWidth: number,
-  sourceHeight: number,
-  previewWidth: number,
-  previewHeight: number
-): { x: number; y: number } => {
-  "worklet";
-
-  const safeSourceWidth = Math.max( sourceWidth, 1 );
-  const safeSourceHeight = Math.max( sourceHeight, 1 );
-  const safePreviewWidth = Math.max( previewWidth, 1 );
-  const safePreviewHeight = Math.max( previewHeight, 1 );
-  const scale = Math.max(
-    safePreviewWidth / safeSourceWidth,
-    safePreviewHeight / safeSourceHeight
-  );
-  const renderedWidth = safeSourceWidth * scale;
-  const renderedHeight = safeSourceHeight * scale;
-  const offsetX = ( renderedWidth - safePreviewWidth ) / 2;
-  const offsetY = ( renderedHeight - safePreviewHeight ) / 2;
-
-  return {
-    x: ( ( x * renderedWidth ) - offsetX ) / safePreviewWidth,
-    y: ( ( y * renderedHeight ) - offsetY ) / safePreviewHeight,
-  };
-};
+// Subject detection (ML Kit) is cheap next to the classifier: track at ~6 fps so the box
+// follows the subject smoothly; the classifier keeps its own adaptive cadence.
+const SUBJECT_INTERVAL_MS = 150;
+// ignore specks and boxes that are basically the whole frame (no better than no crop)
+const MIN_SUBJECT_AREA = 0.02;
+const MAX_SUBJECT_AREA = 0.8;
+// square placed where the user taps when no detected subject is there (fraction of the short side)
+const TAP_SUBJECT_SIZE = 0.45;
 
 const appendPeakingSegmentToPath = ( point: PeakingPoint ): string => {
   "worklet";
@@ -502,6 +405,47 @@ const FrameProcessorCamera = ( props: Props ) => {
   const lastClassificationTimestamp = useSharedValue( 0 );
   const lastPeakingTimestamp = useSharedValue( 0 );
   const previewOrientation = useSharedValue<Orientation>( "portrait" );
+
+  // ---- subject tracking ("On subject") ----
+  const subjectDetectionEnabled = props.subjectDetectionEnabled ?? false;
+  const lastSubjectTimestamp = useSharedValue( 0 );
+  // latest detections + the frame geometry they belong to (read by the tap handler)
+  const detectedSubjects = useSharedValue<FrameSubject[]>( [] );
+  const frameInfo = useSharedValue( { width: 0, height: 0, orientation: "portrait" as Orientation, mirrored: false } );
+  // user's choice: a tracked subject (ML Kit id) or a fixed square they tapped
+  const selectedSubjectId = useSharedValue( -1 );
+  const manualSubjectRect = useSharedValue<NormalizedRect | null>( null );
+  // region handed to the classifier (frame coordinates) and a key to notice changes
+  const chosenSubjectRect = useSharedValue<NormalizedRect | null>( null );
+  const chosenSubjectKey = useSharedValue( "" );
+  const classifiedSubjectKey = useSharedValue( "" );
+  const [subjectBox, setSubjectBox] = useState<{ rect: NormalizedRect | null; manual: boolean }>(
+    { rect: null, manual: false }
+  );
+  const handleSubjectBox = useMemo( () => Worklets.createRunOnJS(
+    ( rect: NormalizedRect | null, manual: boolean ) => {
+      setSubjectBox( current => {
+        const moved = !current.rect || !rect
+          || Math.abs( current.rect.left - rect.left ) > 0.01
+          || Math.abs( current.rect.top - rect.top ) > 0.01
+          || Math.abs( current.rect.width - rect.width ) > 0.01
+          || Math.abs( current.rect.height - rect.height ) > 0.01;
+        return moved || current.manual !== manual ? { rect, manual } : current;
+      } );
+    }
+  ), [] );
+  useEffect( ( ) => {
+    if ( !subjectDetectionEnabled ) {
+      // eslint-disable-next-line react-hooks/react-compiler
+      chosenSubjectRect.value = null;
+      chosenSubjectKey.value = "";
+      manualSubjectRect.value = null;
+      selectedSubjectId.value = -1;
+      detectedSubjects.value = [];
+      setSubjectBox( { rect: null, manual: false } );
+    }
+  }, [subjectDetectionEnabled, chosenSubjectRect, chosenSubjectKey, manualSubjectRect, selectedSubjectId,
+    detectedSubjects] );
   const fps = CLASSIFICATION_FPS;
   // Battery: run the (large) classifier less often while the result is steady.
   // 2/s while the scene changes, 1/s after 4 identical results, ~0.4/s after 10;
@@ -529,7 +473,6 @@ const FrameProcessorCamera = ( props: Props ) => {
     stable.count = key !== "" && key === stable.key ? stable.count + 1 : 0;
     stable.key = key;
     // shared value written from JS, read by the frame processor worklet
-    // eslint-disable-next-line react-hooks/react-compiler
     classificationIntervalMs.value = stable.count >= 10
       ? 2500
       : stable.count >= 4
@@ -611,6 +554,63 @@ const FrameProcessorCamera = ( props: Props ) => {
         }
       }
 
+      if ( subjectDetectionEnabled && timestamp - lastSubjectTimestamp.value >= SUBJECT_INTERVAL_MS ) {
+        lastSubjectTimestamp.value = timestamp;
+        const found = detectFrameSubjects( frame );
+        const subjects: FrameSubject[] = [];
+        for ( let i = 0; i < found.length; i += 1 ) {
+          const area = found[i].frameRect.width * found[i].frameRect.height;
+          if ( area >= MIN_SUBJECT_AREA && area <= MAX_SUBJECT_AREA ) {
+            subjects.push( found[i] );
+          }
+        }
+        detectedSubjects.value = subjects;
+        frameInfo.value = {
+          width: frame.width,
+          height: frame.height,
+          orientation: frame.orientation,
+          mirrored: frame.isMirrored,
+        };
+        // a square the user placed wins, then the subject they picked, then the largest one
+        let rect: NormalizedRect | null = null;
+        let key = "";
+        const manual = manualSubjectRect.value;
+        if ( manual ) {
+          rect = manual;
+          key = `manual:${manual.left.toFixed( 3 )},${manual.top.toFixed( 3 )}`;
+        } else {
+          let pick: FrameSubject | null = null;
+          for ( let i = 0; i < subjects.length; i += 1 ) {
+            if ( selectedSubjectId.value >= 0 && subjects[i].id === selectedSubjectId.value ) {
+              pick = subjects[i];
+            }
+          }
+          if ( !pick && subjects.length > 0 ) {
+            pick = subjects[0];
+          }
+          if ( pick ) {
+            rect = pick.frameRect;
+            key = `id:${pick.id}`;
+          }
+        }
+        chosenSubjectRect.value = rect;
+        chosenSubjectKey.value = key;
+        handleSubjectBox(
+          rect
+            ? frameRectToPreview( rect, {
+              frameWidth: frame.width,
+              frameHeight: frame.height,
+              frameOrientation: frame.orientation,
+              previewOrientation: previewOrientation.value,
+              isMirrored: frame.isMirrored,
+              previewWidth: previewLayout.width,
+              previewHeight: previewLayout.height,
+            } )
+            : null,
+          manual != null
+        );
+      }
+
       const timeSinceLastFrame = timestamp - lastClassificationTimestamp.value;
       if ( timeSinceLastFrame < classificationIntervalMs.value ) {
         return;
@@ -620,11 +620,17 @@ const FrameProcessorCamera = ( props: Props ) => {
         "worklet";
         try {
           const timeBefore = Date.now();
+          // classify the tracked subject; when it changes, drop results that belong to the old one
+          const subjectRect = subjectDetectionEnabled ? chosenSubjectRect.value : null;
+          const subjectKey = subjectDetectionEnabled ? chosenSubjectKey.value : "";
+          const subjectChanged = subjectKey !== classifiedSubjectKey.value;
+          classifiedSubjectKey.value = subjectKey;
           const result = InatVision.inatVision( frame, {
             version: modelVersion,
             modelPath,
             taxonomyPath,
-            numStoredResults: NUM_STORED_RESULTS,
+            numStoredResults: subjectChanged ? 1 : NUM_STORED_RESULTS,
+            ...( subjectRect ? { cropRect: subjectRect } : {} ),
             confidenceThreshold,
             filterByTaxonId,
             negativeFilter,
@@ -678,6 +684,16 @@ const FrameProcessorCamera = ( props: Props ) => {
       previewOrientation,
       previewLayout.height,
       previewLayout.width,
+      subjectDetectionEnabled,
+      lastSubjectTimestamp,
+      detectedSubjects,
+      frameInfo,
+      selectedSubjectId,
+      manualSubjectRect,
+      chosenSubjectRect,
+      chosenSubjectKey,
+      classifiedSubjectKey,
+      handleSubjectBox,
     ]
   );
 
@@ -771,6 +787,63 @@ const FrameProcessorCamera = ( props: Props ) => {
     .onUpdate( event => onViewfinderPan?.( event.translationX, event.translationY ) )
     .onFinalize( ( ) => onViewfinderPanEnd?.( ) ), [onViewfinderPan, onViewfinderPanEnd, onViewfinderPanStart] );
 
+  // Tap: pick the subject under the finger, or place a square there; tapping a placed
+  // square again goes back to automatic. Runs alongside tap-to-focus.
+  const pickSubjectAt = useCallback( ( x: number, y: number ) => {
+    const info = frameInfo.value;
+    if ( !subjectDetectionEnabled || previewLayout.width <= 0 || info.width <= 0 ) {
+      return;
+    }
+    const nx = x / previewLayout.width;
+    const ny = y / previewLayout.height;
+    const g = {
+      frameWidth: info.width,
+      frameHeight: info.height,
+      frameOrientation: info.orientation,
+      previewOrientation: previewOrientation.value,
+      isMirrored: info.mirrored,
+      previewWidth: previewLayout.width,
+      previewHeight: previewLayout.height,
+    };
+    const placed = manualSubjectRect.value;
+    const placedOnScreen = placed ? frameRectToPreview( placed, g ) : null;
+    if ( placedOnScreen && rectContains( placedOnScreen, nx, ny ) ) {
+      manualSubjectRect.value = null;
+      selectedSubjectId.value = -1;
+    } else {
+      const hit = detectedSubjects.value.find( subject => {
+        const onScreen = frameRectToPreview( subject.frameRect, g );
+        return onScreen != null && rectContains( onScreen, nx, ny );
+      } );
+      if ( hit && hit.id >= 0 ) {
+        selectedSubjectId.value = hit.id;
+        manualSubjectRect.value = null;
+      } else {
+        manualSubjectRect.value = hit
+          ? hit.frameRect
+          : previewRectToFrame(
+            previewSquareAround( nx, ny, TAP_SUBJECT_SIZE, previewLayout.width, previewLayout.height ), g
+          );
+        selectedSubjectId.value = -1;
+      }
+    }
+    // identify the new subject right away instead of waiting for the slow steady-state cadence
+    lastClassificationTimestamp.value = 0;
+    classificationIntervalMs.value = 1000 / CLASSIFICATION_FPS;
+    lastSubjectTimestamp.value = 0;
+    stableRef.current = { key: "", count: 0 };
+  }, [subjectDetectionEnabled, previewLayout.width, previewLayout.height, frameInfo, previewOrientation,
+    manualSubjectRect, selectedSubjectId, detectedSubjects, lastClassificationTimestamp,
+    classificationIntervalMs, lastSubjectTimestamp] );
+  const subjectTap = useMemo( ( ) => Gesture.Tap( )
+    .enabled( subjectDetectionEnabled )
+    .runOnJS( true )
+    .onEnd( ( event, success ) => {
+      if ( success ) {
+        pickSubjectAt( event.x, event.y );
+      }
+    } ), [pickSubjectAt, subjectDetectionEnabled] );
+
   const active = isActive && isFocused && isForeground;
   const handlePreviewOrientationChanged = useCallback( ( nextPreviewOrientation: Orientation ) => {
     previewOrientation.value = nextPreviewOrientation;
@@ -794,7 +867,7 @@ const FrameProcessorCamera = ( props: Props ) => {
   return (
     device && cameraPermissionStatus === "granted" && (
       <View onLayout={handlePreviewLayout} style={StyleSheet.absoluteFill}>
-        <GestureDetector gesture={Gesture.Simultaneous( tapToFocus, viewfinderPan )}>
+        <GestureDetector gesture={Gesture.Simultaneous( tapToFocus, subjectTap, viewfinderPan )}>
           <Camera
             ref={cameraRef}
             style={StyleSheet.absoluteFill}
@@ -834,6 +907,14 @@ const FrameProcessorCamera = ( props: Props ) => {
           pathRef={peakingPathRef}
           visible={useOverlayFocusPeaking}
         />
+        {subjectDetectionEnabled && (
+          <SubjectBox
+            rect={subjectBox.rect}
+            manual={subjectBox.manual}
+            previewWidth={previewLayout.width}
+            previewHeight={previewLayout.height}
+          />
+        )}
       </View>
     )
   );

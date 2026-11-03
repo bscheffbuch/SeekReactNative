@@ -161,6 +161,20 @@ The Material 3 design from the design canvas is in the code:
 - Icons are vector (`components/UIComponents/AppIcons.tsx`, lucide geometry).
   The PNGs left in use are illustrations (badges, onboarding/help art, map
   markers and their legend), not UI glyphs.
+- Subject detection and Reframe (Android): ML Kit object detection
+  (`com.google.mlkit:object-detection`) in `android/.../SubjectDetection.kt` provides
+  the `detectSubjects` frame-processor plugin (live, tracked boxes in both upright and
+  sensor-frame coordinates) and `SeekSubjects.detect(uri)` for photos. The classifier
+  plugin patch adds `cropRect` to `inatVision` (frame coordinates) and
+  `getPredictionsForImage` (photo as displayed, EXIF applied); the model sees the
+  smallest square around it, padded 10%. Camera: `FrameProcessorCamera` tracks the
+  subject at ~6 fps, draws `SubjectBox`, classifies that region, tap picks a subject or
+  places a square (tap it again for automatic); the "Subject" tile in the camera sheet
+  turns it off (AsyncStorage `subject_detection`). Shutter and gallery photos open
+  `components/Camera/Reframe/ReframeScreen.tsx` (boxes, drag corners/edges/inside,
+  debounced suggestions, Retake / Use this crop -> Match); auto-capture at species
+  skips it. Frame <-> preview math lives in `helpers/previewGeometry.ts` (tested).
+  iOS has no detector yet: both fall back to the old full-frame behaviour.
 - Checks without a device: `tests/unit/audit/contrast.test.js` (in the suite)
   fails on low-contrast text in 20 screens, light and dark. For screenshots,
   `SHOT_DIR=/some/dir npx jest --testMatch '<rootDir>/tests/unit/audit/screens.shot.js'`

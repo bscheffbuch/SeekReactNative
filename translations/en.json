@@ -471,7 +471,11 @@
     "save_location_on": "On - tag where found",
     "show_controls": "Show camera controls",
     "hide_controls": "Hide camera controls",
-    "general": "General"
+    "general": "General",
+    "subject": "Subject",
+    "subject_sub": "Find and track the subject",
+    "subject_on": "On - tap to pick a subject",
+    "subject_found": "Subject found and tracked"
   },
   "gallery": {
     "import_photos_from": "Import Photos From"
@@ -1198,5 +1202,18 @@
     "if_youre_seeing_this_error": "If you're seeing this and you're online, iNat staff have already been notified. Thanks for finding a bug! If you're offline, please take a screenshot and send us an email when you're back on the Internet.",
     "restart": "RESTART APP",
     "error": "Error"
+  },
+  "reframe": {
+    "title": "Frame the subject",
+    "reset": "Reset",
+    "hint": "Drag a corner or edge to resize · drag inside to move · tap another box to switch",
+    "hint_single": "Drag a corner or edge to resize · drag inside to move",
+    "live": "Updates as you adjust",
+    "no_subject": "No subject found - drag the box onto it",
+    "retake": "Retake",
+    "use": "Use this crop",
+    "subject_label": "Subject {{number}}",
+    "selected": "selected",
+    "no_match": "No confident match for this crop"
   }
 }

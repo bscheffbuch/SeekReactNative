@@ -42,6 +42,8 @@ export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<BottomTabParamList>;
   Camera: { origin?: "camera" | "queue" } | undefined;
   Match: { origin?: "camera" | "queue" } | undefined;
+  // photo -> pick / adjust the subject -> Match (see components/Camera/Reframe)
+  Reframe: { image: object; photoPath: string };
   Species: undefined;
   ChallengeDetails: undefined;
   QueuedObservations: undefined;

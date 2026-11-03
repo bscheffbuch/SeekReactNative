@@ -174,5 +174,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    // on-device subject detection for the camera and the reframe screen
+    implementation("com.google.mlkit:object-detection:17.0.2")
 
 }

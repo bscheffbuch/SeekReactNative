@@ -397,7 +397,11 @@
     "flash_off": "Blitz aus",
     "show_controls": "Kamerasteuerung einblenden",
     "hide_controls": "Kamerasteuerung ausblenden",
-    "general": "Allgemein"
+    "general": "Allgemein",
+    "subject": "Motiv",
+    "subject_sub": "Motiv finden und verfolgen",
+    "subject_on": "An - tippen, um ein Motiv zu wählen",
+    "subject_found": "Motiv gefunden und verfolgt"
   },
   "gallery": {
     "import_photos_from": "Fotos importieren von"
@@ -1084,5 +1088,18 @@
     "if_youre_seeing_this_error": "Wenn du dies siehst und online bist, wurden die iNat-Mitarbeitenden bereits informiert. Danke, dass du einen Fehler gefunden hast! Wenn du offline bist, mache bitte einen Screenshot und schicke uns eine E-Mail, wenn du wieder mit dem Internet verbunden bist.",
     "restart": "APP NEUSTARTEN",
     "error": "Fehler"
+  },
+  "reframe": {
+    "title": "Motiv einrahmen",
+    "reset": "Zurücksetzen",
+    "hint": "Ecke oder Kante ziehen zum Anpassen · innen ziehen zum Verschieben · anderen Rahmen antippen zum Wechseln",
+    "hint_single": "Ecke oder Kante ziehen zum Anpassen · innen ziehen zum Verschieben",
+    "live": "Aktualisiert sich beim Anpassen",
+    "no_subject": "Kein Motiv gefunden - zieh den Rahmen darauf",
+    "retake": "Neu aufnehmen",
+    "use": "Diesen Ausschnitt verwenden",
+    "subject_label": "Motiv {{number}}",
+    "selected": "ausgewählt",
+    "no_match": "Keine sichere Bestimmung für diesen Ausschnitt"
   }
 }
