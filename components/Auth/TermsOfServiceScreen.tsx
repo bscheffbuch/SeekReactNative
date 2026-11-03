@@ -2,12 +2,16 @@ import * as React from "react";
 import type { RenderersProps } from "react-native-render-html";
 import HTML from "react-native-render-html";
 
+import { themeHtmlTags } from "../../styles/htmlTheme";
+import { useTheme } from "../Providers/ThemeProvider";
+
 import { viewStyles, textStyles } from "../../styles/auth/privacy";
 import ScrollWithHeader from "../UIComponents/Screens/ScrollWithHeader";
 import { baseTextStyles } from "../../styles/textStyles";
 import { dimensions, htmlFonts } from "../../styles/global";
 
 const TermsOfServiceScreen = ( ) => {
+  const { theme } = useTheme( );
   const html = `<p><strong><em>Revised July 11, 2023</em></strong></p>
 
 <p>Read our Privacy Policy at <a href="https://www.inaturalist.org/pages/privacy">https://www.inaturalist.org/pages/privacy</a></p>
@@ -200,8 +204,8 @@ const TermsOfServiceScreen = ( ) => {
           allowFontScaling: true,
           maxFontSizeMultiplier: 2,
         }}
-        baseStyle={viewStyles.textContainer}
-        tagsStyles={{
+        baseStyle={{ ...viewStyles.textContainer, color: theme.colors.text }}
+        tagsStyles={themeHtmlTags( {
           p: { ...baseTextStyles.bodySpaced, ...textStyles.text },
           h3: { ...baseTextStyles.bodySpacedBold, ...textStyles.text },
           a: {
@@ -212,7 +216,7 @@ const TermsOfServiceScreen = ( ) => {
           ol: textStyles.list,
           strong: baseTextStyles.bodySpacedBold,
           i: baseTextStyles.bodySpacedItalic,
-        }}
+        }, theme )}
       />
     </ScrollWithHeader>
   );

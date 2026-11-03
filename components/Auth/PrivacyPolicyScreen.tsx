@@ -2,6 +2,9 @@ import React, { useContext } from "react";
 import type { RenderersProps } from "react-native-render-html";
 import HTML from "react-native-render-html";
 
+import { themeHtmlTags } from "../../styles/htmlTheme";
+import { useTheme } from "../Providers/ThemeProvider";
+
 import { viewStyles, textStyles } from "../../styles/auth/privacy";
 import ScrollWithHeader from "../UIComponents/Screens/ScrollWithHeader";
 import { UserContext } from "../UserContext";
@@ -9,6 +12,7 @@ import { baseTextStyles } from "../../styles/textStyles";
 import { dimensions, htmlFonts } from "../../styles/global";
 
 const PrivacyPolicyScreen = () => {
+  const { theme } = useTheme( );
   const { login } = useContext( UserContext );
 
   const iNatHtml = `<p><i>Last Modified on July 11, 2023</i></p>
@@ -507,8 +511,8 @@ const PrivacyPolicyScreen = () => {
             allowFontScaling: true,
             maxFontSizeMultiplier: 2,
           }}
-          baseStyle={viewStyles.textContainer}
-          tagsStyles={{
+          baseStyle={{ ...viewStyles.textContainer, color: theme.colors.text }}
+          tagsStyles={themeHtmlTags( {
             p: { ...baseTextStyles.bodySpaced, ...textStyles.text },
             h3: { ...baseTextStyles.bodySpacedBold, ...textStyles.text },
             a: {
@@ -518,7 +522,7 @@ const PrivacyPolicyScreen = () => {
             li: textStyles.list,
             strong: baseTextStyles.bodySpacedBold,
             i: baseTextStyles.bodySpacedItalic,
-          }}
+          }, theme )}
         />
       ) : (
         <HTML
@@ -530,8 +534,8 @@ const PrivacyPolicyScreen = () => {
             allowFontScaling: true,
             maxFontSizeMultiplier: 2,
           }}
-          baseStyle={viewStyles.textContainer}
-          tagsStyles={{
+          baseStyle={{ ...viewStyles.textContainer, color: theme.colors.text }}
+          tagsStyles={themeHtmlTags( {
             p: { ...baseTextStyles.bodySpaced, ...textStyles.text },
             h3: { ...baseTextStyles.bodySpacedBold, ...textStyles.text },
             a: {
@@ -542,7 +546,7 @@ const PrivacyPolicyScreen = () => {
             li: textStyles.list,
             strong: baseTextStyles.bodySpacedBold,
             i: baseTextStyles.bodySpacedItalic,
-          }}
+          }, theme )}
         />
       )}
     </ScrollWithHeader>

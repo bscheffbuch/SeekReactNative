@@ -9,10 +9,12 @@ import Button from "./Buttons/Button";
 import StyledText from "./StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const AccountDeletion = ( ) => {
   const { navigate } = useNavigation( );
   const { isLandscape } = useAppOrientation( );
+  const { theme } = useTheme( );
 
   const navToDelete = ( ) => navigate( "FullAnnouncement", {
     uri: "https://www.inaturalist.org/users/delete",
@@ -24,7 +26,12 @@ const AccountDeletion = ( ) => {
   }
 
   return (
-    <View style={viewStyles.whiteContainer}>
+    <View style={[viewStyles.whiteContainer, {
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderRadius: 16,
+      marginHorizontal: 0,
+      shadowOpacity: 0,
+    }]}>
       <StyledText style={baseTextStyles.header}>
         {i18n.t( "settings.danger_zone" )}
       </StyledText>

@@ -21,8 +21,11 @@ import CheckboxRow from "./CheckboxRow";
 import WhiteModal from "../../UIComponents/Modals/WhiteModal";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { themeHtmlTags } from "../../../styles/htmlTheme";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const LicensePhotosScreen = ( ) => {
+  const { theme } = useTheme( );
   const { navigate } = useNavigation( );
 
   const [user, setUser] = useState<{
@@ -125,13 +128,13 @@ const LicensePhotosScreen = ( ) => {
       source={{ html: dataTransferLearnMoreHTML }}
       customHTMLElementModels={customHTMLElementModels}
       // eslint-disable-next-line react-native/no-inline-styles
-      baseStyle={{ marginBottom: 80 }}
+      baseStyle={{ marginBottom: 80, color: theme.colors.text }}
       systemFonts={htmlFonts}
       defaultTextProps={{
         allowFontScaling: true,
         maxFontSizeMultiplier: 2,
       }}
-      tagsStyles={{ p: { ...baseTextStyles.body, ...styles.licenseText } }}
+      tagsStyles={themeHtmlTags( { p: { ...baseTextStyles.body, ...styles.licenseText } }, theme )}
       renderers={{
         privacy: ( ) => renderLink( "Privacy", "privacy" ),
         terms: ( ) => renderLink( "TermsOfService", "terms" ),
@@ -206,9 +209,9 @@ const LicensePhotosScreen = ( ) => {
         children={(
           <HTML
             source={{ html: agreeToTermsHTML }}
-            tagsStyles={{
+            tagsStyles={themeHtmlTags( {
               p: { ...baseTextStyles.body, ...styles.licenseText },
-            }}
+            }, theme )}
             customHTMLElementModels={customHTMLElementModels}
             systemFonts={htmlFonts}
             defaultTextProps={{
