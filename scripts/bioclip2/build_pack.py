@@ -231,7 +231,7 @@ def main( ):
     ap.add_argument( "--species", type=int, default=100_000, help="keep the N most-observed species" )
     ap.add_argument( "--gamma", type=float, default=0.1,
                      help="popularity prior weight; 0.1 was best in the benchmark's cross-validation" )
-    ap.add_argument( "--precision", choices=["fp32", "int8-weights", "int8-dynamic"], default="int8-weights",
+    ap.add_argument( "--precision", choices=["fp32", "int8-weights", "int8-dynamic"], default="int8-dynamic",
                      help="int8-weights: per-channel int8 weights, float activations (~4x smaller); "
                           "int8-dynamic: same size, int8 kernels at run time (much less RAM)" )
     ap.add_argument( "--keep-fp32", action="store_true", help="also keep model_fp32.tflite (for verify_pack)" )

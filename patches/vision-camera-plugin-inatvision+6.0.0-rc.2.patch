@@ -250,7 +250,7 @@ index 41eeb39..423d768 100644
      }
  
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-index dd91fb5..cac9b1d 100644
+index dd91fb5..95f5fbe 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 @@ -2,9 +2,11 @@ package com.visioncameraplugininatvision;
@@ -265,7 +265,7 @@ index dd91fb5..cac9b1d 100644
  
  import java.io.FileInputStream;
  import java.io.IOException;
-@@ -49,9 +51,35 @@ public class ImageClassifier {
+@@ -49,9 +51,49 @@ public class ImageClassifier {
      /** An instance of the driver class to run model inference with Tensorflow Lite. */
      private Interpreter mTFlite;
  
@@ -276,6 +276,20 @@ index dd91fb5..cac9b1d 100644
 +    private static final int DELEGATE_TIER_GPU = 0;
 +    private static final int DELEGATE_TIER_NNAPI = 1;
 +    private static final int DELEGATE_TIER_CPU = 2;
++
++    /**
++     * Models at least this big (e.g. the BioCLIP 2 pack, ~390 MB of int8 weights) start on the
++     * CPU: XNNPACK runs dynamic-range int8 weights as they are (RAM ~ file size), while the GPU
++     * delegate expands them to fp16 buffers (~2x the file, in shared system memory).
++     */
++    private static final long LARGE_MODEL_BYTES = 64L * 1024 * 1024;
++
++    private static Interpreter.Options cpuOptions() {
++        Interpreter.Options options = new Interpreter.Options();
++        options.setUseXNNPACK(true);
++        options.setNumThreads(Math.max(1, Math.min(4, Runtime.getRuntime().availableProcessors())));
++        return options;
++    }
 +
 +    /** The delegate tier the current interpreter was created with. */
 +    private int mDelegateTier = DELEGATE_TIER_CPU;
@@ -301,7 +315,7 @@ index dd91fb5..cac9b1d 100644
      private float[][] mGeomodelScores;
  
      public void setFilterByTaxonId(Integer taxonId) {
-@@ -79,15 +107,20 @@ public class ImageClassifier {
+@@ -79,15 +121,20 @@ public class ImageClassifier {
          mModelFilename = modelPath;
          mTaxonomyFilename = taxonomyPath;
          mModelVersion = version;
@@ -324,7 +338,7 @@ index dd91fb5..cac9b1d 100644
      }
  
      /** Classifies a frame from the preview stream. */
-@@ -102,31 +135,68 @@ public class ImageClassifier {
+@@ -102,31 +149,68 @@ public class ImageClassifier {
          }
          convertBitmapToByteBuffer(bitmap);
  
@@ -408,7 +422,7 @@ index dd91fb5..cac9b1d 100644
          } catch (Exception exc) {
              exc.printStackTrace();
              return new ArrayList<Prediction>();
-@@ -140,15 +210,93 @@ public class ImageClassifier {
+@@ -140,15 +224,101 @@ public class ImageClassifier {
  
      /** Closes tflite to release resources. */
      public void close() {
@@ -425,6 +439,14 @@ index dd91fb5..cac9b1d 100644
 +    }
 +
 +    private Interpreter createInterpreter(MappedByteBuffer modelBuffer) {
++        if (modelBuffer.capacity() >= LARGE_MODEL_BYTES) {
++            try {
++                mDelegateTier = DELEGATE_TIER_CPU;
++                return new Interpreter(modelBuffer, cpuOptions());
++            } catch (Exception exc) {
++                Timber.tag(TAG).w("Failed to initialize CPU interpreter for a large model, trying delegates: " + exc);
++            }
++        }
 +        try {
 +            Interpreter.Options gpuOptions = new Interpreter.Options();
 +            mGpuDelegate = new GpuDelegate();
@@ -451,7 +473,7 @@ index dd91fb5..cac9b1d 100644
 +        }
 +
 +        mDelegateTier = DELEGATE_TIER_CPU;
-+        return new Interpreter(modelBuffer, new Interpreter.Options());
++        return new Interpreter(modelBuffer, cpuOptions());
 +    }
 +
 +    /**
@@ -487,7 +509,7 @@ index dd91fb5..cac9b1d 100644
 +        }
 +
 +        try {
-+            mTFlite = new Interpreter(mModelBuffer, new Interpreter.Options());
++            mTFlite = new Interpreter(mModelBuffer, cpuOptions());
 +            mDelegateTier = DELEGATE_TIER_CPU;
 +            return true;
 +        } catch (Exception exc) {
@@ -506,7 +528,7 @@ index dd91fb5..cac9b1d 100644
      }
  
      /** Writes Image data into a {@code ByteBuffer}. */
-@@ -158,46 +306,159 @@ public class ImageClassifier {
+@@ -158,46 +328,159 @@ public class ImageClassifier {
          }
          imgData.rewind();
  
@@ -694,7 +716,7 @@ index dd91fb5..cac9b1d 100644
          float sum = 0.0f;
  
          // First multiply the scores
-@@ -214,8 +475,6 @@ public class ImageClassifier {
+@@ -214,8 +497,6 @@ public class ImageClassifier {
                  combinedScores[i] = combinedScores[i] / sum;
              }
          }

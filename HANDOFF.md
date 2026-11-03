@@ -175,6 +175,12 @@ The Material 3 design from the design canvas is in the code:
   debounced suggestions, Retake / Use this crop -> Match); auto-capture at species
   skips it. Frame <-> preview math lives in `helpers/previewGeometry.ts` (tested).
   iOS has no detector yet: both fall back to the old full-frame behaviour.
+- Model memory: the pack is dynamic-range int8 (`build_pack.py --precision int8-dynamic`).
+  The earlier weight-only int8 pack measured 3.3 GB resident on CPU (XNNPACK unpacks it to
+  fp32); dynamic-range measures 0.8 GB (about half of it the file mapped from the APK) and
+  0.24 s/photo vs 0.59 s, with no accuracy change. Large models (>= 64 MB) start on the CPU
+  (XNNPACK, up to 4 threads) in `ImageClassifier.createInterpreter`; the GPU delegate would
+  expand the weights to fp16 again. Phone speed is not measured yet.
 - Checks without a device: `tests/unit/audit/contrast.test.js` (in the suite)
   fails on low-contrast text in 20 screens, light and dark. For screenshots,
   `SHOT_DIR=/some/dir npx jest --testMatch '<rootDir>/tests/unit/audit/screens.shot.js'`

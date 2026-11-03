@@ -35,7 +35,7 @@ Useful options:
 
 - `--species 30000`: a smaller pack (fewer look-alike mix-ups, smaller head).
 - `fetch_species.py --place-id 97391`: species for one iNat place (Europe here), for a regional pack.
-- `--precision int8-weights` (default: per-channel int8 weights, float activations, ~4x smaller than fp32) or `fp32`; `--keep-fp32` keeps the unquantized file for `verify_pack.py`.
+- `--precision int8-dynamic` (default: dynamic-range int8, ~4x smaller than fp32, and XNNPACK runs the int8 weights as they are), `int8-weights` (weight-only: same size, but XNNPACK unpacks the weights to fp32 at load, measured 3.3 GB resident vs 0.8 GB for int8-dynamic) or `fp32`; `--keep-fp32` keeps the unquantized file for `verify_pack.py`. On 400 benchmark photos int8-dynamic gave the same top-1 as fp32 for 96.5% of photos and 74.3% vs 73.3% accuracy.
 - `--locales en,de,fr`: common names in more languages (about an hour per extra language).
 - `--skip-model`: taxonomy, names and manifest only, in seconds.
 
