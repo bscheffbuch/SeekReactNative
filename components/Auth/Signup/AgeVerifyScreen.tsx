@@ -50,9 +50,9 @@ const AgeVerifyScreen = () => {
         <View style={styles.marginLarge} />
         <TouchableOpacity accessibilityRole="button"
           onPress={openPicker}
-          style={[styles.dateButton, styles.center]}
+          style={[styles.dateButton, styles.center, { backgroundColor: theme.colors.secondaryContainer }]}
         >
-          <StyledText style={baseTextStyles.button}>{date}</StyledText>
+          <StyledText style={[baseTextStyles.button, { color: theme.colors.onSecondaryContainer }]}>{date}</StyledText>
         </TouchableOpacity>
         {isPickerVisible && (
           <DateTimePicker

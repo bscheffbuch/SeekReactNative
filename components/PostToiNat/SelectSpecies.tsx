@@ -163,7 +163,7 @@ const SelectSpecies = ( {
           >
             <ChevronLeftIcon color={theme.colors.text} size={26} />
           </TouchableOpacity>
-          <StyledText style={[baseTextStyles.button, textStyles.topHeader]}>
+          <StyledText style={[baseTextStyles.button, textStyles.topHeader, { color: theme.colors.text }]}>
             {i18n.t( "posting.what_seen" )}
           </StyledText>
         </View>

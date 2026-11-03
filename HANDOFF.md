@@ -161,6 +161,13 @@ The Material 3 design from the design canvas is in the code:
 - Icons are vector (`components/UIComponents/AppIcons.tsx`, lucide geometry).
   The PNGs left in use are illustrations (badges, onboarding/help art, map
   markers and their legend), not UI glyphs.
+- Checks without a device: `tests/unit/audit/contrast.test.js` (in the suite)
+  fails on low-contrast text in 20 screens, light and dark. For screenshots,
+  `SHOT_DIR=/some/dir npx jest --testMatch '<rootDir>/tests/unit/audit/screens.shot.js'`
+  writes each screen as approximate HTML (host tree to flexbox divs, real SVG
+  icons); open them in Chromium at 412px. Layout widths follow jest's 750px
+  window and bundled images do not load, so judge colors and structure, not
+  pixel positions.
 - Post to iNaturalist is an M3 form (`PostFieldRow` list items in one card,
   filled notes field); the share screen (`components/Social`) uses theme roles.
 

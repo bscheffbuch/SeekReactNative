@@ -30,11 +30,11 @@ export default StyleSheet.create( {
     fontSize: 20,
     textAlign: "center",
   },
+  // M3 tonal button (color from the theme at the call site)
   dateButton: {
     alignSelf: "center",
-    backgroundColor: colors.seekDeepGreen,
-    borderRadius: 14,
-    height: 43,
+    borderRadius: 20,
+    height: 44,
     width: 237,
   },
   flexCenter: {
