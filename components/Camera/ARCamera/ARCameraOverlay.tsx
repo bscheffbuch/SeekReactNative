@@ -21,6 +21,7 @@ import useActiveModelPack from "../../../utility/customHooks/useActiveModelPack"
 import { localizeNumber } from "../../../utility/helpers";
 import { useTheme } from "../../Providers/ThemeProvider";
 import { makeThemedStyles } from "../../../styles/themedStyles";
+import { withAlpha } from "../../../styles/dynamicColor";
 import type { ThemeTokens } from "../../../styles/theme";
 import LoadingWheel from "../../UIComponents/LoadingWheel";
 import ARCameraHeader from "./ARCameraHeader";
@@ -960,7 +961,7 @@ const ARCameraOverlay = ( {
           </StyledText>
         </View>
       )}
-      <View style={viewStyles.bottomDeck}>
+      <View style={[viewStyles.bottomDeck, controlsHidden && m3Styles.deckHidden]}>
         <TouchableOpacity
           accessibilityLabel={i18n.t( controlsHidden ? "camera.show_controls" : "camera.hide_controls" )}
           accessibilityRole="button"
@@ -972,16 +973,19 @@ const ARCameraOverlay = ( {
         >
           <View style={m3Styles.handle} />
         </TouchableOpacity>
-        <View style={viewStyles.coachingRow}>
-          <StyledText
-            maxFontSizeMultiplier={1.1}
-            style={[textStyles.coachingText, !isLandscape && textStyles.textShadow]}
-          >
-            {helpText}
-          </StyledText>
-        </View>
+        {!controlsHidden && (
+          <View style={viewStyles.coachingRow}>
+            <StyledText
+              maxFontSizeMultiplier={1.1}
+              style={[textStyles.coachingText, !isLandscape && textStyles.textShadow]}
+            >
+              {helpText}
+            </StyledText>
+          </View>
+        )}
 
-        <View style={viewStyles.modeControlsRow}>
+        <View style={[viewStyles.modeControlsRow, controlsHidden && m3Styles.rowHidden]}>
+          {!controlsHidden && (
           <GlassButton
             accessibilityLabel={i18n.t( "accessibility.flash" )}
             active={flashEnabled}
@@ -992,6 +996,7 @@ const ARCameraOverlay = ( {
           >
             <FlashIcon color={flashEnabled ? cameraTheme.colors.onSecondaryContainer : colors.white} size={23} strokeWidth={2.2} />
           </GlassButton>
+          )}
           {controlsHidden ? (
             <TouchableOpacity
               accessibilityLabel={i18n.t( "camera.show_controls" )}
@@ -1037,6 +1042,7 @@ const ARCameraOverlay = ( {
             )}
           </View>
           )}
+          {!controlsHidden && (
           <GlassButton
             accessibilityLabel={i18n.t( "camera.settings" )}
             active={settingsOpen}
@@ -1046,6 +1052,7 @@ const ARCameraOverlay = ( {
           >
             <SettingsIcon color={settingsOpen ? cameraTheme.colors.onSecondaryContainer : colors.white} size={23} strokeWidth={2.2} />
           </GlassButton>
+          )}
         </View>
 
         {!controlsHidden && (
@@ -1277,11 +1284,18 @@ const getM3Styles = makeThemedStyles( ( t: ThemeTokens ) => ( {
     fontSize: 15,
     fontWeight: "500",
   },
+  // hidden controls: no deck panel, just the shutter row and a small value pill
+  deckHidden: {
+    backgroundColor: "transparent",
+  },
+  rowHidden: {
+    justifyContent: "center",
+  },
   valuePill: {
     alignItems: "center",
-    backgroundColor: t.colors.surfaceContainerHigh,
+    backgroundColor: withAlpha( t.colors.surfaceContainerHigh, 0.7 ),
     borderRadius: 20,
-    flex: 1,
+    flex: 0,
     flexDirection: "row",
     gap: 8,
     height: 40,

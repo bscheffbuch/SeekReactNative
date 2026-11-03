@@ -144,13 +144,9 @@ exports[`LanguagePicker should render correctly 1`] = `
         [
           {
             "alignItems": "center",
-            "backgroundColor": "#E9EFE8",
-            "borderColor": "#DDE5DC",
-            "borderRadius": 12,
-            "borderWidth": 1,
             "flexDirection": "row",
-            "minHeight": 58,
-            "paddingHorizontal": 16,
+            "gap": 16,
+            "minHeight": 64,
             "paddingVertical": 8,
           },
           false,
@@ -168,10 +164,10 @@ exports[`LanguagePicker should render correctly 1`] = `
         <Text
           style={
             {
-              "color": "#404943",
+              "color": "#171D19",
               "fontFamily": "Lato-Regular",
-              "fontSize": 12,
-              "lineHeight": 16,
+              "fontSize": 16,
+              "lineHeight": 24,
             }
           }
         >
@@ -181,11 +177,10 @@ exports[`LanguagePicker should render correctly 1`] = `
           numberOfLines={1}
           style={
             {
-              "color": "#171D19",
-              "fontFamily": "Lato-Bold",
-              "fontSize": 16,
-              "lineHeight": 22,
-              "marginTop": 2,
+              "color": "#404943",
+              "fontFamily": "Lato-Regular",
+              "fontSize": 14,
+              "lineHeight": 20,
             }
           }
         >
@@ -202,10 +197,10 @@ exports[`LanguagePicker should render correctly 1`] = `
         meetOrSlice={0}
         minX={0}
         minY={0}
-        stroke="#14794F"
+        stroke="#404943"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth={2.2}
+        strokeWidth={2}
         style={
           [
             {
@@ -236,13 +231,13 @@ exports[`LanguagePicker should render correctly 1`] = `
           }
           stroke={
             {
-              "payload": 4279531855,
+              "payload": 4282403139,
               "type": 0,
             }
           }
           strokeLinecap={1}
           strokeLinejoin={1}
-          strokeWidth={2.2}
+          strokeWidth={2}
         >
           <RNSVGPath
             d="m6 9 6 6 6-6"

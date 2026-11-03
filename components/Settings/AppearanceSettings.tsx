@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import i18n from "../../i18n";
-import { useTheme  } from "../Providers/ThemeProvider";
+import { useTheme, DEFAULT_ACCENT, WALLPAPER_ACCENT } from "../Providers/ThemeProvider";
+import { ACCENT_PALETTES } from "../../styles/accentPalettes";
+import { getDynamicPalette } from "../../styles/dynamicColor";
+import { CheckIcon } from "../UIComponents/AppIcons";
 import type {ThemePreference} from "../Providers/ThemeProvider";
 
 const options: { labelKey: string; value: ThemePreference }[] = [
@@ -11,14 +14,19 @@ const options: { labelKey: string; value: ThemePreference }[] = [
   { labelKey: "settings.appearance_dark", value: "dark" },
 ];
 
+const wallpaperPalette = getDynamicPalette( );
+const wallpaper = wallpaperPalette
+  ? { primary: wallpaperPalette.accent1_600, container: wallpaperPalette.accent1_100 }
+  : null;
+
 const AppearanceSettings = ( ) => {
   const {
     theme,
     themePreference,
     setThemePreference,
     dynamicColorSupported,
-    dynamicColor,
-    setDynamicColor,
+    accentColor,
+    setAccentColor,
   } = useTheme( );
   const [pendingPreference, setPendingPreference] = useState<ThemePreference | null>( null );
   const styles = StyleSheet.create( {
@@ -64,32 +72,66 @@ const AppearanceSettings = ( ) => {
       lineHeight: 20,
       textAlign: "center",
     },
-    dynamicRow: {
-      alignItems: "center",
-      flexDirection: "row",
-      gap: theme.spacing.md,
-      marginTop: theme.spacing.md,
-      minHeight: 64,
-    },
-    dynamicText: {
-      flex: 1,
-    },
-    dynamicTitle: {
+    accentHeading: {
       color: theme.colors.text,
       fontFamily: theme.typography.body,
       fontSize: 16,
       lineHeight: 24,
+      marginTop: theme.spacing.lg,
     },
-    dynamicSub: {
+    accentSub: {
       color: theme.colors.onSurfaceVariant,
       fontFamily: theme.typography.body,
       fontSize: 14,
       lineHeight: 20,
     },
+    swatches: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      marginTop: theme.spacing.md,
+    },
+    swatchRing: {
+      alignItems: "center",
+      borderColor: "transparent",
+      borderRadius: 26,
+      borderWidth: 3,
+      height: 52,
+      justifyContent: "center",
+      width: 52,
+    },
+    swatchRingOn: {
+      borderColor: theme.colors.text,
+    },
+    swatch: {
+      alignItems: "center",
+      borderRadius: 20,
+      height: 40,
+      justifyContent: "center",
+      overflow: "hidden",
+      width: 40,
+    },
+    swatchHalf: {
+      height: 20,
+      width: 40,
+    },
     optionTextSelected: {
       color: theme.colors.onSecondaryContainer,
     },
   } );
+
+  const accents = [
+    { id: DEFAULT_ACCENT, primary: theme.isDark ? "#8AD6AD" : "#14794F", container: theme.isDark ? "#005235" : "#A6F2C8" },
+    ...Object.entries( ACCENT_PALETTES )
+      .filter( ( [id] ) => id !== DEFAULT_ACCENT )
+      .map( ( [id, p] ) => {
+        const roles = theme.isDark ? p.dark : p.light;
+        return { id, primary: roles.primary, container: roles.primaryContainer };
+      } ),
+    ...( dynamicColorSupported && wallpaper
+      ? [{ id: WALLPAPER_ACCENT, primary: wallpaper.primary, container: wallpaper.container }]
+      : [] ),
+  ];
 
   const handlePreference = async ( preference: ThemePreference ) => {
     if ( preference === themePreference || pendingPreference ) {
@@ -134,21 +176,41 @@ const AppearanceSettings = ( ) => {
           );
         } )}
       </View>
-      {dynamicColorSupported && (
-        <View style={styles.dynamicRow}>
-          <View style={styles.dynamicText}>
-            <Text style={styles.dynamicTitle}>{i18n.t( "settings.dynamic_color" )}</Text>
-            <Text style={styles.dynamicSub}>{i18n.t( "settings.dynamic_color_sub" )}</Text>
-          </View>
-          <Switch
-            accessibilityLabel={i18n.t( "settings.dynamic_color" )}
-            onValueChange={setDynamicColor}
-            thumbColor={dynamicColor ? theme.colors.onPrimary : theme.colors.outline}
-            trackColor={{ false: theme.colors.surfaceContainerHighest, true: theme.colors.primary }}
-            value={dynamicColor}
-          />
-        </View>
-      )}
+      <Text accessibilityRole="header" style={styles.accentHeading}>{i18n.t( "settings.accent_color" )}</Text>
+      <Text style={styles.accentSub}>
+        {accentColor === WALLPAPER_ACCENT ? i18n.t( "settings.dynamic_color_sub" ) : i18n.t( `settings.accent_${accentColor}` )}
+      </Text>
+      <View accessibilityRole="radiogroup" style={styles.swatches}>
+        {accents.map( accent => {
+          const selected = accent.id === accentColor;
+          return (
+            <Pressable
+              accessibilityLabel={accent.id === WALLPAPER_ACCENT
+                ? i18n.t( "settings.dynamic_color" )
+                : i18n.t( `settings.accent_${accent.id}` )}
+              accessibilityRole="radio"
+              accessibilityState={{ checked: selected }}
+              key={accent.id}
+              onPress={() => setAccentColor( accent.id )}
+              style={[styles.swatchRing, selected && styles.swatchRingOn]}
+              testID={`accent-${accent.id}`}
+            >
+              <View style={styles.swatch}>
+                {/* upper half: the accent, lower half: its container tone */}
+                <View style={[styles.swatchHalf, { backgroundColor: accent.primary }]} />
+                <View style={[styles.swatchHalf, { backgroundColor: accent.container }]} />
+                {selected && (
+                  <View style={StyleSheet.absoluteFill}>
+                    <View style={[styles.swatch, { backgroundColor: "rgba(0, 0, 0, 0.25)" }]}>
+                      <CheckIcon color="#FFFFFF" size={20} strokeWidth={3} />
+                    </View>
+                  </View>
+                )}
+              </View>
+            </Pressable>
+          );
+        } )}
+      </View>
     </View>
   );
 };

@@ -113,3 +113,36 @@ export const applyDynamicColors = ( base: ThemeTokens, palette: Palette ): Theme
   };
   return { ...base, colors };
 };
+
+/** The base theme with a generated M3 accent scheme (styles/accentPalettes.ts) applied. */
+export const applyAccentRoles = ( base: ThemeTokens, r: Record<string, string> ): ThemeTokens => ( {
+  ...base,
+  colors: {
+    ...base.colors,
+    canvas: r.surface,
+    surface: r.surfaceContainerLow,
+    elevatedSurface: r.surfaceContainer,
+    primary: r.primary,
+    primaryContainer: r.primaryContainer,
+    text: r.onSurface,
+    muted: r.onSurfaceVariant,
+    border: base.isDark ? r.surfaceContainerHigh : r.surfaceContainerHighest,
+    accent: r.primary,
+    inverseText: r.onPrimary,
+    pressed: withAlpha( r.primary, 0.12 ),
+    onPrimary: r.onPrimary,
+    onPrimaryContainer: r.onPrimaryContainer,
+    secondaryContainer: r.secondaryContainer,
+    onSecondaryContainer: r.onSecondaryContainer,
+    tertiary: r.primary,
+    tertiaryContainer: r.primaryContainer,
+    onTertiaryContainer: r.onPrimaryContainer,
+    surfaceContainerLow: r.surfaceContainerLow,
+    surfaceContainer: r.surfaceContainer,
+    surfaceContainerHigh: r.surfaceContainerHigh,
+    surfaceContainerHighest: r.surfaceContainerHighest,
+    onSurfaceVariant: r.onSurfaceVariant,
+    outline: r.outline,
+    outlineVariant: r.outlineVariant,
+  },
+} );

@@ -502,8 +502,16 @@ const ARCamera = ( ) => {
       const value = Math.min( 1, Math.max( 0, start.focus - dy / 420 ) );
       updateManualFocusValue( value );
       setGestureHud( { mode: "focus", value } );
-    } else if ( focusPeakingEnabled ) {
+    } else {
+      // Swiping sideways turns peaking on if it was off (it is off by default, so the
+      // gesture previously did nothing), then sets its sensitivity. Swiping all the way
+      // left turns it off again.
       const value = Math.min( 1, Math.max( 0, start.peak + dx / 320 ) );
+      if ( !focusPeakingEnabled && value > 0.02 ) {
+        setFocusPeakingEnabled( true );
+      } else if ( focusPeakingEnabled && value <= 0.02 && dx < -40 ) {
+        setFocusPeakingEnabled( false );
+      }
       updateFocusPeakingSensitivity( value );
       setGestureHud( { mode: "peak", value } );
     }

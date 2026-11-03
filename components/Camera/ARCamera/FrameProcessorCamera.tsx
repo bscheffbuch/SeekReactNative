@@ -503,6 +503,11 @@ const FrameProcessorCamera = ( props: Props ) => {
   const lastPeakingTimestamp = useSharedValue( 0 );
   const previewOrientation = useSharedValue<Orientation>( "portrait" );
   const fps = CLASSIFICATION_FPS;
+  // Battery: run the (large) classifier less often while the result is steady.
+  // 2/s while the scene changes, 1/s after 4 identical results, ~0.4/s after 10;
+  // any change in the top result goes straight back to 2/s.
+  const classificationIntervalMs = useSharedValue( 1000 / CLASSIFICATION_FPS );
+  const stableRef = useRef( { key: "", count: 0 } );
   // These createRunOnJS bindings are captured by the frame-processor worklet below.
   // Memoize them so their identity only changes when the underlying JS callback does,
   // otherwise the worklet is rebuilt on every render.
@@ -517,8 +522,21 @@ const FrameProcessorCamera = ( props: Props ) => {
         },
       } );
     }
+    const top = result?.predictions?.reduce?.( ( best: any, p: any ) => (
+      !best || p.rank_level < best.rank_level ? p : best ), null );
+    const key = top ? `${top.taxon_id}` : "";
+    const stable = stableRef.current;
+    stable.count = key !== "" && key === stable.key ? stable.count + 1 : 0;
+    stable.key = key;
+    // shared value written from JS, read by the frame processor worklet
+    // eslint-disable-next-line react-hooks/react-compiler
+    classificationIntervalMs.value = stable.count >= 10
+      ? 2500
+      : stable.count >= 4
+        ? 1000
+        : 1000 / CLASSIFICATION_FPS;
     onTaxaDetected( result );
-  } ), [onLog, onTaxaDetected] );
+  } ), [classificationIntervalMs, onLog, onTaxaDetected] );
 
   const handleError = useMemo( () => Worklets.createRunOnJS( ( error: ErrorMessage ) => {
     onClassifierError( error );
@@ -568,7 +586,7 @@ const FrameProcessorCamera = ( props: Props ) => {
       if ( useOverlayFocusPeaking ) {
         const timeSinceLastPeakingFrame = timestamp - lastPeakingTimestamp.value;
         if ( timeSinceLastPeakingFrame >= PEAKING_SAMPLE_INTERVAL_MS ) {
-          // eslint-disable-next-line react-hooks/react-compiler
+           
           lastPeakingTimestamp.value = timestamp;
           try {
             const rawPeakingPoints = getFocusPeakingPoints( frame, {
@@ -594,7 +612,7 @@ const FrameProcessorCamera = ( props: Props ) => {
       }
 
       const timeSinceLastFrame = timestamp - lastClassificationTimestamp.value;
-      if ( timeSinceLastFrame < 1000 / fps ) {
+      if ( timeSinceLastFrame < classificationIntervalMs.value ) {
         return;
       }
       lastClassificationTimestamp.value = timestamp;
@@ -644,6 +662,7 @@ const FrameProcessorCamera = ( props: Props ) => {
       filterByTaxonId,
       negativeFilter,
       lastClassificationTimestamp,
+      classificationIntervalMs,
       lastPeakingTimestamp,
       fps,
       hasUserLocation,

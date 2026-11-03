@@ -841,7 +841,15 @@
     "model_species": "{{count}} species",
     "model_install_hint": "To add a model, copy its folder (with manifest.json) into {{path}}",
     "dynamic_color": "Dynamic color",
-    "dynamic_color_sub": "Use colors from your wallpaper (Material You)"
+    "dynamic_color_sub": "Use colors from your wallpaper (Material You)",
+    "accent_color": "Accent color",
+    "accent_green": "Seek green",
+    "accent_teal": "Teal",
+    "accent_blue": "Blue",
+    "accent_purple": "Purple",
+    "accent_pink": "Pink",
+    "accent_orange": "Orange",
+    "accent_olive": "Olive"
   },
   "seek_challenges": {
     "badge": "Seek badge",

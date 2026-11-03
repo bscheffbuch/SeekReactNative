@@ -22,15 +22,13 @@ interface SettingsSectionProps {
 const SettingsSection = ( { children, title, subtitle }: SettingsSectionProps ) => {
   const { theme } = useTheme( );
   const styles = StyleSheet.create( {
+    // M3 filled card per settings group
     section: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.md,
-      borderWidth: 1,
-      marginBottom: theme.spacing.md,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderRadius: 16,
+      marginBottom: theme.spacing.sm,
       paddingHorizontal: theme.spacing.md,
       paddingTop: theme.spacing.md,
-      ...theme.elevation.card,
     },
     title: {
       color: theme.colors.text,

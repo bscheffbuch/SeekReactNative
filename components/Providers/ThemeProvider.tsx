@@ -18,7 +18,8 @@ import {
   lightTheme,
   resolveThemeTokens,
 } from "../../styles/theme";
-import { applyDynamicColors, getDynamicPalette } from "../../styles/dynamicColor";
+import { applyAccentRoles, applyDynamicColors, getDynamicPalette } from "../../styles/dynamicColor";
+import { ACCENT_PALETTES } from "../../styles/accentPalettes";
 import type {ThemePreference, ThemeTokens} from "../../styles/theme";
 
 interface ThemeContextValue {
@@ -30,11 +31,14 @@ interface ThemeContextValue {
   isDark: boolean;
   // Material You (Android 12+): colors from the wallpaper
   dynamicColorSupported: boolean;
-  dynamicColor: boolean;
-  setDynamicColor: ( enabled: boolean ) => Promise<void>;
+  // "green" (default), another accent from styles/accentPalettes, or "wallpaper"
+  accentColor: string;
+  setAccentColor: ( accent: string ) => Promise<void>;
 }
 
-const DYNAMIC_COLOR_KEY = "dynamic_color";
+const ACCENT_COLOR_KEY = "accent_color";
+export const DEFAULT_ACCENT = "green";
+export const WALLPAPER_ACCENT = "wallpaper";
 
 const ThemeContext = createContext<ThemeContextValue>( {
   theme: lightTheme,
@@ -43,25 +47,29 @@ const ThemeContext = createContext<ThemeContextValue>( {
   setThemePreference: async () => {},
   isDark: false,
   dynamicColorSupported: false,
-  dynamicColor: false,
-  setDynamicColor: async () => {},
+  accentColor: DEFAULT_ACCENT,
+  setAccentColor: async () => {},
 } );
 
 const ThemeProvider = ( { children }: React.PropsWithChildren ) => {
   const systemScheme = useColorScheme( );
   const [themePreference, setThemePreferenceState] = useState<ThemePreference>( "system" );
   const palette = useMemo( ( ) => getDynamicPalette( ), [] );
-  const [dynamicColor, setDynamicColorState] = useState( true );
+  const [accentColor, setAccentColorState] = useState( DEFAULT_ACCENT );
 
   useEffect( ( ) => {
-    AsyncStorage.getItem( DYNAMIC_COLOR_KEY )
-      .then( value => setDynamicColorState( value !== "off" ) )
+    AsyncStorage.getItem( ACCENT_COLOR_KEY )
+      .then( value => {
+        if ( value && ( value === WALLPAPER_ACCENT || ACCENT_PALETTES[value] ) ) {
+          setAccentColorState( value );
+        }
+      } )
       .catch( ( ) => null );
   }, [] );
 
-  const setDynamicColor = useCallback( async ( enabled: boolean ) => {
-    setDynamicColorState( enabled );
-    await AsyncStorage.setItem( DYNAMIC_COLOR_KEY, enabled ? "on" : "off" );
+  const setAccentColor = useCallback( async ( accent: string ) => {
+    setAccentColorState( accent );
+    await AsyncStorage.setItem( ACCENT_COLOR_KEY, accent );
   }, [] );
   const normalizedSystemScheme = systemScheme === "light" || systemScheme === "dark"
     ? systemScheme
@@ -94,15 +102,22 @@ const ThemeProvider = ( { children }: React.PropsWithChildren ) => {
     await updateUserSetting( "themePreference", preference );
   }, [] );
 
-  const useDynamic = dynamicColor && palette != null;
-  const theme = useMemo( ( ) => {
-    const base = resolveThemeTokens( themePreference, normalizedSystemScheme );
-    return useDynamic ? applyDynamicColors( base, palette ) : base;
-  }, [normalizedSystemScheme, palette, themePreference, useDynamic] );
-  const cameraTheme = useMemo(
-    ( ) => ( useDynamic ? applyDynamicColors( darkTheme, palette ) : darkTheme ),
-    [palette, useDynamic]
+  const useDynamic = accentColor === WALLPAPER_ACCENT && palette != null;
+  const accentPalette = accentColor !== DEFAULT_ACCENT ? ACCENT_PALETTES[accentColor] : undefined;
+  const withAccent = useCallback( ( base: ThemeTokens ) => {
+    if ( useDynamic ) {
+      return applyDynamicColors( base, palette );
+    }
+    if ( accentPalette ) {
+      return applyAccentRoles( base, base.isDark ? accentPalette.dark : accentPalette.light );
+    }
+    return base; // green: the hand-tuned Seek theme
+  }, [accentPalette, palette, useDynamic] );
+  const theme = useMemo(
+    ( ) => withAccent( resolveThemeTokens( themePreference, normalizedSystemScheme ) ),
+    [normalizedSystemScheme, themePreference, withAccent]
   );
+  const cameraTheme = useMemo( ( ) => withAccent( darkTheme ), [withAccent] );
 
   const value = useMemo( () => ( {
     theme,
@@ -111,9 +126,9 @@ const ThemeProvider = ( { children }: React.PropsWithChildren ) => {
     setThemePreference,
     isDark: theme.isDark,
     dynamicColorSupported: palette != null,
-    dynamicColor: useDynamic,
-    setDynamicColor,
-  } ), [cameraTheme, palette, setDynamicColor, setThemePreference, theme, themePreference, useDynamic] );
+    accentColor: useDynamic || accentPalette ? accentColor : DEFAULT_ACCENT,
+    setAccentColor,
+  } ), [accentColor, accentPalette, cameraTheme, palette, setAccentColor, setThemePreference, theme, themePreference, useDynamic] );
 
   return (
     <ThemeContext.Provider value={value}>

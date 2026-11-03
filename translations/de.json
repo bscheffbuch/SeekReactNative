@@ -727,7 +727,15 @@
     "change_language": "Die In-App-Sprache auf {{language}} umschalten?",
     "confirm": "Bestätigen",
     "dynamic_color": "Dynamische Farben",
-    "dynamic_color_sub": "Farben aus deinem Hintergrundbild verwenden (Material You)"
+    "dynamic_color_sub": "Farben aus deinem Hintergrundbild verwenden (Material You)",
+    "accent_color": "Akzentfarbe",
+    "accent_green": "Seek-Grün",
+    "accent_teal": "Petrol",
+    "accent_blue": "Blau",
+    "accent_purple": "Lila",
+    "accent_pink": "Pink",
+    "accent_orange": "Orange",
+    "accent_olive": "Oliv"
   },
   "seek_challenges": {
     "badge": "Seek-Abzeichen",

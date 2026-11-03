@@ -9,7 +9,7 @@ import {
 } from "react-native";
 
 import i18n from "../../i18n";
-import { CheckIcon, ChevronDownIcon } from "../UIComponents/AppIcons";
+import { ChevronDownIcon } from "../UIComponents/AppIcons";
 import { useTheme } from "../Providers/ThemeProvider";
 
 interface PickerItem<T> {
@@ -40,72 +40,83 @@ const SettingsSelect = <T extends string | number,>( {
   const [open, setOpen] = useState( false );
   const selected = items.find( item => item.value === value );
   const styles = StyleSheet.create( {
+    // M3 basic dialog with radio options
     backdrop: {
       alignItems: "center",
       backgroundColor: theme.colors.overlay,
       flex: 1,
-      justifyContent: "flex-end",
+      justifyContent: "center",
       padding: theme.spacing.lg,
     },
     sheet: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.lg,
-      borderWidth: 1,
+      backgroundColor: theme.colors.surfaceContainerHigh,
+      borderRadius: 28,
       maxHeight: "72%",
       overflow: "hidden",
-      padding: theme.spacing.sm,
+      paddingBottom: theme.spacing.sm,
+      paddingTop: theme.spacing.lg,
       width: "100%",
     },
     sheetTitle: {
       color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 17,
-      lineHeight: 23,
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.sm,
+      fontFamily: theme.typography.body,
+      fontSize: 24,
+      lineHeight: 32,
+      paddingBottom: theme.spacing.md,
+      paddingHorizontal: theme.spacing.lg,
     },
+    // M3 two-line list item
     field: {
-      backgroundColor: theme.colors.elevatedSurface,
-      borderColor: theme.colors.border,
-      borderRadius: theme.radii.sm,
-      borderWidth: 1,
-      flexDirection: "row",
-      minHeight: 58,
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.sm,
       alignItems: "center",
+      flexDirection: "row",
+      gap: theme.spacing.md,
+      minHeight: 64,
+      paddingVertical: theme.spacing.sm,
     },
     copy: {
       flex: 1,
       minWidth: 0,
     },
     label: {
-      color: theme.colors.muted,
+      color: theme.colors.text,
       fontFamily: theme.typography.body,
-      fontSize: 12,
-      lineHeight: 16,
+      fontSize: 16,
+      lineHeight: 24,
     },
     value: {
-      color: theme.colors.text,
-      fontFamily: theme.typography.heading,
-      fontSize: 16,
-      lineHeight: 22,
-      marginTop: theme.spacing.xxs,
+      color: theme.colors.onSurfaceVariant,
+      fontFamily: theme.typography.body,
+      fontSize: 14,
+      lineHeight: 20,
     },
     disabled: {
       opacity: 0.48,
     },
     option: {
       alignItems: "center",
-      borderRadius: theme.radii.sm,
       flexDirection: "row",
-      minHeight: 54,
-      paddingHorizontal: theme.spacing.md,
-      paddingVertical: theme.spacing.sm,
+      gap: theme.spacing.md,
+      minHeight: 56,
+      paddingHorizontal: theme.spacing.lg,
     },
-    selectedOption: {
-      backgroundColor: theme.colors.primaryContainer,
+    selectedOption: {},
+    radio: {
+      alignItems: "center",
+      borderColor: theme.colors.onSurfaceVariant,
+      borderRadius: 10,
+      borderWidth: 2,
+      height: 20,
+      justifyContent: "center",
+      width: 20,
+    },
+    radioOn: {
+      borderColor: theme.colors.primary,
+    },
+    radioDot: {
+      backgroundColor: theme.colors.primary,
+      borderRadius: 5,
+      height: 10,
+      width: 10,
     },
     optionText: {
       color: theme.colors.text,
@@ -114,19 +125,7 @@ const SettingsSelect = <T extends string | number,>( {
       fontSize: 16,
       lineHeight: 22,
     },
-    selectedOptionText: {
-      color: theme.colors.primary,
-      fontFamily: theme.typography.heading,
-    },
-    handle: {
-      alignSelf: "center",
-      backgroundColor: theme.colors.border,
-      borderRadius: 999,
-      height: 4,
-      marginBottom: theme.spacing.xs,
-      marginTop: theme.spacing.xs,
-      width: 42,
-    },
+    selectedOptionText: {},
   } );
 
   const openPicker = () => {
@@ -159,7 +158,7 @@ const SettingsSelect = <T extends string | number,>( {
             {selected?.label || ""}
           </Text>
         </View>
-        <ChevronDownIcon color={theme.colors.primary} size={22} strokeWidth={2.2} />
+        <ChevronDownIcon color={theme.colors.onSurfaceVariant} size={22} strokeWidth={2} />
       </View>
       </Pressable>
       <Modal
@@ -175,28 +174,27 @@ const SettingsSelect = <T extends string | number,>( {
           onPress={closePicker}
         >
           <Pressable style={styles.sheet}>
-            <View style={styles.handle} />
             <Text style={styles.sheetTitle}>{label}</Text>
             <ScrollView showsVerticalScrollIndicator={false}>
               {items.map( item => {
                 const isSelected = item.value === value;
                 return (
                   <Pressable
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: isSelected }}
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: isSelected }}
                     key={`${item.value}`}
                     onPress={() => selectItem( item )}
-                    style={[styles.option, isSelected && styles.selectedOption]}
+                    style={( { pressed } ) => [styles.option, pressed && { backgroundColor: theme.colors.pressed }]}
                   >
+                    <View style={[styles.radio, isSelected && styles.radioOn]}>
+                      {isSelected && <View style={styles.radioDot} />}
+                    </View>
                     <Text
                       numberOfLines={1}
                       style={[styles.optionText, isSelected && styles.selectedOptionText]}
                     >
                       {item.label}
                     </Text>
-                    {isSelected && (
-                      <CheckIcon color={theme.colors.primary} size={20} strokeWidth={2.4} />
-                    )}
                   </Pressable>
                 );
               } )}
