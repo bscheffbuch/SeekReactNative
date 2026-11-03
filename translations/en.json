@@ -145,6 +145,7 @@
     "learn_more_about_data_transfer_4": "There is no way to have an iNaturalist account without storing personal information, so the only way to revoke this consent is to delete your account."
   },
   "inat_login": {
+    "web_session_failed": "Signed in on the website, but Seek couldn't get access. Try again, or sign out on the website and back in.",
     "log_in_with_inat": "Log in with your iNaturalist account",
     "username": "Username",
     "username_email": "Username / email",

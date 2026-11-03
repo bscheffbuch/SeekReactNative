@@ -145,6 +145,7 @@
     "learn_more_about_data_transfer_4": "Es gibt keine Möglichkeit, ein iNaturalist-Konto zu haben, ohne persönliche Daten zu speichern - sodass die einzige Möglichkeit, diese Einwilligung zu widerrufen ist, das Konto zu löschen."
   },
   "inat_login": {
+    "web_session_failed": "Auf der Website angemeldet, aber Seek bekommt keinen Zugriff. Versuch es nochmal oder melde dich auf der Website ab und wieder an.",
     "log_in_with_inat": "Mit deinem iNaturalist-Konto anmelden",
     "username": "Benutzername",
     "username_email": "Benutzername / E-Mail",

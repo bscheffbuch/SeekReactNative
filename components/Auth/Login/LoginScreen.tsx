@@ -8,7 +8,8 @@ import InputField from "../../UIComponents/InputField";
 import GreenText from "../../UIComponents/GreenText";
 import GreenButton from "../../UIComponents/Buttons/GreenButton";
 import ErrorMessage from "../ErrorMessage";
-import { saveAccessToken } from "../../../utility/loginHelpers";
+import { hasOAuthApp, saveAccessToken } from "../../../utility/loginHelpers";
+import WebLogin from "./WebLogin";
 import config from "../../../config";
 import createUserAgent from "../../../utility/userAgent";
 import { UserContext } from "../../UserContext";
@@ -102,6 +103,10 @@ const LoginScreen = ( ) => {
     return errorText;
   };
 
+
+  if ( !hasOAuthApp( ) ) {
+    return <WebLogin />;
+  }
 
   return (
     <ScrollWithHeader header="login.log_in">

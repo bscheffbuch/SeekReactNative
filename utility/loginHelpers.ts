@@ -1,7 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import inatjs from "inaturalistjs";
 
-import { fetchJSONWebToken } from "./tokenHelpers";
+import { TurboModuleRegistry } from "react-native";
+
+import config from "../config";
+import { fetchJSONWebToken, WEB_SESSION_LOGIN } from "./tokenHelpers";
 
 const checkIsEmailValid = ( email: string ): boolean => {
   if ( email && email.length > 5 ) {
@@ -11,6 +14,10 @@ const checkIsEmailValid = ( email: string ): boolean => {
   }
   return false;
 };
+
+// Builds made without Seek's OAuth app credentials (config.example.js values) can only
+// sign in on the iNaturalist website.
+const hasOAuthApp = ( ): boolean => !!config.appId && !config.appId.startsWith( "SEEK_APP_ID" );
 
 const saveAccessToken = ( token: string ): Promise<void> => AsyncStorage.setItem( "access_token", token );
 
@@ -23,8 +30,22 @@ const fetchAccessToken = async ( ): Promise<string | null> => {
   }
 };
 
+// Forgets the website session behind a WebView login too, so the next login asks again.
+// React Native's networking module, which shares its cookie store with WebViews
+const clearWebSession = ( ): Promise<boolean> => new Promise( ( resolve ) => {
+  const networking = TurboModuleRegistry.get<any>( "Networking" );
+  if ( !networking?.clearCookies ) {
+    resolve( false );
+    return;
+  }
+  networking.clearCookies( resolve );
+} );
+
 const removeAccessToken = async ( ): Promise<boolean | void> => {
   try {
+    if ( ( await AsyncStorage.getItem( "access_token" ) ) === WEB_SESSION_LOGIN ) {
+      await clearWebSession( );
+    }
     const token = await AsyncStorage.removeItem( "access_token" );
     return token;
   } catch {
@@ -66,6 +87,8 @@ const fetchUserProfile = async ( login: string ): Promise<any> => {
 };
 
 export {
+  hasOAuthApp,
+  clearWebSession,
   saveAccessToken,
   fetchAccessToken,
   removeAccessToken,
