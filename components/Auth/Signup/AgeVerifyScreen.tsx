@@ -12,8 +12,10 @@ import DateTimePicker from "../../UIComponents/DateTimePicker";
 import PrivacyAndTerms from "../../UIComponents/PrivacyAndTerms";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const AgeVerifyScreen = () => {
+  const { theme } = useTheme( );
   const { navigate } = useNavigation();
   const [date, setDate] = useState( formatYearMonthDay() );
   const [isPickerVisible, setPicker] = useState( false );
@@ -38,7 +40,7 @@ const AgeVerifyScreen = () => {
 
   return (
     <ViewWithHeader header="login.sign_up" footer={false}>
-      <View style={[styles.flexCenter, styles.whiteContainer]}>
+      <View style={[styles.flexCenter, styles.whiteContainer, { backgroundColor: theme.colors.canvas }]}>
         <StyledText style={[baseTextStyles.emptyState, styles.header]} allowFontScaling={false}>
           {i18n.t( "inat_signup.enter_birthday" )}
         </StyledText>

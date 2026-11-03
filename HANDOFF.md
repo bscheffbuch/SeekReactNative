@@ -147,9 +147,22 @@ The Material 3 design from the design canvas is in the code:
   again, View species).
 - Camera: dark tonal controls; `FrameProcessorCamera` takes `onViewfinderPan*`
   callbacks (one-finger pan; pinch zoom stays native), `ARCamera` maps vertical
-  swipes to manual focus and horizontal swipes to peaking sensitivity, with a
-  gold value readout. A handle at the top of the controls hides them; a value
-  pill stays and gestures keep working.
+  swipes to manual focus and horizontal swipes to peaking sensitivity (a swipe
+  turns peaking on when it is off), with a value readout in the accent color. A
+  handle at the top of the controls hides them; a value pill stays and gestures
+  keep working.
+- One accent color: `ThemeProvider` applies the wallpaper palette (Material
+  You, Android 12+, native module `SeekDynamicColors`) or one of the generated
+  schemes in `styles/accentPalettes.ts` (Settings > Appearance; green is the
+  default). Use `theme.colors.*` roles, never the legacy `colors.seek*` brand
+  greens/teal/gold, or a component ignores the user's accent. `StyledText` maps
+  the legacy ink/gray/green text colors onto roles, but not white: white text
+  only belongs on photos, the camera, or `primary` surfaces.
+- Icons are vector (`components/UIComponents/AppIcons.tsx`, lucide geometry).
+  The PNGs left in use are illustrations (badges, onboarding/help art, map
+  markers and their legend), not UI glyphs.
+- Post to iNaturalist is an M3 form (`PostFieldRow` list items in one card,
+  filled notes field); the share screen (`components/Social`) uses theme roles.
 
 Preview builds: without `inaturalist-android.keystore`, `assembleRelease` signs
 with the debug key and uses the package `org.inaturalist.seek.preview`. Model

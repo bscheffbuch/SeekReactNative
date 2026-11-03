@@ -6,9 +6,11 @@ import { viewStyles, textStyles } from "../../../styles/uiComponents/speciesNear
 import i18n from "../../../i18n";
 import StyledText from "../StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 const EmptyList = ( ) => {
   const { name } = useRoute( );
+  const { theme } = useTheme( );
 
   let text = null;
 
@@ -22,7 +24,7 @@ const EmptyList = ( ) => {
 
   return (
     <View style={viewStyles.noTaxon}>
-      <StyledText style={[baseTextStyles.bodyWhite, textStyles.cellTitleText]}>
+      <StyledText style={[baseTextStyles.bodyWhite, textStyles.cellTitleText, { color: theme.colors.onSurfaceVariant }]}>
         {text}
       </StyledText>
     </View>
