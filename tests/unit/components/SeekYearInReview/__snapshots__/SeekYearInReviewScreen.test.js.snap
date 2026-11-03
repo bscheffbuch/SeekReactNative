@@ -2128,14 +2128,18 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
       />
       <View
         style={
-          {
-            "backgroundColor": "#F3F1E8",
-            "bottom": -1000,
-            "height": 1050,
-            "left": 0,
-            "position": "absolute",
-            "right": 0,
-          }
+          [
+            {
+              "bottom": -1000,
+              "height": 1050,
+              "left": 0,
+              "position": "absolute",
+              "right": 0,
+            },
+            {
+              "backgroundColor": "#F5FBF4",
+            },
+          ]
         }
       />
     </View>

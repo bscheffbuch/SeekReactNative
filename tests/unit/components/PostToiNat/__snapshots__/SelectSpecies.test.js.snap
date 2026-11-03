@@ -157,6 +157,9 @@ exports[`SelectSpecies should render correctly 1`] = `
               "paddingTop": 20,
               "position": "absolute",
             },
+            {
+              "color": "#171D19",
+            },
           ],
           null,
         ]
