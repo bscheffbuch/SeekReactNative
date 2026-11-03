@@ -44,9 +44,9 @@ const SeekYearInReviewCard = ( ) => {
   }
   const themedStyles = StyleSheet.create( {
     container: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: 12,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderColor: theme.colors.surfaceContainerLow,
+      borderRadius: 16,
       ...theme.elevation.card,
     },
     title: {

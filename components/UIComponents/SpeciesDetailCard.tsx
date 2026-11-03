@@ -17,9 +17,9 @@ const SpeciesDetailCard = ( { children, text, hide = false }: Props ) => {
   const { theme } = useTheme( );
   const styles = StyleSheet.create( {
     card: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: 14,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderColor: theme.colors.surfaceContainerLow,
+      borderRadius: 16,
       borderWidth: 1,
       marginTop: theme.spacing.md,
       padding: theme.spacing.md,

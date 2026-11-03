@@ -32,7 +32,7 @@ const viewStyles = StyleSheet.create( {
     backgroundColor: "#FFFFFF",
     borderColor: "#E6E9E4",
     borderRadius: 18,
-    borderWidth: 1,
+    borderWidth: 0,
     height: 223,
     marginHorizontal: 16,
     overflow: "hidden",

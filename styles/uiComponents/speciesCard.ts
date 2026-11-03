@@ -27,7 +27,7 @@ const viewStyles = StyleSheet.create( {
     backgroundColor: "#FFFFFF",
     borderColor: "#E6E9E4",
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: 0,
     minHeight: 96,
     paddingHorizontal: 10,
     paddingVertical: 10,

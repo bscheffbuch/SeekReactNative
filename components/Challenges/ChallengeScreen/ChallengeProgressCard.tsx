@@ -37,9 +37,9 @@ const ChallengeProgressCard = ( { challenge }: Props ) => {
   const { theme } = useTheme( );
   const themedStyles = StyleSheet.create( {
     card: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
-      borderRadius: 12,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderColor: theme.colors.surfaceContainerLow,
+      borderRadius: 16,
       ...theme.elevation.card,
     },
     title: {

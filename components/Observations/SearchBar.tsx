@@ -17,8 +17,8 @@ const SearchBar = ( { fetchFilteredObservations, searchText, clearText }: Props 
   const { theme } = useTheme( );
   const themedStyles = StyleSheet.create( {
     row: {
-      backgroundColor: theme.colors.elevatedSurface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surfaceContainerHigh,
+      borderColor: theme.colors.surfaceContainerHigh,
     },
     input: {
       color: theme.colors.text,

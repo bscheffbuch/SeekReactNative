@@ -7,9 +7,9 @@ const viewStyles = StyleSheet.create( {
     alignItems: "center",
     backgroundColor: "#FAF8F1",
     borderColor: "#E6E9E4",
-    borderRadius: 999,
-    borderWidth: 1,
-    minHeight: 44,
+    borderRadius: 28,
+    borderWidth: 0,
+    minHeight: 56,
     paddingHorizontal: 16,
   },
   margins: {

@@ -179,8 +179,15 @@ const themedStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
     paddingHorizontal: theme.spacing.md,
     paddingVertical: theme.spacing.sm,
   },
+  // M3 list item: leading icon in a tonal disc
   rowIcon: {
+    alignItems: "center",
+    backgroundColor: theme.colors.secondaryContainer,
+    borderRadius: 20,
+    height: 40,
+    justifyContent: "center",
     marginRight: theme.spacing.md,
+    width: 40,
   },
   rowText: {
     flex: 1,
@@ -485,14 +492,14 @@ const ListRow = ( {
     >
       {icon && (
         <View style={styles.rowIcon}>
-          <AppIcon icon={icon} color={theme.colors.primary} />
+          <AppIcon icon={icon} color={theme.colors.onSecondaryContainer} />
         </View>
       )}
       <View style={styles.rowText}>
         <Text style={styles.rowLabel}>{label}</Text>
         {detail && <Text style={styles.rowDetail}>{detail}</Text>}
       </View>
-      <AppIcon icon={ChevronRightIcon} color={theme.colors.muted} />
+      <AppIcon icon={ChevronRightIcon} color={theme.colors.onSurfaceVariant} />
     </Pressable>
   );
 };

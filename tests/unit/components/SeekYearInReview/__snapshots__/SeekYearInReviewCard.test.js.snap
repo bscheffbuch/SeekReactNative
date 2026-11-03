@@ -15,8 +15,8 @@ exports[`SeekYearInReviewCard should render in December with observations 1`] = 
       },
       {
         "backgroundColor": "#EFF5EE",
-        "borderColor": "#DDE5DC",
-        "borderRadius": 12,
+        "borderColor": "#EFF5EE",
+        "borderRadius": 16,
         "elevation": 0,
         "shadowColor": "#000000",
         "shadowOffset": {
@@ -201,8 +201,8 @@ exports[`SeekYearInReviewCard should render in January with observations 1`] = `
       },
       {
         "backgroundColor": "#EFF5EE",
-        "borderColor": "#DDE5DC",
-        "borderRadius": 12,
+        "borderColor": "#EFF5EE",
+        "borderRadius": 16,
         "elevation": 0,
         "shadowColor": "#000000",
         "shadowOffset": {

@@ -35,17 +35,15 @@ const getMoreStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   content: {
     padding: theme.spacing.md,
   },
+  // same primary-container card as the Home level card
   profileCard: {
     alignItems: "center",
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radii.lg,
-    borderWidth: 1,
+    backgroundColor: theme.colors.primaryContainer,
+    borderRadius: 24,
     flexDirection: "row",
     gap: theme.spacing.md,
     marginBottom: theme.spacing.lg,
-    padding: theme.spacing.md,
-    ...theme.elevation.card,
+    padding: 20,
   },
   profileMark: {
     alignItems: "center",
@@ -65,13 +63,13 @@ const getMoreStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
     flex: 1,
   },
   profileTitle: {
-    color: theme.colors.text,
-    fontFamily: theme.typography.heading,
-    fontSize: 18,
-    lineHeight: 23,
+    color: theme.colors.onPrimaryContainer,
+    fontFamily: theme.typography.body,
+    fontSize: 22,
+    lineHeight: 28,
   },
   profileMeta: {
-    color: theme.colors.muted,
+    color: theme.colors.onPrimaryContainer,
     fontFamily: theme.typography.body,
     fontSize: 13,
     lineHeight: 18,
@@ -121,7 +119,7 @@ const MoreScreen = ( ) => {
               </Text>
             )}
           </View>
-          <ChevronRightIcon color={theme.colors.muted} size={20} />
+          <ChevronRightIcon color={theme.colors.onPrimaryContainer} size={22} />
         </Pressable>
         <SectionHeading>{i18n.t( "menu.more" )}</SectionHeading>
         <SurfaceCard style={styles.group}>

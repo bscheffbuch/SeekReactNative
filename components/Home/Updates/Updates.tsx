@@ -13,8 +13,8 @@ const Updates = ( ) => {
   const { theme } = useTheme( );
   const styles = StyleSheet.create( {
     container: {
-      backgroundColor: theme.colors.surface,
-      borderColor: theme.colors.border,
+      backgroundColor: theme.colors.surfaceContainerLow,
+      borderColor: theme.colors.surfaceContainerLow,
       ...theme.elevation.card,
     },
     iconCircle: {
