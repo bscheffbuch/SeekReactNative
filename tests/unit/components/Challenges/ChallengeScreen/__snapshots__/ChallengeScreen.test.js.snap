@@ -402,7 +402,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                   "justifyContent": "center",
                 },
                 {
-                  "backgroundColor": "#f0f0f0",
+                  "backgroundColor": "#DEE4DD",
                   "borderRadius": 29.5,
                   "height": 59,
                   "width": 59,
@@ -436,7 +436,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                       "top": 0,
                     },
                     {
-                      "backgroundColor": "#77b300",
+                      "backgroundColor": "#14794F",
                       "borderRadius": 29.5,
                       "height": 59,
                       "overflow": "hidden",
@@ -483,7 +483,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                       "top": 0,
                     },
                     {
-                      "backgroundColor": "#f0f0f0",
+                      "backgroundColor": "#DEE4DD",
                       "borderRadius": 29.5,
                       "height": 59,
                       "overflow": "hidden",
@@ -513,7 +513,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                     "overflow": "hidden",
                   },
                   {
-                    "backgroundColor": "#ffffff",
+                    "backgroundColor": "#D0E8D7",
                     "borderRadius": 26.5,
                     "height": 53,
                     "width": 53,
@@ -536,10 +536,11 @@ exports[`ChallengeScreen should render correctly 1`] = `
                       {
                         "fontSize": 19,
                       },
+                      {
+                        "color": "#0B1F15",
+                      },
                     ],
-                    {
-                      "color": "#171D19",
-                    },
+                    null,
                   ]
                 }
               >
@@ -703,7 +704,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                   "justifyContent": "center",
                 },
                 {
-                  "backgroundColor": "#f0f0f0",
+                  "backgroundColor": "#DEE4DD",
                   "borderRadius": 29.5,
                   "height": 59,
                   "width": 59,
@@ -737,7 +738,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                       "top": 0,
                     },
                     {
-                      "backgroundColor": "#77b300",
+                      "backgroundColor": "#14794F",
                       "borderRadius": 29.5,
                       "height": 59,
                       "overflow": "hidden",
@@ -784,7 +785,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                       "top": 0,
                     },
                     {
-                      "backgroundColor": "#f0f0f0",
+                      "backgroundColor": "#DEE4DD",
                       "borderRadius": 29.5,
                       "height": 59,
                       "overflow": "hidden",
@@ -814,7 +815,7 @@ exports[`ChallengeScreen should render correctly 1`] = `
                     "overflow": "hidden",
                   },
                   {
-                    "backgroundColor": "#ffffff",
+                    "backgroundColor": "#D0E8D7",
                     "borderRadius": 26.5,
                     "height": 53,
                     "width": 53,
@@ -837,10 +838,11 @@ exports[`ChallengeScreen should render correctly 1`] = `
                       {
                         "fontSize": 19,
                       },
+                      {
+                        "color": "#0B1F15",
+                      },
                     ],
-                    {
-                      "color": "#171D19",
-                    },
+                    null,
                   ]
                 }
               >
@@ -1432,13 +1434,87 @@ exports[`ChallengeScreen should render correctly 1`] = `
             }
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/icon-completed.webp",
-              }
+          <View
+            accessibilityLabel="100%"
+            style={
+              [
+                {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                },
+                {
+                  "backgroundColor": "#14794F",
+                  "borderRadius": 29.5,
+                  "height": 59,
+                  "width": 59,
+                },
+              ]
             }
-          />
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={29.5}
+              bbWidth={29.5}
+              fill="none"
+              focusable={false}
+              height={29.5}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              stroke="#FFFFFF"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.6}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 29,
+                    "width": 29,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={29.5}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "stroke",
+                    "strokeWidth",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeWidth={2.6}
+              >
+                <RNSVGPath
+                  d="M20 6 9 17l-5-5"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
+          </View>
         </View>
       </View>
       <View
@@ -1587,13 +1663,87 @@ exports[`ChallengeScreen should render correctly 1`] = `
             }
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/icon-completed.webp",
-              }
+          <View
+            accessibilityLabel="100%"
+            style={
+              [
+                {
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                },
+                {
+                  "backgroundColor": "#14794F",
+                  "borderRadius": 29.5,
+                  "height": 59,
+                  "width": 59,
+                },
+              ]
             }
-          />
+          >
+            <RNSVGSvgView
+              align="xMidYMid"
+              bbHeight={29.5}
+              bbWidth={29.5}
+              fill="none"
+              focusable={false}
+              height={29.5}
+              meetOrSlice={0}
+              minX={0}
+              minY={0}
+              stroke="#FFFFFF"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2.6}
+              style={
+                [
+                  {
+                    "backgroundColor": "transparent",
+                    "borderWidth": 0,
+                  },
+                  {
+                    "flex": 0,
+                    "height": 29,
+                    "width": 29,
+                  },
+                ]
+              }
+              vbHeight={24}
+              vbWidth={24}
+              width={29.5}
+            >
+              <RNSVGGroup
+                fill={null}
+                propList={
+                  [
+                    "fill",
+                    "stroke",
+                    "strokeWidth",
+                    "strokeLinecap",
+                    "strokeLinejoin",
+                  ]
+                }
+                stroke={
+                  {
+                    "payload": 4294967295,
+                    "type": 0,
+                  }
+                }
+                strokeLinecap={1}
+                strokeLinejoin={1}
+                strokeWidth={2.6}
+              >
+                <RNSVGPath
+                  d="M20 6 9 17l-5-5"
+                  fill={
+                    {
+                      "payload": 4278190080,
+                      "type": 0,
+                    }
+                  }
+                />
+              </RNSVGGroup>
+            </RNSVGSvgView>
+          </View>
         </View>
       </View>
     </View>

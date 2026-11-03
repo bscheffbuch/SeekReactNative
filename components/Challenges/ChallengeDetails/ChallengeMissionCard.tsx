@@ -1,9 +1,8 @@
 // @ts-nocheck
 import React from "react";
-import { View, Image } from "react-native";
+import { View } from "react-native";
 
 import { viewStyles, textStyles, imageStyles } from "../../../styles/challenges/challengeMission";
-import icons from "../../../assets/icons";
 import i18n from "../../../i18n";
 import PercentCircle from "../../UIComponents/PercentCircle";
 import GreenText from "../../UIComponents/GreenText";
@@ -11,6 +10,9 @@ import missionsDict from "../../../utility/dictionaries/missionsDict";
 import { useFetchMissions } from "../hooks/challengeHooks";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import CompletedBadge from "../../UIComponents/CompletedBadge";
+import { CircleCheckIcon } from "../../UIComponents/AppIcons";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   challenge: {
@@ -20,6 +22,7 @@ interface Props {
 }
 
 const ChallengeMissionCard = ( { challenge }: Props ) => {
+  const { theme } = useTheme( );
   const missions = useFetchMissions( challenge );
 
   const { index, percentComplete } = challenge;
@@ -41,7 +44,7 @@ const ChallengeMissionCard = ( { challenge }: Props ) => {
 
     const list = subBullets.map( ( bullet, i ) => (
       <View key={i.toString()} style={viewStyles.missionRow}>
-        <Image source={icons.grayBullet} style={viewStyles.subBullets} />
+        <View style={[viewStyles.subBullets, { backgroundColor: theme.colors.outline }]} />
         <StyledText style={[baseTextStyles.bodySmall, textStyles.secondLevelBulletText]}>{bullet.split( "-" )}</StyledText>
       </View>
     ) );
@@ -55,8 +58,12 @@ const ChallengeMissionCard = ( { challenge }: Props ) => {
     return (
       <>
         {missionDetails[missionIndex] && missionDetails[missionIndex].number === item.observations
-          ? <Image source={icons.checklist} style={imageStyles.checklist} />
-          : <StyledText allowFontScaling={false} style={textStyles.bullets}>&#8226;</StyledText>}
+          ? (
+            <View style={imageStyles.checklist}>
+              <CircleCheckIcon color={theme.colors.primary} size={24} strokeWidth={2.2} />
+            </View>
+          )
+          : <StyledText allowFontScaling={false} style={[textStyles.bullets, { color: theme.colors.primary }]}>&#8226;</StyledText>}
         <View style={viewStyles.textContainer}>
           <StyledText style={[baseTextStyles.body, textStyles.text]}>{missionNoSubBullets || header}</StyledText>
           {header.length > 0 && <View style={viewStyles.marginTop} />}
@@ -72,7 +79,7 @@ const ChallengeMissionCard = ( { challenge }: Props ) => {
       {formatLongMissionText( item, i )}
       {i === 0 && (
         <View style={viewStyles.circleStyle}>
-          {percentComplete === 100 ? <Image source={icons.completed} /> : <PercentCircle challenge={challenge} />}
+          {percentComplete === 100 ? <CompletedBadge /> : <PercentCircle challenge={challenge} />}
         </View>
       )}
     </View>

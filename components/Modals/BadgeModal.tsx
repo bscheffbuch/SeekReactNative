@@ -13,11 +13,12 @@ import { viewStyles, textStyles, imageStyles } from "../../styles/modals/badgeMo
 import badgeImages from "../../assets/badges";
 import BannerHeader from "../UIComponents/BannerHeader";
 import LargeProgressCircle from "../UIComponents/LargeProgressCircle";
-import icons from "../../assets/icons";
 import GreenText from "../UIComponents/GreenText";
 import WhiteModal from "../UIComponents/Modals/WhiteModal";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { ChevronRightIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Badge {
   earned: boolean;
@@ -34,6 +35,7 @@ interface Props {
 }
 
 const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
+  const { theme } = useTheme( );
   const flatList = useRef<FlatList>( null );
   const [scrollIndex, setScrollIndex] = useState( 0 );
   const viewConfigRef = useRef( {
@@ -87,7 +89,7 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
       onPress={scrollLeft}
       style={viewStyles.leftArrow}
     >
-      <Image source={icons.badgeSwipeRight} />
+      <ChevronRightIcon color={theme.colors.onSurfaceVariant} size={28} strokeWidth={2.4} />
     </TouchableOpacity>
   );
 
@@ -98,7 +100,7 @@ const BadgeModal = ( { badges, iconicSpeciesCount, closeModal }: Props ) => {
       onPress={scrollRight}
       style={viewStyles.arrow}
     >
-      <Image source={icons.badgeSwipeRight} />
+      <ChevronRightIcon color={theme.colors.onSurfaceVariant} size={28} strokeWidth={2.4} />
     </TouchableOpacity>
   );
 

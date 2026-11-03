@@ -7,12 +7,12 @@ import LinearGradient from "react-native-linear-gradient";
 
 import i18n from "../../i18n";
 import { viewStyles, textStyles, imageStyles } from "../../styles/modals/levelModal";
-import { colors } from "../../styles/global";
 import badgeImages from "../../assets/badges";
 import GreenText from "../UIComponents/GreenText";
 import WhiteModal from "../UIComponents/Modals/WhiteModal";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   readonly level: {
@@ -29,7 +29,11 @@ const LevelModal = ( {
   speciesCount,
   closeModal,
   screen = null,
-}: Props ) => (
+}: Props ) => {
+  // Brand surface for white text: primary in light, primary container in dark (follows the accent)
+  const { theme } = useTheme( );
+  const brandSurface = theme.isDark ? theme.colors.primaryContainer : theme.colors.primary;
+  return (
   <WhiteModal closeModal={closeModal}>
     <View style={viewStyles.headerMargins}>
       <GreenText text={screen === "achievements"
@@ -38,7 +42,7 @@ const LevelModal = ( {
       />
     </View>
     <LinearGradient
-      colors={[colors.seekDeepGreen, colors.seekDeepGreen]}
+      colors={[brandSurface, brandSurface]}
       style={viewStyles.backgroundColor}
     >
       <Image
@@ -50,5 +54,6 @@ const LevelModal = ( {
     <StyledText style={[baseTextStyles.body, textStyles.text]}>{i18n.t( "banner.number_seen_plural", { count: speciesCount } )}</StyledText>
   </WhiteModal>
 );
+};
 
 export default LevelModal;

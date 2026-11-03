@@ -9,8 +9,15 @@ const viewStyles = StyleSheet.create( {
   margin: {
     marginTop: 19,
   },
-  marginRight: {
-    marginRight: 10,
+  gap: {
+    width: 8,
+  },
+  iconDisc: {
+    alignItems: "center",
+    borderRadius: 20,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
   },
   paragraph: {
     marginBottom: 16,
@@ -18,15 +25,16 @@ const viewStyles = StyleSheet.create( {
   row,
   textContainer: {
     backgroundColor: colors.seekCanvas,
-    marginHorizontal: 27,
-    marginTop: 30,
+    marginHorizontal: 16,
+    marginTop: 24,
   },
 } );
 
 const textStyles = StyleSheet.create( {
   headerText: {
     justifyContent: "center",
-    marginLeft: 21,
+    flexShrink: 1,
+    marginLeft: 16,
     paddingTop: Platform.OS === "ios" ? 6 : 0,
   },
   italicText: {
@@ -39,16 +47,7 @@ const textStyles = StyleSheet.create( {
   },
 } );
 
-const imageStyles = StyleSheet.create( {
-  icon: {
-    height: 32,
-    resizeMode: "contain",
-    width: 32,
-  },
-} );
-
 export {
   textStyles,
   viewStyles,
-  imageStyles,
 };

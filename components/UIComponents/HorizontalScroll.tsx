@@ -1,13 +1,13 @@
 // @ts-nocheck
 import React, { useRef, useState, useCallback } from "react";
-import { View, Image, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import type { FlashListRef, ViewToken } from "@shopify/flash-list";
 import { useRoute } from "@react-navigation/native";
 
 import styles from "../../styles/uiComponents/horizontalScroll";
 import i18n from "../../i18n";
-import icons from "../../assets/icons";
+import { ChevronRightIcon } from "./AppIcons";
 
 interface Props {
   photoList: JSX.Element[];
@@ -87,7 +87,9 @@ const HorizontalScroll = ( { photoList }: Props ) => {
             isYearInReviewScreen && styles.yearInReviewArrow,
           ]}
         >
-          <Image source={icons.swipeRight} style={styles.rotate} />
+          <View style={[styles.arrowDisc, styles.rotate]}>
+            <ChevronRightIcon color="#FFFFFF" size={24} strokeWidth={2.4} />
+          </View>
         </TouchableOpacity>
       )}
       {scrollIndex < length && (
@@ -102,7 +104,9 @@ const HorizontalScroll = ( { photoList }: Props ) => {
             isYearInReviewScreen && styles.yearInReviewArrow,
           ]}
         >
-          <Image source={icons.swipeRight} style={styles.rotateRTL} />
+          <View style={[styles.arrowDisc, styles.rotateRTL]}>
+            <ChevronRightIcon color="#FFFFFF" size={24} strokeWidth={2.4} />
+          </View>
         </TouchableOpacity>
       )}
     </View>

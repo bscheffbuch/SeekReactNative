@@ -1,71 +1,50 @@
-import { StyleSheet, Dimensions, I18nManager } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
-import { colors } from "../global";
-
-const { height, width } = Dimensions.get( "window" );
+const { height } = Dimensions.get( "window" );
 
 export default StyleSheet.create( {
-  buttonIcon: {
-    position: "absolute",
-    right: 27,
-    zIndex: 1,
-  },
-  editIcon: {
-    position: "absolute",
-    right: 23,
-    zIndex: 1,
-  },
   card: {
     alignItems: "center",
     flexDirection: "row",
     flexWrap: "nowrap",
     height: height / 6,
-    marginLeft: height < 570 ? 14 : 27,
-  },
-  container: {
-    backgroundColor: "#F3F1E8",
-    flex: 1,
+    marginHorizontal: 16,
   },
   divider: {
-    backgroundColor: "#E6E9E4",
-    height: 1,
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 72,
   },
-  extraMargin: {
-    marginHorizontal: 5,
-  },
-  inputField: {
-    marginHorizontal: height < 570 ? 14 : 27,
-    paddingBottom: 21,
-    paddingTop: 21,
-    textAlignVertical: "top",
-    width: width - 54,
-  },
-  rotate: {
-    tintColor: colors.seekDeepGreen,
-    transform: [{ rotate: I18nManager.isRTL ? "0deg" : "180deg" }],
-  },
-  row: {
-    alignItems: "flex-start",
+  // M3 icon button (tonal) on the species row
+  editIcon: {
+    alignItems: "center",
+    borderRadius: 20,
+    height: 40,
     justifyContent: "center",
-    marginLeft: 21,
-    width: 211,
+    position: "absolute",
+    right: 0,
+    width: 40,
+    zIndex: 1,
   },
-  text: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    fontSize: height < 570 ? 15 : 16,
-    lineHeight: height < 570 ? 18 : 21,
-    marginTop: height < 570 ? 2 : 7,
+  // the post fields as one M3 filled card with inset dividers
+  fieldsCard: {
+    borderCurve: "continuous",
+    borderRadius: 16,
+    marginHorizontal: 16,
+    overflow: "hidden",
+  },
+  // M3 filled text field
+  inputField: {
+    borderBottomWidth: 1,
+    borderTopLeftRadius: 4,
+    borderTopRightRadius: 4,
+    margin: 16,
+    minHeight: 88,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    textAlignVertical: "top",
   },
   textContainer: {
-    marginHorizontal: height < 570 ? 14 : 27,
-    marginTop: height < 570 ? 13 : 25,
-  },
-  thinCard: {
-    alignItems: "center",
-    flexDirection: "row",
-    flexWrap: "nowrap",
-    height: height / 9,
-    marginLeft: 27,
+    marginHorizontal: 16,
+    marginTop: 24,
   },
 } );

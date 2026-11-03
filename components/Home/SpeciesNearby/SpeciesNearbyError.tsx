@@ -3,14 +3,13 @@ import * as React from "react";
 import {
   View,
   TouchableOpacity,
-  Image,
   ImageBackground,
 } from "react-native";
 import { useNetInfo } from "@react-native-community/netinfo";
 
 import i18n from "../../../i18n";
 import { viewStyles, textStyles } from "../../../styles/home/error";
-import icons from "../../../assets/icons";
+import { AlertCircleIcon, WifiOffIcon } from "../../UIComponents/AppIcons";
 import backgrounds from "../../../assets/backgrounds";
 import GreenButton from "../../UIComponents/Buttons/GreenButton";
 import { colors } from "../../../styles/global";
@@ -67,7 +66,9 @@ const SpeciesNearbyError = ( {
         style={[viewStyles.background, viewStyles.center]}
       >
         <View style={viewStyles.row}>
-          <Image source={error === "internet_error" ? icons.internet : icons.error} />
+          {error === "internet_error"
+            ? <WifiOffIcon color={colors.white} size={28} strokeWidth={2} />
+            : <AlertCircleIcon color={colors.white} size={28} strokeWidth={2} />}
           <StyledText style={[baseTextStyles.bodyWhite, textStyles.text]}>
             {error === "downtime"
               ? i18n.t( "results.error_downtime_plural", { count: i18n.t( "results.error_few" ) } )

@@ -12,12 +12,17 @@ exports[`SeekYearInReviewChart should render correctly 1`] = `
 >
   <View
     style={
-      {
-        "borderBottomColor": "#297f87",
-        "borderBottomWidth": 2,
-        "flex": 1,
-        "marginBottom": 10,
-      }
+      [
+        {
+          "borderBottomColor": "#297f87",
+          "borderBottomWidth": 2,
+          "flex": 1,
+          "marginBottom": 10,
+        },
+        {
+          "borderBottomColor": "#BFC9C1",
+        },
+      ]
     }
   >
     <View
@@ -42,7 +47,7 @@ exports[`SeekYearInReviewChart should render correctly 1`] = `
         style={
           {
             "fontFamily": "Lato-Regular",
-            "fontSize": 18,
+            "fontSize": 14,
             "fontWeight": undefined,
             "opacity": 0,
           }

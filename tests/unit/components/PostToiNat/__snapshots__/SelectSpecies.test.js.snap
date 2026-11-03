@@ -193,12 +193,8 @@ exports[`SelectSpecies should render correctly 1`] = `
     style={
       [
         {
-          "alignItems": "center",
-          "backgroundColor": "#F3F1E8",
-          "flexDirection": "row",
-          "flexWrap": "nowrap",
-          "height": 63,
-          "justifyContent": "center",
+          "paddingHorizontal": 16,
+          "paddingVertical": 8,
         },
         {
           "backgroundColor": "#F5FBF4",
@@ -206,59 +202,122 @@ exports[`SelectSpecies should render correctly 1`] = `
       ]
     }
   >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/posting/icon-search-green.webp",
+    <View
+      style={
+        [
+          {
+            "alignItems": "center",
+            "borderRadius": 28,
+            "flexDirection": "row",
+            "height": 56,
+            "paddingHorizontal": 16,
+          },
+          {
+            "backgroundColor": "#E3EAE3",
+          },
+        ]
+      }
+    >
+      <RNSVGSvgView
+        align="xMidYMid"
+        bbHeight={22}
+        bbWidth={22}
+        fill="none"
+        focusable={false}
+        height={22}
+        meetOrSlice={0}
+        minX={0}
+        minY={0}
+        stroke="#404943"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2.2}
+        style={
+          [
+            {
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+            },
+            {
+              "flex": 0,
+              "height": 22,
+              "width": 22,
+            },
+          ]
         }
-      }
-      style={
-        [
-          {
-            "height": 20,
-            "resizeMode": "contain",
-            "tintColor": "#14794f",
-            "width": 20,
-          },
-          {
-            "tintColor": "#14794F",
-          },
-        ]
-      }
-      tintColor="#14794F"
-    />
-    <TextInput
-      defaultValue={null}
-      onChangeText={[Function]}
-      placeholder="Look up a species by name"
-      placeholderTextColor="#404943"
-      style={
-        [
-          {
-            "color": "#000000",
-            "fontFamily": "Lato-Regular",
-            "fontSize": 15,
-          },
-          {
-            "backgroundColor": "#FFFFFF",
-            "borderColor": "#E6E9E4",
-            "borderRadius": 14,
-            "borderWidth": 1,
-            "height": 37,
-            "marginLeft": 11,
-            "paddingBottom": 0,
-            "paddingLeft": 16,
-            "paddingTop": 0,
-            "width": 679,
-          },
-          {
-            "backgroundColor": "#EFF5EE",
-            "borderColor": "#DDE5DC",
-            "color": "#171D19",
-          },
-        ]
-      }
-    />
+        vbHeight={24}
+        vbWidth={24}
+        width={22}
+      >
+        <RNSVGGroup
+          fill={null}
+          propList={
+            [
+              "fill",
+              "stroke",
+              "strokeWidth",
+              "strokeLinecap",
+              "strokeLinejoin",
+            ]
+          }
+          stroke={
+            {
+              "payload": 4282403139,
+              "type": 0,
+            }
+          }
+          strokeLinecap={1}
+          strokeLinejoin={1}
+          strokeWidth={2.2}
+        >
+          <RNSVGPath
+            d="m21 21-4.34-4.34"
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+          />
+          <RNSVGCircle
+            cx="11"
+            cy="11"
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+            r="8"
+          />
+        </RNSVGGroup>
+      </RNSVGSvgView>
+      <TextInput
+        defaultValue={null}
+        onChangeText={[Function]}
+        placeholder="Look up a species by name"
+        placeholderTextColor="#404943"
+        style={
+          [
+            {
+              "color": "#000000",
+              "fontFamily": "Lato-Regular",
+              "fontSize": 15,
+            },
+            {
+              "flex": 1,
+              "height": 56,
+              "marginLeft": 12,
+              "paddingBottom": 0,
+              "paddingTop": 0,
+            },
+            {
+              "color": "#171D19",
+            },
+          ]
+        }
+      />
+    </View>
   </View>
   <View
     onScroll={[Function]}

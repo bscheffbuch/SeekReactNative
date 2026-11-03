@@ -328,12 +328,17 @@ exports[`NotificationsScreen should render correctly 1`] = `
         </View>
         <View
           style={
-            {
-              "backgroundColor": "#77b300",
-              "borderRadius": 5.5,
-              "height": 11,
-              "width": 11,
-            }
+            [
+              {
+                "backgroundColor": "#77b300",
+                "borderRadius": 5.5,
+                "height": 11,
+                "width": 11,
+              },
+              {
+                "backgroundColor": "#14794F",
+              },
+            ]
           }
         />
       </View>

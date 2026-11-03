@@ -253,8 +253,8 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         <BVLinearGradient
           colors={
             [
-              4280449101,
-              4281898861,
+              4279531855,
+              4279531855,
             ]
           }
           endPoint={
@@ -893,12 +893,17 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
         >
           <View
             style={
-              {
-                "borderBottomColor": "#297f87",
-                "borderBottomWidth": 2,
-                "flex": 1,
-                "marginBottom": 10,
-              }
+              [
+                {
+                  "borderBottomColor": "#297f87",
+                  "borderBottomWidth": 2,
+                  "flex": 1,
+                  "marginBottom": 10,
+                },
+                {
+                  "borderBottomColor": "#BFC9C1",
+                },
+              ]
             }
           >
             <View
@@ -923,7 +928,7 @@ exports[`SeekYearInReviewScreen should render correctly 1`] = `
                 style={
                   {
                     "fontFamily": "Lato-Regular",
-                    "fontSize": 18,
+                    "fontSize": 14,
                     "fontWeight": undefined,
                     "opacity": 0,
                   }

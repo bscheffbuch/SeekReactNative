@@ -18,8 +18,11 @@ import PostingHeader from "./PostingHeader";
 import ScrollWithHeader from "../UIComponents/Screens/ScrollWithHeader";
 import { saveObservationToRealm } from "../../utility/uploadHelpers";
 import { useObservation } from "../Providers/ObservationProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const PostScreen = ( ) => {
+  const { theme } = useTheme( );
+  const divider = [styles.divider, { backgroundColor: theme.colors.outlineVariant }];
   const { observation } = useObservation( );
   const navigation = useNavigation( );
   const { params } = useRoute( );
@@ -180,15 +183,15 @@ const PostScreen = ( ) => {
         updateTaxon={updateTaxon}
       />
       <Notes description={editedObservation.description} updateObservation={updateObservation} />
-      <View style={styles.divider} />
-      <DatePicker dateToDisplay={displayDate} handleDatePicked={handleDatePicked} />
-      <View style={styles.divider} />
-      <LocationPickerCard updateLocation={updateLocation} location={location} observation={editedObservation} />
-      <View style={styles.divider} />
-      <GeoprivacyPicker updateObservation={updateObservation} geoprivacy={editedObservation.geoprivacy} />
-      <View style={styles.divider} />
-      <CaptivePicker updateObservation={updateObservation} captive={editedObservation.captive_flag} />
-      <View style={styles.divider} />
+      <View style={[styles.fieldsCard, { backgroundColor: theme.colors.surfaceContainerLow }]}>
+        <DatePicker dateToDisplay={displayDate} handleDatePicked={handleDatePicked} />
+        <View style={divider} />
+        <LocationPickerCard updateLocation={updateLocation} location={location} observation={editedObservation} />
+        <View style={divider} />
+        <GeoprivacyPicker updateObservation={updateObservation} geoprivacy={editedObservation.geoprivacy} />
+        <View style={divider} />
+        <CaptivePicker updateObservation={updateObservation} captive={editedObservation.captive_flag} />
+      </View>
       <View style={styles.textContainer}>
         <GreenButton
           handlePress={saveObservation}

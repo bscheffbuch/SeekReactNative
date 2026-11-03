@@ -10,9 +10,10 @@ import {
 import { useRoute } from "@react-navigation/native";
 import Checkbox from "react-native-check-box";
 
-import { colors, dimensions } from "../../styles/global";
+import { dimensions } from "../../styles/global";
 import { viewStyles, textStyles, imageStyles } from "../../styles/social/social";
-import icons from "../../assets/icons";
+import { CropIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 import GreenText from "../UIComponents/GreenText";
 import BackArrow from "../UIComponents/Buttons/BackArrow";
 import i18n from "../../i18n";
@@ -26,6 +27,7 @@ import StyledText from "../UIComponents/StyledText";
 import { useObservation } from "../Providers/ObservationProvider";
 
 const SocialScreen = ( ) => {
+  const { theme } = useTheme( );
   const { observation } = useObservation();
   const { image } = observation;
   const { uri } = image;
@@ -183,18 +185,21 @@ const SocialScreen = ( ) => {
   const showCropButton = ( ) => {
     if ( watermarkedSquareImage ) {
       return (
-        <TouchableOpacity onPress={openModal} style={viewStyles.cropButton}>
-          <Image source={icons.cropIcon} />
+        <TouchableOpacity accessibilityLabel={i18n.t( "social.crop_image" )} accessibilityRole="button" onPress={openModal} style={viewStyles.cropButton}>
+          <View style={viewStyles.cropDisc}>
+            <CropIcon color="#FFFFFF" size={22} strokeWidth={2.2} />
+          </View>
         </TouchableOpacity>
       );
     } else {
       return (
         <TouchableOpacity
           onPress={openModal}
-          style={viewStyles.greenButton}
+          accessibilityRole="button"
+          style={[viewStyles.greenButton, { backgroundColor: theme.colors.primary }]}
         >
-          <Image source={icons.cropIconWhite} />
-          <StyledText style={textStyles.buttonText}>
+          <CropIcon color={theme.colors.onPrimary} size={20} strokeWidth={2.2} />
+          <StyledText style={[textStyles.buttonText, { color: theme.colors.onPrimary }]}>
             {i18n.t( "social.crop_image" )}
           </StyledText>
         </TouchableOpacity>
@@ -256,7 +261,7 @@ const SocialScreen = ( ) => {
 
   return (
     <ScrollNoHeader footer={false}>
-      <View style={viewStyles.whiteContainer}>
+      <View style={[viewStyles.whiteContainer, { backgroundColor: theme.colors.canvas }]}>
         <Modal
           onRequestClose={closeModal}
           visible={showModal}
@@ -269,7 +274,7 @@ const SocialScreen = ( ) => {
             closeModal={closeModal}
           />
         </Modal>
-        <View style={viewStyles.header}>
+        <View style={[viewStyles.header, { backgroundColor: theme.colors.canvas }]}>
           <BackArrow green />
           <View style={viewStyles.headerText}>
             <GreenText allowFontScaling={false} smaller text="social.share_observation" />
@@ -283,7 +288,7 @@ const SocialScreen = ( ) => {
             <StyledText style={textStyles.optionsText}>{i18n.t( "social.options" )}</StyledText>
             <View style={[viewStyles.row, viewStyles.checkboxRow]}>
               <Checkbox
-                checkBoxColor={colors.checkboxColor}
+                checkBoxColor={theme.colors.primary}
                 isChecked={showWatermark}
                 onClick={toggleWatermark}
                 style={viewStyles.checkbox}

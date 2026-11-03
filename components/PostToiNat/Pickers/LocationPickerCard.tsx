@@ -1,20 +1,15 @@
 import React, { useState, useCallback } from "react";
 import {
-  Image,
   TouchableOpacity,
-  View,
   Modal,
 } from "react-native";
 
-import styles from "../../../styles/posting/postToiNat";
 import i18n from "../../../i18n";
-import posting from "../../../assets/posting";
-import icons from "../../../assets/icons";
 import LocationPicker from "./LocationPicker";
 import { truncateCoordinates } from "../../../utility/locationHelpers";
-import StyledText from "../../UIComponents/StyledText";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { baseTextStyles } from "../../../styles/textStyles";
+import PostFieldRow from "../PostFieldRow";
+import { MapPinIcon } from "../../UIComponents/AppIcons";
 
 interface Props {
   location: string | null;
@@ -59,24 +54,12 @@ const LocationPickerCard = ( { location, updateLocation, observation }: Props ) 
           />
         </SafeAreaProvider>
       </Modal>
-      <TouchableOpacity accessibilityRole="button" onPress={openModal} style={styles.thinCard}>
-        <Image source={posting.location} style={styles.extraMargin} />
-        <View style={styles.row}>
-          <StyledText style={baseTextStyles.postSectionHeader}>
-            {i18n.t( "posting.location" )}
-          </StyledText>
-          <StyledText style={[baseTextStyles.body, styles.text]}>
-            {location || i18n.t( "location_picker.undefined" )}
-          </StyledText>
-          {coordinateString && (
-            <StyledText style={baseTextStyles.coords}>
-              {coordinateString}
-            </StyledText>
-          )}
-        </View>
-        <Image
-          source={icons.backButton}
-          style={[styles.buttonIcon, styles.rotate]}
+      <TouchableOpacity accessibilityRole="button" onPress={openModal}>
+        <PostFieldRow
+          icon={MapPinIcon}
+          label={i18n.t( "posting.location" )}
+          value={location || i18n.t( "location_picker.undefined" )}
+          detail={coordinateString}
         />
       </TouchableOpacity>
     </>

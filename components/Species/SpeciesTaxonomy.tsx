@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Image } from "react-native";
+import { View } from "react-native";
 
 import { capitalizeNames } from "../../utility/helpers";
 import { getTaxonCommonName } from "../../utility/commonNamesHelpers";
 import { viewStyles, textStyles } from "../../styles/species/speciesTaxonomy";
-import icons from "../../assets/icons";
 import SpeciesDetailCard from "../UIComponents/SpeciesDetailCard";
 import i18n from "../../i18n";
 import StyledText from "../UIComponents/StyledText";
@@ -94,7 +93,7 @@ const SpeciesTaxonomy = ( { ancestors, predictions, id }: Props ) => {
             key={`taxon-${ancestor.rank}`}
             style={[{ marginLeft }, viewStyles.row, index !== 0 && viewStyles.marginTop]}
           >
-            <Image source={icons.greenDot} style={viewStyles.bullet} />
+            <View style={[viewStyles.bullet, { backgroundColor: theme.colors.primary }]} />
             <View>
               <StyledText style={[
                 baseTextStyles.bodyBold,

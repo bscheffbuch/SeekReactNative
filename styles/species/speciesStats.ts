@@ -1,17 +1,16 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../global";
 
 const spaceBelowTags = 6;
 
 const viewStyles = StyleSheet.create( {
   tag: {
-    backgroundColor: colors.seekiNatGreen,
-    borderRadius: 6,
+    borderCurve: "continuous",
+    borderRadius: 8,
     flexDirection: "row",
     marginBottom: spaceBelowTags,
     marginRight: 10,
-    paddingBottom: 4,
-    paddingTop: 4,
+    paddingBottom: 6,
+    paddingTop: 6,
   },
   tagContainer: {
     flexDirection: "row",
@@ -28,7 +27,7 @@ const viewStyles = StyleSheet.create( {
 
 const textStyles = StyleSheet.create( {
   tagText: {
-    paddingHorizontal: 9,
+    paddingHorizontal: 12,
   },
 } );
 

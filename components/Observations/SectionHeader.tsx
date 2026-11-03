@@ -10,7 +10,8 @@ import i18n from "../../i18n";
 import { colors } from "../../styles/global";
 import styles from "../../styles/observations/sectionHeader";
 import badges from "../../assets/badges";
-import icons from "../../assets/icons";
+import { ChevronDownIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 import { iconicTaxaNamesById } from "../../utility/dictionaries/taxonomyDicts";
 import realmConfig from "../../models/index";
 import StyledText from "../UIComponents/StyledText";
@@ -24,6 +25,7 @@ interface Props {
 }
 
 const SectionHeader = ( { id, dataLength, open, toggleSection }: Props ) => {
+  const { theme } = useTheme( );
   const [badgeCount, setBadgeCount] = useState( 0 );
 
   const noBadge = badgeCount === 0;
@@ -63,10 +65,9 @@ const SectionHeader = ( { id, dataLength, open, toggleSection }: Props ) => {
             style={[styles.badge, noBadge && styles.empty, tint && { tintColor: tint }]}
           />
         )}
-        <Image
-          source={icons.dropdownOpen}
-          style={!open ? styles.margin : styles.marginOpen}
-        />
+        <View style={!open ? styles.margin : styles.marginOpen}>
+          <ChevronDownIcon color={theme.colors.onSurfaceVariant} size={22} strokeWidth={2.2} />
+        </View>
       </View>
     </TouchableOpacity>
   );

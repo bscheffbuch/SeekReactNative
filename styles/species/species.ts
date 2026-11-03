@@ -7,11 +7,9 @@ const bottomPadding = 100;
 const viewStyles = StyleSheet.create( {
   backButton: {
     left: 0,
-    paddingBottom: 18,
-    paddingHorizontal: 23,
-    paddingTop: 23,
+    padding: 8,
     position: "absolute",
-    zIndex: 1,
+    zIndex: 2,
   },
   background: {
     backgroundColor: "#F3F1E8",

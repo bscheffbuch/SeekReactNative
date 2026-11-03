@@ -6,11 +6,11 @@ import i18n from "../../i18n";
 import { viewStyles, textStyles } from "../../styles/match/speciesNearby";
 import SpeciesNearbyList from "../UIComponents/SpeciesNearby/SpeciesNearbyList";
 import LoadingWheel from "../UIComponents/LoadingWheel";
-import { colors } from "../../styles/global";
 import TapToLoad from "../UIComponents/SpeciesNearby/TapToLoad";
 import { fetchSpeciesNearby } from "../../utility/apiCalls";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   readonly ancestorId: number | null | undefined;
@@ -21,6 +21,8 @@ interface Props {
 }
 
 const SpeciesNearbyMatch = ( { ancestorId, image }: Props ) => {
+  const { theme } = useTheme( );
+  const container = [viewStyles.speciesNearbyContainer, viewStyles.center, { backgroundColor: theme.colors.surfaceContainerLow }];
   const [taxa, setTaxa] = useState( [] );
   const [loading, setLoading] = useState( false );
   const [loaded, setLoaded] = useState( false );
@@ -48,14 +50,14 @@ const SpeciesNearbyMatch = ( { ancestorId, image }: Props ) => {
   const renderSpecies = ( ) => {
     if ( loaded ) {
       return (
-        <View style={[viewStyles.speciesNearbyContainer, viewStyles.center]}>
+        <View style={container}>
           <SpeciesNearbyList taxa={taxa} />
         </View>
       );
     } else if ( loading ) {
       return (
-        <View style={[viewStyles.speciesNearbyContainer, viewStyles.center]}>
-          <LoadingWheel color={colors.white} />
+        <View style={container}>
+          <LoadingWheel color={theme.colors.primary} />
         </View>
       );
     }
@@ -64,7 +66,7 @@ const SpeciesNearbyMatch = ( { ancestorId, image }: Props ) => {
 
   return (
     <>
-      <StyledText style={[baseTextStyles.highlightTeal, textStyles.headerText]}>
+      <StyledText style={[baseTextStyles.highlightTeal, textStyles.headerText, { color: theme.colors.primary }]}>
         {i18n.t( "results.nearby" )}
       </StyledText>
       {renderSpecies( )}

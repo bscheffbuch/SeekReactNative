@@ -4,15 +4,18 @@ import { View, Platform } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 
 import { viewStyles } from "../../styles/iNaturalist/iNatStats";
-import { colors } from "../../styles/global";
 import BulletedList from "./BulletedList";
 import OpenINatButton from "../UIComponents/Buttons/OpenINatButton";
 import ProfileImageAndLogin from "./ProfileImageAndLogin";
 import { useUploadedObservationCount } from "../../utility/customHooks";
 import { UserContext } from "../UserContext";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const INatHeaderLoggedIn = ( ) => {
+  // Brand surface for white text: primary in light, primary container in dark (follows the accent)
+  const { theme } = useTheme( );
+  const brandSurface = theme.isDark ? theme.colors.primaryContainer : theme.colors.primary;
   const [triggerReload, setTriggerReload] = useState( false );
   const { userProfile, login } = useContext( UserContext );
   const { isTablet } = useAppOrientation( );
@@ -27,7 +30,7 @@ const INatHeaderLoggedIn = ( ) => {
   return (
     <>
       <LinearGradient
-        colors={[colors.seekDeepGreen, colors.seekDeepGreen]}
+        colors={[brandSurface, brandSurface]}
         style={viewStyles.linearGradient}
       >
         <ProfileImageAndLogin count={count} reload={reload} />

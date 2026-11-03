@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   View,
-  Image,
   TouchableOpacity,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
@@ -9,12 +8,13 @@ import LinearGradient from "react-native-linear-gradient";
 import i18n from "../../i18n";
 import { viewStyles, textStyles } from "../../styles/modals/deleteModal";
 import { colors } from "../../styles/global";
-import icons from "../../assets/icons";
 import SpeciesCard from "../UIComponents/SpeciesCard";
 import WhiteModal from "../UIComponents/Modals/WhiteModal";
 import Button from "../UIComponents/Buttons/Button";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { XIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   closeModal: ( ) => void;
@@ -33,6 +33,7 @@ const DeleteModal = ( {
   deleteObservation,
   itemToDelete,
 }: Props ) => {
+  const { theme } = useTheme( );
   const {
     id,
     photo,
@@ -49,11 +50,11 @@ const DeleteModal = ( {
   return (
     <WhiteModal noButton>
       <LinearGradient
-        colors={[colors.seekPrimaryContainer, colors.seekPrimaryContainer]}
+        colors={[theme.colors.primaryContainer, theme.colors.primaryContainer]}
         style={viewStyles.flagHeader}
       >
         <View style={[viewStyles.flagTextContainer, viewStyles.row]}>
-          <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText]}>
+          <StyledText allowFontScaling={false} style={[baseTextStyles.button, textStyles.buttonText, { color: theme.colors.onPrimaryContainer }]}>
             {i18n.t( "delete.header" )}
           </StyledText>
           <TouchableOpacity accessibilityRole="button"
@@ -61,7 +62,7 @@ const DeleteModal = ( {
             onPress={closeModal}
             style={viewStyles.flagBackButton}
           >
-            <Image source={icons.closeModal} />
+            <XIcon color={theme.colors.onPrimaryContainer} size={24} strokeWidth={2.2} />
           </TouchableOpacity>
         </View>
       </LinearGradient>

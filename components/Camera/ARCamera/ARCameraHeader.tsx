@@ -7,6 +7,7 @@ import { ranks } from "../../../utility/dictionaries/taxonomyDicts";
 import { getTaxonCommonName } from "../../../utility/commonNamesHelpers";
 import { useFetchUserSettings } from "../../../utility/customHooks/useFetchUserSettings";
 import StyledText from "../../UIComponents/StyledText";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Prediction {
   name: string;
@@ -24,6 +25,9 @@ interface Props {
 const RANK_LIST = ["kingdom", "phylum", "class", "order", "family", "genus", "species"];
 
 const ARCameraHeader = ( { prediction }: Props ) => {
+  // camera chrome is always dark: follow the dark camera theme's accent
+  const { cameraTheme } = useTheme( );
+  const accent = cameraTheme.colors.primary;
   const rankToRender = prediction?.rank;
   const [commonName, setCommonName] = useState<string | void | null>( null );
   const settings = useFetchUserSettings( );
@@ -106,7 +110,7 @@ const ARCameraHeader = ( { prediction }: Props ) => {
               <StyledText
                 maxFontSizeMultiplier={1.1}
                 numberOfLines={1}
-                style={textStyles.rankLabel}
+                style={[textStyles.rankLabel, { color: accent }]}
               >
                 {rankLabel}
               </StyledText>
@@ -124,6 +128,7 @@ const ARCameraHeader = ( { prediction }: Props ) => {
           style={[
             viewStyles.progressBubble,
             isSpecies && viewStyles.progressBubbleSpecies,
+            isSpecies && { borderColor: accent },
           ]}
         >
           <StyledText
@@ -132,6 +137,7 @@ const ARCameraHeader = ( { prediction }: Props ) => {
             style={[
               textStyles.progressText,
               isSpecies && textStyles.progressTextSpecies,
+              isSpecies && { color: accent },
             ]}
           >
             {progressLabel}

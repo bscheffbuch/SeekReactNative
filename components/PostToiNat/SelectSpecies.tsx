@@ -14,7 +14,6 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { viewStyles, textStyles, imageStyles } from "../../styles/posting/selectSpecies";
 import i18n from "../../i18n";
-import posting from "../../assets/posting";
 import SpeciesCard from "../UIComponents/SpeciesCard";
 import GreenText from "../UIComponents/GreenText";
 import Padding from "../UIComponents/Padding";
@@ -24,7 +23,7 @@ import { capitalizeNames } from "../../utility/helpers";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useTheme } from "../Providers/ThemeProvider";
-import { ChevronLeftIcon } from "../UIComponents/AppIcons";
+import { ChevronLeftIcon, SearchIcon } from "../UIComponents/AppIcons";
 
 interface Taxon {
   name: string;
@@ -172,22 +171,16 @@ const SelectSpecies = ( {
           {image && <Image source={{ uri: image }} style={imageStyles.image} />}
         </View>
         <View style={[viewStyles.row, { backgroundColor: theme.colors.canvas }]}>
-          <Image
-            source={posting.searchGreen}
-            tintColor={theme.colors.primary}
-            style={[imageStyles.search, { tintColor: theme.colors.primary }]}
-          />
-          <TextInput
-            onChangeText={handleTextChange}
-            placeholder={i18n.t( "posting.look_up" )}
-            placeholderTextColor={theme.colors.muted}
-            style={[baseTextStyles.inputField, textStyles.inputField, {
-              backgroundColor: theme.colors.surface,
-              borderColor: theme.colors.border,
-              color: theme.colors.text,
-            }]}
-            defaultValue={textInput}
-          />
+          <View style={[viewStyles.searchPill, { backgroundColor: theme.colors.surfaceContainerHigh }]}>
+            <SearchIcon color={theme.colors.onSurfaceVariant} size={22} strokeWidth={2.2} />
+            <TextInput
+              onChangeText={handleTextChange}
+              placeholder={i18n.t( "posting.look_up" )}
+              placeholderTextColor={theme.colors.onSurfaceVariant}
+              style={[baseTextStyles.inputField, textStyles.inputField, { color: theme.colors.text }]}
+              defaultValue={textInput}
+            />
+          </View>
         </View>
         <FlashList
           ref={sectionList}

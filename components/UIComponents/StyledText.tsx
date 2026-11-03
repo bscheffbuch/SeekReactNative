@@ -10,8 +10,6 @@ const StyledText = ( props: TextProps ) => {
   const { theme } = useTheme( );
   const flattenedStyle = StyleSheet.flatten( props.style );
   const color = flattenedStyle?.color;
-  // Legacy baseTextStyles bake light-theme ink/gray colors into most variants,
-  // so bare call sites would render near-black text on the dark canvas.
   // Legacy baseTextStyles bake fixed Seek colors into most variants. Map them onto
   // the Material 3 roles so every screen follows the theme (light and dark).
   const isInkColor = color === undefined

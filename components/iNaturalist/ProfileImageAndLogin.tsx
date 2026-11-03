@@ -8,6 +8,7 @@ import logos from "../../assets/logos";
 import i18n from "../../i18n";
 import { UserContext } from "../UserContext";
 import icons from "../../assets/icons";
+import { WifiOffIcon } from "../UIComponents/AppIcons";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 
@@ -38,7 +39,9 @@ const ProfileImageAndLogin = ( { count, reload }: Props ) => {
           <View
             style={[viewStyles.linearGradientTextContainer, viewStyles.row]}
           >
-            <Image source={icons.internet} style={viewStyles.errorImage} />
+            <View style={viewStyles.errorImage}>
+              <WifiOffIcon color="#FFFFFF" size={28} strokeWidth={2} />
+            </View>
             <StyledText
               style={[baseTextStyles.body, !isHomeScreen && textStyles.whiteText]}
             >

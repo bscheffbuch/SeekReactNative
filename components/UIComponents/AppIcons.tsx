@@ -91,6 +91,14 @@ const ChevronDownIcon = ( props: GlyphProps ) => (
   </StrokeIcon>
 );
 
+// lucide: arrow-left (M3 top app bar "back")
+const ArrowLeftIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Path d="m12 19-7-7 7-7" />
+    <Path d="M19 12H5" />
+  </StrokeIcon>
+);
+
 // lucide: chevron-left
 const ChevronLeftIcon = ( props: GlyphProps ) => (
   <StrokeIcon {...props}>
@@ -319,17 +327,96 @@ const XIcon = ( props: GlyphProps ) => (
   </StrokeIcon>
 );
 
+// lucide: calendar
+const CalendarIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Path d="M8 2v4" />
+    <Path d="M16 2v4" />
+    <Rect height="18" rx="2" width="18" x="3" y="4" />
+    <Path d="M3 10h18" />
+  </StrokeIcon>
+);
+
+// lucide: pencil
+const PencilIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+    <Path d="m15 5 4 4" />
+  </StrokeIcon>
+);
+
+// lucide: crop
+const CropIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Path d="M6 2v14a2 2 0 0 0 2 2h14" />
+    <Path d="M18 22V8a2 2 0 0 0-2-2H2" />
+  </StrokeIcon>
+);
+
+// lucide: lock
+const LockIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Rect height="11" rx="2" ry="2" width="18" x="3" y="11" />
+    <Path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </StrokeIcon>
+);
+
+// lucide: sprout
+const SproutIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Path d="M7 20h10" />
+    <Path d="M10 20c5.5-2.5.8-6.4 3-10" />
+    <Path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z" />
+    <Path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z" />
+  </StrokeIcon>
+);
+
+// lucide: wifi-off
+const WifiOffIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Path d="M12 20h.01" />
+    <Path d="M8.5 16.429a5 5 0 0 1 7 0" />
+    <Path d="M5 12.859a10 10 0 0 1 5.17-2.69" />
+    <Path d="M19 12.859a10 10 0 0 0-2.007-1.523" />
+    <Path d="M2 8.82a15 15 0 0 1 4.177-2.643" />
+    <Path d="M22 8.82a15 15 0 0 0-11.288-3.764" />
+    <Path d="m2 2 20 20" />
+  </StrokeIcon>
+);
+
+// lucide: circle-alert
+const AlertCircleIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Circle cx="12" cy="12" r="10" />
+    <Path d="M12 8v4" />
+    <Path d="M12 16h.01" />
+  </StrokeIcon>
+);
+
+// lucide: circle-check
+const CircleCheckIcon = ( props: GlyphProps ) => (
+  <StrokeIcon {...props}>
+    <Circle cx="12" cy="12" r="10" />
+    <Path d="m9 12 2 2 4-4" />
+  </StrokeIcon>
+);
+
 export {
+  AlertCircleIcon,
+  ArrowLeftIcon,
   AwardIcon,
   BellIcon,
   BinocularsIcon,
+  CalendarIcon,
   CameraIcon,
   CheckIcon,
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CircleCheckIcon,
   CircleHelpIcon,
   CloudUploadIcon,
+  CropIcon,
   EyeIcon,
   FlashIcon,
   FlagIcon,
@@ -339,16 +426,20 @@ export {
   ImageIcon,
   InfoIcon,
   LeafIcon,
+  LockIcon,
   MapPinIcon,
   MenuIcon,
   MountainIcon,
+  PencilIcon,
   PlusIcon,
   QueueIcon,
   RotateCameraIcon,
   SearchIcon,
   SettingsIcon,
   SlidersIcon,
+  SproutIcon,
   TrashIcon,
   TrophyIcon,
+  WifiOffIcon,
   XIcon,
 };

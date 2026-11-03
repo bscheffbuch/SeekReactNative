@@ -11,6 +11,7 @@ import i18n from "../../../i18n";
 import { viewStyles, textStyles } from "../../../styles/species/speciesStats";
 import StyledText from "../../UIComponents/StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 interface Props {
   readonly loading: boolean;
@@ -26,6 +27,7 @@ interface Props {
 }
 
 const SpeciesStats = ( { loading, stats, region, id, seenDate }: Props ) => {
+  const { theme } = useTheme( );
   const [tagsToShow, setTagsToShow] = useState<string[]>( [] );
 
   const showAlert = ( type: string ) => {
@@ -87,10 +89,10 @@ const SpeciesStats = ( { loading, stats, region, id, seenDate }: Props ) => {
         {tagsToShow.map( tag => (
           <TouchableOpacity accessibilityRole="button"
             onPress={() => showAlert( tag )}
-            style={viewStyles.tag}
+            style={[viewStyles.tag, { backgroundColor: theme.colors.secondaryContainer }]}
             key={tag}
           >
-            <StyledText style={[baseTextStyles.button, textStyles.tagText]}>{i18n.t( `species_detail.${tag}` )}</StyledText>
+            <StyledText style={[baseTextStyles.button, textStyles.tagText, { color: theme.colors.onSecondaryContainer }]}>{i18n.t( `species_detail.${tag}` )}</StyledText>
           </TouchableOpacity>
         ) )}
       </View>

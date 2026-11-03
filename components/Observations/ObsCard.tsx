@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useRef, useEffect, useCallback } from "react";
-import { Image, Pressable, ScrollView } from "react-native";
+import { Pressable, ScrollView } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -12,7 +12,8 @@ import { useNavigation } from "@react-navigation/native";
 
 import { setRoute, StoredRoutes } from "../../utility/helpers";
 import styles from "../../styles/observations/obsCard";
-import icons from "../../assets/icons";
+import { TrashIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 import SpeciesCard from "../UIComponents/SpeciesCard";
 import { useUserPhoto } from "../../utility/customHooks/useUserPhoto";
 import { useSpeciesDetail } from "../Providers/SpeciesDetailProvider";
@@ -51,6 +52,7 @@ const ObservationCard = ( {
   setHasAnimated,
 }: Props ) => {
   const { setId } = useSpeciesDetail( );
+  const { theme } = useTheme( );
   const scrollView = useRef<ScrollView>( null );
   const { navigate } = useNavigation( );
   const translateX = useSharedValue( 0 );
@@ -120,9 +122,9 @@ const ObservationCard = ( {
         />
         <Pressable accessibilityRole="button"
           onPress={handleDeletePress}
-          style={styles.deleteButton}
+          style={[styles.deleteButton, { backgroundColor: theme.colors.destructive }]}
         >
-          <Image source={icons.delete} />
+          <TrashIcon color={theme.isDark ? "#690005" : "#FFFFFF"} size={24} strokeWidth={2.2} />
         </Pressable>
       </Animated.View>
     </ScrollView>

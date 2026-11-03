@@ -20,6 +20,15 @@ const viewStyles = StyleSheet.create( {
     top: 1010,
     zIndex: 1,
   },
+  // scrim disc so the arrow reads on any photo
+  arrowDisc: {
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.32)",
+    borderRadius: 20,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
   rotate: {
     transform: [{ rotate: I18nManager.isRTL ? "0deg" : "180deg" }],
   },

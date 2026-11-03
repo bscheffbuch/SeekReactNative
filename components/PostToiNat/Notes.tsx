@@ -23,7 +23,11 @@ const Notes = ( { description, updateObservation }: Props ) => {
       onChangeText={text => updateObservation( "description", text )}
       placeholder={i18n.t( "posting.notes" )}
       placeholderTextColor={theme.colors.muted}
-      style={[baseTextStyles.inputField, styles.inputField, { color: theme.colors.text }]}
+      style={[baseTextStyles.inputField, styles.inputField, {
+        backgroundColor: theme.colors.surfaceContainerHighest,
+        borderBottomColor: theme.colors.onSurfaceVariant,
+        color: theme.colors.text,
+      }]}
     />
   );
 };

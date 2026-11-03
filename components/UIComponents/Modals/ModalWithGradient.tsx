@@ -8,12 +8,12 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 
 import i18n from "../../../i18n";
-import icons from "../../../assets/icons";
 import { viewStyles, textStyles } from "../../../styles/uiComponents/modals/modalWithGradient";
 import iconicTaxa from "../../../assets/iconicTaxa";
 import StyledText from "../StyledText";
 import { baseTextStyles } from "../../../styles/textStyles";
 import { useTheme } from "../../Providers/ThemeProvider";
+import { XIcon } from "../AppIcons";
 
 interface Props extends React.PropsWithChildren {
   readonly closeModal: () => void;
@@ -53,7 +53,7 @@ const ModalWithGradient = ( {
             onPress={closeModal}
             style={viewStyles.backButton}
           >
-            <Image source={icons.closeModal} />
+            <XIcon color={theme.colors.onPrimaryContainer} size={24} strokeWidth={2.2} />
           </TouchableOpacity>
         </View>
         <View style={[viewStyles.images, viewStyles.row]}>

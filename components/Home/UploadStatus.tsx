@@ -9,9 +9,8 @@ import Animated, {
 import { useNavigation } from "@react-navigation/native";
 
 import i18n from "../../i18n";
-import { viewStyles, textStyles, imageStyles } from "../../styles/home/uploadStatus";
+import { viewStyles, textStyles } from "../../styles/home/uploadStatus";
 import logos from "../../assets/logos";
-import icons from "../../assets/icons";
 import { uploadObservation, markCurrentUploadAsSeen, checkForUploads } from "../../utility/uploadHelpers";
 import { useInternetStatus } from "../../utility/customHooks";
 import GreenButton from "../UIComponents/Buttons/GreenButton";
@@ -20,7 +19,7 @@ import { resetRouter } from "../../utility/navigationHelpers";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
 import { useTheme } from "../Providers/ThemeProvider";
-import { XIcon } from "../UIComponents/AppIcons";
+import { CheckIcon, XIcon } from "../UIComponents/AppIcons";
 
 interface Props {
   successfulUploads: number;
@@ -144,10 +143,10 @@ const UploadStatus = ( {
         <View style={[viewStyles.row, viewStyles.center]}>
           <Image source={logos.iNatAppIcon} style={viewStyles.iNatIcon} />
           <View>
-            <StyledText style={baseTextStyles.headerWhite}>{i18n.t( "post_to_inat_card.post_to_inaturalist" )}</StyledText>
+            <StyledText style={[baseTextStyles.headerWhite, { color: theme.colors.text }]}>{i18n.t( "post_to_inat_card.post_to_inaturalist" )}</StyledText>
             <View style={viewStyles.row}>
-              {internet !== null && <StyledText style={[baseTextStyles.bodyWhite, textStyles.text]}>{setUploadText( )}</StyledText>}
-              {successfulUploads > 0 && <Image source={icons.checklist} style={imageStyles.checkmark} />}
+              {internet !== null && <StyledText style={[baseTextStyles.bodyWhite, textStyles.text, { color: theme.colors.onSurfaceVariant }]}>{setUploadText( )}</StyledText>}
+              {successfulUploads > 0 && <CheckIcon color={theme.colors.primary} size={16} strokeWidth={2.8} />}
             </View>
           </View>
         </View>
@@ -158,7 +157,7 @@ const UploadStatus = ( {
               handlePress={retryUploads}
               text="post_to_inat_card.upload_now"
             />
-            <StyledText style={[baseTextStyles.bodyWhite, textStyles.errorText]}>{setErrorText( )}</StyledText>
+            <StyledText style={[baseTextStyles.bodyWhite, textStyles.errorText, { color: theme.colors.onSurfaceVariant }]}>{setErrorText( )}</StyledText>
           </View>
         )}
         {( internet === true && !error ) && (

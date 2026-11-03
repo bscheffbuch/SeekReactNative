@@ -1,6 +1,5 @@
 import { StyleSheet } from "react-native";
 import {
-  colors,
   dimensions,
   row,
 } from "../global";
@@ -26,8 +25,6 @@ const imageStyles = StyleSheet.create( {
   image: {
     height: 24,
     marginRight: 15,
-    resizeMode: "contain",
-    tintColor: colors.seekiNatGreen,
     width: 27,
   },
 } );

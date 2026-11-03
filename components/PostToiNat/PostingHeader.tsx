@@ -1,14 +1,15 @@
 import React, { useCallback, useState } from "react";
 import {
-  Image,
   TouchableOpacity,
   Modal,
+  View,
 } from "react-native";
 
 import styles from "../../styles/posting/postToiNat";
-import posting from "../../assets/posting";
 import SelectSpecies from "./SelectSpecies";
 import SpeciesCard from "../UIComponents/SpeciesCard";
+import { PencilIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Taxon {
   name: string;
@@ -32,6 +33,7 @@ const PostingHeader = ( {
   image,
   updateTaxon,
 }: Props ) => {
+  const { theme } = useTheme( );
   const [showModal, setShowModal] = useState( false );
 
   const openModal = ( ) => setShowModal( true );
@@ -59,10 +61,9 @@ const PostingHeader = ( {
           handlePress={openModal}
           photo={{ uri: image.uri }}
         />
-        <Image
-          source={posting.edit}
-          style={styles.editIcon}
-        />
+        <View style={[styles.editIcon, { backgroundColor: theme.colors.secondaryContainer }]}>
+          <PencilIcon color={theme.colors.onSecondaryContainer} size={20} strokeWidth={2} />
+        </View>
       </TouchableOpacity>
     </>
   );

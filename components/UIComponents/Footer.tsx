@@ -20,25 +20,20 @@ const Footer = () => {
   const route = useRoute();
   const [notifications, setNotifications] = useState( false );
   const { theme } = useTheme();
+  // Material 3 bottom app bar: tonal surface, no shadow, camera as an in-bar FAB.
   const styles = StyleSheet.create( {
     safeArea: {
-      backgroundColor: theme.colors.surface,
+      backgroundColor: theme.colors.surfaceContainer,
     },
     container: {
-      backgroundColor: theme.colors.surface,
-      borderTopColor: theme.colors.border,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      shadowColor: theme.colors.shadow,
-      shadowOffset: { width: 0, height: -6 },
-      shadowOpacity: theme.isDark ? 0.22 : 0.08,
-      shadowRadius: 14,
+      backgroundColor: theme.colors.surfaceContainer,
     },
     navbar: {
       alignItems: "center",
       flexDirection: "row",
-      height: 70,
+      height: 80,
       justifyContent: "space-between",
-      paddingHorizontal: theme.spacing.lg,
+      paddingHorizontal: theme.spacing.md,
     },
     iconButton: {
       alignItems: "center",
@@ -48,30 +43,21 @@ const Footer = () => {
     },
     cameraButton: {
       alignItems: "center",
-      backgroundColor: theme.colors.primary,
-      borderColor: theme.colors.surface,
-      borderRadius: 27,
-      borderWidth: 2,
-      height: 54,
+      backgroundColor: theme.colors.primaryContainer,
+      borderCurve: "continuous",
+      borderRadius: 16,
+      height: 56,
       justifyContent: "center",
-      marginTop: -theme.spacing.lg,
-      shadowColor: theme.colors.primary,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.26,
-      shadowRadius: 16,
-      width: 54,
-      elevation: 5,
+      width: 56,
     },
     notificationDot: {
-      backgroundColor: theme.colors.accent,
-      borderColor: theme.colors.surface,
-      borderRadius: 5,
-      borderWidth: 2,
-      height: 10,
+      backgroundColor: theme.colors.destructive,
+      borderRadius: 3,
+      height: 6,
       position: "absolute",
-      right: 10,
-      top: 9,
-      width: 10,
+      right: 12,
+      top: 12,
+      width: 6,
     },
   } );
 
@@ -119,7 +105,7 @@ const Footer = () => {
             onPress={navToDrawer}
             style={styles.iconButton}
           >
-            <MenuIcon color={theme.colors.text} size={25} strokeWidth={2.2} />
+            <MenuIcon color={theme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
           </TouchableOpacity>
           <TouchableOpacity
             testID="openCameraButton"
@@ -128,7 +114,7 @@ const Footer = () => {
             onPress={() => navigation.navigate( "Camera" )}
             style={styles.cameraButton}
           >
-            <CameraIcon color={theme.colors.inverseText} size={27} strokeWidth={2.25} />
+            <CameraIcon color={theme.colors.onPrimaryContainer} size={24} strokeWidth={2} />
           </TouchableOpacity>
           {challenge ? (
             <TouchableOpacity
@@ -137,7 +123,7 @@ const Footer = () => {
               onPress={() => navigation.navigate( "iNatStats" )}
               style={styles.iconButton}
             >
-              <TrophyIcon color={theme.colors.text} size={25} strokeWidth={2.2} />
+              <TrophyIcon color={theme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -146,7 +132,7 @@ const Footer = () => {
               onPress={() => navigation.navigate( "Notifications" )}
               style={styles.iconButton}
             >
-              <BellIcon color={notifications ? theme.colors.primary : theme.colors.text} size={25} strokeWidth={2.2} />
+              <BellIcon color={theme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
               {notifications ? <View style={styles.notificationDot} /> : null}
             </TouchableOpacity>
           )}

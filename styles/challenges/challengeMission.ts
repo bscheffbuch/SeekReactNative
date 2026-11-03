@@ -2,8 +2,11 @@ import { StyleSheet } from "react-native";
 
 const viewStyles = StyleSheet.create( {
   subBullets: {
-    marginTop: 15,
+    borderRadius: 3,
+    height: 6,
     marginRight: 10,
+    marginTop: 9,
+    width: 6,
   },
   circleStyle: {
     height: 59,
@@ -50,8 +53,8 @@ const textStyles = StyleSheet.create( {
 
 const imageStyles = StyleSheet.create( {
   checklist: {
-    marginTop: 20,
     marginRight: 16,
+    marginTop: 12,
   },
 } );
 

@@ -37,12 +37,16 @@ const viewStyles = StyleSheet.create( {
     height: 155,
   },
   row: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  // M3 search bar
+  searchPill: {
     alignItems: "center",
-    backgroundColor: "#F3F1E8",
+    borderRadius: 28,
     flexDirection: "row",
-    flexWrap: "nowrap",
-    height: 63,
-    justifyContent: "center",
+    height: 56,
+    paddingHorizontal: 16,
   },
   suggestionsTopMargin: {
     marginTop: 23,
@@ -56,16 +60,11 @@ const textStyles = StyleSheet.create( {
     position: "absolute",
   },
   inputField: {
-    backgroundColor: colors.seekSurface,
-    borderColor: colors.seekBorder,
-    borderRadius: 14,
-    borderWidth: 1,
-    height: 37,
-    marginLeft: 11,
+    flex: 1,
+    height: 56,
+    marginLeft: 12,
     paddingBottom: 0,
-    paddingLeft: 16,
     paddingTop: 0,
-    width: dimensions.width - 19 - 52,
   },
 } );
 
@@ -74,12 +73,6 @@ const imageStyles = StyleSheet.create( {
     height: 155,
     resizeMode: "contain",
     width: dimensions.width,
-  },
-  search: {
-    height: 20,
-    resizeMode: "contain",
-    tintColor: colors.seekDeepGreen,
-    width: 20,
   },
 } );
 

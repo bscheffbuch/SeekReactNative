@@ -61,22 +61,91 @@ exports[`HorizontalScroll should render correctly 1`] = `
     }
     testID="right-arrow"
   >
-    <Image
-      source={
-        {
-          "testUri": "../../../assets/icons/img-swipearrow-right.webp",
-        }
-      }
+    <View
       style={
-        {
-          "transform": [
-            {
-              "rotate": "0deg",
-            },
-          ],
-        }
+        [
+          {
+            "alignItems": "center",
+            "backgroundColor": "rgba(0, 0, 0, 0.32)",
+            "borderRadius": 20,
+            "height": 40,
+            "justifyContent": "center",
+            "width": 40,
+          },
+          {
+            "transform": [
+              {
+                "rotate": "0deg",
+              },
+            ],
+          },
+        ]
       }
-    />
+    >
+      <RNSVGSvgView
+        align="xMidYMid"
+        bbHeight={24}
+        bbWidth={24}
+        fill="none"
+        focusable={false}
+        height={24}
+        meetOrSlice={0}
+        minX={0}
+        minY={0}
+        stroke="#FFFFFF"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2.4}
+        style={
+          [
+            {
+              "backgroundColor": "transparent",
+              "borderWidth": 0,
+            },
+            {
+              "flex": 0,
+              "height": 24,
+              "width": 24,
+            },
+          ]
+        }
+        vbHeight={24}
+        vbWidth={24}
+        width={24}
+      >
+        <RNSVGGroup
+          fill={null}
+          propList={
+            [
+              "fill",
+              "stroke",
+              "strokeWidth",
+              "strokeLinecap",
+              "strokeLinejoin",
+            ]
+          }
+          stroke={
+            {
+              "payload": 4294967295,
+              "type": 0,
+            }
+          }
+          strokeLinecap={1}
+          strokeLinejoin={1}
+          strokeWidth={2.4}
+        >
+          <RNSVGPath
+            d="m9 18 6-6-6-6"
+            fill={
+              {
+                "payload": 4278190080,
+                "type": 0,
+              }
+            }
+          />
+        </RNSVGGroup>
+      </RNSVGSvgView>
+    </View>
   </View>
 </View>
 `;

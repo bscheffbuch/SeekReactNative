@@ -9,7 +9,6 @@ import {
   textStyles,
   imageStyles,
 } from "../../styles/seekYearInReview/seekYearInReview";
-import { colors } from "../../styles/global";
 import { UserContext } from "../UserContext";
 import ScrollWithHeader from "../UIComponents/Screens/ScrollWithHeader";
 import {
@@ -40,6 +39,7 @@ import Modal from "../UIComponents/Modals/Modal";
 import LevelModal from "../Modals/LevelModal";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const SubstringStyledText = ( { text, greenText }: { text: any; greenText: any } ) => {
   // Split the text into an array using whitespace
@@ -64,6 +64,9 @@ const SubstringStyledText = ( { text, greenText }: { text: any; greenText: any }
 };
 
 const SeekYearInReviewScreen = () => {
+  // Brand surface for white text: primary in light, primary container in dark (follows the accent)
+  const { theme } = useTheme( );
+  const brandSurface = theme.isDark ? theme.colors.primaryContainer : theme.colors.primary;
   // The year to show stats for
   const now = new Date();
   let year = now.getFullYear();
@@ -119,7 +122,7 @@ const SeekYearInReviewScreen = () => {
           />
 
           <LinearGradient
-            colors={[colors.greenGradientDark, colors.greenGradientLight]}
+            colors={[brandSurface, brandSurface]}
             style={[viewStyles.header, viewStyles.center, viewStyles.row]}
           >
             <View style={viewStyles.levelTextContainer}>

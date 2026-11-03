@@ -8,6 +8,7 @@ import GreenButton from "../UIComponents/Buttons/GreenButton";
 import GreenText from "../UIComponents/GreenText";
 import CustomBackArrow from "../UIComponents/Buttons/CustomBackArrow";
 import { viewStyles } from "../../styles/social/social";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const CropScreen = ( {
   saveCrop,
@@ -15,31 +16,34 @@ const CropScreen = ( {
   cropViewRef,
   handleImageCrop,
   closeModal,
-} ) => (
-  <SafeAreaView style={viewStyles.cropScreenContainer} edges={["top"]}>
-    <View style={viewStyles.header}>
-      <CustomBackArrow handlePress={closeModal} style={viewStyles.backButton} green />
-      <View style={viewStyles.headerText}>
-        <GreenText allowFontScaling={false} smaller text="social.adjust_square_crop" />
+} ) => {
+  const { theme } = useTheme( );
+  return (
+    <SafeAreaView style={[viewStyles.cropScreenContainer, { backgroundColor: theme.colors.canvas }]} edges={["top"]}>
+      <View style={[viewStyles.header, { backgroundColor: theme.colors.canvas }]}>
+        <CustomBackArrow handlePress={closeModal} style={viewStyles.backButton} green />
+        <View style={viewStyles.headerText}>
+          <GreenText allowFontScaling={false} smaller text="social.adjust_square_crop" />
+        </View>
+        <View />
       </View>
-      <View />
-    </View>
-    {/* <CropView
-      sourceUrl={uri}
-      style={viewStyles.cropView}
-      ref={cropViewRef}
-      onImageCrop={handleImageCrop}
-      keepAspectRatio
-      aspectRatio={aspectRatio}
-    /> */}
-    <View style={viewStyles.cropFooter}>
-      <GreenButton
-        width={dimensions.width}
-        handlePress={saveCrop}
-        text="social.crop_image"
-      />
-    </View>
-  </SafeAreaView>
-);
+      {/* <CropView
+        sourceUrl={uri}
+        style={viewStyles.cropView}
+        ref={cropViewRef}
+        onImageCrop={handleImageCrop}
+        keepAspectRatio
+        aspectRatio={aspectRatio}
+      /> */}
+      <View style={viewStyles.cropFooter}>
+        <GreenButton
+          width={dimensions.width}
+          handlePress={saveCrop}
+          text="social.crop_image"
+        />
+      </View>
+    </SafeAreaView>
+  );
+};
 
 export default CropScreen;

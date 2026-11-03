@@ -10,7 +10,6 @@ const viewStyles = StyleSheet.create( {
   },
   deleteButton: {
     alignItems: "center",
-    backgroundColor: "#B33A3A",
     borderRadius: 18,
     height: 54,
     justifyContent: "center",

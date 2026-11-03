@@ -1,14 +1,11 @@
 // @ts-nocheck
 import * as React from "react";
-import { Image, View } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 
 import i18n from "../../../i18n";
-import styles from "../../../styles/posting/postToiNat";
-import posting from "../../../assets/posting";
-import icons from "../../../assets/icons";
-import StyledText from "../../UIComponents/StyledText";
-import { baseTextStyles } from "../../../styles/textStyles";
+import PostFieldRow from "../PostFieldRow";
+import { SproutIcon } from "../../UIComponents/AppIcons";
+import { useTheme } from "../../Providers/ThemeProvider";
 
 type Captive = "captive_flag";
 interface Props {
@@ -17,6 +14,7 @@ interface Props {
 }
 
 const CaptivePicker = ( { updateObservation, captive }: Props ) => {
+  const { theme } = useTheme( );
   const captiveTypes = [{
     label: i18n.t( "posting.no" ),
     value: false,
@@ -35,24 +33,14 @@ const CaptivePicker = ( { updateObservation, captive }: Props ) => {
       placeholder={{}}
       useNativeAndroidPickerStyle={false}
       pickerProps={{
-        themeVariant: "light",
+        themeVariant: theme.isDark ? "dark" : "light",
       }}
     >
-      <View style={styles.thinCard}>
-        <Image source={posting.captive} />
-        <View style={styles.row}>
-          <StyledText style={baseTextStyles.postSectionHeader}>
-            {i18n.t( "posting.captive" )}
-          </StyledText>
-          <StyledText style={[baseTextStyles.body, styles.text]}>
-            {captive ? i18n.t( "posting.yes" ) : i18n.t( "posting.no" )}
-          </StyledText>
-        </View>
-        <Image
-          source={icons.backButton}
-          style={[styles.buttonIcon, styles.rotate]}
-        />
-      </View>
+      <PostFieldRow
+        icon={SproutIcon}
+        label={i18n.t( "posting.captive" )}
+        value={captive ? i18n.t( "posting.yes" ) : i18n.t( "posting.no" )}
+      />
     </RNPickerSelect>
   );
 };

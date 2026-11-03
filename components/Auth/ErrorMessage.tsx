@@ -1,11 +1,9 @@
 import * as React from "react";
-import {
-  View,
-  Image,
-} from "react-native";
+import { View } from "react-native";
 import { useNetInfo } from "@react-native-community/netinfo";
 
-import icons from "../../assets/icons";
+import { AlertCircleIcon } from "../UIComponents/AppIcons";
+import { useTheme } from "../Providers/ThemeProvider";
 import i18n from "../../i18n";
 import { viewStyles, imageStyles } from "../../styles/auth/error";
 import StyledText from "../UIComponents/StyledText";
@@ -16,6 +14,7 @@ interface Props {
 }
 
 const ErrorMessage = ( { error }: Props ) => {
+  const { theme } = useTheme( );
   const netInfo = useNetInfo( );
   const { isConnected } = netInfo;
 
@@ -52,7 +51,9 @@ const ErrorMessage = ( { error }: Props ) => {
       error === "credentials" && viewStyles.smallerMargin,
     ]}
     >
-      <Image source={icons.error} style={imageStyles.image} />
+      <View style={imageStyles.image}>
+        <AlertCircleIcon color={theme.colors.destructive} size={24} strokeWidth={2.2} />
+      </View>
       <View style={viewStyles.textContainer}>
         <StyledText allowFontScaling={false} style={baseTextStyles.loginError} testID="loginError">
           {message}

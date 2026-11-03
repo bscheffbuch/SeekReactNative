@@ -1,8 +1,9 @@
 import * as React from "react";
-import { View, Image } from "react-native";
+import { View } from "react-native";
 
 import { viewStyles } from "../../../styles/species/species";
-import icons from "../../../assets/icons";
+import { CircleCheckIcon } from "../../UIComponents/AppIcons";
+import { useTheme } from "../../Providers/ThemeProvider";
 import i18n from "../../../i18n";
 import StyledText from "../../UIComponents/StyledText";
 import { useAppOrientation } from "../../Providers/AppOrientationProvider";
@@ -15,9 +16,12 @@ interface Props {
 
 const SeenDate = ( { loading, seenDate }: Props ) => {
   const { isLandscape } = useAppOrientation( );
+  const { theme } = useTheme( );
   return !loading ? (
     <View style={[viewStyles.row, viewStyles.textContainer, isLandscape && viewStyles.largerTextContainer]}>
-      <Image source={icons.checklist} style={viewStyles.checkmark} />
+      <View style={viewStyles.checkmark}>
+        <CircleCheckIcon color={theme.colors.primary} size={20} strokeWidth={2.2} />
+      </View>
       <StyledText style={baseTextStyles.body}>{i18n.t( "species_detail.seen_on", { date: seenDate } )}</StyledText>
     </View>
   ) : null;

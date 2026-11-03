@@ -73,7 +73,7 @@ const NotificationCard = ( { item }: Props ) => {
           {i18n.t( item.message )}
         </StyledText>
       </View>
-      {!item.seen && <View style={viewStyles.greenDot} />}
+      {!item.seen && <View style={[viewStyles.greenDot, { backgroundColor: theme.colors.primary }]} />}
     </TouchableOpacity>
   );
 };

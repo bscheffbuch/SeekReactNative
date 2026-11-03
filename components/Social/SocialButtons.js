@@ -9,9 +9,11 @@ import i18n from "../../i18n";
 import { shareToFacebook, saveToCameraRoll } from "../../utility/socialHelpers";
 import { UserContext } from "../UserContext";
 import StyledText from "../UIComponents/StyledText";
+import { useTheme } from "../Providers/ThemeProvider";
 
 const SocialButtons = ( { image, tab, disabled } ) => {
   const { login } = useContext( UserContext );
+  const { theme } = useTheme( );
 
   const [saved, setSaved] = useState( false );
   const navigation = useNavigation( );
@@ -66,8 +68,8 @@ const SocialButtons = ( { image, tab, disabled } ) => {
         disabled={disabled}
         color={disabled && colors.seekTransparent}
       />
-      <TouchableOpacity onPress={navigateBack}>
-        <StyledText style={textStyles.linkText}>{i18n.t( "social.back_to_id" )}</StyledText>
+      <TouchableOpacity accessibilityRole="button" onPress={navigateBack}>
+        <StyledText style={[textStyles.linkText, { color: theme.colors.primary }]}>{i18n.t( "social.back_to_id" )}</StyledText>
       </TouchableOpacity>
     </View>
   );

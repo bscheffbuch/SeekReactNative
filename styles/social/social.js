@@ -7,10 +7,7 @@ const { getFontScale } = PixelRatio;
 const viewStyles = StyleSheet.create( {
   center,
   header: {
-    backgroundColor: colors.seekCanvas,
-    borderBottomColor: colors.seekBorder,
-    borderBottomWidth: 1,
-    height: 55,
+    height: 56,
   },
   spaceBeforeButtons: {
     marginTop: 23,
@@ -23,16 +20,18 @@ const viewStyles = StyleSheet.create( {
     justifyContent: "space-around",
   },
   roundedIndicator: {
-    backgroundColor: colors.seekDeepGreen,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-    height: 4,
+    borderTopLeftRadius: 3,
+    borderTopRightRadius: 3,
+    height: 3,
     width: 138,
   },
   hiddenIndicator: {
-    backgroundColor: colors.seekCanvas,
-    height: 4,
+    height: 3,
     width: 138,
+  },
+  tabDivider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    marginTop: 8,
   },
   row,
   checkboxRow: {
@@ -53,9 +52,16 @@ const viewStyles = StyleSheet.create( {
     flex: 1,
   },
   cropButton: {
-    paddingVertical: 11,
-    paddingHorizontal: 10,
     alignItems: "flex-end",
+    padding: 12,
+  },
+  cropDisc: {
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.32)",
+    borderRadius: 20,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
   },
   cropView: {
     height: dimensions.height - 55 - 91 - 46,
@@ -79,9 +85,8 @@ const viewStyles = StyleSheet.create( {
   },
   greenButton: {
     alignSelf: "center",
-    backgroundColor: colors.seekDeepGreen,
-    borderRadius: 14,
-    height: getFontScale() > 1 ? 79 : 46,
+    borderRadius: 24,
+    height: getFontScale() > 1 ? 79 : 48,
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "row",
@@ -89,7 +94,7 @@ const viewStyles = StyleSheet.create( {
     width: dimensions.width < 500 ? 293 : 317,
   },
   whiteContainer: {
-    backgroundColor: colors.seekCanvas,
+    flex: 1,
   },
   headerText: {
     alignSelf: "center",
@@ -110,11 +115,9 @@ const textStyles = StyleSheet.create( {
   },
   linkText: {
     alignSelf: "center",
-    color: colors.linkText,
-    fontFamily: fonts.book,
-    fontSize: 18,
-    textDecorationLine: "underline",
-    paddingVertical: 27,
+    fontFamily: fonts.semibold,
+    fontSize: 16,
+    paddingVertical: 24,
   },
   optionsText: {
     // modalBanner
@@ -130,10 +133,9 @@ const textStyles = StyleSheet.create( {
     fontSize: 16,
   },
   buttonText: {
-    color: colors.white,
     fontFamily: fonts.semibold,
-    fontSize: 18,
-    letterSpacing: 1.0,
+    fontSize: 16,
+    letterSpacing: 0,
     paddingTop: padding.iOSButtonPadding,
     textAlign: "center",
     marginLeft: 10,

@@ -1,17 +1,16 @@
 import { StyleSheet } from "react-native";
-import { colors } from "../global";
 
 const viewStyles = StyleSheet.create( {
   greenButton: {
-    backgroundColor: colors.seekiNatGreen,
-    borderRadius: 6,
+    borderCurve: "continuous",
+    borderRadius: 8,
     paddingVertical: 6,
   },
 } );
 
 const textStyles = StyleSheet.create( {
   greenButtonText: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
 } );
 

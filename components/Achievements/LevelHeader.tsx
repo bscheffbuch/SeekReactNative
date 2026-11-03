@@ -11,11 +11,11 @@ import LevelModal from "../Modals/LevelModal";
 import i18n from "../../i18n";
 import badgeImages from "../../assets/badges";
 import { textStyles, viewStyles, imageStyles } from "../../styles/badges/achievements";
-import { colors } from "../../styles/global";
 import Modal from "../UIComponents/Modals/Modal";
 import { localizeNumber } from "../../utility/helpers";
 import StyledText from "../UIComponents/StyledText";
 import { baseTextStyles } from "../../styles/textStyles";
+import { useTheme } from "../Providers/ThemeProvider";
 
 interface Props {
   level: {
@@ -28,6 +28,9 @@ interface Props {
 }
 
 const LevelHeader = ( { level, nextLevelCount, speciesCount }: Props ) => {
+  // Brand surface for white text: primary in light, primary container in dark (follows the accent)
+  const { theme } = useTheme( );
+  const brandSurface = theme.isDark ? theme.colors.primaryContainer : theme.colors.primary;
   const [showModal, setModal] = useState( false );
 
   const openModal = useCallback( ( ) => setModal( true ), [] );
@@ -50,7 +53,7 @@ const LevelHeader = ( { level, nextLevelCount, speciesCount }: Props ) => {
         modal={renderModalContent}
       />
       <LinearGradient
-        colors={[colors.seekDeepGreen, colors.seekDeepGreen]}
+        colors={[brandSurface, brandSurface]}
         style={[viewStyles.header, viewStyles.center, viewStyles.row]}
       >
         {level && (

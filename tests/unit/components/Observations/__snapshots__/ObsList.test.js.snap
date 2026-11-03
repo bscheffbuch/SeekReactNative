@@ -258,18 +258,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <RCTScrollView
@@ -531,25 +590,121 @@ exports[`ObsList should render correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#B33A3A",
-              "borderRadius": 18,
-              "height": 54,
-              "justifyContent": "center",
-              "marginLeft": 12,
-              "marginTop": 16,
-              "width": 54,
-            }
+            [
+              {
+                "alignItems": "center",
+                "borderRadius": 18,
+                "height": 54,
+                "justifyContent": "center",
+                "marginLeft": 12,
+                "marginTop": 16,
+                "width": 54,
+              },
+              {
+                "backgroundColor": "#BA1A1A",
+              },
+            ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/button-deleteobservation.webp",
-              }
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={24}
+            bbWidth={24}
+            fill="none"
+            focusable={false}
+            height={24}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            stroke="#FFFFFF"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2.2}
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {
+                  "flex": 0,
+                  "height": 24,
+                  "width": 24,
+                },
+              ]
             }
-          />
+            vbHeight={24}
+            vbWidth={24}
+            width={24}
+          >
+            <RNSVGGroup
+              fill={null}
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4294967295,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeWidth={2.2}
+            >
+              <RNSVGPath
+                d="M10 11v6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M14 11v6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M3 6h18"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
         </View>
       </View>
     </View>
@@ -813,25 +968,121 @@ exports[`ObsList should render correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#B33A3A",
-              "borderRadius": 18,
-              "height": 54,
-              "justifyContent": "center",
-              "marginLeft": 12,
-              "marginTop": 16,
-              "width": 54,
-            }
+            [
+              {
+                "alignItems": "center",
+                "borderRadius": 18,
+                "height": 54,
+                "justifyContent": "center",
+                "marginLeft": 12,
+                "marginTop": 16,
+                "width": 54,
+              },
+              {
+                "backgroundColor": "#BA1A1A",
+              },
+            ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/button-deleteobservation.webp",
-              }
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={24}
+            bbWidth={24}
+            fill="none"
+            focusable={false}
+            height={24}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            stroke="#FFFFFF"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2.2}
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {
+                  "flex": 0,
+                  "height": 24,
+                  "width": 24,
+                },
+              ]
             }
-          />
+            vbHeight={24}
+            vbWidth={24}
+            width={24}
+          >
+            <RNSVGGroup
+              fill={null}
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4294967295,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeWidth={2.2}
+            >
+              <RNSVGPath
+                d="M10 11v6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M14 11v6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M3 6h18"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
         </View>
       </View>
     </View>
@@ -1095,25 +1346,121 @@ exports[`ObsList should render correctly 1`] = `
           onResponderTerminationRequest={[Function]}
           onStartShouldSetResponder={[Function]}
           style={
-            {
-              "alignItems": "center",
-              "backgroundColor": "#B33A3A",
-              "borderRadius": 18,
-              "height": 54,
-              "justifyContent": "center",
-              "marginLeft": 12,
-              "marginTop": 16,
-              "width": 54,
-            }
+            [
+              {
+                "alignItems": "center",
+                "borderRadius": 18,
+                "height": 54,
+                "justifyContent": "center",
+                "marginLeft": 12,
+                "marginTop": 16,
+                "width": 54,
+              },
+              {
+                "backgroundColor": "#BA1A1A",
+              },
+            ]
           }
         >
-          <Image
-            source={
-              {
-                "testUri": "../../../assets/icons/button-deleteobservation.webp",
-              }
+          <RNSVGSvgView
+            align="xMidYMid"
+            bbHeight={24}
+            bbWidth={24}
+            fill="none"
+            focusable={false}
+            height={24}
+            meetOrSlice={0}
+            minX={0}
+            minY={0}
+            stroke="#FFFFFF"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2.2}
+            style={
+              [
+                {
+                  "backgroundColor": "transparent",
+                  "borderWidth": 0,
+                },
+                {
+                  "flex": 0,
+                  "height": 24,
+                  "width": 24,
+                },
+              ]
             }
-          />
+            vbHeight={24}
+            vbWidth={24}
+            width={24}
+          >
+            <RNSVGGroup
+              fill={null}
+              propList={
+                [
+                  "fill",
+                  "stroke",
+                  "strokeWidth",
+                  "strokeLinecap",
+                  "strokeLinejoin",
+                ]
+              }
+              stroke={
+                {
+                  "payload": 4294967295,
+                  "type": 0,
+                }
+              }
+              strokeLinecap={1}
+              strokeLinejoin={1}
+              strokeWidth={2.2}
+            >
+              <RNSVGPath
+                d="M10 11v6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M14 11v6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M3 6h18"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+              <RNSVGPath
+                d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                fill={
+                  {
+                    "payload": 4278190080,
+                    "type": 0,
+                  }
+                }
+              />
+            </RNSVGGroup>
+          </RNSVGSvgView>
         </View>
       </View>
     </View>
@@ -1253,18 +1600,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -1418,18 +1824,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -1583,18 +2048,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -1748,18 +2272,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -1913,18 +2496,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -2078,18 +2720,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -2243,18 +2944,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -2408,18 +3168,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -2573,18 +3392,77 @@ exports[`ObsList should render correctly 1`] = `
           ]
         }
       />
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text
@@ -2717,18 +3595,77 @@ exports[`ObsList should render correctly 1`] = `
       >
         0
       </Text>
-      <Image
-        source={
-          {
-            "testUri": "../../../assets/icons/icon-dropdown-open.webp",
-          }
-        }
+      <View
         style={
           {
             "marginLeft": 15,
           }
         }
-      />
+      >
+        <RNSVGSvgView
+          align="xMidYMid"
+          bbHeight={22}
+          bbWidth={22}
+          fill="none"
+          focusable={false}
+          height={22}
+          meetOrSlice={0}
+          minX={0}
+          minY={0}
+          stroke="#404943"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2.2}
+          style={
+            [
+              {
+                "backgroundColor": "transparent",
+                "borderWidth": 0,
+              },
+              {
+                "flex": 0,
+                "height": 22,
+                "width": 22,
+              },
+            ]
+          }
+          vbHeight={24}
+          vbWidth={24}
+          width={22}
+        >
+          <RNSVGGroup
+            fill={null}
+            propList={
+              [
+                "fill",
+                "stroke",
+                "strokeWidth",
+                "strokeLinecap",
+                "strokeLinejoin",
+              ]
+            }
+            stroke={
+              {
+                "payload": 4282403139,
+                "type": 0,
+              }
+            }
+            strokeLinecap={1}
+            strokeLinejoin={1}
+            strokeWidth={2.2}
+          >
+            <RNSVGPath
+              d="m6 9 6 6 6-6"
+              fill={
+                {
+                  "payload": 4278190080,
+                  "type": 0,
+                }
+              }
+            />
+          </RNSVGGroup>
+        </RNSVGSvgView>
+      </View>
     </View>
   </View>
   <Text

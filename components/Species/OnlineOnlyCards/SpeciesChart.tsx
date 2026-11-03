@@ -5,12 +5,12 @@ import type { NumberProp } from "react-native-svg";
 import { Circle } from "react-native-svg";
 import { XAxis, LineChart } from "react-native-svg-charts";
 
-import { colors } from "../../../styles/global";
 import styles from "../../../styles/species/speciesChart";
 import SpeciesDetailCard from "../../UIComponents/SpeciesDetailCard";
 import { createShortMonthsList } from "../../../utility/dateHelpers";
 import { fetchHistogram } from "../../../utility/speciesDetailHelpers";
 import { useFetchUserSettings } from "../../../utility/customHooks/useFetchUserSettings";
+import { useTheme } from "../../Providers/ThemeProvider";
 import { baseTextStyles } from "../../../styles/textStyles";
 
 interface Props {
@@ -28,17 +28,18 @@ interface Datum {
 
 interface DecoratorProps {
   readonly data: Datum[];
+  readonly color: string;
   // These are propped in by LineChart, don't know how to satisfy TS here
   x: ( _: number ) => NumberProp;
   y: ( _: number ) => NumberProp;
 }
 
-const Decorator = ( { data, x, y }: DecoratorProps ) => data.map( ( value ) => (
+const Decorator = ( { data, color, x, y }: DecoratorProps ) => data.map( ( value ) => (
   <Circle
     key={`circle-${value.month}`}
     cx={x( value.month )}
     cy={y( value.count )}
-    fill={colors.seekiNatGreen}
+    fill={color}
     r={4}
   />
 ) );
@@ -79,9 +80,12 @@ const SpeciesChart = ( { id, region }: Props ) => {
 
   const xAccessor = ( { item }: { item: Datum } ) => item.month;
   const yAccessor = ( { item }: { item: Datum } ) => item.count;
-  const lineChartSvg = { stroke: colors.seekDeepGreen };
+  const { theme } = useTheme( );
+  const lineChartSvg = { stroke: theme.colors.primary, strokeWidth: 2 };
+  const chartBaseline = { borderBottomColor: theme.colors.outlineVariant };
 
   const xAxis = useMemo( ( ) => {
+    const axisLabel = { ...baseTextStyles.chartAxis, fill: theme.colors.onSurfaceVariant, fontSize: 14 };
     const allMonths = createShortMonthsList();
     const formatXAxis = ( index: number ) => allMonths[index];
     const formatLabel = ( value: number ) => formatXAxis( value - 1 );
@@ -90,23 +94,23 @@ const SpeciesChart = ( { id, region }: Props ) => {
         contentInset={styles.xAxisWidth}
         data={data}
         formatLabel={formatLabel}
-        svg={baseTextStyles.chartAxis}
+        svg={axisLabel}
         xAccessor={xAccessor}
       />
     );
-  }, [data] );
+  }, [data, theme] );
   return (
     <SpeciesDetailCard text="species_detail.monthly_obs" hide={data.length === 0}>
       <View style={styles.chartContainer}>
         <LineChart
           contentInset={styles.chartInset}
           data={data}
-          style={styles.chart}
+          style={[styles.chart, chartBaseline]}
           svg={lineChartSvg}
           xAccessor={xAccessor}
           yAccessor={yAccessor}
         >
-          <Decorator data={data} />
+          <Decorator data={data} color={theme.colors.primary} />
         </LineChart>
         {xAxis}
       </View>

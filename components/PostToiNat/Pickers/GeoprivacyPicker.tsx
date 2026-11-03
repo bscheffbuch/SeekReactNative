@@ -1,16 +1,8 @@
 import * as React from "react";
-import {
-  Image,
-  View,
-} from "react-native";
-
 import i18n from "../../../i18n";
-import styles from "../../../styles/posting/postToiNat";
-import posting from "../../../assets/posting";
-import icons from "../../../assets/icons";
 import Picker from "../../UIComponents/Picker";
-import StyledText from "../../UIComponents/StyledText";
-import { baseTextStyles } from "../../../styles/textStyles";
+import PostFieldRow from "../PostFieldRow";
+import { LockIcon } from "../../UIComponents/AppIcons";
 
 type Geoprivacy = "geoprivacy";
 interface Props {
@@ -37,21 +29,11 @@ const GeoprivacyPicker = ( { updateObservation, geoprivacy }: Props ) => {
   const geoprivacyText = geoprivacyTypes.filter( type => type.value === geoprivacy )[0].label;
 
   const renderGeoprivacyPicker = React.useMemo( ( ) => (
-    <View style={styles.thinCard}>
-        <Image source={posting.geoprivacy} />
-        <View style={styles.row}>
-          <StyledText style={baseTextStyles.postSectionHeader}>
-            {i18n.t( "posting.geoprivacy" )}
-          </StyledText>
-          <StyledText style={[baseTextStyles.body, styles.text]}>
-            {geoprivacyText}
-          </StyledText>
-        </View>
-        <Image
-          source={icons.backButton}
-          style={[styles.buttonIcon, styles.rotate]}
-        />
-      </View>
+    <PostFieldRow
+      icon={LockIcon}
+      label={i18n.t( "posting.geoprivacy" )}
+      value={geoprivacyText}
+    />
   ), [geoprivacyText] );
 
   return (

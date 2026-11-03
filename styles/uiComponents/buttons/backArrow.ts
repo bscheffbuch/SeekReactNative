@@ -1,29 +1,32 @@
-import { StyleSheet, I18nManager } from "react-native";
-import { colors } from "../../global";
+import { StyleSheet } from "react-native";
 
 const viewStyles = StyleSheet.create( {
   backButton: {
     left: 0,
-    paddingVertical: 18,
-    paddingHorizontal: 23,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
     position: "absolute",
-    transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
+    zIndex: 2,
   },
   challengeDetails: {
-    paddingTop: 28,
+    paddingTop: 16,
   },
-  rotateRTL: {
-    transform: [{ scaleX: I18nManager.isRTL ? -1 : 1 }],
+  // 48dp M3 icon button
+  iconDisc: {
+    alignItems: "center",
+    borderRadius: 24,
+    height: 48,
+    justifyContent: "center",
+    width: 48,
   },
-} );
-
-const imageStyles = StyleSheet.create( {
-  green: {
-    tintColor: colors.seekDeepGreen,
+  iconDiscScrim: {
+    backgroundColor: "rgba(0, 0, 0, 0.32)",
+  },
+  flip: {
+    transform: [{ scaleX: -1 }],
   },
 } );
 
 export {
-  imageStyles,
   viewStyles,
 };
