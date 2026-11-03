@@ -11,6 +11,13 @@ import { resetRouter } from "../../utility/navigationHelpers";
 import SpeciesName from "./SpeciesName";
 import IconicTaxaName from "./IconicTaxaName";
 
+// stored routes that are bottom-tab screens -> tab name
+const TAB_FOR_ROUTE: Partial<Record<StoredRoutes, string>> = {
+  [StoredRoutes.Home]: "Home",
+  [StoredRoutes.Observations]: "Observations",
+  [StoredRoutes.SideMenu]: "More",
+};
+
 interface Props {
   readonly loading: boolean;
   readonly photos: {
@@ -35,15 +42,16 @@ const SpeciesHeader = ( { loading, photos, taxon, id, selectedText, highlightSel
   const backAction = useCallback( async ( ) => {
     const routeName = await getRoute( );
     if ( routeName ) {
-      // ChallengeDetails, Observations, Home, or Match, or SeekYearInReview
-      if ( routeName === StoredRoutes.SideMenu
-        || routeName === StoredRoutes.Home
-        || routeName === StoredRoutes.Match
-        || routeName === StoredRoutes.Observations
+      const tab = TAB_FOR_ROUTE[routeName];
+      if ( tab ) {
+        // tab screens live inside MainTabs; React Navigation 7 does not find nested
+        // screens by name, so navigate( "Home" ) from this stack screen was a no-op
+        navigation.popTo( "MainTabs", { screen: tab } );
+      } else if ( routeName === StoredRoutes.Match
         || routeName === StoredRoutes.SeekYearInReview
         || routeName === StoredRoutes.ChallengeDetails
       ) {
-        navigation.navigate( routeName === StoredRoutes.SideMenu ? "More" : routeName );
+        navigation.navigate( routeName );
       } else {
         navigation.popTo( routeName );
       }
