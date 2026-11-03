@@ -406,6 +406,19 @@
   "gallery": {
     "import_photos_from": "Fotos importieren von"
   },
+  "photo_id": {
+    "header": "Fotos bestimmen",
+    "same_species": "Gleiche Art",
+    "separately": "Jedes Foto",
+    "same_species_hint": "Alle Fotos zeigen dasselbe Lebewesen. Seek kombiniert sie zu einer Bestimmung.",
+    "separately_hint": "Seek bestimmt jedes Foto für sich. Tippe auf ein Foto, um sein Ergebnis zu öffnen.",
+    "identifying": "Bestimme Foto {{done}} von {{count}}…",
+    "agreement": "{{agree}} von {{count}} Fotos stimmen überein",
+    "no_id": "Keine sichere Bestimmung",
+    "failed": "Nicht bestimmbar",
+    "view_match": "Ergebnis ansehen",
+    "skipped": "Nur die ersten {{max}} Fotos werden verwendet."
+  },
   "camera_help": {
     "title": "Seek-Kamera",
     "header": "Dein Ziel",

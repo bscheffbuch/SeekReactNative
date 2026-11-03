@@ -7,6 +7,8 @@ import type { CompositeScreenProps, NavigatorScreenParams } from "@react-navigat
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { StackScreenProps } from "@react-navigation/stack";
 
+import type { PickedPhoto } from "../../utility/photoIdentification";
+
 // Note from the documentation:
 // The type containing the mapping must be a type alias. It cannot be an interface.
 export type BottomTabParamList = {
@@ -41,9 +43,11 @@ export type RootStackParamList = {
   Onboarding: undefined;
   MainTabs: NavigatorScreenParams<BottomTabParamList>;
   Camera: { origin?: "camera" | "queue" } | undefined;
-  Match: { origin?: "camera" | "queue" } | undefined;
+  Match: { origin?: "camera" | "queue" | "photos" } | undefined;
   // photo -> pick / adjust the subject -> Match (see components/Camera/Reframe)
   Reframe: { image: object; photoPath: string };
+  // several gallery photos: identify each, or combine them as one organism
+  PhotoIdentify: { photos: PickedPhoto[]; skipped: number };
   Species: undefined;
   ChallengeDetails: undefined;
   QueuedObservations: undefined;

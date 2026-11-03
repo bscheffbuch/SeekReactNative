@@ -45,6 +45,7 @@ import LicensePhotosScreen from "../Auth/Signup/LicensePhotosScreen";
 import SignUpScreen from "../Auth/Signup/SignUpScreen";
 import Social from "../Social/SocialScreen";
 import Reframe from "../Camera/Reframe/ReframeScreen";
+import PhotoIdentify from "../Camera/PhotoIdentify/PhotoIdentifyScreen";
 import useAppLog from "./hooks/useAppLog";
 import type { RootStackParamList } from "./types";
 
@@ -96,6 +97,7 @@ const App = ( ) => {
           <Stack.Screen name="Camera" component={ARCamera} options={verticalConfig} />
           <Stack.Screen name="MainTabs" component={BottomTabs} options={tabConfig} />
           <Stack.Screen name="Reframe" component={Reframe} options={defaultConfig} />
+          <Stack.Screen name="PhotoIdentify" component={PhotoIdentify} options={defaultConfig} />
           <Stack.Screen name="Match" component={Match} options={defaultConfig} />
           <Stack.Screen name="Species" component={Species} options={defaultConfig} />
           <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} options={defaultConfig} />

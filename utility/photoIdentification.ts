@@ -1,0 +1,97 @@
+// Identifying photos picked from the gallery: reading their date and place, running the
+// classifier on them and turning the result into the observation the Match screen shows.
+import { Platform } from "react-native";
+import { getUnixTime } from "date-fns";
+
+import InatVision from "../components/Camera/ARCamera/helpers/visionPluginWrapper";
+import type { ObservationImage } from "../components/Providers/ObservationProvider";
+import { getActiveModelPack } from "./modelPacks";
+import readExifFromMultiplePhotos from "./parseExif";
+import { checkForPhotoMetaData } from "./photoHelpers";
+
+export interface PickedPhoto {
+  uri: string;
+  // unix seconds
+  time: number;
+  latitude?: number;
+  longitude?: number;
+}
+
+interface PickerAsset {
+  uri?: string;
+  timestamp?: string | number;
+}
+
+// The old Android picker ignores the selection limit, so callers cut the selection to this.
+export const MAX_PHOTOS = 10;
+
+// Below this the plugin drops a taxon from a photo's branch. The single-photo flow keeps
+// its default of 70; combining photos needs the weaker ancestors and species too.
+export const ALL_BRANCH_SCORES = 0.01;
+
+const readPickedPhoto = async ( asset: PickerAsset ): Promise<PickedPhoto | null> => {
+  const { uri, timestamp } = asset;
+  if ( !uri ) {
+    return null;
+  }
+  const exif = await readExifFromMultiplePhotos( [uri] );
+  const { latitude, longitude, observed_on_string: observedOn } = exif;
+  const exifTime = observedOn
+    ? getUnixTime( new Date( observedOn ) )
+    : Math.floor( Date.now( ) / 1000 );
+  const time = typeof timestamp === "string"
+    ? getUnixTime( new Date( timestamp ) )
+    : timestamp || exifTime;
+  return { uri, time, latitude, longitude };
+};
+
+const hasLocation = ( photo: PickedPhoto ) => photo.latitude != null && photo.longitude != null;
+
+const identifyPhoto = async (
+  photo: PickedPhoto,
+  confidenceThreshold?: number
+): Promise<InatVision.Prediction[]> => {
+  const pack = await getActiveModelPack( );
+  const uri = Platform.OS === "android" ? photo.uri.replace( /^file:\/\//, "" ) : photo.uri;
+  const useGeomodel = hasLocation( photo ) && pack.geomodelPath != null;
+  const { predictions } = await InatVision.getPredictionsForImage( {
+    version: pack.version,
+    uri,
+    modelPath: pack.modelPath,
+    taxonomyPath: pack.taxonomyPath,
+    confidenceThreshold,
+    useGeomodel,
+    geomodelPath: pack.geomodelPath ?? undefined,
+    location: useGeomodel
+      ? { latitude: photo.latitude as number, longitude: photo.longitude as number }
+      : undefined,
+  } );
+  return predictions;
+};
+
+// Precise coordinates are filled for logged-in users only (they can post the observation).
+const buildObservationImage = (
+  photo: PickedPhoto,
+  predictions: ObservationImage["predictions"],
+  login: boolean
+): ObservationImage => {
+  const located = checkForPhotoMetaData( hasLocation( photo )
+    ? { latitude: photo.latitude as number, longitude: photo.longitude as number }
+    : null );
+  const latitude = located ? photo.latitude ?? null : null;
+  const longitude = located ? photo.longitude ?? null : null;
+  const image: ObservationImage = {
+    time: photo.time,
+    uri: photo.uri,
+    predictions,
+    errorCode: 0,
+    latitude,
+    longitude,
+    preciseCoords: login
+      ? { latitude, longitude, accuracy: null }
+      : { latitude: null, longitude: null, accuracy: null },
+  };
+  return image;
+};
+
+export { readPickedPhoto, identifyPhoto, buildObservationImage };

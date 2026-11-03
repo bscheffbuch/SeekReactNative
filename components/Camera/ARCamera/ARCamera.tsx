@@ -976,6 +976,9 @@ const ARCamera = ( ) => {
 
     const unsubscribe = navigation.addListener( "focus", ( ) => {
       setObservation( null );
+      // a photo or the gallery paused the camera; coming back (Retake on Reframe,
+      // back from photo identification) resumes it
+      setIsActive( true );
       // reset when camera loads, not when leaving page, for quicker transition
       resetState( );
       checkForFirstCameraLaunch( );

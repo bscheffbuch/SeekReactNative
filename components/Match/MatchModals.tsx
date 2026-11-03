@@ -171,6 +171,9 @@ const MatchModals = ( {
         routes: [{ name: "MainTabs", params: { screen: "Home" } }],
       } );
       navigation.navigate( "Camera" );
+    } else if ( navPath === "Photos" ) {
+      setNavigationPath( null );
+      navigation.goBack( );
     } else if ( navPath === "Social" ) {
       setNavigationPath( null );
       navigation.navigate( "Social", { taxon, commonName } );

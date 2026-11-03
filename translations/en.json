@@ -480,6 +480,19 @@
   "gallery": {
     "import_photos_from": "Import Photos From"
   },
+  "photo_id": {
+    "header": "Identify photos",
+    "same_species": "Same species",
+    "separately": "Each photo",
+    "same_species_hint": "All photos show one organism. Seek combines them into one identification.",
+    "separately_hint": "Seek identifies each photo on its own. Tap a photo to open its match.",
+    "identifying": "Identifying photo {{done}} of {{count}}…",
+    "agreement": "{{agree}} of {{count}} photos agree",
+    "no_id": "No confident identification",
+    "failed": "Couldn't identify",
+    "view_match": "View match",
+    "skipped": "Only the first {{max}} photos are used."
+  },
   "camera_help": {
     "title": "Seek's Camera",
     "header": "Your goal",

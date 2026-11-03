@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useReducer, useCallback, useRef } from "react";
 import { BackHandler, ScrollView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -23,6 +23,9 @@ const MatchScreen = ( ) => {
   const { theme } = useTheme( );
   const scrollView = useRef<any>( null );
   const navigation = useNavigation( );
+  const route = useRoute( );
+  // opened from the photo identification screen: back returns there, not to the camera
+  const backPath = route.params?.origin === "photos" ? "Photos" : "Camera";
   const settings = useFetchUserSettings( );
   const scientificNames = settings?.scientificNames;
   const taxon = observation && observation.taxon;
@@ -67,14 +70,14 @@ const MatchScreen = ( ) => {
   useFocusEffect(
     useCallback( () => {
       const onBackPress = () => {
-        setNavigationPath( "Camera" );
+        setNavigationPath( backPath );
         return true;
       };
 
       const backHandler = BackHandler.addEventListener( "hardwareBackPress", onBackPress );
 
       return () => backHandler.remove();
-    }, [setNavigationPath] )
+    }, [setNavigationPath, backPath] )
   );
 
   const speciesIdentified = screenType === "resighted" || screenType === "newSpecies";
@@ -96,6 +99,7 @@ const MatchScreen = ( ) => {
       />
       <ScrollView ref={scrollView} contentContainerStyle={[styles.whiteContainer, { backgroundColor: theme.colors.canvas }]}>
         <MatchHeader
+          backPath={backPath}
           observation={observation}
           screenType={screenType}
           setNavigationPath={setNavigationPath}

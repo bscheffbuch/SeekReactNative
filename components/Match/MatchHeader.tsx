@@ -12,11 +12,14 @@ interface Props {
   observation: Observation;
   screenType: string;
   setNavigationPath: ( path: string ) => void;
+  // where the back button leads: the camera, or the photo identification screen
+  backPath?: "Camera" | "Photos";
 }
 
 // M3: small top app bar, then the user's photo and the reference photo side by
 // side as large rounded images with label chips.
 const MatchHeader = ( {
+  backPath = "Camera",
   observation,
   screenType,
   setNavigationPath,
@@ -87,7 +90,7 @@ const MatchHeader = ( {
         <Pressable
           accessibilityLabel={i18n.t( "accessibility.back", { defaultValue: "Back" } )}
           accessibilityRole="button"
-          onPress={( ) => setNavigationPath( "Camera" )}
+          onPress={( ) => setNavigationPath( backPath )}
           style={styles.back}
           testID="matchBack"
         >
