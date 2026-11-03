@@ -41,6 +41,17 @@ Useful options:
 
 Expect roughly 400 MB with int8 weights for 100k species.
 
+## Benchmark
+
+`bench/` holds the 1,000-photo random test set (`observations_random.json`, public iNat
+observations from July-October 2026) and the harness used for the numbers in HANDOFF.md:
+
+```sh
+python bench/fetch_photos.py                       # ~17 min at 1 photo/second
+python bench/eval_tflite.py --pack packs/bioclip2-100k model_fp32.tflite model.tflite
+python bench/ram_probe.py packs/bioclip2-100k/model.tflite
+```
+
 ## Install on a phone (debug build)
 
 ```sh
