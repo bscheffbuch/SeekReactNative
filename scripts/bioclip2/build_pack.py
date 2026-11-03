@@ -211,8 +211,10 @@ def build_model( species, taxa, args ):
         from ai_edge_quantizer import quantizer, recipe
         print( f"quantizing weights ({args.precision})", flush=True )
         qt = quantizer.Quantizer( fp32_path )
+        # int8-dynamic: XNNPACK multiplies with the int8 weights directly (RAM ~ file size);
+        # int8-weights stores DEQUANTIZE ops, which XNNPACK unpacks to fp32 at load (~8x the file)
         qt.load_quantization_recipe(
-            recipe.weight_only_wi8_afp32( )
+            recipe.dynamic_wi8_afp32( ) if args.precision == "int8-dynamic" else recipe.weight_only_wi8_afp32( )
         )
         qt.quantize( ).export_model( out_path, overwrite=True )
         if not args.keep_fp32:
@@ -229,8 +231,9 @@ def main( ):
     ap.add_argument( "--species", type=int, default=100_000, help="keep the N most-observed species" )
     ap.add_argument( "--gamma", type=float, default=0.1,
                      help="popularity prior weight; 0.1 was best in the benchmark's cross-validation" )
-    ap.add_argument( "--precision", choices=["fp32", "int8-weights"], default="int8-weights",
-                     help="int8-weights: per-channel int8 weights, float activations (~4x smaller)" )
+    ap.add_argument( "--precision", choices=["fp32", "int8-weights", "int8-dynamic"], default="int8-weights",
+                     help="int8-weights: per-channel int8 weights, float activations (~4x smaller); "
+                          "int8-dynamic: same size, int8 kernels at run time (much less RAM)" )
     ap.add_argument( "--keep-fp32", action="store_true", help="also keep model_fp32.tflite (for verify_pack)" )
     ap.add_argument( "--export", choices=["tflite", "none"], default="tflite" )
     ap.add_argument( "--skip-model", action="store_true", help="only taxonomy, names and manifest" )
