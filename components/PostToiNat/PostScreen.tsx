@@ -30,8 +30,10 @@ const PostScreen = ( ) => {
   const { image } = observation;
   const { preciseCoords } = image;
   const { taxaId, scientificName, commonName } = params;
-  const preciseLat = preciseCoords && preciseCoords.latitude;
-  const preciseLong = preciseCoords && preciseCoords.longitude;
+  // logged in only after the match: precise coordinates weren't kept, start from the
+  // photo's (the location can still be adjusted here)
+  const preciseLat = preciseCoords?.latitude ?? image.latitude;
+  const preciseLong = preciseCoords?.longitude ?? image.longitude;
   const accuracy = preciseCoords && preciseCoords.accuracy;
 
   const date = formatGMTTimeWithTimeZone( setISOTime( image.time ) );
@@ -72,7 +74,7 @@ const PostScreen = ( ) => {
       positional_accuracy: Math.trunc( accuracy ),
       taxon_id: taxaId,
       // this shows that the id is recommended by computer vision
-      vision: true,
+      vision: !observation.taxon?.userChosen,
     },
     taxon: {
       preferredCommonName: commonName,

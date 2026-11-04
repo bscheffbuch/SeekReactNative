@@ -1,7 +1,7 @@
 // @ts-nocheck
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useCallback, useContext, useEffect } from "react";
 import { View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import i18n from "../../i18n";
 import styles from "../../styles/match/match";
@@ -26,27 +26,34 @@ const PostToiNat = ( { color, taxaInfo }: Props ) => {
   const { login } = useContext( UserContext );
   const [postingSuccess, setPostingSuccess] = useState( false );
 
-  const fetchPostingStatus = async ( ) => {
-    const success = await fetchPostingSuccess( );
-    if ( success && success === "true" ) {
-      setPostingSuccess( true );
-    } else {
-      setPostingSuccess( false );
-    }
-  };
+  const fetchPostingStatus = useCallback( ( ) => {
+    fetchPostingSuccess( ).then( ( success ) => setPostingSuccess( success === "true" ) );
+  }, [] );
 
-  useEffect( ( ) => {
-    const unsubscribe = navigation.addListener( "focus", ( ) => {
-      fetchPostingStatus( );
-    } );
-
-    return unsubscribe;
-  }, [navigation] );
+  // refetch on focus (back from posting) and when the species changes, which resets it
+  useFocusEffect( fetchPostingStatus );
+  useEffect( fetchPostingStatus, [fetchPostingStatus, taxaInfo.taxaId] );
 
   // TODO: navigation to TS
   const navToPostingScreen = ( ) => navigation.navigate( "Post", taxaInfo );
 
-  if ( login && !postingSuccess ) {
+  if ( !login ) {
+    return (
+      <>
+        <StyledText style={[baseTextStyles.body, styles.text]}>
+          {i18n.t( "results.post_inat_login" )}
+        </StyledText>
+        <View style={styles.marginMedium} />
+        <GreenButton
+          color={color}
+          handlePress={( ) => navigation.navigate( "LoginOrSignup" )}
+          text="results.log_in_to_post"
+        />
+      </>
+    );
+  }
+
+  if ( !postingSuccess ) {
     return (
       <>
         <StyledText style={[baseTextStyles.body, styles.text]}>

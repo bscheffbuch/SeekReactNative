@@ -378,3 +378,21 @@ for Home (tabs), Observations, Settings (incl. dark mode), and the camera.
   species per queue session) and keeps scanning; the shutter still saves manually.
 - Release builds without the release keystore install as
   `org.inaturalist.seek.preview`; launch that package, not `org.inaturalist.seek`.
+- Photo identification: each tile has a crop button that opens `Reframe` in pick
+  mode (`returnTo: "PhotoIdentify"`); the chosen crop comes back as the `crop` route
+  param and only that photo is identified again. Every photo gets a second pass in
+  the common-ancestor mode for its alternative species; the card's dropdown offers
+  `taxonChoices(branch, alternatives)` for the combined result (Same species) or the
+  selected photo (Each photo), and the pick is forced on the Match screen
+  (`startObservationWithImage(..., { taxonId, suggestions })`).
+- Changing the species: the Match screen's "Change species" opens
+  `ChangeSpeciesSheet` (model suggestions plus iNaturalist autocomplete; search needs
+  internet). A species collected on that Match is moved with `changeCollectedTaxon`,
+  which keeps photo, date and place and recounts badges and challenges. The Species
+  screen offers the same for any collected species (search only, species rank only).
+  A taxon picked from a search is posted with `vision: false`.
+- Posting: logged-out users see "Log in to post" on the Match screen; after logging
+  in, `LoginSuccess` returns to the Match screen when it is in the stack. The posted
+  flag resets for every new observation and every species change.
+- Not checked on the phone yet (it was locked): crop round trip, dropdown, change
+  species on Match and Species, and the login-to-post return.

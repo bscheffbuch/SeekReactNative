@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React from "react";
+import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -10,7 +10,10 @@ import GreenButton from "../UIComponents/Buttons/GreenButton";
 import { renderHeaderText, renderText, setGradients } from "../../utility/matchHelpers";
 import { useCommonName } from "../../utility/customHooks/useCommonName";
 import StyledText from "../UIComponents/StyledText";
+import { useObservation } from "../Providers/ObservationProvider";
 import type { Observation } from "../Providers/ObservationProvider";
+import ChangeSpeciesButton from "../UIComponents/Buttons/ChangeSpeciesButton";
+import ChangeSpeciesSheet from "../UIComponents/ChangeSpeciesSheet";
 import { baseTextStyles } from "../../styles/textStyles";
 import MatchDetails from "./MatchDetails";
 import { useTheme } from "../Providers/ThemeProvider";
@@ -30,6 +33,8 @@ const MatchContainer = ( {
 }: Props ) => {
   const { theme } = useTheme( );
   const navigation = useNavigation();
+  const { changeSpecies } = useObservation( );
+  const [changing, setChanging] = useState( false );
   const taxon = observation && observation.taxon;
   const seenDate = taxon && taxon.seenDate;
   const id = taxon && taxon.taxaId ? taxon.taxaId : 0;
@@ -76,6 +81,10 @@ const MatchContainer = ( {
             {showScientificName ? scientificName : commonName}
           </StyledText>
         )}
+        <ChangeSpeciesButton
+          onPress={( ) => setChanging( true )}
+          text={screenType === "unidentified" ? "change_species.choose" : "change_species.button"}
+        />
         <StyledText style={[baseTextStyles.body, m3.text]}>{text}</StyledText>
         {( speciesIdentified || screenType === "commonAncestor" ) && taxaId && scientificName ? (
           <MatchDetails
@@ -102,6 +111,14 @@ const MatchContainer = ( {
       <View style={styles.textContainer}>
         <PostToiNat color={gradientLight} taxaInfo={taxaInfo} />
       </View>
+      <ChangeSpeciesSheet
+        onClose={( ) => setChanging( false )}
+        onSelect={changeSpecies}
+        selectedId={screenType === "unidentified" ? null : taxaId}
+        lineagePool={[...( observation?.suggestions || [] ), ...( image?.predictions || [] )]}
+        suggestions={observation?.suggestions || image?.predictions}
+        visible={changing}
+      />
     </View>
   );
 };

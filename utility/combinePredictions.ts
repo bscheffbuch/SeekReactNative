@@ -99,4 +99,38 @@ const lineageOf = <P extends PhotoPrediction>( predictions: P[], taxon: P | null
   return predictions.filter( p => lineage.has( p.taxon_id ) );
 };
 
-export { combinePredictions, bestPhotoFor, confidentTaxon, lineageOf };
+// The taxon with whichever of its ancestors the pool holds, for a taxon the pool may not
+// contain itself (an alternative species from another photo or another mode of the model).
+const lineageWith = <P extends PhotoPrediction>( pool: P[], taxon: P ): P[] => {
+  const ancestors = new Set( taxon.ancestor_ids );
+  const seen = new Set<number>( );
+  const lineage = pool.filter( p => {
+    if ( !ancestors.has( p.taxon_id ) || seen.has( p.taxon_id ) ) {
+      return false;
+    }
+    seen.add( p.taxon_id );
+    return true;
+  } );
+  return [...lineage, taxon];
+};
+
+// What a user can pick from: the confident taxon of the best branch first (it can be a
+// genus when the photos disagree), then the alternative species, best first. One entry
+// per taxon; life is never offered.
+const taxonChoices = <P extends PhotoPrediction>( branch: P[], alternatives: P[], limit = 10 ): P[] => {
+  const choices: P[] = [];
+  const add = ( p: P | null | undefined ) => {
+    if ( p && p.rank_level !== 100 && !choices.some( c => c.taxon_id === p.taxon_id ) ) {
+      choices.push( p );
+    }
+  };
+  add( confidentTaxon( branch ) );
+  [...alternatives].sort( ( a, b ) => b.combined_score - a.combined_score ).forEach( add );
+  // nothing confident and no alternatives: still offer the branch's most specific taxon
+  if ( choices.length === 0 ) {
+    add( [...branch].sort( ( a, b ) => a.rank_level - b.rank_level )[0] );
+  }
+  return choices.slice( 0, limit );
+};
+
+export { combinePredictions, bestPhotoFor, confidentTaxon, lineageOf, lineageWith, taxonChoices };

@@ -29,6 +29,17 @@ export interface ReframeParams {
   image: ObservationImage;
   // a local file of the photo the native side can read (the capture, not a content:// uri)
   photoPath: string;
+  // pick mode: only choose the crop and hand it back to the photo identification screen
+  returnTo?: "PhotoIdentify";
+  photoIndex?: number;
+  // the crop chosen before, shown as the first box
+  initialRect?: NormalizedRect | null;
+}
+
+// what pick mode hands back; rect null means the whole photo
+export interface ReframeCrop {
+  index: number;
+  rect: NormalizedRect | null;
 }
 
 interface Suggestion {
@@ -71,7 +82,14 @@ const predictCrop = async (
 const ReframeScreen = ( ) => {
   const navigation = useNavigation<any>( );
   const { params } = useRoute<any>( );
-  const { image, photoPath } = ( params || {} ) as ReframeParams;
+  const {
+    image,
+    photoPath,
+    returnTo,
+    photoIndex = 0,
+    initialRect,
+  } = ( params || {} ) as ReframeParams;
+  const picking = returnTo === "PhotoIdentify";
   const { startObservationWithImage } = useObservation( );
   const { theme } = useTheme( );
   const styles = useMemo( ( ) => makeStyles( theme ), [theme] );
@@ -80,7 +98,7 @@ const ReframeScreen = ( ) => {
   const [photoSize, setPhotoSize] = useState( { width: 0, height: 0 } );
   const [stage, setStage] = useState( { width: 0, height: 0 } );
   const [detected, setDetected] = useState<NormalizedRect[] | null>( null );
-  const [boxes, setBoxes] = useState<NormalizedRect[]>( [DEFAULT_SUBJECT] );
+  const [boxes, setBoxes] = useState<NormalizedRect[]>( [initialRect || DEFAULT_SUBJECT] );
   const [selected, setSelected] = useState( 0 );
   const [suggestions, setSuggestions] = useState<Suggestion[] | null>( null );
   const [busy, setBusy] = useState( false );
@@ -96,11 +114,12 @@ const ReframeScreen = ( ) => {
       if ( !current ) { return; }
       const found = usableSubjects( subjects.map( s => s.box ) );
       setDetected( found );
-      setBoxes( found.length > 0 ? found : [DEFAULT_SUBJECT] );
+      // a crop chosen before stays selected; the detected subjects come after it
+      setBoxes( initialRect ? [initialRect, ...found] : found.length > 0 ? found : [DEFAULT_SUBJECT] );
       setSelected( 0 );
     } );
     return ( ) => { current = false; };
-  }, [photoPath] );
+  }, [photoPath, initialRect] );
 
   const rect = boxes[selected] ?? DEFAULT_SUBJECT;
 
@@ -169,7 +188,16 @@ const ReframeScreen = ( ) => {
     setSelected( 0 );
   };
 
+  const returnCrop = ( cropRect: NormalizedRect | null ) => {
+    const crop: ReframeCrop = { index: photoIndex, rect: cropRect };
+    navigation.popTo( "PhotoIdentify", { crop }, { merge: true } );
+  };
+
   const applyCrop = async ( ) => {
+    if ( picking ) {
+      returnCrop( rect );
+      return;
+    }
     setBusy( true );
     try {
       const result = await predictCrop( image, photoPath, rect, false );
@@ -283,8 +311,12 @@ const ReframeScreen = ( ) => {
       </View>
 
       <View style={styles.actions}>
-        <Pressable accessibilityRole="button" onPress={( ) => navigation.goBack( )} style={styles.outlined}>
-          <Text style={styles.outlinedLabel}>{i18n.t( "reframe.retake" )}</Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={( ) => ( picking ? returnCrop( null ) : navigation.goBack( ) )}
+          style={styles.outlined}
+        >
+          <Text style={styles.outlinedLabel}>{i18n.t( picking ? "reframe.whole_photo" : "reframe.retake" )}</Text>
         </Pressable>
         <Pressable
           accessibilityRole="button"

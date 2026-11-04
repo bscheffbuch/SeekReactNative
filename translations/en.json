@@ -320,6 +320,8 @@
     "date_observed": "You first observed it on:\n{{seenDate}}",
     "post_inat": "If you took the original photo of the organism, you can help train Seek on this species by posting to iNaturalist, where the community will help identify it and improve future versions.",
     "post": "Post to iNaturalist",
+    "post_inat_login": "Log in to iNaturalist to post this observation. If you took the original photo, the community can confirm the identification, and it helps train future versions of Seek.",
+    "log_in_to_post": "Log in to post",
     "save_for_later": "Save for Later",
     "saved_for_later": "Observation saved — log in to upload to iNaturalist.",
     "flag": "Misidentification",
@@ -486,14 +488,19 @@
     "same_species": "Same species",
     "separately": "Each photo",
     "same_species_hint": "All photos show one organism. Seek combines them into one identification.",
-    "separately_hint": "Seek identifies each photo on its own. Tap a photo to open its match.",
+    "separately_hint": "Seek identifies each photo on its own. Tap a photo to see its suggestions.",
     "identifying": "Identifying photo {{done}} of {{count}}…",
     "agreement": "{{agree}} of {{count}} photos agree",
     "no_id": "No confident identification",
     "failed": "Couldn't identify",
     "view_match": "View match",
     "skipped": "Only the first {{max}} photos are used.",
-    "choose_photos": "Choose photos"
+    "choose_photos": "Choose photos",
+    "choose_species": "Tap to choose from the suggested species",
+    "suggested": "Suggested species",
+    "photo_number": "Photo {{number}}",
+    "crop": "Crop photo {{number}}",
+    "cropped": "Cropped"
   },
   "camera_help": {
     "title": "Seek's Camera",
@@ -1229,6 +1236,20 @@
     "use": "Use this crop",
     "subject_label": "Subject {{number}}",
     "selected": "selected",
-    "no_match": "No confident match for this crop"
+    "no_match": "No confident match for this crop",
+    "whole_photo": "Whole photo"
+  },
+  "change_species": {
+    "button": "Change species",
+    "choose": "Choose species",
+    "title": "Change species",
+    "search": "Search species",
+    "suggestions": "Suggestions",
+    "search_hint": "Not listed? Search iNaturalist (needs an internet connection).",
+    "no_results": "No matches",
+    "error_title": "Couldn't change the species",
+    "error_message": "Check your internet connection and try again.",
+    "exists_title": "Already in your collection",
+    "exists_message": "This species is already in your collection, so this observation can't be moved to it."
   }
 }

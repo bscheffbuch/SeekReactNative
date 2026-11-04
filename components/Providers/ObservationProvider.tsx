@@ -2,10 +2,12 @@ import type { PropsWithChildren } from "react";
 import React, { useState, useCallback } from "react";
 import inatjs from "inaturalistjs";
 
-import { iconicTaxaIds } from "../../utility/dictionaries/taxonomyDicts";
 import { fetchSpeciesSeenDate } from "../../utility/dateHelpers";
-import { addToCollection } from "../../utility/observationHelpers";
+import { addToCollection, changeCollectedTaxon, removeFromCollection } from "../../utility/observationHelpers";
 import { createLocationAlert } from "../../utility/locationHelpers";
+import { savePostingSuccess } from "../../utility/loginHelpers";
+import { iconicTaxonIdFor } from "../../utility/taxonChoice";
+import type { TaxonChoice } from "../../utility/taxonChoice";
 
 interface Prediction {
   name: string;
@@ -37,13 +39,25 @@ export interface Observation {
     scientificName?: string;
     rank?: any;
     seenDate?: string | null;
+    // the user picked this taxon from a search instead of the model's suggestions
+    userChosen?: boolean;
   };
+  // what the user can switch to on the Match screen (the model's suggestions)
+  suggestions?: Prediction[];
+}
+
+export interface StartOptions {
+  // show this taxon of the predictions, however it scored (the user picked it)
+  taxonId?: number;
+  // replaces the predictions as what the Match screen offers to switch to
+  suggestions?: Prediction[];
 }
 const ObservationContext = React.createContext<
   {
     observation: Observation | null;
     setObservation: React.Dispatch<React.SetStateAction<any>>;
-    startObservationWithImage: ( _image: ObservationImage, _callback: () => void ) => void;
+    startObservationWithImage: ( _image: ObservationImage, _callback?: () => void, _options?: StartOptions ) => Promise<void>;
+    changeSpecies: ( _choice: TaxonChoice, _lineage: TaxonChoice[] ) => Promise<void>;
   } | undefined
 >( undefined );
 
@@ -62,11 +76,6 @@ const ObservationProvider = ( { children }: PropsWithChildren ) => {
       return ancestor;
     }
     return null;
-  };
-
-  const checkForIconicTaxonId = ( ancestorIds: number[] ) => {
-    const iconicTaxonId = iconicTaxaIds.filter( ( _v ) => ancestorIds.indexOf( _v ) !== -1 );
-    return iconicTaxonId[0] || 1;
   };
 
   const fetchPhoto = useCallback( async ( id: number ): Promise<string | undefined | null> => {
@@ -112,7 +121,7 @@ const ObservationProvider = ( { children }: PropsWithChildren ) => {
         taxon: {
           id: Number( species.taxon_id ),
           name: species.name,
-          iconic_taxon_id: checkForIconicTaxonId( species.ancestor_ids ),
+          iconic_taxon_id: iconicTaxonIdFor( species.ancestor_ids ),
           ancestor_ids: species.ancestor_ids,
         },
       };
@@ -149,17 +158,30 @@ const ObservationProvider = ( { children }: PropsWithChildren ) => {
     };
   }, [fetchPhoto] );
 
-  const startObservationWithImage = async ( image: ObservationImage, positiveCallback?: () => void ) => {
+  const startObservationWithImage = async (
+    image: ObservationImage,
+    positiveCallback?: () => void,
+    options: StartOptions = {}
+  ) => {
     console.log( "Adding image to observation", image );
     if ( !image || !image.predictions ) {
       console.warn( "No predictions found in image" );
       return;
     }
+    // a new observation can be posted, whatever happened to the last one
+    savePostingSuccess( false );
 
-    const { predictions } = image;
-    const species = checkForSpecies( predictions );
+    const predictions = [...image.predictions];
+    const chosen = options.taxonId
+      ? predictions.find( p => p.taxon_id === options.taxonId && p.rank_level !== 100 ) || null
+      : null;
+    const species = chosen
+      ? ( chosen.rank_level === 10 ? chosen : null )
+      : checkForSpecies( predictions );
     console.log( "checkForSpecies result:", species );
-    const ancestor = checkForAncestor( predictions );
+    const ancestor = chosen
+      ? ( chosen.rank_level === 10 ? null : chosen )
+      : checkForAncestor( predictions );
     console.log( "checkForAncestor result:", ancestor );
     let taxon;
     if ( species ) {
@@ -169,7 +191,7 @@ const ObservationProvider = ( { children }: PropsWithChildren ) => {
       taxon = await handleAncestor( ancestor );
       console.log( "handleAncestor result:", taxon );
     }
-    setObservation( { image, taxon } );
+    setObservation( { image, taxon, suggestions: options.suggestions || image.predictions } );
 
     // At this point we were successful in adding the image and processing the predictions
     // call the positiveCallback if it exists
@@ -178,10 +200,68 @@ const ObservationProvider = ( { children }: PropsWithChildren ) => {
     }
   };
 
+  // Switches the observation on the Match screen to another taxon. The collection follows:
+  // a species this observation added moves to the new one (or goes, when the new one is
+  // already collected or isn't a species); an earlier sighting stays as it was.
+  const changeSpecies = async ( choice: TaxonChoice, lineage: TaxonChoice[] ) => {
+    if ( !observation ) {
+      return;
+    }
+    const { image, taxon: current } = observation;
+    const addedHere = !!current?.taxaId && !current.rank && !current.seenDate;
+    const isSpecies = choice.rank_level === 10;
+    const seenDate = isSpecies ? await fetchSpeciesSeenDate( choice.taxon_id ) : null;
+    const photo = await fetchPhoto( choice.taxon_id );
+
+    if ( addedHere && current?.taxaId !== choice.taxon_id ) {
+      if ( isSpecies && !seenDate ) {
+        const result = await changeCollectedTaxon( current.taxaId as number, {
+          id: choice.taxon_id,
+          name: choice.name,
+          iconic_taxon_id: iconicTaxonIdFor( choice.ancestor_ids ),
+          ancestor_ids: choice.ancestor_ids,
+        } );
+        if ( result === "missing" ) {
+          await addToCollection( { taxon: {
+            id: choice.taxon_id,
+            name: choice.name,
+            iconic_taxon_id: iconicTaxonIdFor( choice.ancestor_ids ),
+            ancestor_ids: choice.ancestor_ids,
+          } }, image );
+        }
+      } else {
+        removeFromCollection( current.taxaId as number );
+      }
+    } else if ( !addedHere && isSpecies && !seenDate ) {
+      await addToCollection( { taxon: {
+        id: choice.taxon_id,
+        name: choice.name,
+        iconic_taxon_id: iconicTaxonIdFor( choice.ancestor_ids ),
+        ancestor_ids: choice.ancestor_ids,
+      } }, image );
+    }
+
+    savePostingSuccess( false );
+    setObservation( {
+      // the Match screen reads the classification from the predictions
+      image: { ...image, predictions: lineage },
+      suggestions: observation.suggestions || image.predictions,
+      taxon: {
+        taxaId: choice.taxon_id,
+        scientificName: choice.name,
+        speciesSeenImage: photo,
+        seenDate,
+        rank: isSpecies ? undefined : choice.rank_level,
+        userChosen: !!choice.fromSearch,
+      },
+    } );
+  };
+
   const value = {
     observation,
     setObservation,
     startObservationWithImage,
+    changeSpecies,
   };
   return (
     <ObservationContext.Provider value={value}>{children}</ObservationContext.Provider>

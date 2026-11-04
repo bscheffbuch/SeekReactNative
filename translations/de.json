@@ -311,6 +311,8 @@
     "date_observed": "Erstmals beobachtet am:\n{{seenDate}}",
     "post_inat": "Wenn das Original-Foto von dir ist, kannst du mithelfen, Seek zu trainieren:\nIndem du diese Beobachtung an iNaturalist schickst, und sie dann von anderen Benutzern bestätigt wird, kann der Algorithmus lernen, die Art zukünftig noch besser zu erkennen.",
     "post": "An iNaturalist senden",
+    "post_inat_login": "Melde dich bei iNaturalist an, um diese Beobachtung zu posten. Wenn du das Originalfoto gemacht hast, kann die Community die Bestimmung bestätigen, und das hilft, künftige Seek-Versionen zu trainieren.",
+    "log_in_to_post": "Zum Posten anmelden",
     "flag": "Fehlbestimmung",
     "incorrect": "Wurde diese Beobachtung falsch identifiziert?",
     "yes": "Ja, aus meinen Beobachtungen entfernen",
@@ -412,14 +414,19 @@
     "same_species": "Gleiche Art",
     "separately": "Jedes Foto",
     "same_species_hint": "Alle Fotos zeigen dasselbe Lebewesen. Seek kombiniert sie zu einer Bestimmung.",
-    "separately_hint": "Seek bestimmt jedes Foto für sich. Tippe auf ein Foto, um sein Ergebnis zu öffnen.",
+    "separately_hint": "Seek bestimmt jedes Foto für sich. Tippe auf ein Foto, um seine Vorschläge zu sehen.",
     "identifying": "Bestimme Foto {{done}} von {{count}}…",
     "agreement": "{{agree}} von {{count}} Fotos stimmen überein",
     "no_id": "Keine sichere Bestimmung",
     "failed": "Nicht bestimmbar",
     "view_match": "Ergebnis ansehen",
     "skipped": "Nur die ersten {{max}} Fotos werden verwendet.",
-    "choose_photos": "Fotos auswählen"
+    "choose_photos": "Fotos auswählen",
+    "choose_species": "Tippe, um aus den vorgeschlagenen Arten zu wählen",
+    "suggested": "Vorgeschlagene Arten",
+    "photo_number": "Foto {{number}}",
+    "crop": "Foto {{number}} zuschneiden",
+    "cropped": "Zugeschnitten"
   },
   "camera_help": {
     "title": "Seek-Kamera",
@@ -1115,6 +1122,20 @@
     "use": "Diesen Ausschnitt verwenden",
     "subject_label": "Motiv {{number}}",
     "selected": "ausgewählt",
-    "no_match": "Keine sichere Bestimmung für diesen Ausschnitt"
+    "no_match": "Keine sichere Bestimmung für diesen Ausschnitt",
+    "whole_photo": "Ganzes Foto"
+  },
+  "change_species": {
+    "button": "Art ändern",
+    "choose": "Art wählen",
+    "title": "Art ändern",
+    "search": "Art suchen",
+    "suggestions": "Vorschläge",
+    "search_hint": "Nicht dabei? Auf iNaturalist suchen (braucht eine Internetverbindung).",
+    "no_results": "Keine Treffer",
+    "error_title": "Art konnte nicht geändert werden",
+    "error_message": "Prüfe deine Internetverbindung und versuche es noch einmal.",
+    "exists_title": "Schon in deiner Sammlung",
+    "exists_message": "Diese Art ist schon in deiner Sammlung, deshalb kann die Beobachtung nicht dorthin verschoben werden."
   }
 }

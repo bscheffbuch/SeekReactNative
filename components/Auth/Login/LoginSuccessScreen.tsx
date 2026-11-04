@@ -14,7 +14,17 @@ import { baseTextStyles } from "../../../styles/textStyles";
 import BulletedList from "../../iNaturalist/BulletedList";
 
 const LoginSuccessScreen = ( ) => {
-  const { popTo } = useNavigation();
+  const navigation = useNavigation();
+
+  // logged in from the Match screen to post: go back there, not home
+  const onContinue = ( ) => {
+    const cameFromMatch = navigation.getState( )?.routes?.some( route => route.name === "Match" );
+    if ( cameFromMatch ) {
+      navigation.popTo( "Match" );
+    } else {
+      navigation.popTo( "MainTabs", { screen: "Home" } );
+    }
+  };
 
   return (
     <ScrollWithHeader header="inat_signup.welcome">
@@ -37,7 +47,7 @@ const LoginSuccessScreen = ( ) => {
       </View>
       <View style={styles.marginLarge} />
       <GreenButton
-        handlePress={() => popTo( "MainTabs", { screen: "Home" } )}
+        handlePress={onContinue}
         login
         text="inat_signup.continue"
       />

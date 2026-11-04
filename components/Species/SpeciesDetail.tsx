@@ -17,6 +17,7 @@ import OfflineSpeciesContainer from "./OfflineSpeciesContainer";
 import SpeciesPhotosLandscape from "./SpeciesPhotosLandscape";
 import { AppHeader } from "../UIComponents/AppPrimitives";
 import SpeciesName from "./SpeciesName";
+import ChangeCollectedSpecies from "./ChangeCollectedSpecies";
 import IconicTaxaName from "./IconicTaxaName";
 import { useInternetStatus } from "../../utility/customHooks";
 import { useCommonName } from "../../utility/customHooks/useCommonName";
@@ -195,6 +196,7 @@ const SpeciesDetail = ( ) => {
         selectedText={selectedText}
         highlightSelectedText={highlightSelectedText}
       />
+      <ChangeCollectedSpecies />
       {renderOnlineOrOfflineContent( )}
     </ScrollView>
   );
@@ -224,6 +226,7 @@ const SpeciesDetail = ( ) => {
             selectedText={selectedText}
             highlightSelectedText={highlightSelectedText}
           />
+          <ChangeCollectedSpecies />
           {renderOnlineOrOfflineContent()}
         </ScrollView>
       </View>

@@ -3,6 +3,8 @@ import {
   bestPhotoFor,
   confidentTaxon,
   lineageOf,
+  lineageWith,
+  taxonChoices,
 } from "../../../utility/combinePredictions";
 
 // one best branch: life > genus > species, scores as the plugin returns them (0-100)
@@ -94,5 +96,35 @@ describe( "lineageOf", ( ) => {
     const species = predictions.find( p => p.taxon_id === 11 );
     expect( lineageOf( predictions, species ).map( p => p.taxon_id ).sort( ) ).toEqual( [1, 11, 48460] );
     expect( lineageOf( predictions, null ) ).toHaveLength( 4 );
+  } );
+} );
+
+describe( "lineageWith", ( ) => {
+  it( "adds the pool's ancestors to a taxon the pool doesn't hold", ( ) => {
+    const pool = branch( parus, major, [95, 90] );
+    const alternative = { taxon_id: 12, name: "Parus minor", rank_level: 10, combined_score: 8, ancestor_ids: [48460, 1] };
+    expect( lineageWith( pool, alternative ).map( p => p.taxon_id ) ).toEqual( [48460, 1, 12] );
+  } );
+} );
+
+describe( "taxonChoices", ( ) => {
+  const alternatives = [
+    { taxon_id: 12, name: "Parus minor", rank_level: 10, combined_score: 20, ancestor_ids: [48460, 1] },
+    { taxon_id: 11, name: "Parus major", rank_level: 10, combined_score: 70, ancestor_ids: [48460, 1] },
+  ];
+
+  it( "puts the confident taxon first, then the alternatives by score, once each", ( ) => {
+    const choices = taxonChoices( branch( parus, major, [95, 90] ), alternatives );
+    expect( choices.map( p => p.taxon_id ) ).toEqual( [11, 12] );
+  } );
+
+  it( "starts with the genus when the species isn't confident", ( ) => {
+    const choices = taxonChoices( branch( parus, major, [95, 50] ), alternatives );
+    expect( choices.map( p => p.taxon_id ) ).toEqual( [1, 11, 12] );
+  } );
+
+  it( "falls back to the most specific taxon of the branch", ( ) => {
+    const choices = taxonChoices( branch( parus, major, [40, 30] ), [] );
+    expect( choices.map( p => p.taxon_id ) ).toEqual( [11] );
   } );
 } );

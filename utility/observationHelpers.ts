@@ -2,7 +2,7 @@
 import Realm from "realm";
 
 import * as createUUID from "uuid";
-import { deleteBadges, checkNumberOfBadgesEarned } from "./badgeHelpers";
+import { deleteBadges, checkNumberOfBadgesEarned, recalculateBadges } from "./badgeHelpers";
 import { recalculateChallenges, checkNumberOfChallengesCompleted } from "./challengeHelpers";
 import { createBackupUri, deleteFile } from "./photoHelpers";
 import { createNotification } from "./notificationHelpers";
@@ -39,7 +39,8 @@ const addToCollection = async ( observation: {
   checkNumberOfBadgesEarned();
   checkNumberOfChallengesCompleted();
 
-  Realm.open( realmConfig ).then( ( realm ) => {
+  // returned so callers can wait for the write (a species change right after the match)
+  return Realm.open( realmConfig ).then( ( realm ) => {
     const { length } = realm.objects( "TaxonRealm" );
 
     realm.write( ( ) => {
@@ -100,6 +101,53 @@ const removeFromCollection = ( id: number ) => {
   } );
 };
 
+export interface CollectedTaxon {
+  id: number;
+  name: string;
+  iconic_taxon_id: number;
+  ancestor_ids: number[];
+}
+
+// Moves a saved observation to another species, keeping its photo, date and place.
+// Resolves "exists" when the new species is already in the collection (nothing changes),
+// "missing" when there is no observation of the old one.
+const changeCollectedTaxon = async (
+  oldId: number,
+  taxon: CollectedTaxon
+): Promise<"changed" | "exists" | "missing"> => {
+  const realm = await Realm.open( realmConfig );
+  if ( realm.objects( "TaxonRealm" ).filtered( `id == ${taxon.id}` ).length > 0 ) {
+    return "exists";
+  }
+  const observation = realm.objects( "ObservationRealm" ).filtered( `taxon.id == ${oldId}` )[0];
+  if ( !observation ) {
+    return "missing";
+  }
+  // remember what was earned before, so a badge the new species earns is announced
+  checkNumberOfBadgesEarned( );
+  checkNumberOfChallengesCompleted( );
+  realm.write( ( ) => {
+    const oldTaxon = observation.taxon;
+    const newTaxon = realm.create( "TaxonRealm", {
+      id: taxon.id,
+      name: taxon.name,
+      iconicTaxonId: taxon.iconic_taxon_id,
+      ancestorIds: taxon.ancestor_ids,
+      defaultPhoto: oldTaxon?.defaultPhoto,
+    } );
+    observation.taxon = newTaxon;
+    if ( oldTaxon ) {
+      realm.delete( oldTaxon );
+    }
+  } );
+  // badges and challenges count taxa by iconic group: the old one may lose one, the new
+  // one gain one
+  deleteBadges( );
+  recalculateBadges( );
+  recalculateChallenges( );
+  return "changed";
+};
+
 const sortNewestToOldest = ( observations: { data: any[] }[] ) => {
   observations.sort( ( a, b ) => {
     if ( a.data.length > b.data.length ) {
@@ -147,5 +195,6 @@ const createSectionList = ( species: any, hideSections: boolean ): {id: number; 
 export {
   addToCollection,
   removeFromCollection,
+  changeCollectedTaxon,
   createSectionList,
 };

@@ -10,6 +10,7 @@ import type { ObservationImage } from "../components/Providers/ObservationProvid
 import { getActiveModelPack } from "./modelPacks";
 import readExifFromMultiplePhotos from "./parseExif";
 import { checkForPhotoMetaData } from "./photoHelpers";
+import type { NormalizedRect } from "../components/Camera/ARCamera/helpers/previewGeometry";
 
 export interface PickedPhoto {
   uri: string;
@@ -49,24 +50,45 @@ const readPickedPhoto = async ( asset: PickerAsset ): Promise<PickedPhoto | null
 
 const hasLocation = ( photo: PickedPhoto ) => photo.latitude != null && photo.longitude != null;
 
-const identifyPhoto = async (
-  photo: PickedPhoto,
-  confidenceThreshold?: number
-): Promise<InatVision.Prediction[]> => {
+const imageOptions = async ( photo: PickedPhoto, cropRect?: NormalizedRect | null ) => {
   const pack = await getActiveModelPack( );
   const uri = Platform.OS === "android" ? photo.uri.replace( /^file:\/\//, "" ) : photo.uri;
   const useGeomodel = hasLocation( photo ) && pack.geomodelPath != null;
-  const { predictions } = await InatVision.getPredictionsForImage( {
+  return {
     version: pack.version,
     uri,
     modelPath: pack.modelPath,
     taxonomyPath: pack.taxonomyPath,
-    confidenceThreshold,
     useGeomodel,
     geomodelPath: pack.geomodelPath ?? undefined,
     location: useGeomodel
       ? { latitude: photo.latitude as number, longitude: photo.longitude as number }
       : undefined,
+    ...( cropRect ? { cropRect } : {} ),
+  };
+};
+
+// The best branch: life down to the top leaf. cropRect limits the model to that part of
+// the photo (normalised to the photo as displayed).
+const identifyPhoto = async (
+  photo: PickedPhoto,
+  confidenceThreshold?: number,
+  cropRect?: NormalizedRect | null
+): Promise<InatVision.Prediction[]> => {
+  const options = await imageOptions( photo, cropRect );
+  const { predictions } = await InatVision.getPredictionsForImage( { ...options, confidenceThreshold } );
+  return predictions;
+};
+
+// The model's top leaves (mostly species), best first: the alternatives to the best branch.
+const suggestAlternatives = async (
+  photo: PickedPhoto,
+  cropRect?: NormalizedRect | null
+): Promise<InatVision.Prediction[]> => {
+  const options = await imageOptions( photo, cropRect );
+  const { predictions } = await InatVision.getPredictionsForImage( {
+    ...options,
+    mode: InatVision.MODE.COMMON_ANCESTOR,
   } );
   return predictions;
 };
@@ -129,6 +151,7 @@ const readPickedPhotos = async ( assets: PickerAsset[] ): Promise<PickedPhotos> 
 export {
   readPickedPhoto,
   identifyPhoto,
+  suggestAlternatives,
   buildObservationImage,
   launchPhotoPicker,
   readPickedPhotos,
