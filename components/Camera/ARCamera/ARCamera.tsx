@@ -918,21 +918,31 @@ const ARCamera = ( ) => {
     saveForLaterToQueue( photo.uri, photo.predictions || [] );
   }, [saveForLaterToQueue] );
 
-  const takePictureForLater = useCallback( async ( ) => {
+  // Resolves to false when no photo was taken (a save still running, or a capture error).
+  const takePictureForLater = useCallback( async ( ): Promise<boolean> => {
     // Keep the camera live & responsive: unlike a normal capture we deliberately
     // do NOT flip `pictureTaken` / `isCaptureInProgress`, because those drive the
     // full-screen loading wheel and freeze the preview. A ref guard prevents
     // overlapping saves without showing any spinner.
     if ( queueSaveInProgress.current ) {
-      return;
+      return false;
     }
     queueSaveInProgress.current = true;
+    let taken = false;
     try {
-      await visionCameraTakePhoto( ( photo: HandledPhoto ) => saveForLaterPhoto( photo ) );
+      await visionCameraTakePhoto( ( photo: HandledPhoto ) => {
+        taken = true;
+        saveForLaterPhoto( photo );
+      } );
     } catch ( e ) {
-      queueSaveInProgress.current = false;
       logger.warn( e );
     }
+    // visionCameraTakePhoto swallows capture errors, so release the guard
+    // whenever the save callback never ran
+    if ( !taken ) {
+      queueSaveInProgress.current = false;
+    }
+    return taken;
   }, [visionCameraTakePhoto, saveForLaterPhoto] );
 
   const toggleQueueMode = useCallback( ( ) => {

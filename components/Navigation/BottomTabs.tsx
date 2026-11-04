@@ -8,6 +8,7 @@ import {
   BinocularsIcon,
   CameraIcon,
   HouseIcon,
+  ImageIcon,
   MenuIcon,
   TrophyIcon,
 } from "../UIComponents/AppIcons";
@@ -99,6 +100,23 @@ const getStyles = makeThemedStyles( ( theme: ThemeTokens ) => ( {
   fabPressed: {
     opacity: 0.88,
   },
+  // M3 small FAB for the secondary action, stacked above the extended Scan FAB
+  photosFab: {
+    alignItems: "center",
+    backgroundColor: theme.colors.secondaryContainer,
+    borderCurve: "continuous",
+    borderRadius: 14,
+    elevation: 4,
+    height: 48,
+    justifyContent: "center",
+    position: "absolute",
+    right: theme.spacing.md,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: theme.isDark ? 0.35 : 0.14,
+    shadowRadius: 6,
+    width: 48,
+  },
   fabLabel: {
     color: theme.colors.onPrimaryContainer,
     fontFamily: theme.typography.heading,
@@ -159,6 +177,9 @@ const M3TabBar = ( { state, navigation }: BottomTabBarProps ) => {
 
 const renderTabBar = ( props: BottomTabBarProps ) => <M3TabBar {...props} />;
 
+const FAB_GAP = 16;
+const SCAN_FAB_HEIGHT = 56;
+
 // The FAB sits over the navigator (not inside the bar) so its whole area takes touches.
 const ScanFab = ( ) => {
   const { theme } = useTheme( );
@@ -171,11 +192,36 @@ const ScanFab = ( ) => {
       accessibilityLabel={i18n.t( tabLabels.Scan )}
       accessibilityRole="button"
       onPress={( ) => navigation.navigate( "Camera" as never )}
-      style={( { pressed } ) => [styles.fab, { bottom: barHeight + 16 }, pressed && styles.fabPressed]}
+      style={( { pressed } ) => [styles.fab, { bottom: barHeight + FAB_GAP }, pressed && styles.fabPressed]}
       testID="scanFab"
     >
       <CameraIcon color={theme.colors.onPrimaryContainer} size={24} strokeWidth={2} />
       <Text style={styles.fabLabel}>{i18n.t( tabLabels.Scan )}</Text>
+    </Pressable>
+  );
+};
+
+// Identifies photos from the gallery without starting the camera stream.
+const PhotosFab = ( ) => {
+  const { theme } = useTheme( );
+  const styles = getStyles( theme );
+  const insets = useSafeAreaInsets( );
+  const navigation = useNavigation( );
+  const barHeight = 68 + Math.max( insets.bottom, 12 );
+  return (
+    <Pressable
+      accessibilityLabel={i18n.t( "photo_id.header" )}
+      accessibilityRole="button"
+      hitSlop={4}
+      onPress={( ) => navigation.navigate( "PhotoIdentify" as never )}
+      style={( { pressed } ) => [
+        styles.photosFab,
+        { bottom: barHeight + FAB_GAP + SCAN_FAB_HEIGHT + 12 },
+        pressed && styles.fabPressed,
+      ]}
+      testID="photosFab"
+    >
+      <ImageIcon color={theme.colors.onSecondaryContainer} size={22} strokeWidth={2} />
     </Pressable>
   );
 };
@@ -199,6 +245,7 @@ const BottomTabs = ( ) => (
     <Tab.Screen name="Challenges" component={Challenges} />
     <Tab.Screen name="More" component={More} />
     </Tab.Navigator>
+    <PhotosFab />
     <ScanFab />
   </View>
 );

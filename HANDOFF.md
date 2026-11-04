@@ -365,3 +365,16 @@ for Home (tabs), Observations, Settings (incl. dark mode), and the camera.
 - Google Maps views are blank in debug builds (placeholder API key).
 - The debug app installs as `org.inaturalist.seek.debug` alongside any
   production Seek install.
+- The image-picker patch (`patches/react-native-image-picker+8.2.1.patch`)
+  has the same trap: regenerate it with
+  `npx patch-package react-native-image-picker --exclude 'package\.json$|android/build|\.cxx|\.gradle'`.
+  The patch keeps the old ACTION_PICK chooser (the system picker strips EXIF
+  GPS) and sets `EXTRA_ALLOW_MULTIPLE` on every API level so Samsung Gallery
+  and Google Photos open in multi-select.
+- Photo identification without the camera: the small image FAB above Scan
+  (`photosFab` in `BottomTabs.tsx`) opens `PhotoIdentify`, which launches the
+  picker itself.
+- Queue mode on the camera saves each species-level match on its own (once per
+  species per queue session) and keeps scanning; the shutter still saves manually.
+- Release builds without the release keystore install as
+  `org.inaturalist.seek.preview`; launch that package, not `org.inaturalist.seek`.

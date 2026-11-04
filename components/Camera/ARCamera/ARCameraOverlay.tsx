@@ -2,6 +2,7 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import {
@@ -113,7 +114,7 @@ interface Props {
   toggleLocation: ( ) => void;
   useLocation: boolean;
   handleToastEnd: ( ) => void;
-  saveForLater: ( ) => void;
+  saveForLater: ( ) => Promise<boolean>;
   queueCount: number;
   queueMode: boolean;
   toggleQueueMode: ( ) => void;
@@ -785,6 +786,31 @@ const ARCameraOverlay = ( {
     };
   }, [isSpecies, takePicture, autoCapture, pictureTaken, queueMode] );
 
+  // In save-for-later mode a species match is queued on its own, once per species
+  // per queue session, so scanning simply continues without pressing the shutter.
+  const autoQueuedTaxa = useRef( new Set<number>( ) );
+  useEffect( ( ) => {
+    if ( !queueMode ) {
+      autoQueuedTaxa.current.clear( );
+    }
+  }, [queueMode] );
+  const taxonId = prediction?.taxon_id;
+  useEffect( ( ) => {
+    if ( !queueMode || !isSpecies || taxonId == null || autoQueuedTaxa.current.has( taxonId ) ) {
+      return;
+    }
+    autoQueuedTaxa.current.add( taxonId );
+    saveForLater( )
+      .then( ( taken ) => {
+        // a save already running blocked this one; queueCount changes once that
+        // save lands, which re-runs this effect and retries the species
+        if ( !taken ) {
+          autoQueuedTaxa.current.delete( taxonId );
+        }
+      } )
+      .catch( ( ) => autoQueuedTaxa.current.delete( taxonId ) );
+  }, [queueMode, isSpecies, taxonId, saveForLater, queueCount] );
+
   const showFilterText = ( ) => {
     if ( filterIndex === 0 ) {
       return null;
@@ -880,7 +906,10 @@ const ARCameraOverlay = ( {
   const shutterDisabled = !isSpecies && !queueMode;
   // a shutter press is a manual capture (auto-capture passes { auto: true })
   const takePictureManually = useCallback( ( ) => takePicture( ), [takePicture] );
-  const shutterAction = queueMode ? saveForLater : takePictureManually;
+  const saveForLaterManually = useCallback( ( ) => {
+    saveForLater( );
+  }, [saveForLater] );
+  const shutterAction = queueMode ? saveForLaterManually : takePictureManually;
   const filterOptions = filterSettings.map( setting => ( {
     icon: setting.segmentIcon,
     label: setting.shortText,
