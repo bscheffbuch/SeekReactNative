@@ -418,7 +418,8 @@
     "no_id": "Keine sichere Bestimmung",
     "failed": "Nicht bestimmbar",
     "view_match": "Ergebnis ansehen",
-    "skipped": "Nur die ersten {{max}} Fotos werden verwendet."
+    "skipped": "Nur die ersten {{max}} Fotos werden verwendet.",
+    "choose_photos": "Fotos auswählen"
   },
   "camera_help": {
     "title": "Seek-Kamera",

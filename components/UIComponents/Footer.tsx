@@ -11,7 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import i18n from "../../i18n";
 import realmConfig from "../../models";
-import { BellIcon, CameraIcon, MenuIcon, TrophyIcon } from "./AppIcons";
+import { BellIcon, CameraIcon, ImageIcon, MenuIcon, TrophyIcon } from "./AppIcons";
 import { useTheme } from "../Providers/ThemeProvider";
 
 const Footer = () => {
@@ -34,6 +34,14 @@ const Footer = () => {
       height: 80,
       justifyContent: "space-between",
       paddingHorizontal: theme.spacing.md,
+    },
+    // equal widths on both sides keep the camera button centered
+    side: {
+      flexDirection: "row",
+      width: 96,
+    },
+    sideEnd: {
+      justifyContent: "flex-end",
     },
     iconButton: {
       alignItems: "center",
@@ -99,14 +107,25 @@ const Footer = () => {
     <SafeAreaView style={styles.safeArea} edges={["right", "bottom", "left"]}>
       <View style={styles.container}>
         <View style={styles.navbar}>
-          <TouchableOpacity
-            accessibilityLabel={i18n.t( "accessibility.menu" )}
-            accessible
-            onPress={navToDrawer}
-            style={styles.iconButton}
-          >
-            <MenuIcon color={theme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
-          </TouchableOpacity>
+          <View style={styles.side}>
+            <TouchableOpacity
+              accessibilityLabel={i18n.t( "accessibility.menu" )}
+              accessible
+              onPress={navToDrawer}
+              style={styles.iconButton}
+            >
+              <MenuIcon color={theme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              testID="identifyPhotosButton"
+              accessibilityLabel={i18n.t( "photo_id.header" )}
+              accessible
+              onPress={() => navigation.navigate( "PhotoIdentify" )}
+              style={styles.iconButton}
+            >
+              <ImageIcon color={theme.colors.onSurfaceVariant} size={24} strokeWidth={2} />
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             testID="openCameraButton"
             accessibilityLabel={i18n.t( "accessibility.camera" )}
@@ -116,6 +135,7 @@ const Footer = () => {
           >
             <CameraIcon color={theme.colors.onPrimaryContainer} size={24} strokeWidth={2} />
           </TouchableOpacity>
+          <View style={[styles.side, styles.sideEnd]}>
           {challenge ? (
             <TouchableOpacity
               accessibilityLabel={i18n.t( "accessibility.iNatStats" )}
@@ -136,6 +156,7 @@ const Footer = () => {
               {notifications ? <View style={styles.notificationDot} /> : null}
             </TouchableOpacity>
           )}
+          </View>
         </View>
       </View>
     </SafeAreaView>

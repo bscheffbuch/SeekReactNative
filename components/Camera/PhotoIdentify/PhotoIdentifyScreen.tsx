@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -7,15 +7,17 @@ import i18n from "../../../i18n";
 import { useTheme } from "../../Providers/ThemeProvider";
 import { useObservation } from "../../Providers/ObservationProvider";
 import { UserContext } from "../../UserContext";
-import { ArrowLeftIcon } from "../../UIComponents/AppIcons";
+import { ArrowLeftIcon, ImageIcon } from "../../UIComponents/AppIcons";
 import { getTaxonCommonName } from "../../../utility/commonNamesHelpers";
 import {
   ALL_BRANCH_SCORES,
   MAX_PHOTOS,
   buildObservationImage,
   identifyPhoto,
+  launchPhotoPicker,
+  readPickedPhotos,
 } from "../../../utility/photoIdentification";
-import type { PickedPhoto } from "../../../utility/photoIdentification";
+import type { PickedPhoto, PickedPhotos } from "../../../utility/photoIdentification";
 import {
   bestPhotoFor,
   combinePredictions,
@@ -31,12 +33,6 @@ type Mode = "same" | "separate";
 
 // undefined: not identified yet; null: the classifier failed on this photo
 type PhotoResult = PhotoPrediction[] | null | undefined;
-
-interface Params {
-  photos: PickedPhoto[];
-  // photos past MAX_PHOTOS the picker returned anyway
-  skipped: number;
-}
 
 const NO_PHOTOS: PickedPhoto[] = [];
 
@@ -61,11 +57,16 @@ const useCommonNames = ( taxonIds: number[] ) => {
   return names;
 };
 
-// Several gallery photos: identify each on its own, or combine them as one organism.
+// Gallery photos: identify each on its own, or combine them as one organism. Opened from
+// the camera with photos already picked, or on its own, when it opens the picker itself.
 const PhotoIdentifyScreen = ( ) => {
   const navigation = useNavigation<any>( );
   const { params } = useRoute<any>( );
-  const { photos = NO_PHOTOS, skipped = 0 } = ( params || {} ) as Params;
+  const [selection, setSelection] = useState<PickedPhotos>( ( ) => ( {
+    photos: params?.photos || NO_PHOTOS,
+    skipped: params?.skipped || 0,
+  } ) );
+  const { photos, skipped } = selection;
   const { startObservationWithImage } = useObservation( );
   const { login } = useContext( UserContext );
   const { theme } = useTheme( );
@@ -74,6 +75,35 @@ const PhotoIdentifyScreen = ( ) => {
   const [mode, setMode] = useState<Mode>( "same" );
   const [results, setResults] = useState<PhotoResult[]>( ( ) => photos.map( ( ) => undefined ) );
   const [opening, setOpening] = useState( false );
+  const [picking, setPicking] = useState( false );
+
+  const choosePhotos = useCallback( async ( ) => {
+    setPicking( true );
+    const assets = await launchPhotoPicker( );
+    const picked = assets ? await readPickedPhotos( assets ).catch( ( e ) => {
+      logger.error( "picked photos couldn't be read:", e );
+      return null;
+    } ) : null;
+    setPicking( false );
+    if ( !picked || picked.photos.length === 0 ) {
+      // nothing to show when opened without photos
+      if ( photos.length === 0 ) {
+        navigation.goBack( );
+      }
+      return;
+    }
+    setResults( picked.photos.map( ( ) => undefined ) );
+    setSelection( picked );
+  }, [navigation, photos.length] );
+
+  // opened without photos: start with the picker, once
+  const pickedOnOpen = useRef( false );
+  useEffect( ( ) => {
+    if ( !pickedOnOpen.current && photos.length === 0 ) {
+      pickedOnOpen.current = true;
+      choosePhotos( );
+    }
+  }, [choosePhotos, photos.length] );
 
   // one photo at a time: the native side runs one classifier anyway
   useEffect( ( ) => {
@@ -166,88 +196,116 @@ const PhotoIdentifyScreen = ( ) => {
           <ArrowLeftIcon color={theme.colors.text} size={24} strokeWidth={2} />
         </Pressable>
         <Text accessibilityRole="header" style={styles.title}>{i18n.t( "photo_id.header" )}</Text>
+        <Pressable
+          accessibilityLabel={i18n.t( "photo_id.choose_photos" )}
+          accessibilityRole="button"
+          disabled={picking || opening}
+          onPress={choosePhotos}
+          style={styles.iconButton}
+        >
+          <ImageIcon color={theme.colors.text} size={24} strokeWidth={2} />
+        </Pressable>
       </View>
 
-      <View accessibilityRole="tablist" style={styles.segments}>
-        {renderModeButton( "same", i18n.t( "photo_id.same_species" ) )}
-        {renderModeButton( "separate", i18n.t( "photo_id.separately" ) )}
-      </View>
-      <Text style={styles.hint}>
-        {i18n.t( mode === "same" ? "photo_id.same_species_hint" : "photo_id.separately_hint" )}
-        {skipped > 0 ? ` ${i18n.t( "photo_id.skipped", { max: MAX_PHOTOS } )}` : ""}
-      </Text>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        {mode === "same" && (
-          <View accessibilityLiveRegion="polite" style={styles.card}>
-            {identifying ? (
-              <View style={styles.row}>
-                <ActivityIndicator color={theme.colors.primary} />
-                <Text style={styles.progress}>
-                  {i18n.t( "photo_id.identifying", { done: done + 1, count: photos.length } )}
-                </Text>
-              </View>
-            ) : (
-              <>
-                <View style={styles.row}>
-                  <View style={styles.names}>
-                    <Text numberOfLines={1} style={styles.common}>{combinedName.primary}</Text>
-                    {combinedName.secondary
-                      ? <Text numberOfLines={1} style={styles.sci}>{combinedName.secondary}</Text>
-                      : null}
-                  </View>
-                  {combinedTaxon && (
-                    <>
-                      <View style={styles.barTrack}>
-                        <View style={[styles.barFill, { width: `${combinedScore}%` }]} />
-                      </View>
-                      <Text style={styles.pct}>{`${combinedScore}%`}</Text>
-                    </>
-                  )}
-                </View>
-                {/* only worth saying when the photos disagree */}
-                {combinedTaxon && agreeing < combined.photoCount && (
-                  <Text style={styles.agreement}>
-                    {i18n.t( "photo_id.agreement", { agree: agreeing, count: combined.photoCount } )}
-                  </Text>
-                )}
-              </>
+      {photos.length === 0 && (
+        <View style={styles.empty}>
+          {picking
+            ? <ActivityIndicator color={theme.colors.primary} />
+            : (
+              <Pressable accessibilityRole="button" onPress={choosePhotos} style={styles.filled}>
+                <Text style={styles.filledLabel}>{i18n.t( "photo_id.choose_photos" )}</Text>
+              </Pressable>
             )}
-          </View>
-        )}
+        </View>
+      )}
 
-        <View style={styles.grid}>
-          {photos.map( ( photo, i ) => {
-            const result = results[i];
-            const taxon = perPhotoTaxa[i];
-            const name = result === null ? { primary: i18n.t( "photo_id.failed" ), secondary: null } : label( taxon );
-            const disagrees = mode === "same" && combinedTaxon && result
-              && !result.some( p => p.taxon_id === combinedTaxon.taxon_id );
-            const tappable = mode === "separate" && !!result && !opening;
-            return (
-              <Pressable
-                accessibilityLabel={result === undefined ? undefined : name.primary}
-                accessibilityRole={mode === "separate" ? "button" : "image"}
-                disabled={!tappable}
-                key={photo.uri}
-                onPress={( ) => result && openMatch( photo, result )}
-                style={styles.tile}
-              >
-                <Image source={{ uri: photo.uri }} style={[styles.thumb, disagrees && styles.thumbDimmed]} />
-                {result === undefined
-                  ? <ActivityIndicator color={theme.colors.primary} style={styles.tileSpinner} />
-                  : (
-                    <Text numberOfLines={2} style={[styles.tileLabel, !taxon && styles.tileLabelMuted]}>
-                      {taxon ? `${name.primary} · ${Math.round( taxon.combined_score )}%` : name.primary}
+      {/* the two views only differ with several photos */}
+      {photos.length > 1 && (
+        <>
+          <View accessibilityRole="tablist" style={styles.segments}>
+            {renderModeButton( "same", i18n.t( "photo_id.same_species" ) )}
+            {renderModeButton( "separate", i18n.t( "photo_id.separately" ) )}
+          </View>
+          <Text style={styles.hint}>
+            {i18n.t( mode === "same" ? "photo_id.same_species_hint" : "photo_id.separately_hint" )}
+            {skipped > 0 ? ` ${i18n.t( "photo_id.skipped", { max: MAX_PHOTOS } )}` : ""}
+          </Text>
+        </>
+      )}
+
+      {photos.length > 0 && (
+        <ScrollView contentContainerStyle={styles.content}>
+          {( mode === "same" || photos.length === 1 ) && (
+            <View accessibilityLiveRegion="polite" style={styles.card}>
+              {identifying ? (
+                <View style={styles.row}>
+                  <ActivityIndicator color={theme.colors.primary} />
+                  <Text style={styles.progress}>
+                    {i18n.t( "photo_id.identifying", { done: done + 1, count: photos.length } )}
+                  </Text>
+                </View>
+              ) : (
+                <>
+                  <View style={styles.row}>
+                    <View style={styles.names}>
+                      <Text numberOfLines={1} style={styles.common}>{combinedName.primary}</Text>
+                      {combinedName.secondary
+                        ? <Text numberOfLines={1} style={styles.sci}>{combinedName.secondary}</Text>
+                        : null}
+                    </View>
+                    {combinedTaxon && (
+                      <>
+                        <View style={styles.barTrack}>
+                          <View style={[styles.barFill, { width: `${combinedScore}%` }]} />
+                        </View>
+                        <Text style={styles.pct}>{`${combinedScore}%`}</Text>
+                      </>
+                    )}
+                  </View>
+                  {/* only worth saying when the photos disagree */}
+                  {combinedTaxon && agreeing < combined.photoCount && (
+                    <Text style={styles.agreement}>
+                      {i18n.t( "photo_id.agreement", { agree: agreeing, count: combined.photoCount } )}
                     </Text>
                   )}
-              </Pressable>
-            );
-          } )}
-        </View>
-      </ScrollView>
+                </>
+              )}
+            </View>
+          )}
 
-      {mode === "same" && (
+          <View style={styles.grid}>
+            {photos.map( ( photo, i ) => {
+              const result = results[i];
+              const taxon = perPhotoTaxa[i];
+              const name = result === null ? { primary: i18n.t( "photo_id.failed" ), secondary: null } : label( taxon );
+              const disagrees = mode === "same" && combinedTaxon && result
+                && !result.some( p => p.taxon_id === combinedTaxon.taxon_id );
+              const tappable = mode === "separate" && !!result && !opening;
+              return (
+                <Pressable
+                  accessibilityLabel={result === undefined ? undefined : name.primary}
+                  accessibilityRole={mode === "separate" ? "button" : "image"}
+                  disabled={!tappable}
+                  key={photo.uri}
+                  onPress={( ) => result && openMatch( photo, result )}
+                  style={styles.tile}
+                >
+                  <Image source={{ uri: photo.uri }} style={[styles.thumb, disagrees && styles.thumbDimmed]} />
+                  {result === undefined
+                    ? <ActivityIndicator color={theme.colors.primary} style={styles.tileSpinner} />
+                    : (
+                      <Text numberOfLines={2} style={[styles.tileLabel, !taxon && styles.tileLabelMuted]}>
+                        {taxon ? `${name.primary} · ${Math.round( taxon.combined_score )}%` : name.primary}
+                      </Text>
+                    )}
+                </Pressable>
+              );
+            } )}
+          </View>
+        </ScrollView>
+      )}
+
+      {photos.length > 0 && ( mode === "same" || photos.length === 1 ) && (
         <View style={styles.actions}>
           <Pressable
             accessibilityRole="button"
@@ -292,6 +350,7 @@ const makeStyles = ( theme: any ) => StyleSheet.create( {
     marginTop: 8,
   },
   content: { gap: 16, padding: 16 },
+  empty: { alignItems: "stretch", flex: 1, justifyContent: "center", padding: 16 },
   card: {
     backgroundColor: theme.colors.surfaceContainerLow,
     borderRadius: 16,

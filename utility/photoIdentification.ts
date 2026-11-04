@@ -2,7 +2,9 @@
 // classifier on them and turning the result into the observation the Match screen shows.
 import { Platform } from "react-native";
 import { getUnixTime } from "date-fns";
+import * as ImagePicker from "react-native-image-picker";
 
+import i18n from "../i18n";
 import InatVision from "../components/Camera/ARCamera/helpers/visionPluginWrapper";
 import type { ObservationImage } from "../components/Providers/ObservationProvider";
 import { getActiveModelPack } from "./modelPacks";
@@ -94,4 +96,40 @@ const buildObservationImage = (
   return image;
 };
 
-export { readPickedPhoto, identifyPhoto, buildObservationImage };
+// Opens the photo library; null when nothing usable was picked. The picker never rejects,
+// it reports problems in errorCode.
+const launchPhotoPicker = async ( ): Promise<PickerAsset[] | null> => {
+  const response = await ImagePicker.launchImageLibrary( {
+    selectionLimit: MAX_PHOTOS,
+    mediaType: "photo",
+    includeBase64: false,
+    forceOldAndroidPhotoPicker: true,
+    chooserTitle: i18n.t( "gallery.import_photos_from" ),
+    presentationStyle: "overFullScreen",
+  } );
+  if ( !response || response.didCancel || !response.assets?.length || response.errorCode ) {
+    return null;
+  }
+  return response.assets;
+};
+
+export interface PickedPhotos {
+  photos: PickedPhoto[];
+  // photos past MAX_PHOTOS the picker returned anyway
+  skipped: number;
+}
+
+const readPickedPhotos = async ( assets: PickerAsset[] ): Promise<PickedPhotos> => {
+  const kept = assets.slice( 0, MAX_PHOTOS );
+  const photos = ( await Promise.all( kept.map( readPickedPhoto ) ) )
+    .filter( ( photo ): photo is PickedPhoto => photo !== null );
+  return { photos, skipped: assets.length - kept.length };
+};
+
+export {
+  readPickedPhoto,
+  identifyPhoto,
+  buildObservationImage,
+  launchPhotoPicker,
+  readPickedPhotos,
+};

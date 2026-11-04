@@ -492,7 +492,8 @@
     "no_id": "No confident identification",
     "failed": "Couldn't identify",
     "view_match": "View match",
-    "skipped": "Only the first {{max}} photos are used."
+    "skipped": "Only the first {{max}} photos are used.",
+    "choose_photos": "Choose photos"
   },
   "camera_help": {
     "title": "Seek's Camera",

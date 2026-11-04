@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import * as ImagePicker from "react-native-image-picker";
 import {
   TouchableOpacity,
   View,
@@ -10,10 +9,10 @@ import i18n from "../../../i18n";
 import { UserContext } from "../../UserContext";
 import { useObservation } from "../../Providers/ObservationProvider";
 import {
-  MAX_PHOTOS,
   buildObservationImage,
   identifyPhoto,
-  readPickedPhoto,
+  launchPhotoPicker,
+  readPickedPhotos,
 } from "../../../utility/photoIdentification";
 import type { PickedPhoto } from "../../../utility/photoIdentification";
 import { viewStyles } from "../../../styles/camera/arCameraOverlay";
@@ -68,29 +67,15 @@ const GalleryButton = ( { setIsActive, reframe = false }: Props ) => {
 
   const showPhotoGallery = async () => {
     setIsActive( false );
-    // According to the native code of the image picker library, it never rejects the promise,
-    // just returns a response object with errorCode
-    const response = await ImagePicker.launchImageLibrary( {
-      selectionLimit: MAX_PHOTOS,
-      mediaType: "photo",
-      includeBase64: false,
-      forceOldAndroidPhotoPicker: true,
-      chooserTitle: i18n.t( "gallery.import_photos_from" ),
-      presentationStyle: "overFullScreen",
-    } );
-
-    if ( !response || response.didCancel || !response.assets?.length || response.errorCode ) {
-      // User cancelled selection of photos - nothing to do here
+    const assets = await launchPhotoPicker( );
+    if ( !assets ) {
       setIsActive( true );
       return;
     }
 
     setImageSelected( true );
     try {
-      // the old Android picker doesn't enforce the selection limit
-      const assets = response.assets.slice( 0, MAX_PHOTOS );
-      const photos = ( await Promise.all( assets.map( readPickedPhoto ) ) )
-        .filter( ( photo ): photo is PickedPhoto => photo !== null );
+      const { photos, skipped } = await readPickedPhotos( assets );
       if ( photos.length === 0 ) {
         throw new Error( "No URI in pick photo response" );
       }
@@ -101,7 +86,7 @@ const GalleryButton = ( { setIsActive, reframe = false }: Props ) => {
       setImageSelected( false );
       navigation.navigate( "PhotoIdentify", {
         photos,
-        skipped: response.assets.length - assets.length,
+        skipped,
       } );
     } catch ( e ) {
       logger.error( "gallery photos couldn't be identified:", e );

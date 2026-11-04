@@ -47,7 +47,8 @@ export type RootStackParamList = {
   // photo -> pick / adjust the subject -> Match (see components/Camera/Reframe)
   Reframe: { image: object; photoPath: string };
   // several gallery photos: identify each, or combine them as one organism
-  PhotoIdentify: { photos: PickedPhoto[]; skipped: number };
+  // without params the screen opens the photo picker itself
+  PhotoIdentify: { photos: PickedPhoto[]; skipped: number } | undefined;
   Species: undefined;
   ChallengeDetails: undefined;
   QueuedObservations: undefined;
