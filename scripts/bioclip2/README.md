@@ -52,6 +52,41 @@ python bench/eval_tflite.py --pack packs/bioclip2-100k model_fp32.tflite model.t
 python bench/ram_probe.py packs/bioclip2-100k/model.tflite
 ```
 
+## NPU variant (Snapdragon)
+
+On phones with a Qualcomm Hexagon NPU (tested target: Snapdragon 8 Gen 3, Hexagon V75)
+the plugin runs `model_npu.tflite` from the pack on the NPU and keeps `model.tflite` as
+the CPU fallback. The NPU model is statically quantized: int8 weights, int16
+activations, with the layer-norm statistics (`SQUARED_DIFFERENCE`, `MEAN`, `RSQRT`)
+left in float.
+
+```sh
+python bench/fetch_calibration.py      # 300 iNat research-grade photos observed before 2026-06-30
+python quantize_npu.py packs/<pack>/model_fp32.tflite packs/<pack>/model_npu.tflite \
+    --float-ops SQUARED_DIFFERENCE,MEAN,RSQRT
+python bench/eval_tflite.py --pack packs/<pack> --per-group 40 --preds preds/ \
+    packs/<pack>/model_fp32.tflite packs/<pack>/model_npu.tflite
+```
+
+Calibration photos never overlap the benchmark photos (the script refuses
+`bench/images`). Results on the 400-photo benchmark:
+
+| Model | Top-1 | Same top-1 as fp32 |
+|---|---|---|
+| fp32 | 73.3% | — |
+| int8 weights, int16 activations, layer norm in float | 74.3% | 97.5% |
+| int8 weights, int16 activations, all quantized (50 photos) | — | 26% |
+| int8 weights, int8 activations (also with layer norm and softmax in float, 50 photos) | 0% | 0% |
+
+So a pack ships two models: int8 activations lose the model entirely, and the int16
+model is far too slow for the CPU fallback (13.6 s per photo on a 6-thread desktop CPU), so the CPU
+keeps the dynamic-range int8 `model.tflite`.
+
+The app build bundles Qualcomm's QNN libraries when `SEEK_QNN_SDK_DIR` points at an
+unpacked QAIRT SDK (see `android/app/build.gradle`). Qualcomm's license allows them
+only inside an app, so they are never committed. Without it the app classifies on the
+CPU. On the phone, `adb logcat -s InatVisionNpu` shows which accelerator loaded.
+
 ## Install on a phone (debug build)
 
 ```sh

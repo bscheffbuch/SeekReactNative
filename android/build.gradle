@@ -6,10 +6,10 @@ buildscript {
         minSdkVersion = 24
         compileSdkVersion = 36
         targetSdkVersion = 36
-        ndkVersion = "27.1.12297006"
+        ndkVersion = "29.0.14206865"
         kotlinVersion = "2.1.20"
         // This specifies which LiteRT version to use for our vision-plugin.
-        litertVersion = "1.4.0"
+        litertVersion = "2.3.2"
         // RN-maps uses this version of play-services-location, but RN-geolocation-service
         // uses 17.0.0 but is overridable like so
         playServicesLocationVersion = "21.0.1"

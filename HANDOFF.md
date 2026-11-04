@@ -127,6 +127,18 @@ To check on device: switch models in Settings (with a pack pushed), confirm
 the camera keeps classifying, and run TalkBack over Home, More, Observations
 and a species page.
 
+## Snapdragon NPU (this branch)
+
+The plugin runs a pack's `model_npu.tflite` on the Hexagon NPU through LiteRT's
+CompiledModel API (JIT-compiled on first load, cached in the app's cache dir) and falls
+back to the CPU model wherever that fails. Building, quantizing and the benchmark gate
+are in `scripts/bioclip2/README.md` ("NPU variant"). Release builds need
+`SEEK_QNN_SDK_DIR` for the NPU libraries; without it the APK is CPU-only.
+
+On the phone, still to check: `adb logcat -s InatVisionNpu` (accelerator and compile
+time), per-photo latency, `adb shell dumpsys meminfo org.inaturalist.seek.preview`
+(target ≤ 0.8 GB) and a CPU vs NPU top-3 comparison on the same photos.
+
 ## Material 3 port and preview APK (this branch)
 
 The Material 3 design from the design canvas is in the code:

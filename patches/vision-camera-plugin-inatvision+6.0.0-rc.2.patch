@@ -1,12 +1,17 @@
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/build.gradle b/node_modules/vision-camera-plugin-inatvision/android/build.gradle
-index 4c7855d..9b45bb1 100644
+index 4c7855d..13f64a2 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/build.gradle
 +++ b/node_modules/vision-camera-plugin-inatvision/android/build.gradle
-@@ -70,6 +70,7 @@ dependencies {
+@@ -69,7 +69,12 @@ dependencies {
+   implementation 'androidx.exifinterface:exifinterface:1.2.0'
    // CV model 1.0 works with TF Lite 1.15.0
    // CV model 2.3 works with TF Lite 2.?
++  // LiteRT 2: the Interpreter (CPU, XNNPACK) plus the CompiledModel API for the NPU
    implementation "com.google.ai.edge.litert:litert:${getExtOrDefault("litertVersion")}"
-+  implementation "com.google.ai.edge.litert:litert-gpu:${getExtOrDefault("litertVersion")}"
++  implementation "com.google.ai.edge.litert:litert-api:${getExtOrDefault("litertVersion")}"
++  // LiteRT's Qualcomm compiler plugin and dispatch library; the QNN libraries they load
++  // are added to the app's jniLibs at build time (see the app's build.gradle)
++  implementation "com.google.ai.edge.litert:litert-npu-runtime-qualcomm:${getExtOrDefault("litertVersion")}"
    implementation 'com.jakewharton.timber:timber:4.7.0'
  }
  
@@ -250,40 +255,38 @@ index 41eeb39..423d768 100644
      }
  
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-index dd91fb5..95f5fbe 100644
+index dd91fb5..0b68cb9 100644
 --- a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ImageClassifier.java
-@@ -2,9 +2,11 @@ package com.visioncameraplugininatvision;
+@@ -2,6 +2,8 @@ package com.visioncameraplugininatvision;
  
  import android.graphics.Bitmap;
  import android.graphics.Color;
 +import android.media.Image;
++import android.os.SystemClock;
  import android.util.Log;
  
  import org.tensorflow.lite.Interpreter;
-+import org.tensorflow.lite.gpu.GpuDelegate;
+@@ -14,8 +16,10 @@ import java.nio.ByteOrder;
+ import java.nio.MappedByteBuffer;
+ import java.nio.channels.FileChannel;
+ import java.util.ArrayList;
++import java.util.Arrays;
+ import java.util.HashMap;
+ import java.util.List;
++import java.util.Locale;
+ import java.util.Map;
  
- import java.io.FileInputStream;
- import java.io.IOException;
-@@ -49,9 +51,49 @@ public class ImageClassifier {
+ import timber.log.Timber;
+@@ -49,9 +53,44 @@ public class ImageClassifier {
      /** An instance of the driver class to run model inference with Tensorflow Lite. */
      private Interpreter mTFlite;
  
-+    /** Optional GPU delegate kept alive for the lifetime of the interpreter. */
-+    private GpuDelegate mGpuDelegate;
-+
-+    /** Delegate tiers the interpreter can run on, ordered from most to least preferred. */
-+    private static final int DELEGATE_TIER_GPU = 0;
-+    private static final int DELEGATE_TIER_NNAPI = 1;
-+    private static final int DELEGATE_TIER_CPU = 2;
-+
 +    /**
-+     * Models at least this big (e.g. the BioCLIP 2 pack, ~390 MB of int8 weights) start on the
-+     * CPU: XNNPACK runs dynamic-range int8 weights as they are (RAM ~ file size), while the GPU
-+     * delegate expands them to fp16 buffers (~2x the file, in shared system memory).
++     * The interpreter runs on the CPU (XNNPACK); since LiteRT 2 it has no GPU or NNAPI
++     * delegates. For dynamic-range int8 models such as the large model packs, XNNPACK keeps
++     * the weights as they are (RAM ~ file size). NPU inference goes through {@link NpuRunner}.
 +     */
-+    private static final long LARGE_MODEL_BYTES = 64L * 1024 * 1024;
-+
 +    private static Interpreter.Options cpuOptions() {
 +        Interpreter.Options options = new Interpreter.Options();
 +        options.setUseXNNPACK(true);
@@ -291,11 +294,16 @@ index dd91fb5..95f5fbe 100644
 +        return options;
 +    }
 +
-+    /** The delegate tier the current interpreter was created with. */
-+    private int mDelegateTier = DELEGATE_TIER_CPU;
-+
-+    /** The mapped model, kept so the interpreter can be recreated if a delegate fails at inference time. */
++    /** The mapped CPU model; only mapped when the CPU interpreter is needed. */
 +    private MappedByteBuffer mModelBuffer;
++
++    /** The pack's NPU model, when the device has a supported NPU; the interpreter is then created only as fallback. */
++    private NpuRunner mNpu;
++    private float[] mNpuInput;
++
++    /** Inference count and summed latency, logged periodically per accelerator. */
++    private int mInferenceCount;
++    private long mInferenceMillis;
 +
      /** A ByteBuffer to hold image data, to be feed into Tensorflow Lite as inputs. */
      private ByteBuffer imgData;
@@ -315,13 +323,11 @@ index dd91fb5..95f5fbe 100644
      private float[][] mGeomodelScores;
  
      public void setFilterByTaxonId(Integer taxonId) {
-@@ -79,15 +121,20 @@ public class ImageClassifier {
+@@ -79,20 +118,140 @@ public class ImageClassifier {
          mModelFilename = modelPath;
          mTaxonomyFilename = taxonomyPath;
          mModelVersion = version;
 -        mTFlite = new Interpreter(loadModelFile());
-+        mModelBuffer = loadModelFile();
-+        mTFlite = createInterpreter(mModelBuffer);
          imgData =
                  ByteBuffer.allocateDirect(
                          4 * DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE);
@@ -335,10 +341,133 @@ index dd91fb5..95f5fbe 100644
 +        outputScores = new float[1][mModelSize];
 +        combinedScores = new float[mModelSize];
 +        expectedOutputs.put(0, outputScores);
++
++        mNpu = NpuRunner.tryCreate(mModelFilename);
++        if (mNpu != null) {
++            try {
++                if (mNpu.outputSize() != mModelSize) {
++                    throw new IOException("NPU model has " + mNpu.outputSize() + " outputs, taxonomy " + mModelSize);
++                }
++                mNpuInput = new float[DIM_BATCH_SIZE * DIM_IMG_SIZE_X * DIM_IMG_SIZE_Y * DIM_PIXEL_SIZE];
++            } catch (Exception exc) {
++                Log.w(NpuRunner.TAG, "NPU model doesn't match the pack, using CPU: " + exc);
++                mNpu.close();
++                mNpu = null;
++            }
++        }
++        if (mNpu == null) {
++            createCpuInterpreter();
++        }
++        Log.i(NpuRunner.TAG, "Classifier accelerator: " + acceleratorName()
++                + (mNpu != null ? " (compiled in " + mNpu.compileMillis + " ms)" : ""));
++    }
++
++    private void createCpuInterpreter() throws IOException {
++        if (mTFlite != null) {
++            return;
++        }
++        mModelBuffer = loadModelFile();
++        mTFlite = new Interpreter(mModelBuffer, cpuOptions());
++    }
++
++    /** The accelerator inference currently runs on, for logs. */
++    public String acceleratorName() {
++        if (mNpu != null) {
++            return "NPU";
++        }
++        return mTFlite != null ? "CPU (XNNPACK)" : "none";
++    }
++
++    private boolean isReady() {
++        return mNpu != null || mTFlite != null;
++    }
++
++    /** Runs the vision model on imgData into outputScores, on the NPU if loaded, else the interpreter. */
++    private void runVisionModel() throws Exception {
++        long start = SystemClock.elapsedRealtime();
++        if (mNpu != null) {
++            try {
++                ByteBuffer input = imgData.duplicate().order(ByteOrder.nativeOrder());
++                input.rewind();
++                input.asFloatBuffer().get(mNpuInput);
++                mNpu.run(mNpuInput, outputScores[0]);
++                logLatency(start);
++                if (Log.isLoggable(NpuRunner.TAG, Log.DEBUG)) {
++                    compareWithCpu();
++                }
++                return;
++            } catch (Exception exc) {
++                Log.w(NpuRunner.TAG, "NPU inference failed, falling back to CPU: " + exc);
++                mNpu.close();
++                mNpu = null;
++                createCpuInterpreter();
++                Log.i(NpuRunner.TAG, "Classifier accelerator: " + acceleratorName());
++                start = SystemClock.elapsedRealtime();
++            }
++        }
++        imgData.rewind();
++        mTFlite.runForMultipleInputsOutputs(inputArray, expectedOutputs);
++        logLatency(start);
++    }
++
++    /**
++     * Debug check, enabled with {@code adb shell setprop log.tag.InatVisionNpu DEBUG}: runs
++     * the same input through the CPU model as well and logs both top-3 (model output
++     * index:score). Keeps the CPU interpreter loaded, so measure memory with it off.
++     */
++    private void compareWithCpu() {
++        try {
++            createCpuInterpreter();
++            float[][] cpuScores = new float[1][mModelSize];
++            Map<Integer, Object> cpuOutputs = new HashMap<>();
++            cpuOutputs.put(0, cpuScores);
++            imgData.rewind();
++            mTFlite.runForMultipleInputsOutputs(inputArray, cpuOutputs);
++            Log.d(NpuRunner.TAG, "Top-3 NPU " + topScores(outputScores[0], 3) + " CPU " + topScores(cpuScores[0], 3));
++        } catch (Exception | OutOfMemoryError exc) {
++            Log.w(NpuRunner.TAG, "CPU comparison failed: " + exc);
++        }
++    }
++
++    private static String topScores(float[] scores, int count) {
++        int[] top = new int[count];
++        Arrays.fill(top, -1);
++        for (int i = 0; i < scores.length; i++) {
++            for (int k = 0; k < count; k++) {
++                if (top[k] < 0 || scores[i] > scores[top[k]]) {
++                    System.arraycopy(top, k, top, k + 1, count - k - 1);
++                    top[k] = i;
++                    break;
++                }
++            }
++        }
++        StringBuilder out = new StringBuilder("[");
++        for (int k = 0; k < count && top[k] >= 0; k++) {
++            out.append(k > 0 ? " " : "").append(top[k]).append(':')
++                    .append(String.format(Locale.ROOT, "%.3f", scores[top[k]]));
++        }
++        return out.append(']').toString();
++    }
++
++    /** Logs the first inferences (the first includes warm-up) and then a running average. */
++    private void logLatency(long start) {
++        long millis = SystemClock.elapsedRealtime() - start;
++        mInferenceCount++;
++        mInferenceMillis += millis;
++        if (mInferenceCount <= 3 || mInferenceCount % 50 == 0) {
++            Log.i(NpuRunner.TAG, "Inference on " + acceleratorName() + ": " + millis + " ms (average "
++                    + (mInferenceMillis / mInferenceCount) + " ms over " + mInferenceCount + ")");
++        }
      }
  
      /** Classifies a frame from the preview stream. */
-@@ -102,31 +149,68 @@ public class ImageClassifier {
+     public List<Prediction> classifyBitmap(Bitmap bitmap, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
+-        if (mTFlite == null) {
++        if (!isReady()) {
+             Timber.tag(TAG).e("Image classifier has not been initialized; Skipped.");
+             return null;
+         }
+@@ -102,31 +261,54 @@ public class ImageClassifier {
          }
          convertBitmapToByteBuffer(bitmap);
  
@@ -346,21 +475,21 @@ index dd91fb5..95f5fbe 100644
 -        imgData.get(arr);
 +        return runInference(taxonomyRollupCutoff, commonAncestorMode);
 +    }
++
++    public List<Prediction> classifyImage(Image image, double cropRatio, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
++        return classifyImage(image, cropRatio, null, taxonomyRollupCutoff, commonAncestorMode);
++    }
  
 -        Map<Integer, Object> expectedOutputs = new HashMap<>();
 -        for (int i = 0; i < 1; i++) {
 -            expectedOutputs.put(i, new float[1][mModelSize]);
-+    public List<Prediction> classifyImage(Image image, double cropRatio, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
-+        return classifyImage(image, cropRatio, null, taxonomyRollupCutoff, commonAncestorMode);
-+    }
-+
 +    /**
 +     * cropRect: optional {left, top, width, height} as fractions of the frame (sensor
 +     * orientation). The model sees the smallest square around it (padded 10%, kept
 +     * inside the frame); null uses the centered cropRatio square.
 +     */
 +    public List<Prediction> classifyImage(Image image, double cropRatio, float[] cropRect, Double taxonomyRollupCutoff, Boolean commonAncestorMode) {
-+        if (mTFlite == null) {
++        if (!isReady()) {
 +            Timber.tag(TAG).e("Image classifier has not been initialized; Skipped.");
 +            return new ArrayList<Prediction>();
          }
@@ -382,21 +511,7 @@ index dd91fb5..95f5fbe 100644
          List<Prediction> predictions = null;
          try {
 -            mTFlite.runForMultipleInputsOutputs(input, expectedOutputs);
-+            // GPU/NNAPI delegates can be constructed successfully but still fail on the
-+            // first run(); fall back to the next tier (ultimately CPU) and retry so such
-+            // devices don't silently get zero predictions forever.
-+            boolean ranInference = false;
-+            while (!ranInference) {
-+                try {
-+                    mTFlite.runForMultipleInputsOutputs(inputArray, expectedOutputs);
-+                    ranInference = true;
-+                } catch (Exception inferenceExc) {
-+                    if (!fallbackToNextDelegateTier(inferenceExc)) {
-+                        throw inferenceExc;
-+                    }
-+                    imgData.rewind();
-+                }
-+            }
++            runVisionModel();
              // Get raw vision scores
 -            float[] visionScores = ((float[][]) expectedOutputs.get(0))[0];
 -            float[] combinedScores = new float[visionScores.length];
@@ -422,100 +537,20 @@ index dd91fb5..95f5fbe 100644
          } catch (Exception exc) {
              exc.printStackTrace();
              return new ArrayList<Prediction>();
-@@ -140,15 +224,101 @@ public class ImageClassifier {
+@@ -140,15 +322,21 @@ public class ImageClassifier {
  
      /** Closes tflite to release resources. */
      public void close() {
 -        mTFlite.close();
++        if (mNpu != null) {
++            mNpu.close();
++        }
++        mNpu = null;
 +        if (mTFlite != null) {
 +            mTFlite.close();
 +        }
          mTFlite = null;
-+        if (mGpuDelegate != null) {
-+            mGpuDelegate.close();
-+        }
-+        mGpuDelegate = null;
 +        mModelBuffer = null;
-+    }
-+
-+    private Interpreter createInterpreter(MappedByteBuffer modelBuffer) {
-+        if (modelBuffer.capacity() >= LARGE_MODEL_BYTES) {
-+            try {
-+                mDelegateTier = DELEGATE_TIER_CPU;
-+                return new Interpreter(modelBuffer, cpuOptions());
-+            } catch (Exception exc) {
-+                Timber.tag(TAG).w("Failed to initialize CPU interpreter for a large model, trying delegates: " + exc);
-+            }
-+        }
-+        try {
-+            Interpreter.Options gpuOptions = new Interpreter.Options();
-+            mGpuDelegate = new GpuDelegate();
-+            gpuOptions.addDelegate(mGpuDelegate);
-+            Interpreter gpuInterpreter = new Interpreter(modelBuffer, gpuOptions);
-+            mDelegateTier = DELEGATE_TIER_GPU;
-+            return gpuInterpreter;
-+        } catch (Exception exc) {
-+            Timber.tag(TAG).w("Failed to initialize GPU delegate, falling back: " + exc);
-+            if (mGpuDelegate != null) {
-+                mGpuDelegate.close();
-+                mGpuDelegate = null;
-+            }
-+        }
-+
-+        try {
-+            Interpreter.Options nnapiOptions = new Interpreter.Options();
-+            nnapiOptions.setUseNNAPI(true);
-+            Interpreter nnapiInterpreter = new Interpreter(modelBuffer, nnapiOptions);
-+            mDelegateTier = DELEGATE_TIER_NNAPI;
-+            return nnapiInterpreter;
-+        } catch (Exception exc) {
-+            Timber.tag(TAG).w("Failed to initialize NNAPI delegate, falling back to CPU: " + exc);
-+        }
-+
-+        mDelegateTier = DELEGATE_TIER_CPU;
-+        return new Interpreter(modelBuffer, cpuOptions());
-+    }
-+
-+    /**
-+     * Recreates the interpreter with the next delegate tier (GPU -> NNAPI -> CPU) after an
-+     * inference-time failure. Returns true if a new interpreter is ready and the inference
-+     * can be retried, false if the classifier was already on CPU (or cannot be recreated).
-+     */
-+    private boolean fallbackToNextDelegateTier(Exception inferenceExc) {
-+        if (mDelegateTier >= DELEGATE_TIER_CPU || mModelBuffer == null) {
-+            return false;
-+        }
-+
-+        Timber.tag(TAG).w("Inference failed on delegate tier " + mDelegateTier + ", falling back: " + inferenceExc);
-+        if (mTFlite != null) {
-+            mTFlite.close();
-+            mTFlite = null;
-+        }
-+        if (mGpuDelegate != null) {
-+            mGpuDelegate.close();
-+            mGpuDelegate = null;
-+        }
-+
-+        if (mDelegateTier < DELEGATE_TIER_NNAPI) {
-+            try {
-+                Interpreter.Options nnapiOptions = new Interpreter.Options();
-+                nnapiOptions.setUseNNAPI(true);
-+                mTFlite = new Interpreter(mModelBuffer, nnapiOptions);
-+                mDelegateTier = DELEGATE_TIER_NNAPI;
-+                return true;
-+            } catch (Exception exc) {
-+                Timber.tag(TAG).w("Failed to initialize NNAPI delegate during fallback: " + exc);
-+            }
-+        }
-+
-+        try {
-+            mTFlite = new Interpreter(mModelBuffer, cpuOptions());
-+            mDelegateTier = DELEGATE_TIER_CPU;
-+            return true;
-+        } catch (Exception exc) {
-+            Timber.tag(TAG).e("Failed to recreate interpreter on CPU during fallback: " + exc);
-+            return false;
-+        }
      }
  
      /** Memory-map the model file in Assets. */
@@ -528,7 +563,7 @@ index dd91fb5..95f5fbe 100644
      }
  
      /** Writes Image data into a {@code ByteBuffer}. */
-@@ -158,46 +328,159 @@ public class ImageClassifier {
+@@ -158,46 +346,159 @@ public class ImageClassifier {
          }
          imgData.rewind();
  
@@ -716,7 +751,7 @@ index dd91fb5..95f5fbe 100644
          float sum = 0.0f;
  
          // First multiply the scores
-@@ -214,8 +497,6 @@ public class ImageClassifier {
+@@ -214,8 +515,6 @@ public class ImageClassifier {
                  combinedScores[i] = combinedScores[i] / sum;
              }
          }
@@ -727,15 +762,16 @@ index dd91fb5..95f5fbe 100644
  }
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ModelFiles.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ModelFiles.java
 new file mode 100644
-index 0000000..921d10c
+index 0000000..2bf3969
 --- /dev/null
 +++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/ModelFiles.java
-@@ -0,0 +1,55 @@
+@@ -0,0 +1,72 @@
 +package com.visioncameraplugininatvision;
 +
 +import android.content.Context;
 +import android.content.res.AssetFileDescriptor;
 +
++import java.io.File;
 +import java.io.FileInputStream;
 +import java.io.IOException;
 +import java.io.InputStream;
@@ -757,6 +793,22 @@ index 0000000..921d10c
 +    static void init(Context context) {
 +        if (context != null) {
 +            sAppContext = context.getApplicationContext();
++        }
++    }
++
++    static Context context() {
++        return sAppContext;
++    }
++
++    /** True if the file (or "asset:/" entry) exists and can be opened. */
++    static boolean exists(String path) {
++        if (!path.startsWith(ASSET_PREFIX)) {
++            return new File(path).isFile();
++        }
++        try (AssetFileDescriptor fd = sAppContext == null ? null : sAppContext.getAssets().openFd(assetName(path))) {
++            return fd != null;
++        } catch (IOException exc) {
++            return false;
 +        }
 +    }
 +
@@ -901,6 +953,158 @@ index df84da8..92a0ad2 100644
      }
  
      public Node() {
+diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/NpuRunner.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/NpuRunner.java
+new file mode 100644
+index 0000000..5276f7f
+--- /dev/null
++++ b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/NpuRunner.java
+@@ -0,0 +1,146 @@
++package com.visioncameraplugininatvision;
++
++import android.content.Context;
++import android.os.Build;
++import android.os.SystemClock;
++import android.util.Log;
++
++import com.google.ai.edge.litert.Accelerator;
++import com.google.ai.edge.litert.CompiledModel;
++import com.google.ai.edge.litert.Environment;
++import com.google.ai.edge.litert.TensorBuffer;
++
++import java.io.BufferedReader;
++import java.io.File;
++import java.io.FileReader;
++import java.io.IOException;
++import java.util.EnumMap;
++import java.util.List;
++import java.util.Map;
++import java.util.Set;
++
++/**
++ * Runs a pack's NPU model through LiteRT's CompiledModel API on a Qualcomm Hexagon NPU.
++ *
++ * The NPU model is a statically quantized copy of the pack model, stored next to it as
++ * {@value #NPU_MODEL_NAME}. It is compiled for the NPU on the device when it is first
++ * loaded; LiteRT caches the compiled model in the app's cache dir, so later loads skip
++ * the compilation. The Qualcomm runtime and QNN libraries ship in the APK's native
++ * library dir. {@link #tryCreate} returns null wherever the NPU can't be used, and the
++ * caller keeps its CPU interpreter.
++ */
++final class NpuRunner implements AutoCloseable {
++    static final String TAG = "InatVisionNpu";
++    static final String NPU_MODEL_NAME = "model_npu.tflite";
++
++    private final Environment mEnvironment;
++    private final CompiledModel mModel;
++    private final List<TensorBuffer> mInputs;
++    private final List<TensorBuffer> mOutputs;
++    final long compileMillis;
++
++    private NpuRunner(Environment environment, CompiledModel model, long compileMillis) throws Exception {
++        mEnvironment = environment;
++        mModel = model;
++        mInputs = model.createInputBuffers();
++        mOutputs = model.createOutputBuffers();
++        this.compileMillis = compileMillis;
++    }
++
++    /** The NPU model next to a pack model: "asset:/" paths, plain files, or a "<file>.asset" marker. */
++    static String npuModelPath(String modelPath) {
++        String path = modelPath.substring(0, modelPath.lastIndexOf('/') + 1) + NPU_MODEL_NAME;
++        if (path.startsWith(ModelFiles.ASSET_PREFIX) || new File(path).exists()) {
++            return path;
++        }
++        File marker = new File(path + ".asset");
++        if (marker.exists()) {
++            try (BufferedReader in = new BufferedReader(new FileReader(marker))) {
++                String asset = in.readLine();
++                if (asset != null && asset.trim().startsWith(ModelFiles.ASSET_PREFIX)) {
++                    return asset.trim();
++                }
++            } catch (IOException exc) {
++                Log.w(TAG, "Could not read " + marker + ": " + exc);
++            }
++        }
++        return path;
++    }
++
++    /** Loads and compiles the NPU model next to modelPath, or returns null to keep the CPU path. */
++    static NpuRunner tryCreate(String modelPath) {
++        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
++            Log.i(TAG, "NPU needs Android 12+, using CPU");
++            return null;
++        }
++        Context context = ModelFiles.context();
++        if (context == null) {
++            Log.i(TAG, "No context for the NPU runtime, using CPU");
++            return null;
++        }
++        String path = npuModelPath(modelPath);
++        if (!ModelFiles.exists(path)) {
++            Log.i(TAG, "No NPU model at " + path + ", using CPU");
++            return null;
++        }
++
++        Environment environment = null;
++        try {
++            String libraryDir = context.getApplicationInfo().nativeLibraryDir;
++            Map<Environment.Option, String> options = new EnumMap<>(Environment.Option.class);
++            options.put(Environment.Option.DispatchLibraryDir, libraryDir);
++            options.put(Environment.Option.CompilerPluginLibraryDir, libraryDir);
++            // true: keep JIT-compiled NPU models in the cache dir between launches
++            environment = Environment.create(context, options, true);
++            Set<Accelerator> available = environment.getAvailableAccelerators();
++            if (!available.contains(Accelerator.NPU)) {
++                Log.i(TAG, "No NPU accelerator (available: " + available + "), using CPU");
++                environment.close();
++                return null;
++            }
++
++            long start = SystemClock.elapsedRealtime();
++            // ops the NPU compiler rejects (the float layer-norm statistics) run on the CPU
++            CompiledModel.Options modelOptions = new CompiledModel.Options(Accelerator.NPU, Accelerator.CPU);
++            CompiledModel model = path.startsWith(ModelFiles.ASSET_PREFIX)
++                    ? CompiledModel.create(context.getAssets(), path.substring(ModelFiles.ASSET_PREFIX.length()), modelOptions, environment)
++                    : CompiledModel.create(path, modelOptions, environment);
++            long compileMillis = SystemClock.elapsedRealtime() - start;
++            NpuRunner runner = new NpuRunner(environment, model, compileMillis);
++            Log.i(TAG, "Loaded " + path + " on NPU in " + compileMillis + " ms");
++            return runner;
++        } catch (Throwable exc) {
++            // LiteRtException, missing native libraries (UnsatisfiedLinkError), unsupported SoC
++            Log.w(TAG, "NPU unavailable, using CPU: " + exc);
++            if (environment != null) {
++                environment.close();
++            }
++            return null;
++        }
++    }
++
++    /** Number of floats in the (single) output tensor. */
++    int outputSize() throws Exception {
++        return mOutputs.get(0).readFloat().length;
++    }
++
++    /** Runs one inference; output must hold {@link #outputSize()} floats. */
++    void run(float[] input, float[] output) throws Exception {
++        mInputs.get(0).writeFloat(input);
++        mModel.run(mInputs, mOutputs);
++        float[] scores = mOutputs.get(0).readFloat();
++        System.arraycopy(scores, 0, output, 0, Math.min(scores.length, output.length));
++    }
++
++    @Override
++    public void close() {
++        for (TensorBuffer buffer : mInputs) {
++            buffer.close();
++        }
++        for (TensorBuffer buffer : mOutputs) {
++            buffer.close();
++        }
++        mModel.close();
++        mEnvironment.close();
++    }
++}
 diff --git a/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/SharedImageClassifier.java b/node_modules/vision-camera-plugin-inatvision/android/src/main/java/com/visioncameraplugininatvision/SharedImageClassifier.java
 new file mode 100644
 index 0000000..17fae20
@@ -1472,7 +1676,7 @@ diff --git a/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPlugin
 index 76960db..5d12b3d 100644
 --- a/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m
 +++ b/node_modules/vision-camera-plugin-inatvision/ios/VisionCameraPluginInatVision/VisionCameraPluginInatVision.m
-@@ -63,7 +63,9 @@
+@@ -63,7 +63,9 @@ - (id)callback:(Frame*)frame withArguments:(NSDictionary*)arguments {
      NSDate *startDate = [NSDate date];
  
      // Log arguments

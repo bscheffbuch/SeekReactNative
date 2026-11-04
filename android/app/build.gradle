@@ -96,6 +96,44 @@ def includeDebugCameraAssetsInRelease = project.hasProperty('SEEK_INCLUDE_DEBUG_
 // adding international version for timezone support with date-fns-tz in posting to iNat
 def jscFlavor = 'io.github.react-native-community:jsc-android:2026004.+'
 
+/**
+ * QNN libraries for the Snapdragon NPU, copied from a local QAIRT SDK at build time.
+ * Qualcomm's license lets apps ship them inside the APK but not on their own, so they
+ * are never committed. Point SEEK_QNN_SDK_DIR (gradle property or environment variable)
+ * at an unpacked QAIRT SDK (its root, with lib/aarch64-android and lib/hexagon-v75) or at
+ * a folder holding the five libraries. Without it the app builds and classifies on the CPU.
+ */
+def qnnSdkDir = project.findProperty('SEEK_QNN_SDK_DIR') ?: System.getenv('SEEK_QNN_SDK_DIR')
+def qnnJniLibsDir = layout.buildDirectory.dir("generated/qnn-jniLibs").get().asFile
+def qnnLibraries = [
+    "lib/aarch64-android/libQnnHtp.so",
+    "lib/aarch64-android/libQnnHtpV75Stub.so",
+    "lib/aarch64-android/libQnnSystem.so",
+    "lib/aarch64-android/libQnnHtpPrepare.so",
+    "lib/hexagon-v75/unsigned/libQnnHtpV75Skel.so",
+]
+def copyQnnLibraries = tasks.register("copyQnnLibraries") {
+    def outDir = new File(qnnJniLibsDir, "arm64-v8a")
+    outputs.dir(outDir)
+    doLast {
+        project.delete(outDir)
+        outDir.mkdirs()
+        if (!qnnSdkDir) {
+            logger.warn("SEEK_QNN_SDK_DIR not set: building without the NPU libraries (CPU only)")
+            return
+        }
+        qnnLibraries.each { relative ->
+            def name = new File(relative).name
+            def source = [new File(qnnSdkDir, relative), new File(qnnSdkDir, name)].find { it.isFile() }
+            if (source == null) {
+                throw new GradleException("${name} not found in SEEK_QNN_SDK_DIR=${qnnSdkDir}")
+            }
+            project.copy { from source; into outDir }
+        }
+    }
+}
+preBuild.dependsOn(copyQnnLibraries)
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -154,6 +192,22 @@ android {
     // uncompressed makes that a straight copy.
     androidResources {
         noCompress += ["tflite"]
+    }
+
+    // The NPU path (Qualcomm Hexagon) loads native libraries LiteRT finds by path in the
+    // app's native library dir, so they must be extracted on install. The QNN
+    // libraries are added from a local Qualcomm AI Runtime (QAIRT) SDK, see SEEK_QNN_SDK_DIR above;
+    // they are prebuilt and stripped, and the DSP skeleton isn't an ARM binary.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+            keepDebugSymbols += ["**/libQnn*.so"]
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs += [qnnJniLibsDir]
+        }
     }
 
     if (includeDebugCameraAssetsInRelease) {
