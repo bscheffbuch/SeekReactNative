@@ -183,6 +183,103 @@ interface Observation {
   vision: boolean;
 }
 
+const genericPhotoError = ( ): ErrorType => ( {
+  error: {
+    type: "photo",
+    errorText: i18n.t( "post_to_inat_card.error_photo" ),
+  },
+} );
+
+// photoUris is a JSON array; null means the observation only has `photo.uri`,
+// an empty stored array means every photo has already been handled
+const parsePhotoUris = ( observation ): string[] | null => {
+  if ( !observation.photoUris ) {
+    return null;
+  }
+  try {
+    const parsed = JSON.parse( observation.photoUris );
+    return Array.isArray( parsed ) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+// Adds each photo to the iNat observation `id`, in order (the first becomes the cover).
+// The remaining list is persisted after every photo, so a retry or a crash mid-loop
+// never uploads a photo twice. Unreadable photos are dropped for good; photos that
+// fail for another reason stay in the list for the next attempt.
+const uploadPhotoList = async (
+  observation,
+  photoUris: string[],
+  id: number,
+  token: string,
+  { deleteUploaded }: { deleteUploaded: boolean }
+): Promise<{ uploadedPhotoCount: number; remaining: string[]; firstPhotoError?: ErrorType }> => {
+  let uploadedPhotoCount = 0;
+  let remaining: string[] = [...photoUris];
+  let firstPhotoError: ErrorType | undefined;
+
+  const persistRemaining = async ( ) => {
+    const realm = await Realm.open( realmConfig );
+    realm.write( ( ) => {
+      observation.photoUris = JSON.stringify( remaining );
+    } );
+  };
+
+  for ( const uri of photoUris ) {
+    const resizedPhoto = await resizeImageForUpload( uri );
+    if ( !resizedPhoto ) {
+      remaining = remaining.filter( u => u !== uri );
+      await persistRemaining( );
+      if ( deleteUploaded ) {
+        deleteBackupFile( uri );
+      }
+      firstPhotoError = firstPhotoError || genericPhotoError( );
+      continue;
+    }
+    const photoUpload = await appendPhotoToObservation(
+      { id, uuid: createUUID.v4(), uri: resizedPhoto },
+      token,
+      resizedPhoto
+    );
+    if ( photoUpload === true ) {
+      uploadedPhotoCount += 1;
+      remaining = remaining.filter( u => u !== uri );
+      await persistRemaining( );
+      if ( deleteUploaded ) {
+        // uploaded, so the local backup copy is no longer needed
+        deleteBackupFile( uri );
+      }
+    } else {
+      firstPhotoError = firstPhotoError || photoUpload || genericPhotoError( );
+    }
+  }
+  return { uploadedPhotoCount, remaining, firstPhotoError };
+};
+
+// An observation posted with several photos (from identifying multiple photos of one
+// organism): all of them go to the same iNat observation, best photo first.
+const uploadObservationPhotos = async (
+  observation,
+  photoUris: string[],
+  id: number,
+  token: string
+): Promise<boolean | ErrorType> => {
+  const { uploadedPhotoCount, remaining, firstPhotoError } = await uploadPhotoList(
+    observation, photoUris, id, token, { deleteUploaded: false }
+  );
+  if ( remaining.length > 0 ) {
+    return firstPhotoError || genericPhotoError( );
+  }
+  if ( uploadedPhotoCount === 0 && firstPhotoError ) {
+    // nothing uploaded and nothing left to retry
+    saveUploadFailed( id );
+    return firstPhotoError;
+  }
+  saveUploadSucceeded( id );
+  return true;
+};
+
 const uploadObservation = async ( observation: Observation ): Promise<boolean | ErrorType | undefined> => {
   const login = await fetchAccessToken( );
   logger.debug( `login: ${login}` );
@@ -217,6 +314,8 @@ const uploadObservation = async ( observation: Observation ): Promise<boolean | 
   }
   const options = { api_token: token };
   logger.debug( `options.api_token: ${options.api_token}` );
+  // several photos of the same organism, best first; null for a single photo
+  const photoUris = parsePhotoUris( observation );
 
   try {
     if ( !observation.photo.id ) {
@@ -225,12 +324,16 @@ const uploadObservation = async ( observation: Observation ): Promise<boolean | 
       logger.debug( `id: ${id}` );
 
       const photo = await saveObservationId( id, observation.photo );
-      return await uploadPhoto( photo, token );
+      return photoUris
+        ? await uploadObservationPhotos( observation, photoUris, id, token )
+        : await uploadPhoto( photo, token );
     } else {
       // don't try to create an observation which has already been uploaded to
       // iNat; this leads to limitless repeat identifications if a user suggests a different identification
       // than what's stored in observation.taxon_id via iNat web/apps
-      return await uploadPhoto( observation.photo, token );
+      return photoUris
+        ? await uploadObservationPhotos( observation, photoUris, observation.photo.id, token )
+        : await uploadPhoto( observation.photo, token );
     }
   } catch ( e ) {
     logger.debug( `error: ${e}` );
@@ -262,13 +365,6 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
   }
   const options = { api_token: token };
 
-  const genericPhotoError: ErrorType = {
-    error: {
-      type: "photo",
-      errorText: i18n.t( "post_to_inat_card.error_photo" ),
-    },
-  };
-
   // mark the draft as permanently failed (analogous to uploadFailed on the
   // normal upload path) so Seek doesn't retry an upload that can never succeed
   const markQueuedUploadFailed = async ( ) => {
@@ -285,28 +381,17 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
     }
   };
 
-  let photoUris: string[] = [];
-  let hasStoredPhotoUris = false;
-  try {
-    if ( observation.photoUris ) {
-      const parsed = JSON.parse( observation.photoUris );
-      if ( Array.isArray( parsed ) ) {
-        photoUris = parsed;
-        hasStoredPhotoUris = true;
-      }
-    }
-  } catch {
-    photoUris = [];
-  }
+  const storedPhotoUris = parsePhotoUris( observation );
+  let photoUris: string[] = storedPhotoUris || [];
   // fall back to the representative photo only for legacy records that never
   // stored a photoUris array; an empty stored array means nothing is left
-  if ( !hasStoredPhotoUris && photoUris.length === 0 && observation.photo?.uri ) {
+  if ( !storedPhotoUris && observation.photo?.uri ) {
     photoUris = [observation.photo.uri];
   }
 
   if ( photoUris.length === 0 ) {
     await markQueuedUploadFailed( );
-    return genericPhotoError;
+    return genericPhotoError( );
   }
 
   const params = {
@@ -338,47 +423,11 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
       logger.debug( `queued observation created with id: ${id}` );
     }
 
-    let uploadedPhotoCount = 0;
-    let remainingPhotoUris: string[] = [...photoUris];
-    let firstPhotoError: ErrorType | undefined;
+    const { uploadedPhotoCount, remaining, firstPhotoError } = await uploadPhotoList(
+      observation, photoUris, id, token, { deleteUploaded: true }
+    );
 
-    // persist the remaining list after every removal so a crash mid-loop
-    // doesn't re-upload photos that already made it to iNat
-    const persistRemainingPhotoUris = async ( ) => {
-      const realm = await Realm.open( realmConfig );
-      realm.write( ( ) => {
-        observation.photoUris = JSON.stringify( remainingPhotoUris );
-      } );
-    };
-
-    for ( const uri of photoUris ) {
-      const resizedPhoto = await resizeImageForUpload( uri );
-      if ( !resizedPhoto ) {
-        // photo is missing/unreadable and can never upload; drop it for good
-        remainingPhotoUris = remainingPhotoUris.filter( u => u !== uri );
-        await persistRemainingPhotoUris( );
-        deleteBackupFile( uri );
-        firstPhotoError = firstPhotoError || genericPhotoError;
-        continue;
-      }
-      const photoUpload = await appendPhotoToObservation(
-        { id, uuid: createUUID.v4(), uri: resizedPhoto },
-        token,
-        resizedPhoto
-      );
-      if ( photoUpload === true ) {
-        uploadedPhotoCount += 1;
-        remainingPhotoUris = remainingPhotoUris.filter( u => u !== uri );
-        await persistRemainingPhotoUris( );
-        // uploaded, so the local backup copy is no longer needed
-        deleteBackupFile( uri );
-      } else {
-        // transient failure: keep the uri around so it retries next time
-        firstPhotoError = firstPhotoError || photoUpload || genericPhotoError;
-      }
-    }
-
-    if ( remainingPhotoUris.length === 0 ) {
+    if ( remaining.length === 0 ) {
       if ( uploadedPhotoCount > 0 ) {
         // everything that could upload has uploaded; any unreadable photos
         // were dropped permanently above
@@ -386,10 +435,10 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
       }
       // nothing uploaded and nothing left to retry
       await markQueuedUploadFailed( );
-      return firstPhotoError || genericPhotoError;
+      return firstPhotoError || genericPhotoError( );
     }
 
-    return firstPhotoError || genericPhotoError;
+    return firstPhotoError || genericPhotoError( );
   } catch ( e ) {
     logger.debug( `uploadQueuedObservation error: ${e}` );
     if ( e.message === "timeout" ) {
@@ -399,7 +448,12 @@ const uploadQueuedObservation = async ( observation ): Promise<boolean | ErrorTy
   }
 };
 
-const saveObservationToRealm = async ( observation: Observation, uri: string ): Promise<boolean | ErrorType | undefined> => {
+// extraUris: more photos of the same organism, posted to the same iNat observation after `uri`
+const saveObservationToRealm = async (
+  observation: Observation,
+  uri: string,
+  extraUris: string[] = []
+): Promise<boolean | ErrorType | undefined> => {
   const realm = await Realm.open( realmConfig );
   const obsUUID = createUUID.v4();
   const photoUUID = createUUID.v4();
@@ -425,6 +479,7 @@ const saveObservationToRealm = async ( observation: Observation, uri: string ): 
         ...observation,
         uuid: obsUUID,
         photo,
+        photoUris: extraUris.length > 0 ? JSON.stringify( [uri, ...extraUris] ) : null,
       }, true );
     } );
 

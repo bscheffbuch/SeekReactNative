@@ -15,6 +15,12 @@ export default StyleSheet.create( {
     marginLeft: 72,
   },
   // M3 icon button (tonal) on the species row
+  photoCount: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginHorizontal: 16,
+    marginTop: 4,
+  },
   editIcon: {
     alignItems: "center",
     borderRadius: 20,

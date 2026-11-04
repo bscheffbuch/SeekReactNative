@@ -172,7 +172,7 @@ const PostScreen = ( ) => {
       return;
     }
     dispatch( { type: "BUTTON_DISABLED" } );
-    saveObservationToRealm( editedObservation, observation.image.uri );
+    saveObservationToRealm( editedObservation, observation.image.uri, observation.image.extraPhotoUris );
     savePostingSuccess( true );
     navigation.navigate( "PostStatus" );
   };

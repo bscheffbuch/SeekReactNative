@@ -394,5 +394,15 @@ for Home (tabs), Observations, Settings (incl. dark mode), and the camera.
 - Posting: logged-out users see "Log in to post" on the Match screen; after logging
   in, `LoginSuccess` returns to the Match screen when it is in the stack. The posted
   flag resets for every new observation and every species change.
+- Posting several photos: in Same species mode, all picked photos go into the one
+  iNaturalist observation, the best-matching photo first (it becomes the cover).
+  `ObservationImage.extraPhotoUris` carries the others to the Post screen, which shows
+  "N photos will be posted". `saveObservationToRealm` stores `[main, ...extras]` in
+  `photoUris`, and `uploadObservation` adds them through `uploadPhotoList` (shared with
+  the save-for-later queue). The remaining list is saved after each photo, so a retry
+  from Home only uploads what is left and never creates the observation twice. Upload
+  uses the uncropped originals. Each photo mode still posts only the selected photo.
+  Checked on the phone up to the Post screen (3 photos shown); the actual upload
+  was not run, because it would publish a real observation.
 - Not checked on the phone yet (it was locked): crop round trip, dropdown, change
   species on Match and Species, and the login-to-post return.

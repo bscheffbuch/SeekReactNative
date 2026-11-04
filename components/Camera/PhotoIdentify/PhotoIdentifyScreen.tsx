@@ -260,6 +260,10 @@ const PhotoIdentifyScreen = ( ) => {
     }
     const predictions = chosenTaxon ? lineageWith( view.branch, chosenTaxon ) : view.branch;
     const image = buildObservationImage( photos[photoIndex], predictions as any, login );
+    if ( source === "all" && photos.length > 1 ) {
+      // all photos show the same organism, so they go into one observation, best first
+      image.extraPhotoUris = photos.filter( ( _, i ) => i !== photoIndex ).map( p => p.uri );
+    }
     setOpening( true );
     Promise.resolve( startObservationWithImage( image, ( ) => {
       navigation.navigate( "Match", { origin: "photos" } );

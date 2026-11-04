@@ -2,10 +2,12 @@ import React, { useCallback, useState } from "react";
 import {
   TouchableOpacity,
   Modal,
+  Text,
   View,
 } from "react-native";
 
 import styles from "../../styles/posting/postToiNat";
+import i18n from "../../i18n";
 import SelectSpecies from "./SelectSpecies";
 import SpeciesCard from "../UIComponents/SpeciesCard";
 import { PencilIcon } from "../UIComponents/AppIcons";
@@ -20,6 +22,7 @@ interface Taxon {
 
 interface ImageObject {
   uri: string;
+  extraPhotoUris?: string[];
 }
 
 interface Props {
@@ -35,6 +38,8 @@ const PostingHeader = ( {
 }: Props ) => {
   const { theme } = useTheme( );
   const [showModal, setShowModal] = useState( false );
+
+  const photoCount = 1 + ( image.extraPhotoUris?.length ?? 0 );
 
   const openModal = ( ) => setShowModal( true );
   const closeModal = useCallback( () => setShowModal( false ), [] );
@@ -65,6 +70,11 @@ const PostingHeader = ( {
           <PencilIcon color={theme.colors.onSecondaryContainer} size={20} strokeWidth={2} />
         </View>
       </TouchableOpacity>
+      {photoCount > 1 && (
+        <Text style={[styles.photoCount, { color: theme.colors.onSurfaceVariant }]}>
+          {i18n.t( "posting.photo_count", { count: photoCount } )}
+        </Text>
+      )}
     </>
   );
 };

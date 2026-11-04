@@ -647,7 +647,15 @@
     "error_title_no_location": "Standort erforderlich",
     "error_message_no_location": "Alle auf iNaturalist hochgeladenen Beobachtungen benötigen einen Standort, um für wissenschaftliche Auswertungen hilfreich zu sein.",
     "error_title_no_date": "Datum erforderlich",
-    "error_message_no_date": "Alle auf iNaturalist hochgeladenen Beobachtungen benötigen ein Datum, um für wissenschaftliche Auswertungen hilfreich zu sein."
+    "error_message_no_date": "Alle auf iNaturalist hochgeladenen Beobachtungen benötigen ein Datum, um für wissenschaftliche Auswertungen hilfreich zu sein.",
+    "photo_count": {
+      "zero": "{{count}} Fotos werden gesendet",
+      "one": "{{count}} Foto wird gesendet",
+      "two": "{{count}} Fotos werden gesendet",
+      "few": "{{count}} Fotos werden gesendet",
+      "many": "{{count}} Fotos werden gesendet",
+      "other": "{{count}} Fotos werden gesendet"
+    }
   },
   "posting_status": {
     "posting_to_inat_background": "WIRD IM HINTERGRUND NACH INATURALIST ÜBERTRAGEN",

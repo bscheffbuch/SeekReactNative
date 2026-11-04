@@ -30,6 +30,8 @@ export interface ObservationImage {
   };
   uri: string;
   time: number;
+  // more photos of the same organism, posted to iNaturalist after `uri`
+  extraPhotoUris?: string[];
 }
 export interface Observation {
   image: ObservationImage;

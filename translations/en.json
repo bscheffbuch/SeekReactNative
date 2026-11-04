@@ -721,7 +721,15 @@
     "error_title_no_location": "Location required",
     "error_message_no_location": "All observations posted to iNaturalist need a location to be helpful to scientists.",
     "error_title_no_date": "Date required",
-    "error_message_no_date": "All observations posted to iNaturalist need a date to be helpful to scientists."
+    "error_message_no_date": "All observations posted to iNaturalist need a date to be helpful to scientists.",
+    "photo_count": {
+      "zero": "{{count}} photos will be posted",
+      "one": "{{count}} photo will be posted",
+      "two": "{{count}} photos will be posted",
+      "few": "{{count}} photos will be posted",
+      "many": "{{count}} photos will be posted",
+      "other": "{{count}} photos will be posted"
+    }
   },
   "posting_status": {
     "posting_to_inat_background": "POSTING TO INATURALIST IN THE BACKGROUND",
