@@ -1,9 +1,10 @@
 // @ts-nocheck
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { View, Image, Pressable, Text, StyleSheet } from "react-native";
 
 import i18n from "../../i18n";
-import { ChevronLeftIcon } from "../UIComponents/AppIcons";
+import { ChevronLeftIcon, ImageIcon } from "../UIComponents/AppIcons";
+import PhotoViewer from "../UIComponents/PhotoViewer";
 import { useAppOrientation } from "../Providers/AppOrientationProvider";
 import { useTheme } from "../Providers/ThemeProvider";
 import type { Observation } from "../Providers/ObservationProvider";
@@ -29,6 +30,9 @@ const MatchHeader = ( {
   const taxon = observation && observation.taxon;
   const image = observation && observation.image;
   const imageUri = image && image.uri;
+  // every photo of this observation (several when identified from multiple photos)
+  const uris = useMemo( ( ) => ( imageUri ? [imageUri, ...( image.extraPhotoUris ?? [] )] : [] ), [image, imageUri] );
+  const [viewing, setViewing] = useState( false );
   const showSpeciesImage = ( taxon && taxon.speciesSeenImage ) && screenType !== "unidentified";
   const imageHeight = isLandscape ? 260 : 156;
 
@@ -82,6 +86,23 @@ const MatchHeader = ( {
       paddingVertical: 3,
       position: "absolute",
     },
+    count: {
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.55)",
+      borderRadius: 8,
+      flexDirection: "row",
+      gap: 4,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      position: "absolute",
+      right: 10,
+      top: 10,
+    },
+    countLabel: {
+      color: "#FFFFFF",
+      fontFamily: theme.typography.heading,
+      fontSize: 12,
+    },
   } );
 
   return (
@@ -102,10 +123,21 @@ const MatchHeader = ( {
       </View>
       <View style={styles.images}>
         {imageUri && (
-          <View style={styles.image}>
+          <Pressable
+            accessibilityHint={i18n.t( "photo_viewer.open" )}
+            accessibilityRole="imagebutton"
+            onPress={( ) => setViewing( true )}
+            style={styles.image}
+          >
             <Image source={{ uri: imageUri }} style={styles.fill} />
             <Text style={styles.chip}>{i18n.t( "results.your_photo", { defaultValue: "Your photo" } )}</Text>
-          </View>
+            {uris.length > 1 && (
+              <View style={styles.count}>
+                <ImageIcon color="#FFFFFF" size={14} strokeWidth={2.2} />
+                <Text style={styles.countLabel}>{uris.length}</Text>
+              </View>
+            )}
+          </Pressable>
         )}
         {showSpeciesImage && (
           <View style={styles.image}>
@@ -114,6 +146,7 @@ const MatchHeader = ( {
           </View>
         )}
       </View>
+      <PhotoViewer onClose={( ) => setViewing( false )} uris={uris} visible={viewing} />
     </View>
   );
 };

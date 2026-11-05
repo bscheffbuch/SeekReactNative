@@ -1,7 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
+  Image,
   TouchableOpacity,
   Modal,
+  Pressable,
+  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -10,6 +13,7 @@ import styles from "../../styles/posting/postToiNat";
 import i18n from "../../i18n";
 import SelectSpecies from "./SelectSpecies";
 import SpeciesCard from "../UIComponents/SpeciesCard";
+import PhotoViewer from "../UIComponents/PhotoViewer";
 import { PencilIcon } from "../UIComponents/AppIcons";
 import { useTheme } from "../Providers/ThemeProvider";
 
@@ -39,7 +43,8 @@ const PostingHeader = ( {
   const { theme } = useTheme( );
   const [showModal, setShowModal] = useState( false );
 
-  const photoCount = 1 + ( image.extraPhotoUris?.length ?? 0 );
+  const uris = useMemo( ( ) => [image.uri, ...( image.extraPhotoUris ?? [] )], [image] );
+  const [viewing, setViewing] = useState<number | null>( null );
 
   const openModal = ( ) => setShowModal( true );
   const closeModal = useCallback( () => setShowModal( false ), [] );
@@ -70,10 +75,30 @@ const PostingHeader = ( {
           <PencilIcon color={theme.colors.onSecondaryContainer} size={20} strokeWidth={2} />
         </View>
       </TouchableOpacity>
-      {photoCount > 1 && (
-        <Text style={[styles.photoCount, { color: theme.colors.onSurfaceVariant }]}>
-          {i18n.t( "posting.photo_count", { count: photoCount } )}
-        </Text>
+      {uris.length > 1 && (
+        <>
+          <Text style={[styles.photoCount, { color: theme.colors.onSurfaceVariant }]}>
+            {i18n.t( "posting.photo_count", { count: uris.length } )}
+          </Text>
+          <ScrollView contentContainerStyle={styles.photoStrip} horizontal showsHorizontalScrollIndicator={false}>
+            {uris.map( ( uri, i ) => (
+              <Pressable
+                accessibilityLabel={i18n.t( "photo_viewer.position", { index: i + 1, count: uris.length } )}
+                accessibilityRole="imagebutton"
+                key={`${i}-${uri}`}
+                onPress={( ) => setViewing( i )}
+              >
+                <Image source={{ uri }} style={styles.thumbnail} />
+              </Pressable>
+            ) )}
+          </ScrollView>
+          <PhotoViewer
+            initialIndex={viewing ?? 0}
+            onClose={( ) => setViewing( null )}
+            uris={uris}
+            visible={viewing !== null}
+          />
+        </>
       )}
     </>
   );

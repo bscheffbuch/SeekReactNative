@@ -1145,5 +1145,10 @@
     "error_message": "Prüfe deine Internetverbindung und versuche es noch einmal.",
     "exists_title": "Schon in deiner Sammlung",
     "exists_message": "Diese Art ist schon in deiner Sammlung, deshalb kann die Beobachtung nicht dorthin verschoben werden."
+  },
+  "photo_viewer": {
+    "close": "Schließen",
+    "open": "Zeigt alle Fotos",
+    "position": "Foto {{index}} von {{count}}"
   }
 }

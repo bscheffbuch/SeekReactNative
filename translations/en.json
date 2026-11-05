@@ -1259,5 +1259,10 @@
     "error_message": "Check your internet connection and try again.",
     "exists_title": "Already in your collection",
     "exists_message": "This species is already in your collection, so this observation can't be moved to it."
+  },
+  "photo_viewer": {
+    "close": "Close",
+    "open": "Shows all photos",
+    "position": "Photo {{index}} of {{count}}"
   }
 }

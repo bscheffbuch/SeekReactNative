@@ -14,13 +14,24 @@ export default StyleSheet.create( {
     height: StyleSheet.hairlineWidth,
     marginLeft: 72,
   },
-  // M3 icon button (tonal) on the species row
   photoCount: {
     fontSize: 14,
     lineHeight: 20,
     marginHorizontal: 16,
-    marginTop: 4,
+    marginTop: 8,
   },
+  // all photos that will be posted, as a row of thumbnails
+  photoStrip: {
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  thumbnail: {
+    borderRadius: 12,
+    height: 72,
+    width: 72,
+  },
+  // M3 icon button (tonal) on the species row
   editIcon: {
     alignItems: "center",
     borderRadius: 20,

@@ -404,5 +404,16 @@ for Home (tabs), Observations, Settings (incl. dark mode), and the camera.
   uses the uncropped originals. Each photo mode still posts only the selected photo.
   Checked on the phone up to the Post screen (3 photos shown); the actual upload
   was not run, because it would publish a real observation.
+- Looking through all photos: `UIComponents/PhotoViewer` is a full-screen modal that
+  pages through photos with an "i / n" counter. On Match, the "Your photo" tile shows
+  a photo-count badge when there are several and opens the viewer. On the Post screen,
+  a strip of thumbnails sits under "N photos will be posted", and each opens the viewer
+  at that photo. Checked on the phone with 3 photos (swipe 1/3 to 3/3, thumbnail opens
+  at 2/3).
+- Testing on a virtual display: create it with the phone's own size and density
+  (`android-vdisplay.sh up -r 1440x3120/560` on the S24). React Native measures text
+  and modals with the main display's density, so at the default 420 dpi text gets cut
+  off and modals fill only 75% of the screen. That is a test-setup artifact, not an
+  app bug.
 - Not checked on the phone yet (it was locked): crop round trip, dropdown, change
   species on Match and Species, and the login-to-post return.
